@@ -271,7 +271,9 @@ body {
 
 @media (min-width: 768px) {
   .turnos-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
+    max-width: 800px;
+    margin: 0 auto;
   }
 
   .busca-wrapper {
