@@ -31,6 +31,7 @@ body {
   color: var(--text-primary);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   min-height: 100dvh;
+  width: 100%;
   overflow-x: hidden;
 }
 
@@ -106,6 +107,7 @@ body {
 ======================== */
 .busca-wrapper {
   padding: 0.75rem 1rem 0;
+  width: 100%;
   max-width: 960px;
   margin: 0 auto;
   display: flex;
@@ -184,6 +186,7 @@ body {
 ======================== */
 .filtros-wrapper {
   padding: 0.6rem 1rem;
+  width: 100%;
   display: flex;
   gap: 0.5rem;
   overflow-x: auto;
@@ -226,6 +229,7 @@ body {
 ======================== */
 .main-container {
   padding: 0.75rem 0.75rem 3rem;
+  width: 100%;
   max-width: 960px;
   margin: 0 auto;
 }
@@ -278,19 +282,25 @@ body {
 
 .turno-header-emoji { font-size: 1.5rem; position: relative; flex-shrink: 0; }
 
-.turno-header-info { flex: 1; position: relative; }
+.turno-header-info { flex: 1; position: relative; min-width: 0; }
 
 .turno-header-nome {
   font-size: 1rem;
   font-weight: 700;
   color: white;
   text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .turno-header-horario {
   font-size: 0.72rem;
   color: rgba(255,255,255,0.7);
   margin-top: 0.1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .turno-header-total { position: relative; text-align: right; flex-shrink: 0; }
