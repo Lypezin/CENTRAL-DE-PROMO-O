@@ -133,7 +133,8 @@ body {
 .busca-wrapper {
   padding: 0.75rem 1rem 0;
   width: 100%;
-  max-width: 800px;
+  max-width: min(800px, 100%);
+  min-width: 0;
   box-sizing: border-box;
   margin: 0 auto;
   display: flex;
@@ -213,7 +214,8 @@ body {
 .filtros-wrapper {
   padding: 0.75rem 1rem;
   width: 100%;
-  max-width: 800px;
+  max-width: min(800px, 100%);
+  min-width: 0;
   box-sizing: border-box;
   margin: 0 auto;
   display: flex;
@@ -259,7 +261,8 @@ body {
 .main-container {
   padding: 0 1rem 3rem;
   width: 100%;
-  max-width: 800px;
+  max-width: min(800px, 100%);
+  min-width: 0;
   box-sizing: border-box;
   margin: 0 auto;
 }
@@ -269,6 +272,8 @@ body {
   display: grid;
   grid-template-columns: 1fr;
   gap: 1.25rem;
+  width: 100%;
+  min-width: 0;
 }
 
 @media (min-width: 768px) {
@@ -296,6 +301,9 @@ body {
 ======================== */
 .turno-section {
   break-inside: avoid;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .turno-header {
@@ -308,6 +316,9 @@ body {
   overflow: hidden;
   user-select: none;
   cursor: pointer;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .turno-header-emoji {
@@ -346,6 +357,7 @@ body {
   position: relative;
   text-align: right;
   flex-shrink: 0;
+  max-width: 6.5rem;
 }
 
 .turno-header-total-label {
@@ -373,6 +385,8 @@ body {
   padding: 0.75rem 1rem;
   border: 1px solid var(--border-color);
   border-top: none;
+  width: 100%;
+  min-width: 0;
 }
 
 .premio-panel-titulo {
@@ -405,6 +419,9 @@ body {
   border: 1px solid var(--border-color);
   border-top: none;
   overflow: hidden;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .ranking-vazio {
@@ -466,6 +483,8 @@ body {
   text-align: right;
   flex-shrink: 0;
   margin-left: 0.5rem;
+  max-width: 6.5rem;
+  min-width: 0;
 }
 
 .ranking-total {
@@ -473,6 +492,8 @@ body {
   font-weight: 700;
   color: var(--text-primary);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .ranking-premio {
@@ -481,12 +502,17 @@ body {
   color: #22C55E;
   margin-top: 0.1rem;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .ranking-sem-premio {
   font-size: 0.68rem;
   color: var(--text-muted);
   margin-top: 0.1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .ranking-item.posicao-1 .ranking-total { color: var(--gold); }
@@ -506,6 +532,46 @@ body {
   height: 100%;
   border-radius: 999px;
   transition: width 0.8s ease;
+}
+
+@media (max-width: 480px) {
+  .turno-header {
+    gap: 0.55rem;
+    padding: 0.85rem 0.8rem;
+    border-radius: 14px 14px 0 0;
+  }
+
+  .turno-header-total {
+    max-width: 3.25rem;
+  }
+
+  .turno-header-total-label,
+  .turno-expand-hint {
+    display: none;
+  }
+
+  .ranking-item {
+    gap: 0.55rem;
+    padding: 0.85rem 0.75rem;
+  }
+
+  .posicao-medalha {
+    width: 1.75rem;
+  }
+
+  .ranking-valores {
+    max-width: 5.25rem;
+    margin-left: 0.25rem;
+  }
+
+  .ranking-total {
+    font-size: 0.78rem;
+  }
+
+  .ranking-premio,
+  .ranking-sem-premio {
+    font-size: 0.62rem;
+  }
 }
 
 /* ========================
