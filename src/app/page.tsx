@@ -5,6 +5,7 @@ import { supabase, EntregaRanking } from '@/lib/supabase'
 import { TURNOS_CONFIG, TurnoKey, formatCurrency, getMedalha, getPremio } from '@/lib/config'
 
 const TURNOS_COM_FILTRO = (Object.keys(TURNOS_CONFIG) as TurnoKey[]).filter(key => key !== 'TARDE')
+const LIMITE_ENTREGADORES_POR_TURNO = 15
 
 export default function HomePage() {
   const [ranking, setRanking] = useState<EntregaRanking[]>([])
@@ -41,7 +42,7 @@ export default function HomePage() {
         p_data_fim: null,
         p_periodo: filtroAtivo,
         p_praca: null,
-        p_limite: 200,
+        p_limite: LIMITE_ENTREGADORES_POR_TURNO,
       })
       if (error) throw error
       setRanking(data || [])
@@ -60,7 +61,7 @@ export default function HomePage() {
   let entregadoresFiltrados = ranking.filter(r => {
     const p = r.periodo?.toUpperCase().trim() ?? ''
     return p === filtroAtivo
-  }).sort((a, b) => Number(a.posicao) - Number(b.posicao))
+  }).sort((a, b) => Number(a.posicao) - Number(b.posicao)).slice(0, LIMITE_ENTREGADORES_POR_TURNO)
 
   if (busca.trim()) {
     const termo = busca.trim().toLowerCase()
