@@ -89,6 +89,8 @@ body {
 .header-dates {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
   gap: 0.5rem;
   background: rgba(124, 58, 237, 0.15);
   border: 1px solid rgba(124, 58, 237, 0.3);
@@ -108,11 +110,13 @@ body {
   margin: 0 auto;
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 0.75rem;
 }
 
 .busca-input-wrapper {
   flex: 1;
+  min-width: 240px;
   position: relative;
   display: flex;
   align-items: center;
@@ -172,7 +176,7 @@ body {
 .busca-resultado {
   font-size: 0.78rem;
   color: var(--text-muted);
-  white-space: nowrap;
+  white-space: normal;
 }
 
 /* ========================
@@ -272,7 +276,7 @@ body {
   user-select: none;
 }
 
-.turno-header-emoji { font-size: 1.5rem; position: relative; }
+.turno-header-emoji { font-size: 1.5rem; position: relative; flex-shrink: 0; }
 
 .turno-header-info { flex: 1; position: relative; }
 
@@ -289,7 +293,7 @@ body {
   margin-top: 0.1rem;
 }
 
-.turno-header-total { position: relative; text-align: right; }
+.turno-header-total { position: relative; text-align: right; flex-shrink: 0; }
 
 .turno-header-total-label {
   font-size: 0.65rem;

@@ -4,32 +4,42 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase, EntregaRanking } from '@/lib/supabase'
 import { TURNOS_CONFIG, TurnoKey, formatCurrency, getMedalha, getPremio } from '@/lib/config'
 
-type FiltroTurno = 'TODOS' | TurnoKey
+type FiltroTurno = TurnoKey
 
 export default function HomePage() {
   const [ranking, setRanking] = useState<EntregaRanking[]>([])
   const [loading, setLoading] = useState(true)
-  const [filtroAtivo, setFiltroAtivo] = useState<FiltroTurno>('TODOS')
+  const [filtroAtivo, setFiltroAtivo] = useState<TurnoKey>('CAFE_DA_MANHA')
   const [dataMinima, setDataMinima] = useState<string | null>(null)
   const [dataMaxima, setDataMaxima] = useState<string | null>(null)
   const [totalRegistros, setTotalRegistros] = useState(0)
   const [turnoExpandido, setTurnoExpandido] = useState<TurnoKey | null>(null)
   const [busca, setBusca] = useState('')
 
-  const carregarDados = useCallback(async () => {
+  // Carrega as datas apenas uma vez ao montar o componente
+  useEffect(() => {
+    const carregarDatas = async () => {
+      try {
+        const { data: datasData } = await supabase.rpc('get_datas_disponiveis')
+        if (datasData && datasData.length > 0) {
+          setDataMinima(datasData[0].data_minima)
+          setDataMaxima(datasData[0].data_maxima)
+          setTotalRegistros(datasData[0].total_registros)
+        }
+      } catch (err) {
+        console.error('Erro ao carregar datas:', err)
+      }
+    }
+    carregarDatas()
+  }, [])
+
+  const carregarRanking = useCallback(async () => {
     setLoading(true)
     try {
-      const { data: datasData } = await supabase.rpc('get_datas_disponiveis')
-      if (datasData && datasData.length > 0) {
-        setDataMinima(datasData[0].data_minima)
-        setDataMaxima(datasData[0].data_maxima)
-        setTotalRegistros(datasData[0].total_registros)
-      }
-
       const { data, error } = await supabase.rpc('get_ranking_por_turno', {
         p_data_inicio: null,
         p_data_fim: null,
-        p_periodo: filtroAtivo !== 'TODOS' ? filtroAtivo : null,
+        p_periodo: filtroAtivo,
         p_praca: null,
         p_limite: 200,
       })
@@ -43,28 +53,21 @@ export default function HomePage() {
   }, [filtroAtivo])
 
   useEffect(() => {
-    carregarDados()
-  }, [carregarDados])
+    carregarRanking()
+  }, [carregarRanking])
 
-  // Agrupa e filtra por turno + busca
-  const rankingPorTurno = (Object.keys(TURNOS_CONFIG) as TurnoKey[]).reduce((acc, turnoKey) => {
-    let itens = ranking.filter(r => {
-      // Períodos já estão normalizados no banco (ex: CAFE_DA_MANHA, ALMOCO, JANTAR...)
-      const p = r.periodo?.toUpperCase().trim() ?? ''
-      return p === turnoKey
-    }).sort((a, b) => Number(a.posicao) - Number(b.posicao))
+  // Filtra por turno + busca
+  let entregadoresFiltrados = ranking.filter(r => {
+    const p = r.periodo?.toUpperCase().trim() ?? ''
+    return p === filtroAtivo
+  }).sort((a, b) => Number(a.posicao) - Number(b.posicao))
 
-    if (busca.trim()) {
-      const termo = busca.trim().toLowerCase()
-      itens = itens.filter(r => r.pessoa_entregadora?.toLowerCase().includes(termo))
-    }
-    acc[turnoKey] = itens
-    return acc
-  }, {} as Record<TurnoKey, EntregaRanking[]>)
+  if (busca.trim()) {
+    const termo = busca.trim().toLowerCase()
+    entregadoresFiltrados = entregadoresFiltrados.filter(r => r.pessoa_entregadora?.toLowerCase().includes(termo))
+  }
 
-  const turnosExibidos = filtroAtivo === 'TODOS'
-    ? (Object.keys(TURNOS_CONFIG) as TurnoKey[])
-    : [filtroAtivo as TurnoKey]
+  const turnosExibidos = [filtroAtivo]
 
   const formatarData = (dateStr: string | null) => {
     if (!dateStr) return '—'
@@ -74,7 +77,7 @@ export default function HomePage() {
   const getBarraProgresso = (valor: number, maxValor: number) =>
     maxValor === 0 ? 0 : Math.min(100, (valor / maxValor) * 100)
 
-  const totalBuscaResultados = Object.values(rankingPorTurno).reduce((acc, arr) => acc + arr.length, 0)
+  const totalBuscaResultados = entregadoresFiltrados.length
 
   return (
     <div style={{ minHeight: '100dvh', background: 'var(--bg-primary)' }}>
@@ -122,12 +125,6 @@ export default function HomePage() {
 
       {/* FILTROS */}
       <div className="filtros-wrapper">
-        <button
-          className={`filtro-btn ${filtroAtivo === 'TODOS' ? 'active' : ''}`}
-          onClick={() => setFiltroAtivo('TODOS')}
-        >
-          🏆 Todos
-        </button>
         {(Object.keys(TURNOS_CONFIG) as TurnoKey[]).map(key => (
           <button
             key={key}
@@ -156,8 +153,8 @@ export default function HomePage() {
           <div className="turnos-grid">
             {turnosExibidos.map(turnoKey => {
               const config = TURNOS_CONFIG[turnoKey]
-              const entregadores = rankingPorTurno[turnoKey] || []
-              if (entregadores.length === 0 && !busca && filtroAtivo === 'TODOS') return null
+              const entregadores = entregadoresFiltrados
+              if (entregadores.length === 0 && !busca) return null
 
               const maxValor = entregadores[0]?.total_soma_taxas || 1
               const isExpandido = turnoExpandido === turnoKey
