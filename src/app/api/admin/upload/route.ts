@@ -285,17 +285,18 @@ export async function DELETE(request: NextRequest) {
     const dataInicio = searchParams.get('data_inicio')
     const dataFim = searchParams.get('data_fim')
 
-    let query = supabaseAdmin.from('entregas').delete()
+    let error: any;
 
     if (dataInicio && dataFim) {
-      query = query.gte('data_do_periodo', dataInicio).lte('data_do_periodo', dataFim)
+      const res = await supabaseAdmin.rpc('limpar_entregas', { p_data_inicio: dataInicio, p_data_fim: dataFim })
+      error = res.error
       await logAction('delete_periodo', `Deletando de ${dataInicio} a ${dataFim}`, 'success', { dataInicio, dataFim }, ip)
     } else {
-      query = query.neq('id', 0)
+      const res = await supabaseAdmin.rpc('limpar_entregas', { p_data_inicio: null, p_data_fim: null })
+      error = res.error
       await logAction('delete_tudo', 'Deletando TODOS os dados de entregas', 'success', {}, ip)
     }
 
-    const { error } = await query
     if (error) throw error
 
     return NextResponse.json({ success: true })
