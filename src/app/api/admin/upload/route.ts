@@ -146,15 +146,26 @@ export async function POST(request: NextRequest) {
       .filter(r => r.data_do_periodo && r.periodo && r.id_da_pessoa_entregadora)
 
     const linhasIgnoradas = rows.length - registros.length
+
+    // Desduplicar: planilha pode ter linhas duplicadas com mesma chave (data+periodo+id)
+    // Mantém a última ocorrência de cada combinação única
+    const mapaDedup = new Map<string, Record<string, string | number | null>>()
+    for (const r of registros) {
+      const chave = `${r.data_do_periodo}|${r.periodo}|${r.id_da_pessoa_entregadora}`
+      mapaDedup.set(chave, r)
+    }
+    const registrosUnicos = Array.from(mapaDedup.values())
+    const duplicatasRemovidas = registros.length - registrosUnicos.length
+
     await logAction(
       'upload_filtro',
-      `${registros.length} registros válidos, ${linhasIgnoradas} ignorados`,
+      `${registrosUnicos.length} registros únicos válidos, ${linhasIgnoradas} ignorados, ${duplicatasRemovidas} duplicatas removidas`,
       'success',
-      { total_validos: registros.length, ignorados: linhasIgnoradas },
+      { total_validos: registrosUnicos.length, ignorados: linhasIgnoradas, duplicatas: duplicatasRemovidas },
       ip
     )
 
-    if (registros.length === 0) {
+    if (registrosUnicos.length === 0) {
       await logAction('upload_erro', 'Nenhum registro válido após filtro', 'error', { nome: nomeArquivo }, ip)
       return NextResponse.json({ error: 'Nenhum registro válido encontrado. Verifique os cabeçalhos da planilha.' }, { status: 400 })
     }
@@ -165,8 +176,8 @@ export async function POST(request: NextRequest) {
     let totalAtualizados = 0
     let loteErros = 0
 
-    for (let i = 0; i < registros.length; i += TAMANHO_LOTE) {
-      const lote = registros.slice(i, i + TAMANHO_LOTE)
+    for (let i = 0; i < registrosUnicos.length; i += TAMANHO_LOTE) {
+      const lote = registrosUnicos.slice(i, i + TAMANHO_LOTE)
       const numeroLote = Math.floor(i / TAMANHO_LOTE) + 1
 
       const { data, error } = await supabaseAdmin.rpc('upsert_entregas_batch', {
@@ -200,16 +211,16 @@ export async function POST(request: NextRequest) {
     // Registra no histórico de uploads
     await supabaseAdmin.from('uploads').insert({
       nome_arquivo: nomeArquivo,
-      total_linhas: registros.length,
+      total_linhas: registrosUnicos.length,
       status: loteErros > 0 ? 'parcial' : 'success',
-      mensagem: `${totalInseridos} inseridos, ${totalAtualizados} atualizados${loteErros > 0 ? `, ${loteErros} lotes com erro` : ''}`,
+      mensagem: `${totalInseridos} inseridos, ${totalAtualizados} atualizados${duplicatasRemovidas > 0 ? `, ${duplicatasRemovidas} duplicatas ignoradas` : ''}${loteErros > 0 ? `, ${loteErros} lotes com erro` : ''}`,
     })
 
     await logAction(
       'upload_concluido',
       `${nomeArquivo}: ${totalInseridos} inseridos, ${totalAtualizados} atualizados em ${(duracaoMs / 1000).toFixed(1)}s`,
       loteErros > 0 ? 'error' : 'success',
-      { inseridos: totalInseridos, atualizados: totalAtualizados, duracao_ms: duracaoMs, lote_erros: loteErros },
+      { inseridos: totalInseridos, atualizados: totalAtualizados, duracao_ms: duracaoMs, lote_erros: loteErros, duplicatas: duplicatasRemovidas },
       ip
     )
 
@@ -217,7 +228,7 @@ export async function POST(request: NextRequest) {
       success: true,
       inseridos: totalInseridos,
       atualizados: totalAtualizados,
-      total: registros.length,
+      total: registrosUnicos.length,
       ignorados: linhasIgnoradas,
       duracao_ms: duracaoMs,
     })
