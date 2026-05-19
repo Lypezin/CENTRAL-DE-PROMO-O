@@ -80,7 +80,7 @@ export default function HomePage() {
   const totalBuscaResultados = entregadoresFiltrados.length
 
   return (
-    <div style={{ minHeight: '100dvh', background: 'var(--bg-primary)' }}>
+    <div style={{ minHeight: '100dvh', width: '100%', maxWidth: '100vw', overflowX: 'hidden', background: 'var(--bg-primary)', display: 'flex', flexDirection: 'column' }}>
       {/* HEADER */}
       <header className="header">
         <span className="header-trophy">🏆</span>
