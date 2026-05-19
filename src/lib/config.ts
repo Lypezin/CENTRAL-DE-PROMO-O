@@ -28,6 +28,14 @@ export const TURNOS_CONFIG = {
       { posicao_inicio: 11, posicao_fim: 15, valor: 150 },
     ]
   },
+  'TARDE': {
+    label: '🌅 Tarde',
+    emoji: '🌅',
+    horario: 'Turno da Tarde',
+    cor: '#F97316',
+    corGradiente: 'linear-gradient(135deg, #F97316, #EAB308)',
+    premios: [] as { posicao?: number; valor: number; posicao_inicio?: number; posicao_fim?: number }[]
+  },
   'JANTAR': {
     label: '🌙 Jantar',
     emoji: '🌙',
@@ -56,28 +64,39 @@ export const TURNOS_CONFIG = {
 
 export type TurnoKey = keyof typeof TURNOS_CONFIG
 
-// Mapeamento de strings do Excel para chaves dos turnos
-// Ajuste conforme os valores reais que vêm na coluna "periodo"
+// Mapeamento de strings do Excel → chaves normalizadas
+// (usado no import para normalizar na hora da gravação)
 export const MAPEAMENTO_PERIODOS: Record<string, TurnoKey> = {
-  'CAFE DA MANHA': 'CAFE_DA_MANHA',
-  'CAFÉ DA MANHÃ': 'CAFE_DA_MANHA',
-  'CAFE_DA_MANHA': 'CAFE_DA_MANHA',
-  'CAFÉ_DA_MANHÃ': 'CAFE_DA_MANHA',
-  'ALMOCO': 'ALMOCO',
-  'ALMOÇO': 'ALMOCO',
-  'JANTAR': 'JANTAR',
-  'MADRUGADA': 'MADRUGADA',
+  // Café da Manhã - todas as variações
+  'CAFE DA MANHA':   'CAFE_DA_MANHA',
+  'CAFÉ DA MANHÃ':   'CAFE_DA_MANHA',
+  'CAFE_DA_MANHA':   'CAFE_DA_MANHA',
+  'CAFÉ_DA_MANHÃ':   'CAFE_DA_MANHA',
+  'CAFE DA MANHÃ':   'CAFE_DA_MANHA',
+  'CAFÉ DA MANHA':   'CAFE_DA_MANHA',
+  // Almoço
+  'ALMOCO':          'ALMOCO',
+  'ALMOÇO':          'ALMOCO',
+  'ADMOÇO':          'ALMOCO',
+  // Tarde
+  'TARDE':           'TARDE',
+  // Jantar
+  'JANTAR':          'JANTAR',
+  // Madrugada
+  'MADRUGADA':       'MADRUGADA',
+}
+
+export function normalizarPeriodo(periodo: string): TurnoKey | null {
+  if (!periodo) return null
+  return MAPEAMENTO_PERIODOS[periodo.toUpperCase().trim()] ?? null
 }
 
 export function getPremio(turnoKey: TurnoKey, posicao: number): number {
   const config = TURNOS_CONFIG[turnoKey]
   if (!config) return 0
-
-  for (const premio of config.premios) {
-    if ('posicao' in premio && premio.posicao === posicao) return premio.valor
-    if ('posicao_inicio' in premio &&
-        posicao >= premio.posicao_inicio &&
-        posicao <= premio.posicao_fim) return premio.valor
+  for (const p of config.premios) {
+    if ('posicao' in p && p.posicao === posicao) return p.valor
+    if ('posicao_inicio' in p && posicao >= p.posicao_inicio! && posicao <= p.posicao_fim!) return p.valor
   }
   return 0
 }
@@ -94,10 +113,4 @@ export function getMedalha(posicao: number): string {
   if (posicao === 2) return '🥈'
   if (posicao === 3) return '🥉'
   return `${posicao}º`
-}
-
-export function normalizarPeriodo(periodo: string): TurnoKey | null {
-  if (!periodo) return null
-  const upper = periodo.toUpperCase().trim()
-  return MAPEAMENTO_PERIODOS[upper] || null
 }

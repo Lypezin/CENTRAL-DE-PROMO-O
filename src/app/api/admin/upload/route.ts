@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import * as XLSX from 'xlsx'
+import { normalizarPeriodo } from '@/lib/config'
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -137,9 +138,19 @@ export async function POST(request: NextRequest) {
         const obj: Record<string, string | number | null> = {}
         Object.entries(colMap).forEach(([idx, campo]) => {
           const val = (row as unknown[])[Number(idx)]
-          obj[campo] = campo === 'data_do_periodo'
-            ? parseExcelDate(val)
-            : (val !== null && val !== undefined ? String(val).trim() : null)
+          if (campo === 'data_do_periodo') {
+            obj[campo] = parseExcelDate(val)
+          } else if (campo === 'periodo') {
+            // Normaliza periodos: 'CAFÉ DA MANHÃ' → 'CAFE_DA_MANHA'
+            const periodoStr = val !== null && val !== undefined ? String(val).trim() : ''
+            obj[campo] = normalizarPeriodo(periodoStr) ?? periodoStr
+          } else if (campo === 'soma_das_taxas_das_corridas_aceitas') {
+            // Valores vêm em centavos no Excel → dividir por 100
+            const num = val !== null && val !== undefined ? Number(val) : NaN
+            obj[campo] = isNaN(num) ? null : String(Math.round(num) / 100)
+          } else {
+            obj[campo] = val !== null && val !== undefined ? String(val).trim() : null
+          }
         })
         return obj
       })
@@ -147,21 +158,42 @@ export async function POST(request: NextRequest) {
 
     const linhasIgnoradas = rows.length - registros.length
 
-    // Desduplicar: planilha pode ter linhas duplicadas com mesma chave (data+periodo+id)
-    // Mantém a última ocorrência de cada combinação única
+    // Agregar: planilha pode ter linhas quebradas (ex: por sub-praça) com mesma chave (data+periodo+id)
+    // Soma os valores numéricos em vez de descartar
     const mapaDedup = new Map<string, Record<string, string | number | null>>()
+    const camposNumericosParaSomar = [
+      'tempo_disponivel_escalado',
+      'tempo_disponivel_absoluto',
+      'numero_de_corridas_ofertadas',
+      'numero_de_corridas_aceitas',
+      'numero_de_corridas_rejeitadas',
+      'numero_de_corridas_completadas',
+      'numero_de_corridas_canceladas_pela_pessoa_entregadora',
+      'numero_de_pedidos_aceitos_e_concluidos',
+      'soma_das_taxas_das_corridas_aceitas'
+    ]
+
     for (const r of registros) {
       const chave = `${r.data_do_periodo}|${r.periodo}|${r.id_da_pessoa_entregadora}`
-      mapaDedup.set(chave, r)
+      if (mapaDedup.has(chave)) {
+        const existente = mapaDedup.get(chave)!
+        for (const campo of camposNumericosParaSomar) {
+          const valExistente = Number(existente[campo]) || 0
+          const valNovo = Number(r[campo]) || 0
+          existente[campo] = valExistente + valNovo
+        }
+      } else {
+        mapaDedup.set(chave, { ...r })
+      }
     }
     const registrosUnicos = Array.from(mapaDedup.values())
-    const duplicatasRemovidas = registros.length - registrosUnicos.length
+    const registrosMesclados = registros.length - registrosUnicos.length
 
     await logAction(
       'upload_filtro',
-      `${registrosUnicos.length} registros únicos válidos, ${linhasIgnoradas} ignorados, ${duplicatasRemovidas} duplicatas removidas`,
+      `${registrosUnicos.length} registros únicos válidos, ${linhasIgnoradas} ignorados, ${registrosMesclados} registros mesclados`,
       'success',
-      { total_validos: registrosUnicos.length, ignorados: linhasIgnoradas, duplicatas: duplicatasRemovidas },
+      { total_validos: registrosUnicos.length, ignorados: linhasIgnoradas, mesclados: registrosMesclados },
       ip
     )
 
@@ -213,14 +245,14 @@ export async function POST(request: NextRequest) {
       nome_arquivo: nomeArquivo,
       total_linhas: registrosUnicos.length,
       status: loteErros > 0 ? 'parcial' : 'success',
-      mensagem: `${totalInseridos} inseridos, ${totalAtualizados} atualizados${duplicatasRemovidas > 0 ? `, ${duplicatasRemovidas} duplicatas ignoradas` : ''}${loteErros > 0 ? `, ${loteErros} lotes com erro` : ''}`,
+      mensagem: `${totalInseridos} inseridos, ${totalAtualizados} atualizados${registrosMesclados > 0 ? `, ${registrosMesclados} registros mesclados` : ''}${loteErros > 0 ? `, ${loteErros} lotes com erro` : ''}`,
     })
 
     await logAction(
       'upload_concluido',
       `${nomeArquivo}: ${totalInseridos} inseridos, ${totalAtualizados} atualizados em ${(duracaoMs / 1000).toFixed(1)}s`,
       loteErros > 0 ? 'error' : 'success',
-      { inseridos: totalInseridos, atualizados: totalAtualizados, duracao_ms: duracaoMs, lote_erros: loteErros, duplicatas: duplicatasRemovidas },
+      { inseridos: totalInseridos, atualizados: totalAtualizados, duracao_ms: duracaoMs, lote_erros: loteErros, mesclados: registrosMesclados },
       ip
     )
 

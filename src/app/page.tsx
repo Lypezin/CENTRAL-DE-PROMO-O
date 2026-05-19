@@ -49,8 +49,9 @@ export default function HomePage() {
   // Agrupa e filtra por turno + busca
   const rankingPorTurno = (Object.keys(TURNOS_CONFIG) as TurnoKey[]).reduce((acc, turnoKey) => {
     let itens = ranking.filter(r => {
+      // Períodos já estão normalizados no banco (ex: CAFE_DA_MANHA, ALMOCO, JANTAR...)
       const p = r.periodo?.toUpperCase().trim() ?? ''
-      return p === turnoKey || p === turnoKey.replace('_', ' ') || p.replace(/\s+/g, '_') === turnoKey
+      return p === turnoKey
     }).sort((a, b) => Number(a.posicao) - Number(b.posicao))
 
     if (busca.trim()) {
@@ -188,9 +189,9 @@ export default function HomePage() {
                       {config.premios.map((p, i) => (
                         <div key={i} className="premio-row">
                           <span className="premio-posicao">
-                            {'posicao' in p
-                              ? getMedalha(p.posicao)
-                              : `${p.posicao_inicio}º ao ${p.posicao_fim}º`}
+                            {'posicao' in p && p.posicao !== undefined
+                              ? getMedalha(p.posicao as number)
+                              : `${(p as any).posicao_inicio}º ao ${(p as any).posicao_fim}º`}
                           </span>
                           <span className="premio-valor">R$ {p.valor.toLocaleString('pt-BR')}</span>
                         </div>
