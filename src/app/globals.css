@@ -17,17 +17,17 @@
   --sidebar-width: 220px;
 }
 
-* {
+*,
+*::before,
+*::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
 }
 
-html { scroll-behavior: smooth; }
-
-html, body {
-  max-width: 100vw;
+html {
+  scroll-behavior: smooth;
   overflow-x: hidden;
 }
 
@@ -36,19 +36,31 @@ body {
   color: var(--text-primary);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   min-height: 100dvh;
-  width: 100%;
-  position: relative;
+  overflow-x: hidden;
 }
 
 /* ========================
-   HEADER (ranking público)
+   LAYOUT RAIZ DO RANKING
+======================== */
+.ranking-page {
+  min-height: 100dvh;
+  width: 100%;
+  background: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* ========================
+   HEADER
 ======================== */
 .header {
   background: linear-gradient(180deg, #12121A 0%, transparent 100%);
-  padding: 1.5rem 1rem 1rem;
+  padding: 2rem 1rem 1rem;
   text-align: center;
   position: relative;
   overflow: hidden;
+  width: 100%;
 }
 
 .header::before {
@@ -76,7 +88,7 @@ body {
 }
 
 .header-title {
-  font-size: 1.6rem;
+  font-size: clamp(1.4rem, 5vw, 2rem);
   font-weight: 800;
   background: linear-gradient(135deg, #FFD700, #FF8C00, #FF4500);
   -webkit-background-clip: text;
@@ -95,36 +107,35 @@ body {
 .header-dates {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.4rem;
   background: rgba(124, 58, 237, 0.15);
   border: 1px solid rgba(124, 58, 237, 0.3);
   border-radius: 999px;
-  padding: 0.35rem 1rem;
-  font-size: 0.8rem;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.78rem;
   color: #A855F7;
   font-weight: 600;
-  max-width: 100%;
+  max-width: 90%;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 /* ========================
    BUSCA
 ======================== */
 .busca-wrapper {
-  padding: 1rem 1rem 0;
+  padding: 0.75rem 1rem 0;
   width: 100%;
   max-width: 960px;
   margin: 0 auto;
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
   gap: 0.75rem;
 }
 
 .busca-input-wrapper {
   flex: 1;
-  min-width: 240px;
+  min-width: 0;
   position: relative;
   display: flex;
   align-items: center;
@@ -184,28 +195,30 @@ body {
 .busca-resultado {
   font-size: 0.78rem;
   color: var(--text-muted);
-  white-space: normal;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* ========================
    FILTROS
 ======================== */
 .filtros-wrapper {
-  padding: 1rem;
+  padding: 0.75rem 1rem;
   width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
   display: flex;
   gap: 0.5rem;
   overflow-x: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
-  max-width: 960px;
-  margin: 0 auto;
 }
 
 .filtros-wrapper::-webkit-scrollbar { display: none; }
 
 .filtro-btn {
   white-space: nowrap;
+  flex-shrink: 0;
   padding: 0.45rem 1rem;
   border-radius: 999px;
   border: 1px solid var(--border-color);
@@ -231,16 +244,16 @@ body {
 }
 
 /* ========================
-   CONTAINER PRINCIPAL (ranking)
+   CONTAINER PRINCIPAL
 ======================== */
 .main-container {
-  padding: 0.75rem 1rem 3rem;
+  padding: 0 1rem 3rem;
   width: 100%;
   max-width: 960px;
   margin: 0 auto;
 }
 
-/* Grid de 2 colunas em desktop */
+/* Grid: 1 coluna mobile, 2 em desktop */
 .turnos-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -252,9 +265,6 @@ body {
     grid-template-columns: 1fr 1fr;
   }
 
-  .header-title { font-size: 2rem; }
-  .header-trophy { font-size: 3.5rem; }
-
   .busca-wrapper {
     padding: 1rem 1.5rem 0;
   }
@@ -264,7 +274,7 @@ body {
   }
 
   .main-container {
-    padding: 0.75rem 1.5rem 3rem;
+    padding: 0 1.5rem 3rem;
   }
 }
 
@@ -284,11 +294,21 @@ body {
   position: relative;
   overflow: hidden;
   user-select: none;
+  cursor: pointer;
 }
 
-.turno-header-emoji { font-size: 1.5rem; position: relative; flex-shrink: 0; }
+.turno-header-emoji {
+  font-size: 1.5rem;
+  position: relative;
+  flex-shrink: 0;
+}
 
-.turno-header-info { flex: 1; position: relative; min-width: 0; overflow: hidden; }
+.turno-header-info {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  overflow: hidden;
+}
 
 .turno-header-nome {
   font-size: 1rem;
@@ -309,7 +329,11 @@ body {
   text-overflow: ellipsis;
 }
 
-.turno-header-total { position: relative; text-align: right; flex-shrink: 0; }
+.turno-header-total {
+  position: relative;
+  text-align: right;
+  flex-shrink: 0;
+}
 
 .turno-header-total-label {
   font-size: 0.65rem;
@@ -385,6 +409,7 @@ body {
   border-bottom: 1px solid var(--border-color);
   transition: background 0.2s ease;
   position: relative;
+  min-width: 0;
 }
 
 .ranking-item:last-child { border-bottom: none; }
@@ -394,16 +419,20 @@ body {
 .ranking-item.posicao-3 { background: linear-gradient(90deg, rgba(205, 127, 50, 0.06) 0%, transparent 100%); }
 
 .posicao-medalha {
-  font-size: 1.4rem;
-  width: 2.2rem;
+  font-size: 1.2rem;
+  width: 2rem;
   text-align: center;
   flex-shrink: 0;
 }
 
-.ranking-info { flex: 1; min-width: 0; overflow: hidden; }
+.ranking-info {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
 
 .ranking-nome {
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 600;
   color: var(--text-primary);
   white-space: nowrap;
@@ -412,28 +441,37 @@ body {
 }
 
 .ranking-detalhes {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   color: var(--text-muted);
   margin-top: 0.15rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.ranking-valores { text-align: right; flex-shrink: 0; }
+.ranking-valores {
+  text-align: right;
+  flex-shrink: 0;
+  margin-left: 0.5rem;
+}
 
 .ranking-total {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 700;
   color: var(--text-primary);
+  white-space: nowrap;
 }
 
 .ranking-premio {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 600;
   color: #22C55E;
   margin-top: 0.1rem;
+  white-space: nowrap;
 }
 
 .ranking-sem-premio {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   color: var(--text-muted);
   margin-top: 0.1rem;
 }
@@ -595,7 +633,7 @@ body {
 
 @media (max-width: 640px) {
   .admin-sidebar {
-    display: none; /* Em mobile, esconde sidebar */
+    display: none;
   }
 
   .admin-content {

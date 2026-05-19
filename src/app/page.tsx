@@ -80,7 +80,7 @@ export default function HomePage() {
   const totalBuscaResultados = entregadoresFiltrados.length
 
   return (
-    <div style={{ minHeight: '100dvh', width: '100%', maxWidth: '100vw', overflowX: 'hidden', background: 'var(--bg-primary)', display: 'flex', flexDirection: 'column' }}>
+    <div className="ranking-page">
       {/* HEADER */}
       <header className="header">
         <span className="header-trophy">🏆</span>
@@ -164,7 +164,7 @@ export default function HomePage() {
                   {/* Header do turno */}
                   <div
                     className="turno-header"
-                    style={{ background: config.corGradiente, cursor: 'pointer' }}
+                    style={{ background: config.corGradiente }}
                     onClick={() => setTurnoExpandido(isExpandido ? null : turnoKey)}
                   >
                     <span className="turno-header-emoji">{config.emoji}</span>
