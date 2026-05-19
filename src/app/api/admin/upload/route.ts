@@ -170,7 +170,7 @@ export async function POST(request: NextRequest) {
       const numeroLote = Math.floor(i / TAMANHO_LOTE) + 1
 
       const { data, error } = await supabaseAdmin.rpc('upsert_entregas_batch', {
-        p_registros: JSON.stringify(lote),
+        p_registros: lote,
       })
 
       if (error) {
