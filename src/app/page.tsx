@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase, EntregaRanking } from '@/lib/supabase'
 import { TURNOS_CONFIG, TurnoKey, formatCurrency, getMedalha, getPremio } from '@/lib/config'
 
-type FiltroTurno = TurnoKey
+const TURNOS_COM_FILTRO = (Object.keys(TURNOS_CONFIG) as TurnoKey[]).filter(key => key !== 'TARDE')
 
 export default function HomePage() {
   const [ranking, setRanking] = useState<EntregaRanking[]>([])
@@ -125,7 +125,7 @@ export default function HomePage() {
 
       {/* FILTROS */}
       <div className="filtros-wrapper">
-        {(Object.keys(TURNOS_CONFIG) as TurnoKey[]).map(key => (
+        {TURNOS_COM_FILTRO.map(key => (
           <button
             key={key}
             className={`filtro-btn ${filtroAtivo === key ? 'active' : ''}`}
