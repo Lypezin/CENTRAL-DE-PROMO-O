@@ -42,7 +42,7 @@ export default function HomePage() {
         p_data_fim: null,
         p_periodo: filtroAtivo,
         p_praca: null,
-        p_limite: LIMITE_ENTREGADORES_POR_TURNO,
+        p_limite: 1000, // Carrega uma quantidade maior para permitir a busca completa
       })
       if (error) throw error
       setRanking(data || [])
@@ -58,14 +58,23 @@ export default function HomePage() {
   }, [carregarRanking])
 
   // Filtra por turno + busca
-  let entregadoresFiltrados = ranking.filter(r => {
-    const p = r.periodo?.toUpperCase().trim() ?? ''
-    return p === filtroAtivo
-  }).sort((a, b) => Number(a.posicao) - Number(b.posicao)).slice(0, LIMITE_ENTREGADORES_POR_TURNO)
+  const entregadoresDoTurno = ranking
+    .filter(r => {
+      const p = r.periodo?.toUpperCase().trim() ?? ''
+      return p === filtroAtivo
+    })
+    .sort((a, b) => Number(a.posicao) - Number(b.posicao))
 
+  const maxValorTurno = entregadoresDoTurno[0]?.total_soma_taxas || 1
+
+  let entregadoresFiltrados = entregadoresDoTurno
   if (busca.trim()) {
     const termo = busca.trim().toLowerCase()
-    entregadoresFiltrados = entregadoresFiltrados.filter(r => r.pessoa_entregadora?.toLowerCase().includes(termo))
+    entregadoresFiltrados = entregadoresDoTurno.filter(r =>
+      r.pessoa_entregadora?.toLowerCase().includes(termo)
+    )
+  } else {
+    entregadoresFiltrados = entregadoresDoTurno.slice(0, LIMITE_ENTREGADORES_POR_TURNO)
   }
 
   const turnosExibidos = [filtroAtivo]
@@ -157,7 +166,7 @@ export default function HomePage() {
               const entregadores = entregadoresFiltrados
               if (entregadores.length === 0 && !busca) return null
 
-              const maxValor = entregadores[0]?.total_soma_taxas || 1
+              const maxValor = maxValorTurno
               const isExpandido = turnoExpandido === turnoKey
 
               return (
