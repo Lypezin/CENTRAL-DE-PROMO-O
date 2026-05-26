@@ -25,7 +25,7 @@ export const TURNOS_CONFIG = {
       { posicao: 2, valor: 1000 },
       { posicao: 3, valor: 500 },
       { posicao_inicio: 4, posicao_fim: 10, valor: 300 },
-      { posicao_inicio: 11, posicao_fim: 15, valor: 150 },
+      { posicao_inicio: 11, posicao_fim: 15, valor: 100 },
     ]
   },
   'TARDE': {
@@ -47,7 +47,7 @@ export const TURNOS_CONFIG = {
       { posicao: 2, valor: 1000 },
       { posicao: 3, valor: 500 },
       { posicao_inicio: 4, posicao_fim: 10, valor: 300 },
-      { posicao_inicio: 11, posicao_fim: 15, valor: 150 },
+      { posicao_inicio: 11, posicao_fim: 15, valor: 100 },
     ]
   },
   'MADRUGADA': {
@@ -57,7 +57,9 @@ export const TURNOS_CONFIG = {
     cor: '#06B6D4',
     corGradiente: 'linear-gradient(135deg, #06B6D4, #3B82F6)',
     premios: [
-      { posicao_inicio: 1, posicao_fim: 5, valor: 100 },
+      { posicao: 1, valor: 300 },
+      { posicao: 2, valor: 200 },
+      { posicao_inicio: 3, posicao_fim: 5, valor: 100 },
     ]
   },
 } as const
