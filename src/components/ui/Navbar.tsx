@@ -59,8 +59,8 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden glass border-b border-white/10 animate-slide-up">
-          <div className="container mx-auto px-4 py-4 flex flex-col gap-4">
+        <div className="md:hidden bg-[#06060c]/98 backdrop-blur-2xl border-b border-white/10 animate-slide-up shadow-2xl">
+          <div className="container mx-auto px-4 py-4 flex flex-col gap-3">
             {links.map(link => {
               const isActive = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href))
               return (
