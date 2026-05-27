@@ -42,7 +42,14 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
         <div className="premium-glow-card-content p-6 flex flex-col flex-grow">
           {/* Card Header */}
           <div className="flex justify-between items-start mb-4">
-            <StatusBadge status={promo.status} />
+            <div className="flex flex-col gap-1.5">
+              <StatusBadge status={promo.status} />
+              {promo.cidade && (
+                <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-blue-400 uppercase tracking-widest pl-0.5">
+                  📍 {promo.cidade}
+                </span>
+              )}
+            </div>
             <span className="text-xs font-semibold tracking-wide text-gray-400 uppercase px-2.5 py-1 rounded-full bg-white/5 border border-white/5 shadow-inner">
               {isRanking ? '🏆 Ranking' : '🎯 Desafio'}
             </span>

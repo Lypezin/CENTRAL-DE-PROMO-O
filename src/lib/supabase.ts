@@ -45,6 +45,7 @@ export interface Promocao {
   config_premios: any
   config_turnos: string[] | null
   config_regras: any
+  cidade: string | null
   created_at: string
   updated_at: string
 }

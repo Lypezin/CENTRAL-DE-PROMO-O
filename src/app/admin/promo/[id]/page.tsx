@@ -130,8 +130,13 @@ export default function EditPromoPage() {
         </Link>
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <div className="flex items-center gap-3 mb-2">
+            <div className="flex flex-wrap items-center gap-3 mb-2">
               <h1 className="text-3xl font-bold text-white">{promo.nome}</h1>
+              {promo.cidade && (
+                <span className="text-xs font-bold text-blue-400 px-2.5 py-1 rounded-full bg-blue-500/10 border border-blue-500/20">
+                  📍 {promo.cidade}
+                </span>
+              )}
               <StatusBadge status={promo.status} />
             </div>
             <p className="text-gray-400 text-sm">ID: {promo.id}</p>
@@ -174,14 +179,27 @@ export default function EditPromoPage() {
             <h2 className="text-xl font-bold text-white mb-6">Configurações Gerais</h2>
             
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">Nome da Promoção</label>
-                <input 
-                  type="text" 
-                  value={promo.nome}
-                  onChange={e => setPromo({...promo, nome: e.target.value})}
-                  className="admin-input"
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">Nome da Promoção</label>
+                  <input 
+                    type="text" 
+                    value={promo.nome}
+                    onChange={e => setPromo({...promo, nome: e.target.value})}
+                    className="admin-input"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">Cidade / Praça</label>
+                  <input 
+                    type="text" 
+                    value={promo.cidade || ''}
+                    placeholder="Ex: São Paulo, Rio de Janeiro, Campinas..."
+                    onChange={e => setPromo({...promo, cidade: e.target.value})}
+                    className="admin-input"
+                  />
+                </div>
               </div>
               
               <div>
@@ -222,7 +240,8 @@ export default function EditPromoPage() {
                     nome: promo.nome, 
                     descricao: promo.descricao,
                     data_inicio: promo.data_inicio,
-                    data_fim: promo.data_fim
+                    data_fim: promo.data_fim,
+                    cidade: promo.cidade
                   })}
                   disabled={saving}
                   className="admin-btn-primary"

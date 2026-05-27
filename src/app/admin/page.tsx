@@ -177,7 +177,14 @@ export default function AdminPage() {
                 promocoes.map(promo => (
                   <tr key={promo.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                     <td className="p-4">
-                      <div className="font-bold text-white mb-1">{promo.nome}</div>
+                      <div className="flex flex-wrap items-center gap-2 mb-1">
+                        <span className="font-bold text-white">{promo.nome}</span>
+                        {promo.cidade && (
+                          <span className="text-[10px] font-extrabold text-blue-400 px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20 uppercase tracking-wider">
+                            📍 {promo.cidade}
+                          </span>
+                        )}
+                      </div>
                       <div className="text-xs text-gray-500">{promo.slug}</div>
                     </td>
                     <td className="p-4">

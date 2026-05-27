@@ -44,7 +44,7 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json()
-    const { nome, descricao, tipo, data_inicio, data_fim, config_premios, config_turnos } = body
+    const { nome, descricao, tipo, data_inicio, data_fim, config_premios, config_turnos, cidade } = body
 
     if (!nome || typeof nome !== 'string' || nome.trim().length === 0) {
       return NextResponse.json({ error: 'Nome é obrigatório' }, { status: 400 })
@@ -58,13 +58,14 @@ export async function POST(request: Request) {
         slug,
         nome: nome.trim(),
         descricao: descricao || null,
-        tipo: tipo || 'ranking',
+        tipo: tipo || 'ranking_turno',
         status: 'rascunho',
         data_inicio: data_inicio || null,
         data_fim: data_fim || null,
         config_premios: config_premios || null,
         config_turnos: config_turnos || null,
         config_regras: null,
+        cidade: cidade || null,
       })
       .select()
       .single()

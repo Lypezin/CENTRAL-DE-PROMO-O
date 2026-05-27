@@ -29,9 +29,14 @@ export default async function PromoPage({ params }: { params: Promise<{ slug: st
       {/* Header */}
       <div className="promo-header mb-12 flex flex-col md:flex-row gap-6 md:items-center justify-between">
         <div>
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex flex-wrap items-center gap-3 mb-4">
             <StatusBadge status={promo.status} />
-            <span className="text-xs font-medium text-gray-500 px-2 py-1 rounded-md bg-white/5 border border-white/10">
+            {promo.cidade && (
+              <span className="text-xs font-bold text-blue-400 px-2.5 py-1 rounded-full bg-blue-500/10 border border-blue-500/20">
+                📍 {promo.cidade}
+              </span>
+            )}
+            <span className="text-xs font-semibold tracking-wide text-gray-400 px-2.5 py-1 rounded-md bg-white/5 border border-white/10 uppercase">
               {promo.tipo === 'ranking_turno' ? '🏆 Ranking por Turno' : '🎯 Desafio'}
             </span>
           </div>

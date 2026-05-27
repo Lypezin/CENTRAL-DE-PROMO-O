@@ -70,6 +70,7 @@ export async function PUT(
       'config_premios',
       'config_turnos',
       'config_regras',
+      'cidade',
     ]
 
     const updates: Record<string, unknown> = {}
