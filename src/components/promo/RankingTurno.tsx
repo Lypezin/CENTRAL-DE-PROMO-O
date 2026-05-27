@@ -313,7 +313,7 @@ export default function RankingTurno({
                           <div className="space-y-3 mt-auto">
                             {/* Stats */}
                             <div className="flex justify-between items-center text-[10px] font-mono border-t border-white/[0.02] pt-2">
-                              <span className="text-zinc-500">Faturamento:</span>
+                              <span className="text-zinc-500">VALOR:</span>
                               <span className="text-white font-bold">{formatCurrency(item.total_soma_taxas)}</span>
                             </div>
                             
@@ -372,7 +372,7 @@ export default function RankingTurno({
                           <div className="space-y-3 mt-auto">
                             {/* Stats */}
                             <div className="flex justify-between items-center text-[10px] font-mono border-t border-yellow-600/10 pt-2">
-                              <span className="text-zinc-500">Faturamento:</span>
+                              <span className="text-zinc-500">VALOR:</span>
                               <span className="text-white font-extrabold">{formatCurrency(item.total_soma_taxas)}</span>
                             </div>
                             
@@ -428,7 +428,7 @@ export default function RankingTurno({
                           <div className="space-y-3 mt-auto">
                             {/* Stats */}
                             <div className="flex justify-between items-center text-[10px] font-mono border-t border-white/[0.02] pt-2">
-                              <span className="text-zinc-500">Faturamento:</span>
+                              <span className="text-zinc-500">VALOR:</span>
                               <span className="text-white font-bold">{formatCurrency(item.total_soma_taxas)}</span>
                             </div>
                             
