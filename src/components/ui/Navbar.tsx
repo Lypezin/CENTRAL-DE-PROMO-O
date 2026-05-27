@@ -13,28 +13,30 @@ export default function Navbar() {
   ]
 
   return (
-    <nav className="navbar fixed top-0 w-full z-50 glass border-b border-white/10 transition-all">
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <Link href="/" className="navbar-brand flex items-center gap-2 group">
-          <span className="text-2xl group-hover:scale-110 transition-transform">🏆</span>
-          <span className="font-bold text-sm sm:text-lg text-gradient">Central de Promoções</span>
+    <nav className="fixed top-0 w-full z-50 bg-[#030303]/75 backdrop-blur-md border-b border-white/[0.04] transition-all">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-2 group">
+          <span className="font-extrabold text-sm sm:text-base tracking-tight text-white flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 bg-sky-500 rounded-full animate-pulse"></span>
+            EntreGÔ <span className="text-zinc-500 font-normal">|</span> <span className="text-zinc-300 font-medium">Central de Promoções</span>
+          </span>
         </Link>
 
         {/* Desktop Links */}
-        <div className="navbar-links hidden md:flex items-center gap-6">
+        <div className="hidden md:flex items-center gap-8">
           {links.map(link => {
             const isActive = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href))
             return (
               <Link 
                 key={link.href} 
                 href={link.href}
-                className={`relative font-medium transition-colors ${
-                  isActive ? 'text-white' : 'text-gray-400 hover:text-white'
+                className={`relative text-xs font-semibold uppercase tracking-wider transition-colors duration-200 py-1 ${
+                  isActive ? 'text-white font-bold' : 'text-zinc-400 hover:text-white'
                 }`}
               >
                 {link.label}
                 {isActive && (
-                  <span className="absolute -bottom-5 left-0 w-full h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-t-full" />
+                  <span className="absolute -bottom-[19px] left-0 w-full h-[1px] bg-white" />
                 )}
               </Link>
             )
@@ -43,10 +45,10 @@ export default function Navbar() {
 
         {/* Mobile Toggle */}
         <button 
-          className="navbar-mobile-toggle md:hidden p-2 text-gray-400 hover:text-white"
+          className="md:hidden p-2 text-zinc-400 hover:text-white transition-colors"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
-          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             {isMobileMenuOpen ? (
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             ) : (
@@ -58,8 +60,8 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-[#06060c]/98 backdrop-blur-2xl border-b border-white/10 animate-slide-up shadow-2xl">
-          <div className="container mx-auto px-4 py-4 flex flex-col gap-3">
+        <div className="md:hidden bg-[#030303]/98 backdrop-blur-2xl border-b border-white/[0.04] animate-fade-in shadow-2xl">
+          <div className="px-4 py-4 flex flex-col gap-2">
             {links.map(link => {
               const isActive = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href))
               return (
@@ -67,8 +69,8 @@ export default function Navbar() {
                   key={link.href} 
                   href={link.href}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className={`p-2 rounded-lg font-medium transition-colors ${
-                    isActive ? 'bg-white/10 text-white' : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                  className={`px-3 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors ${
+                    isActive ? 'bg-white/[0.04] text-white' : 'text-zinc-400 hover:bg-white/[0.02] hover:text-white'
                   }`}
                 >
                   {link.label}

@@ -28,8 +28,7 @@ export default function HubContent({ initialPromocoes }: { initialPromocoes: Pro
   const ativas = initialPromocoes.filter(p => p.status === 'ativa')
   const encerradas = initialPromocoes.filter(p => p.status === 'encerrada')
 
-
-  // Estimate total prizes for display (or default to a motivated text)
+  // Estimate total prizes for display
   const calculateTotalPrizes = () => {
     let total = 0
     initialPromocoes.forEach(p => {
@@ -51,94 +50,89 @@ export default function HubContent({ initialPromocoes }: { initialPromocoes: Pro
   return (
     <div className="w-full max-w-7xl mx-auto px-4 md:px-8 py-6">
       
-      {/* Hero Section */}
-      <section className="relative mb-16 rounded-3xl overflow-hidden glass border border-white/5 p-8 md:p-12 flex flex-col items-center text-center shadow-[0_24px_50px_-15px_rgba(0,0,0,0.6)]">
-        {/* Decorative inner glow */}
-        <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 via-transparent to-purple-500/5 pointer-events-none"></div>
-        
-        <div className="relative z-10 max-w-3xl">
-          {/* Tagline */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs font-semibold text-blue-400 mb-6 uppercase tracking-wider">
-            <span>🏆</span> Central de Rankings & Campanhas
+      {/* Hero Header Section */}
+      <section className="mb-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8 pt-8">
+        <div className="max-w-2xl text-left">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-sky-950/20 border border-sky-900/30 text-[10px] font-bold text-sky-400 mb-4 uppercase tracking-wider font-mono">
+            <span className="w-1.5 h-1.5 bg-sky-400 rounded-full animate-pulse"></span>
+            Painel Operacional
           </div>
-
-          <h1 className="text-4xl md:text-6xl font-extrabold mb-6 tracking-tight leading-tight">
-            <span className="text-gradient">Central de Promoções</span>
+          <h1 className="text-3xl md:text-5xl font-black text-white mb-4 tracking-tight leading-tight">
+            Central de Promoções
           </h1>
-          
-          <p className="text-gray-400 max-w-2xl text-lg mb-10 leading-relaxed">
+          <p className="text-zinc-400 text-sm md:text-base leading-relaxed max-w-xl">
             Acompanhe o seu progresso em tempo real, veja a premiação de cada turno, consulte o histórico de campanhas e dispute as melhores colocações!
           </p>
+        </div>
 
-          {/* Stats Bar */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl mx-auto pt-6 border-t border-white/5">
-            {/* Stat 1 */}
-            <div className="group relative bg-[#0e0e17]/40 backdrop-blur rounded-2xl p-5 border border-white/5 transition-all hover:border-blue-500/20 hover:bg-[#0e0e17]/60">
-              <div className="absolute top-4 right-4 text-blue-500/80 group-hover:scale-110 transition-transform">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <div className="text-3xl font-extrabold text-white mb-1 tracking-tight">{ativas.length}</div>
-              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Promoções Ativas</div>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full lg:w-auto lg:min-w-[500px]">
+          {/* Stat 1 */}
+          <div className="bg-[#08080a] border border-white/[0.04] rounded-2xl p-5 relative overflow-hidden group">
+            <div className="text-2xl font-bold text-white mb-0.5 font-mono tracking-tight">{ativas.length}</div>
+            <div className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider font-mono">Promoções Ativas</div>
+            <div className="absolute top-4 right-4 text-sky-500/25">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
             </div>
+          </div>
 
-            {/* Stat 2 */}
-            <div className="group relative bg-[#0e0e17]/40 backdrop-blur rounded-2xl p-5 border border-white/5 transition-all hover:border-purple-500/20 hover:bg-[#0e0e17]/60">
-              <div className="absolute top-4 right-4 text-purple-500/80 group-hover:scale-110 transition-transform">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div className="text-3xl font-extrabold text-white mb-1 tracking-tight">{encerradas.length}</div>
-              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Campanhas no Histórico</div>
+          {/* Stat 2 */}
+          <div className="bg-[#08080a] border border-white/[0.04] rounded-2xl p-5 relative overflow-hidden group">
+            <div className="text-2xl font-bold text-white mb-0.5 font-mono tracking-tight">{encerradas.length}</div>
+            <div className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider font-mono">Histórico</div>
+            <div className="absolute top-4 right-4 text-indigo-500/25">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
             </div>
+          </div>
 
-            {/* Stat 3 */}
-            <div className="group relative bg-[#0e0e17]/40 backdrop-blur rounded-2xl p-5 border border-white/5 transition-all hover:border-emerald-500/20 hover:bg-[#0e0e17]/60">
-              <div className="absolute top-4 right-4 text-emerald-500/80 group-hover:scale-110 transition-transform">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M12 16V5" />
-                </svg>
-              </div>
-              <div className="text-3xl font-extrabold text-emerald-400 mb-1 tracking-tight">{calculateTotalPrizes()}</div>
-              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Prêmios Distribuídos</div>
+          {/* Stat 3 */}
+          <div className="bg-[#08080a] border border-white/[0.04] rounded-2xl p-5 relative overflow-hidden group">
+            <div className="text-2xl font-bold text-emerald-400 mb-0.5 font-mono tracking-tight">{calculateTotalPrizes()}</div>
+            <div className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider font-mono">Prêmios Acumulados</div>
+            <div className="absolute top-4 right-4 text-emerald-500/25">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M12 16V5" />
+              </svg>
             </div>
           </div>
         </div>
       </section>
 
       {/* Filter and Search Bar */}
-      <section className="mb-10 flex flex-col md:flex-row gap-4 items-center justify-between animate-slide-up">
-        {/* Categories Tab Toggles */}
-        <div className="flex bg-[#0e0e17]/60 p-1.5 rounded-full border border-white/5 shadow-inner w-full md:w-auto overflow-x-auto shrink-0 scrollbar-none">
+      <section className="mb-8 flex flex-col md:flex-row gap-4 items-center justify-between animate-slide-up">
+        {/* Categories Tab Toggles (Segmented Apple Style) */}
+        <div className="flex bg-zinc-950/80 p-1 rounded-xl border border-zinc-900 w-full md:w-auto overflow-x-auto shrink-0 scrollbar-none gap-1">
           <button
             onClick={() => setActiveTab('todas')}
-            className={`flex-1 md:flex-initial shrink-0 px-6 py-2.5 rounded-full text-sm font-extrabold transition-all duration-300 active:scale-95 ${
+            className={`flex-grow md:flex-initial px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-200 active:scale-95 ${
               activeTab === 'todas'
-                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg tab-active-line'
-                : 'text-gray-400 hover:text-white'
+                ? 'bg-zinc-900 text-white shadow-sm'
+                : 'text-zinc-500 hover:text-zinc-300'
             }`}
           >
             Todas
           </button>
           <button
             onClick={() => setActiveTab('ativas')}
-            className={`flex-1 md:flex-initial shrink-0 px-6 py-2.5 rounded-full text-sm font-extrabold transition-all duration-300 flex items-center justify-center gap-2 active:scale-95 ${
+            className={`flex-grow md:flex-initial px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-200 flex items-center justify-center gap-1.5 active:scale-95 ${
               activeTab === 'ativas'
-                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg tab-active-line'
-                : 'text-gray-400 hover:text-white'
+                ? 'bg-zinc-900 text-white shadow-sm'
+                : 'text-zinc-500 hover:text-zinc-300'
             }`}
           >
-            <span className={`w-2 h-2 rounded-full ${activeTab === 'ativas' ? 'bg-white' : 'bg-emerald-500'} animate-pulse`}></span>
+            <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></span>
             Ativas ({ativas.length})
           </button>
           <button
             onClick={() => setActiveTab('encerradas')}
-            className={`flex-1 md:flex-initial shrink-0 px-6 py-2.5 rounded-full text-sm font-extrabold transition-all duration-300 active:scale-95 ${
+            className={`flex-grow md:flex-initial px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-200 active:scale-95 ${
               activeTab === 'encerradas'
-                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg tab-active-line'
-                : 'text-gray-400 hover:text-white'
+                ? 'bg-zinc-900 text-white shadow-sm'
+                : 'text-zinc-500 hover:text-zinc-300'
             }`}
           >
             Histórico ({encerradas.length})
@@ -153,18 +147,18 @@ export default function HubContent({ initialPromocoes }: { initialPromocoes: Pro
             placeholder="Buscar campanha pelo nome..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[#0e0e17]/50 border border-white/10 rounded-full py-2.5 pl-11 pr-4 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all placeholder-gray-500"
+            className="w-full bg-[#08080a] border border-white/[0.04] focus:border-sky-500/80 rounded-xl py-2.5 pl-10 pr-8 text-xs text-white focus:outline-none focus:ring-1 focus:ring-sky-500/40 transition-all placeholder-zinc-600 font-sans"
           />
-          <svg className="w-5 h-5 text-gray-500 absolute left-4 top-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          <svg className="w-4 h-4 text-zinc-600 absolute left-3.5 top-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           {searchQuery && (
             <button 
               onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-2.5 text-gray-500 hover:text-white p-0.5 rounded-full hover:bg-white/10 transition-all"
+              className="absolute right-3 top-2.5 text-zinc-500 hover:text-white p-0.5 rounded-full hover:bg-white/5 transition-all"
             >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           )}
@@ -174,10 +168,10 @@ export default function HubContent({ initialPromocoes }: { initialPromocoes: Pro
       {/* Promotions List Grid */}
       <section className="animate-slide-up">
         {filteredPromocoes.length === 0 ? (
-          <div className="text-center py-20 px-6 glass rounded-3xl border border-white/5 flex flex-col items-center justify-center">
-            <div className="text-5xl mb-4">🔍</div>
-            <h3 className="text-xl font-bold text-white mb-2">Nenhuma campanha encontrada</h3>
-            <p className="text-gray-400 max-w-sm text-sm">
+          <div className="text-center py-20 px-6 bg-[#08080a] rounded-2xl border border-white/[0.04] flex flex-col items-center justify-center">
+            <div className="text-3xl mb-4">🔍</div>
+            <h3 className="text-base font-bold text-white mb-1">Nenhuma campanha encontrada</h3>
+            <p className="text-zinc-500 max-w-sm text-xs">
               {searchQuery 
                 ? `Não encontramos resultados para "${searchQuery}". Tente digitar outro termo ou limpar o filtro.`
                 : 'Não há campanhas disponíveis nesta categoria no momento.'}
@@ -185,7 +179,7 @@ export default function HubContent({ initialPromocoes }: { initialPromocoes: Pro
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="mt-6 px-5 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white font-semibold text-xs transition-all"
+                className="mt-6 px-4 py-2 rounded-xl bg-zinc-900/60 border border-zinc-800/80 hover:bg-zinc-900 text-white font-bold text-[10px] uppercase tracking-wider transition-all"
               >
                 Limpar Busca
               </button>
@@ -203,70 +197,70 @@ export default function HubContent({ initialPromocoes }: { initialPromocoes: Pro
       </section>
 
       {/* Footer */}
-      <footer className="mt-28 py-10 border-t border-white/5 text-center text-xs text-gray-500 flex flex-col md:flex-row items-center justify-between gap-4">
+      <footer className="mt-24 py-8 border-t border-white/[0.04] text-[10px] text-zinc-600 flex flex-col sm:flex-row items-center justify-between gap-4 font-mono">
         <div>
-          &copy; {new Date().getFullYear()} <span className="text-gradient font-bold">EntreGÔ - Itaim</span>. Todos os direitos reservados.
+          &copy; {new Date().getFullYear()} <span className="text-white font-bold">EntreGÔ - Itaim</span>. Todos os direitos reservados.
         </div>
         <div className="flex gap-4">
           <button 
             type="button" 
             onClick={() => setIsTermsOpen(true)}
-            className="hover:text-white transition-colors cursor-pointer bg-transparent border-none outline-none"
+            className="hover:text-zinc-400 transition-colors cursor-pointer bg-transparent border-none outline-none font-bold uppercase tracking-wider"
           >
             Termos de Uso
           </button>
           <span>&bull;</span>
-          <span className="hover:text-white transition-colors cursor-pointer">Suporte ao Entregador</span>
+          <span className="hover:text-zinc-400 transition-colors cursor-pointer font-bold uppercase tracking-wider">Suporte ao Entregador</span>
         </div>
       </footer>
 
       {/* Terms of Use Modal */}
       {isTermsOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in">
-          <div className="glass max-w-2xl w-full rounded-2xl border border-white/10 p-6 md:p-8 max-h-[85vh] overflow-y-auto relative shadow-2xl animate-slide-up text-left">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm animate-fade-in">
+          <div className="bg-[#08080a] border border-white/[0.06] max-w-2xl w-full rounded-2xl p-6 md:p-8 max-h-[80vh] overflow-y-auto relative shadow-2xl animate-slide-up text-left">
             <button
               onClick={() => setIsTermsOpen(false)}
-              className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors p-1.5 rounded-full hover:bg-white/5"
+              className="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors p-1 rounded-full hover:bg-white/5"
             >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
 
-            <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+            <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2 tracking-tight">
               <span>📄</span> Termos de Uso e Condições Gerais
             </h3>
 
-            <div className="space-y-6 text-sm text-gray-300 leading-relaxed pr-1">
-              <section className="space-y-2">
+            <div className="space-y-5 text-xs text-zinc-400 leading-relaxed font-sans">
+              <section className="space-y-1.5">
                 <h4 className="font-bold text-white">1. Visão Geral</h4>
                 <p>
                   Bem-vindo à Central de Promoções da <strong>EntreGÔ - Itaim</strong>. Este portal destina-se a fins de consulta, acompanhamento de desempenho em tempo real, divulgação de rankings semanais e visualização de premiações de corridas por turnos para nossos entregadores parceiros.
                 </p>
               </section>
 
-              <section className="space-y-2">
+              <section className="space-y-1.5">
                 <h4 className="font-bold text-white">2. Participação e Elegibilidade</h4>
                 <p>
                   A participação em qualquer campanha ou ranking é voluntária. Os entregadores devem cumprir com todas as regras específicas da campanha detalhada em tela, incluindo o <strong>mínimo de corridas completadas no turno correspondente</strong>, para se tornarem elegíveis aos prêmios acumulados.
                 </p>
               </section>
 
-              <section className="space-y-2">
+              <section className="space-y-1.5">
                 <h4 className="font-bold text-white">3. Integridade e Fair Play</h4>
                 <p>
                   Prezamos pelo respeito e honestidade nas ruas. Qualquer atitude fraudulenta, simulação de corridas, agrupamento indevido de entregas, compartilhamento de contas ou manipulação de dados importados acarretará na <strong>desclassificação imediata e irrecorrível</strong> do entregador de qualquer campanha ativa.
                 </p>
               </section>
 
-              <section className="space-y-2">
+              <section className="space-y-1.5">
                 <h4 className="font-bold text-white">4. Importação e Atualização de Dados</h4>
                 <p>
                   Os dados apresentados são consolidados e atualizados periodicamente através de relatórios internos da base <strong>EntreGÔ - Itaim</strong>. Embora busquemos a maior precisão possível, divergências cadastrais ou operacionais de corridas devem ser reportadas à liderança de suporte no prazo de até 48 horas após a conclusão da respectiva semana.
                 </p>
               </section>
 
-              <section className="space-y-2">
+              <section className="space-y-1.5">
                 <h4 className="font-bold text-white">5. Disposições Finais</h4>
                 <p>
                   A <strong>EntreGÔ - Itaim</strong> reserva-se o direito de ajustar, suspender ou prorrogar prazos e regras das promoções mediante aviso prévio oficial aos entregadores.
@@ -274,11 +268,11 @@ export default function HubContent({ initialPromocoes }: { initialPromocoes: Pro
               </section>
             </div>
 
-            <div className="mt-8 pt-4 border-t border-white/5 flex justify-end">
+            <div className="mt-8 pt-4 border-t border-white/[0.04] flex justify-end">
               <button
                 type="button"
                 onClick={() => setIsTermsOpen(false)}
-                className="admin-btn-primary !py-2 !px-6 text-xs"
+                className="admin-btn-primary !py-2 !px-5 text-[10px] uppercase tracking-wider font-extrabold"
               >
                 Entendi e Aceito
               </button>

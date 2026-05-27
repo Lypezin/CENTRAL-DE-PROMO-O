@@ -6,8 +6,8 @@ import Navbar from "@/components/ui/Navbar";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "🏆 Ranking de Entregadores | Central de Promoções",
-  description: "Ranking semanal de entregadores por turno. Acompanhe sua posição e ganhe prêmios incríveis!",
+  title: "Central de Promoções | EntreGÔ Itaim",
+  description: "Acompanhe seus rankings operacionais e consulte metas semanais por turnos em tempo real.",
 };
 
 export const viewport: Viewport = {
@@ -25,15 +25,11 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={inter.className}>
-        {/* Ambient Glowing Background */}
-        <div className="mesh-container">
-          <div className="blob blob-1"></div>
-          <div className="blob blob-2"></div>
-          <div className="blob blob-3"></div>
-        </div>
+        {/* Modern grid line pattern overlay (Pure CSS, 60fps native performance) */}
+        <div className="tech-grid"></div>
         
         <Navbar />
-        <main className="pt-20 min-h-screen">
+        <main className="pt-16 min-h-screen">
           {children}
         </main>
       </body>

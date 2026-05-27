@@ -1,15 +1,15 @@
 export default function StatusBadge({ status }: { status: 'rascunho' | 'ativa' | 'encerrada' }) {
   const map = {
-    rascunho: { label: 'Rascunho', classes: 'badge-rascunho bg-gray-500/20 text-gray-300 border-gray-500/30' },
-    ativa: { label: 'Ativa', classes: 'badge-ativa bg-emerald-500/20 text-emerald-400 border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.2)]' },
-    encerrada: { label: 'Encerrada', classes: 'badge-encerrada bg-rose-500/20 text-rose-400 border-rose-500/30' }
+    rascunho: { label: 'RASCUNHO', classes: 'bg-zinc-900/40 text-zinc-400 border-zinc-800/80' },
+    ativa: { label: 'ATIVA', classes: 'bg-emerald-950/20 text-emerald-400 border-emerald-900/40' },
+    encerrada: { label: 'ENCERRADA', classes: 'bg-red-950/20 text-red-400 border-red-900/40' }
   }
   
   const config = map[status]
 
   return (
-    <span className={`badge px-2.5 py-0.5 rounded-full text-xs font-medium border flex items-center gap-1.5 ${config.classes}`}>
-      {status === 'ativa' && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-slow"></span>}
+    <span className={`px-2.5 py-0.5 rounded text-[9px] font-extrabold tracking-wider border flex items-center gap-1 font-mono uppercase ${config.classes}`}>
+      {status === 'ativa' && <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse"></span>}
       {config.label}
     </span>
   )
