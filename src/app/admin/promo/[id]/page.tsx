@@ -5,7 +5,6 @@ import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import StatusBadge from '@/components/ui/StatusBadge'
 import { Promocao, PromocaoStats } from '@/lib/supabase'
-import LightningBackground from '@/components/ui/LightningBackground'
 
 // Admin Subcomponents
 import StatsOverview from '@/components/admin/StatsOverview'
@@ -156,7 +155,6 @@ export default function EditPromoPage() {
   return (
     <div className="min-h-screen pb-16 relative overflow-hidden">
       {/* Ambient WebGL dynamic background and grid texture */}
-      <LightningBackground />
       <div className="tech-grid"></div>
 
       <div className="container mx-auto p-4 md:p-8 relative z-10 animate-slide-up">

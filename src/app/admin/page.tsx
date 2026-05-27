@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import StatusBadge from '@/components/ui/StatusBadge'
 import { Promocao } from '@/lib/supabase'
-import LightningBackground from '@/components/ui/LightningBackground'
 
 export default function AdminPage() {
   const [pageState, setPageState] = useState<'login' | 'admin'>('login')
@@ -143,7 +142,6 @@ export default function AdminPage() {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
         {/* Ambient WebGL dynamic background and grid texture */}
-        <LightningBackground />
         <div className="tech-grid"></div>
 
         <div className="glass p-8 rounded-2xl max-w-md w-full border border-white/10 animate-slide-up relative z-10">
@@ -263,7 +261,6 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen pb-16 relative overflow-hidden">
       {/* Ambient WebGL dynamic background and grid texture */}
-      <LightningBackground />
       <div className="tech-grid"></div>
 
       <div className="container mx-auto p-4 md:p-8 relative z-10 animate-slide-up">

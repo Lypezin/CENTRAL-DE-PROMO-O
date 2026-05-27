@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useMemo } from 'react'
 import PromoCard from '@/components/ui/PromoCard'
 import { Promocao } from '@/lib/supabase'
 
@@ -10,26 +10,30 @@ export default function HubContent({ initialPromocoes }: { initialPromocoes: Pro
   const [isTermsOpen, setIsTermsOpen] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
 
-  // Filter promotions based on search and active tab
-  const filteredPromocoes = initialPromocoes.filter(promo => {
-    const matchesSearch = promo.nome.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          (promo.descricao && promo.descricao.toLowerCase().includes(searchQuery.toLowerCase()))
-    
-    if (activeTab === 'ativas') {
-      return matchesSearch && promo.status === 'ativa'
-    } else if (activeTab === 'encerradas') {
-      return matchesSearch && promo.status === 'encerrada'
-    }
-    return matchesSearch
-  })
+  // Otimização: calcular contadores e estatísticas apenas quando initialPromocoes mudar
+  const totalCampanhas = useMemo(() => initialPromocoes.length, [initialPromocoes])
+  const ativas = useMemo(() => initialPromocoes.filter(p => p.status === 'ativa'), [initialPromocoes])
+  const encerradas = useMemo(() => initialPromocoes.filter(p => p.status === 'encerrada'), [initialPromocoes])
 
-  // Calculate dynamic stats
-  const totalCampanhas = initialPromocoes.length
-  const ativas = initialPromocoes.filter(p => p.status === 'ativa')
-  const encerradas = initialPromocoes.filter(p => p.status === 'encerrada')
+  // Otimização: filtrar promoções de forma memoizada observando initialPromocoes, searchQuery e activeTab
+  const filteredPromocoes = useMemo(() => {
+    const query = searchQuery.toLowerCase().trim()
+    return initialPromocoes.filter(promo => {
+      const matchesSearch = !query || 
+                            promo.nome.toLowerCase().includes(query) || 
+                            (promo.descricao && promo.descricao.toLowerCase().includes(query))
+      
+      if (activeTab === 'ativas') {
+        return matchesSearch && promo.status === 'ativa'
+      } else if (activeTab === 'encerradas') {
+        return matchesSearch && promo.status === 'encerrada'
+      }
+      return matchesSearch
+    })
+  }, [initialPromocoes, searchQuery, activeTab])
 
-  // Estimate total prizes for display
-  const calculateTotalPrizes = () => {
+  // Otimização: calcular valor total de prêmios apenas se a lista inicial de campanhas mudar (evita recalculação ao pesquisar)
+  const totalPrizesLabel = useMemo(() => {
     let total = 0
     initialPromocoes.forEach(p => {
       if (p.config_premios && Array.isArray(p.config_premios)) {
@@ -45,7 +49,7 @@ export default function HubContent({ initialPromocoes }: { initialPromocoes: Pro
       }
     })
     return total > 0 ? `R$ ${total.toLocaleString('pt-BR')}` : 'R$ 15.000+'
-  }
+  }, [initialPromocoes])
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 md:px-8 py-6">
@@ -91,7 +95,7 @@ export default function HubContent({ initialPromocoes }: { initialPromocoes: Pro
 
           {/* Stat 3 */}
           <div className="bg-[#08080a] border border-white/[0.04] rounded-2xl p-5 relative overflow-hidden group">
-            <div className="text-2xl font-bold text-emerald-400 mb-0.5 font-mono tracking-tight">{calculateTotalPrizes()}</div>
+            <div className="text-2xl font-bold text-emerald-400 mb-0.5 font-mono tracking-tight">{totalPrizesLabel}</div>
             <div className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider font-mono">Prêmios Acumulados</div>
             <div className="absolute top-4 right-4 text-emerald-500/25">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

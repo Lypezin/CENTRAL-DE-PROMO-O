@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { supabase, EntregaRanking } from '@/lib/supabase'
 import { formatCurrency, getMedalha } from '@/lib/config'
 
@@ -53,6 +53,11 @@ export default function RankingTurno({
   const [loading, setLoading] = useState(true)
   const [painelAberto, setPainelAberto] = useState(false)
 
+  // Otimização: buscar configuração do turno de forma unificada no nível do componente
+  const activeTurnoConfig = useMemo(() => {
+    return configPremios?.find(c => c.turno === filtroAtivo) || null
+  }, [configPremios, filtroAtivo])
+
   // Force filter GERAL when grouping is global
   useEffect(() => {
     if (isGeral && filtroAtivo !== 'GERAL') {
@@ -78,25 +83,34 @@ export default function RankingTurno({
     fetchRanking()
   }, [promocaoId, filtroAtivo])
 
-  const filteredRanking = rankingData.filter(item => 
-    item.pessoa_entregadora.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  // Otimização: filtrar ranking apenas se os dados ou termo de busca mudarem
+  const filteredRanking = useMemo(() => {
+    const query = searchQuery.toLowerCase().trim()
+    if (!query) return rankingData
+    return rankingData.filter(item => 
+      item.pessoa_entregadora.toLowerCase().includes(query)
+    )
+  }, [rankingData, searchQuery])
 
   // Dynamic ranking positions display limit
   const limiteRanking = configRegras?.limite_ranking ?? 15
   const displayLimit = searchQuery ? filteredRanking.length : Math.min(filteredRanking.length, limiteRanking)
-  const rankingToDisplay = filteredRanking.slice(0, displayLimit)
+  const rankingToDisplay = useMemo(() => {
+    return filteredRanking.slice(0, displayLimit)
+  }, [filteredRanking, displayLimit])
   
-  // Calculate dynamic driver scores based on chosen metric
-  const getScore = (item: EntregaRanking) => {
+  // Calculate dynamic driver scores based on chosen metric (estabilidade com useCallback)
+  const getScore = useCallback((item: EntregaRanking) => {
     return mecanica.metrica === 'faturamento_taxas' ? item.total_soma_taxas : item.total_corridas_completadas
-  }
+  }, [mecanica.metrica])
 
-  const formatScoreValue = (val: number) => {
+  const formatScoreValue = useCallback((val: number) => {
     return mecanica.metrica === 'faturamento_taxas' ? formatCurrency(val) : `${val} corr.`
-  }
+  }, [mecanica.metrica])
 
-  const maxScore = rankingToDisplay.length > 0 ? getScore(rankingToDisplay[0]) : 1
+  const maxScore = useMemo(() => {
+    return rankingToDisplay.length > 0 ? getScore(rankingToDisplay[0]) : 1
+  }, [rankingToDisplay, getScore])
 
   // Color profiles
   const activeTurnoDisplay = TURNO_DISPLAY[filtroAtivo] || {
@@ -180,15 +194,15 @@ export default function RankingTurno({
               <>
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
                   <p className="text-xs text-zinc-500">Configuração de prêmios por classificação nesta modalidade:</p>
-                  {(configPremios?.find(c => c.turno === filtroAtivo)?.minimo_corridas || 0) > 0 && (
+                  {(activeTurnoConfig?.minimo_corridas || 0) > 0 && (
                     <span className="text-[10px] bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-md font-bold tracking-wider font-mono text-amber-400 uppercase">
-                      ⚡ Mínimo Elegível: {configPremios?.find(c => c.turno === filtroAtivo)?.minimo_corridas} corridas
+                      ⚡ Mínimo Elegível: {activeTurnoConfig?.minimo_corridas} corridas
                     </span>
                   )}
                 </div>
                 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  {configPremios?.find(c => c.turno === filtroAtivo)?.premios.map((p: any, idx: number) => (
+                  {activeTurnoConfig?.premios?.map((p: any, idx: number) => (
                     <div key={idx} className="bg-zinc-900/30 border border-zinc-800/80 rounded-xl p-3.5 text-center font-mono">
                       <div className="text-[9px] text-zinc-500 uppercase font-bold tracking-wider mb-1">
                         {p.posicao ? `${p.posicao}º Lugar` : `${p.posicao_inicio}º ao ${p.posicao_fim}º`}
@@ -198,7 +212,7 @@ export default function RankingTurno({
                   ))}
                 </div>
                 
-                {(!configPremios?.find(c => c.turno === filtroAtivo)?.premios || configPremios?.find(c => c.turno === filtroAtivo)?.premios.length === 0) && (
+                {(!activeTurnoConfig?.premios || activeTurnoConfig.premios.length === 0) && (
                   <p className="text-xs text-zinc-500">Nenhum prêmio configurado para esta modalidade.</p>
                 )}
               </>
@@ -288,7 +302,6 @@ export default function RankingTurno({
                     {/* 2nd Place */}
                     {rankingToDisplay[1] && (() => {
                       const item = rankingToDisplay[1]
-                      const activeTurnoConfig = configPremios?.find(c => c.turno === filtroAtivo)
                       const minimoCorridas = activeTurnoConfig?.minimo_corridas || 0
                       const atingiuMinimo = item.total_corridas_completadas >= minimoCorridas
                       const premioTeorico = getPremioFromConfig(configPremios, filtroAtivo, 2)
@@ -344,7 +357,6 @@ export default function RankingTurno({
                     {/* 1st Place (Featured Center) */}
                     {rankingToDisplay[0] && (() => {
                       const item = rankingToDisplay[0]
-                      const activeTurnoConfig = configPremios?.find(c => c.turno === filtroAtivo)
                       const minimoCorridas = activeTurnoConfig?.minimo_corridas || 0
                       const atingiuMinimo = item.total_corridas_completadas >= minimoCorridas
                       const premioTeorico = getPremioFromConfig(configPremios, filtroAtivo, 1)
@@ -403,7 +415,6 @@ export default function RankingTurno({
                     {/* 3rd Place */}
                     {rankingToDisplay[2] && (() => {
                       const item = rankingToDisplay[2]
-                      const activeTurnoConfig = configPremios?.find(c => c.turno === filtroAtivo)
                       const minimoCorridas = activeTurnoConfig?.minimo_corridas || 0
                       const atingiuMinimo = item.total_corridas_completadas >= minimoCorridas
                       const premioTeorico = getPremioFromConfig(configPremios, filtroAtivo, 3)
@@ -474,7 +485,6 @@ export default function RankingTurno({
                   {/* Table Body Rows */}
                   <div className="divide-y divide-zinc-900/60 font-sans">
                     {rankingToDisplay.map((item) => {
-                      const activeTurnoConfig = configPremios?.find(c => c.turno === filtroAtivo)
                       const minimoCorridas = activeTurnoConfig?.minimo_corridas || 0
                       const atingiuMinimo = item.total_corridas_completadas >= minimoCorridas
 
