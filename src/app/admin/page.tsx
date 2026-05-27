@@ -12,9 +12,26 @@ export default function AdminPage() {
   const [loginLoading, setLoginLoading] = useState(false)
   const [loginErro, setLoginErro] = useState('')
   
+  const [setupRequired, setSetupRequired] = useState<boolean | null>(null)
+  const [nomeAdmin, setNomeAdmin] = useState('')
   const [promocoes, setPromocoes] = useState<Promocao[]>([])
   const [loading, setLoading] = useState(false)
   const [creating, setCreating] = useState(false)
+
+  useEffect(() => {
+    async function verificarSetup() {
+      try {
+        const res = await fetch('/api/admin/setup-check')
+        if (res.ok) {
+          const data = await res.json()
+          setSetupRequired(data.setupRequired)
+        }
+      } catch (e) {
+        console.error(e)
+      }
+    }
+    verificarSetup()
+  }, [])
 
   useEffect(() => {
     if (pageState === 'admin') carregarPromocoes()
@@ -48,6 +65,30 @@ export default function AdminPage() {
       const data = await res.json()
       if (data.success) setPageState('admin')
       else setLoginErro(data.error || 'Usuário ou senha incorretos.')
+    } catch {
+      setLoginErro('Erro de conexão.')
+    } finally {
+      setLoginLoading(false)
+    }
+  }
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoginLoading(true)
+    setLoginErro('')
+    try {
+      const res = await fetch('/api/admin/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: nomeAdmin, email: usuario, password: senha }),
+      })
+      const data = await res.json()
+      if (data.success) {
+        setSetupRequired(false)
+        setPageState('admin')
+      } else {
+        setLoginErro(data.error || 'Erro ao registrar administrador.')
+      }
     } catch {
       setLoginErro('Erro de conexão.')
     } finally {
@@ -100,46 +141,115 @@ export default function AdminPage() {
   if (pageState === 'login') {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="glass p-8 rounded-2xl max-w-md w-full border border-white/10">
-          <div className="text-center mb-8">
-            <span className="text-5xl mb-4 block">🔐</span>
-            <h1 className="text-2xl font-bold text-white mb-2">Acesso Admin</h1>
-            <p className="text-gray-400 text-sm">Gerencie promoções e rankings</p>
-          </div>
-          
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">E-mail de acesso</label>
-              <input
-                type="email"
-                className="admin-input"
-                placeholder="Ex: admin@centraldepromocoes.com.br"
-                value={usuario}
-                onChange={e => setUsuario(e.target.value)}
-                required
-              />
+        <div className="glass p-8 rounded-2xl max-w-md w-full border border-white/10 animate-slide-up">
+          {setupRequired === null ? (
+            <div className="text-center py-8 text-gray-400">
+              <div className="animate-spin text-3xl mb-3 flex justify-center">🔄</div>
+              Carregando portal...
             </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">Senha de acesso</label>
-              <input
-                type="password"
-                className="admin-input"
-                placeholder="Digite a senha"
-                value={senha}
-                onChange={e => setSenha(e.target.value)}
-                required
-              />
-            </div>
-            {loginErro && (
-              <div className="p-3 bg-red-500/20 border border-red-500/30 text-red-400 rounded-lg text-sm flex items-center gap-2">
-                <span>❌</span> {loginErro}
+          ) : setupRequired ? (
+            /* CONFIGURAR PRIMEIRO ADMIN (REGISTRO) */
+            <>
+              <div className="text-center mb-8">
+                <span className="text-5xl mb-4 block">🏆</span>
+                <h1 className="text-2xl font-bold text-white mb-2">Criar Conta Admin</h1>
+                <p className="text-gray-400 text-sm">Configure a primeira conta para acessar o painel</p>
               </div>
-            )}
-            <button type="submit" className="admin-btn-primary w-full" disabled={loginLoading}>
-              {loginLoading ? 'Verificando...' : 'Entrar'}
-            </button>
-          </form>
+              
+              <form onSubmit={handleRegister} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">Nome Completo</label>
+                  <input
+                    type="text"
+                    className="admin-input"
+                    placeholder="Ex: Luiz Fernando"
+                    value={nomeAdmin}
+                    onChange={e => setNomeAdmin(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">E-mail de acesso</label>
+                  <input
+                    type="email"
+                    className="admin-input"
+                    placeholder="Ex: seu@email.com"
+                    value={usuario}
+                    onChange={e => setUsuario(e.target.value)}
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">Senha</label>
+                  <input
+                    type="password"
+                    className="admin-input"
+                    placeholder="Mínimo 6 caracteres"
+                    value={senha}
+                    onChange={e => setSenha(e.target.value)}
+                    required
+                  />
+                </div>
+
+                {loginErro && (
+                  <div className="p-3 bg-red-500/20 border border-red-500/30 text-red-400 rounded-lg text-sm flex items-center gap-2">
+                    <span>❌</span> {loginErro}
+                  </div>
+                )}
+
+                <button type="submit" className="admin-btn-primary w-full" disabled={loginLoading}>
+                  {loginLoading ? 'Configurando...' : 'Criar Conta & Entrar'}
+                </button>
+              </form>
+            </>
+          ) : (
+            /* LOGIN STANDARD */
+            <>
+              <div className="text-center mb-8">
+                <span className="text-5xl mb-4 block">🔐</span>
+                <h1 className="text-2xl font-bold text-white mb-2">Acesso Admin</h1>
+                <p className="text-gray-400 text-sm">Gerencie promoções e rankings</p>
+              </div>
+              
+              <form onSubmit={handleLogin} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">E-mail de acesso</label>
+                  <input
+                    type="email"
+                    className="admin-input"
+                    placeholder="Ex: admin@centraldepromocoes.com.br"
+                    value={usuario}
+                    onChange={e => setUsuario(e.target.value)}
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">Senha de acesso</label>
+                  <input
+                    type="password"
+                    className="admin-input"
+                    placeholder="Digite a senha"
+                    value={senha}
+                    onChange={e => setSenha(e.target.value)}
+                    required
+                  />
+                </div>
+
+                {loginErro && (
+                  <div className="p-3 bg-red-500/20 border border-red-500/30 text-red-400 rounded-lg text-sm flex items-center gap-2">
+                    <span>❌</span> {loginErro}
+                  </div>
+                )}
+
+                <button type="submit" className="admin-btn-primary w-full" disabled={loginLoading}>
+                  {loginLoading ? 'Verificando...' : 'Entrar'}
+                </button>
+              </form>
+            </>
+          )}
         </div>
       </div>
     )
