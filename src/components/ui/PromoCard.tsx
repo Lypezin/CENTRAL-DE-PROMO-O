@@ -44,11 +44,6 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
           <div className="flex justify-between items-start mb-4">
             <div className="flex flex-col gap-1.5">
               <StatusBadge status={promo.status} />
-              {promo.cidade && (
-                <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-blue-400 uppercase tracking-widest pl-0.5">
-                  📍 {promo.cidade}
-                </span>
-              )}
             </div>
             <span className="text-xs font-semibold tracking-wide text-gray-400 uppercase px-2.5 py-1 rounded-full bg-white/5 border border-white/5 shadow-inner">
               {isRanking ? '🏆 Ranking' : '🎯 Desafio'}
@@ -56,6 +51,13 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
           </div>
 
           {/* Card Body */}
+          {promo.cidade && (
+            <div className="mb-2">
+              <span className="inline-flex items-center gap-1.5 text-[10px] font-extrabold tracking-widest text-blue-300 uppercase bg-blue-500/15 border border-blue-500/25 px-2.5 py-0.5 rounded-full shadow-[0_0_12px_rgba(59,130,246,0.1)]">
+                <span className="animate-pulse">📍</span> {promo.cidade}
+              </span>
+            </div>
+          )}
           <h3 className="text-xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors tracking-tight">
             {promo.nome}
           </h3>

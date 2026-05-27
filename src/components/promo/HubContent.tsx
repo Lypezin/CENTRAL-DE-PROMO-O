@@ -127,6 +127,11 @@ export default function HubContent({ initialPromocoes }: { initialPromocoes: Pro
                 <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-xs font-bold text-emerald-400 animate-pulse-slow">
                   ⚡ ATIVA AGORA
                 </span>
+                {featuredPromo.cidade && (
+                  <span className="px-2.5 py-0.5 rounded-full bg-blue-500/15 border border-blue-500/25 text-xs font-bold text-blue-300 flex items-center gap-1.5 shadow-[0_0_12px_rgba(59,130,246,0.1)]">
+                    <span className="animate-pulse">📍</span> {featuredPromo.cidade}
+                  </span>
+                )}
                 <span className="px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-gray-300">
                   {featuredPromo.tipo === 'ranking_turno' ? '🏆 Ranking por Turno' : '🎯 Desafio'}
                 </span>
