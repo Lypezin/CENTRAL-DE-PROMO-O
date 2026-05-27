@@ -466,10 +466,10 @@ export default function RankingTurno({
                     <div className="flex-1 min-w-0 pl-4">Entregador</div>
                     <div className="w-20 hidden sm:block">Praça</div>
                     {mecanica.metrica !== 'corridas_completadas' && (
-                      <div className="w-24 text-right pr-4">Pontuação</div>
+                      <div className="w-24 text-right pr-4 hidden sm:block">Pontuação</div>
                     )}
-                    <div className="w-28 text-right pr-4">Taxas Acumuladas</div>
-                    <div className="w-32 text-right">Prêmio Estimado</div>
+                    <div className="w-20 sm:w-28 text-right pr-2 sm:pr-4">Taxas Acumuladas</div>
+                    <div className="w-24 sm:w-32 text-right">Prêmio Estimado</div>
                   </div>
 
                   {/* Table Body Rows */}
@@ -536,18 +536,18 @@ export default function RankingTurno({
 
                           {/* Custom metric target (only if not completions) */}
                           {mecanica.metrica !== 'corridas_completadas' && (
-                            <div className="w-24 text-right pr-4 font-mono text-xs font-bold text-zinc-400">
+                            <div className="w-24 text-right pr-4 font-mono text-xs font-bold text-zinc-400 hidden sm:block">
                               {formatScoreValue(score)}
                             </div>
                           )}
 
                           {/* Delivery fees earnings (Monospace font matching finance layout) */}
-                          <div className="w-28 text-right pr-4 font-mono text-xs font-bold text-zinc-300">
+                          <div className="w-20 sm:w-28 text-right pr-2 sm:pr-4 font-mono text-xs font-bold text-zinc-300">
                             {formatCurrency(item.total_soma_taxas)}
                           </div>
 
                           {/* Eligibility & Prizes Column */}
-                          <div className="w-32 text-right flex flex-col items-end justify-center font-mono">
+                          <div className="w-24 sm:w-32 text-right flex flex-col items-end justify-center font-mono">
                             {premioTeorico > 0 ? (
                               atingiuMinimo ? (
                                 <span className="inline-flex items-center gap-0.5 text-emerald-400 text-xs font-extrabold tracking-tight">
