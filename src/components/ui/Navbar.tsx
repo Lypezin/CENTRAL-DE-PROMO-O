@@ -10,7 +10,6 @@ export default function Navbar() {
 
   const links = [
     { href: '/', label: 'Promoções' },
-    { href: '/admin', label: 'Admin' },
   ]
 
   return (

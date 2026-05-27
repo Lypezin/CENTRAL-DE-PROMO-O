@@ -109,11 +109,11 @@ export default function AdminPage() {
           
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">Usuário de acesso</label>
+              <label className="block text-sm font-medium text-gray-400 mb-2">E-mail de acesso</label>
               <input
-                type="text"
+                type="email"
                 className="admin-input"
-                placeholder="Ex: admin"
+                placeholder="Ex: admin@centraldepromocoes.com.br"
                 value={usuario}
                 onChange={e => setUsuario(e.target.value)}
                 required
