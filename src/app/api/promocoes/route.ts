@@ -1,0 +1,81 @@
+import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
+import { createClient } from '@supabase/supabase-js'
+import { gerarSlug } from '@/lib/config'
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
+
+async function isAuthenticated(): Promise<boolean> {
+  const cookieStore = await cookies()
+  return cookieStore.get('admin_auth')?.value === 'true'
+}
+
+// GET: Listar promoções (público, com filtro opcional por status)
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url)
+  const status = searchParams.get('status')
+
+  let query = supabase
+    .from('promocoes')
+    .select('*')
+    .order('created_at', { ascending: false })
+
+  if (status) {
+    query = query.eq('status', status)
+  }
+
+  const { data, error } = await query
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+
+  return NextResponse.json(data)
+}
+
+// POST: Criar nova promoção (requer autenticação admin)
+export async function POST(request: Request) {
+  if (!(await isAuthenticated())) {
+    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+  }
+
+  try {
+    const body = await request.json()
+    const { nome, descricao, tipo, data_inicio, data_fim, config_premios, config_turnos } = body
+
+    if (!nome || typeof nome !== 'string' || nome.trim().length === 0) {
+      return NextResponse.json({ error: 'Nome é obrigatório' }, { status: 400 })
+    }
+
+    const slug = gerarSlug(nome.trim())
+
+    const { data, error } = await supabase
+      .from('promocoes')
+      .insert({
+        slug,
+        nome: nome.trim(),
+        descricao: descricao || null,
+        tipo: tipo || 'ranking',
+        status: 'rascunho',
+        data_inicio: data_inicio || null,
+        data_fim: data_fim || null,
+        config_premios: config_premios || null,
+        config_turnos: config_turnos || null,
+        config_regras: null,
+      })
+      .select()
+      .single()
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    return NextResponse.json(data, { status: 201 })
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : 'Erro interno'
+    return NextResponse.json({ error: msg }, { status: 500 })
+  }
+}

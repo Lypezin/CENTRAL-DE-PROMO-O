@@ -32,3 +32,26 @@ export interface UploadHistorico {
   mensagem: string
   created_at: string
 }
+
+export interface Promocao {
+  id: string
+  slug: string
+  nome: string
+  descricao: string | null
+  tipo: string
+  status: 'rascunho' | 'ativa' | 'encerrada'
+  data_inicio: string | null
+  data_fim: string | null
+  config_premios: any
+  config_turnos: string[] | null
+  config_regras: any
+  created_at: string
+  updated_at: string
+}
+
+export interface PromocaoStats {
+  total_participantes: number
+  total_entregas: number
+  total_valor: number
+  periodos_ativos: string[]
+}

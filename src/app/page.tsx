@@ -1,259 +1,89 @@
-'use client'
+import { supabase } from '@/lib/supabase'
+import PromoCard from '@/components/ui/PromoCard'
+import { Promocao } from '@/lib/supabase'
 
-import { useState, useEffect, useCallback } from 'react'
-import { supabase, EntregaRanking } from '@/lib/supabase'
-import { TURNOS_CONFIG, TurnoKey, formatCurrency, getMedalha, getPremio } from '@/lib/config'
+export const revalidate = 0 // Disable cache for now
 
-const TURNOS_COM_FILTRO = (Object.keys(TURNOS_CONFIG) as TurnoKey[]).filter(key => key !== 'TARDE')
-const LIMITE_ENTREGADORES_POR_TURNO = 15
-
-export default function HomePage() {
-  const [ranking, setRanking] = useState<EntregaRanking[]>([])
-  const [loading, setLoading] = useState(true)
-  const [filtroAtivo, setFiltroAtivo] = useState<TurnoKey>('CAFE_DA_MANHA')
-  const [dataMinima, setDataMinima] = useState<string | null>(null)
-  const [dataMaxima, setDataMaxima] = useState<string | null>(null)
-  const [totalRegistros, setTotalRegistros] = useState(0)
-  const [turnoExpandido, setTurnoExpandido] = useState<TurnoKey | null>(null)
-  const [busca, setBusca] = useState('')
-
-  // Carrega as datas apenas uma vez ao montar o componente
-  useEffect(() => {
-    const carregarDatas = async () => {
-      try {
-        const { data: datasData } = await supabase.rpc('get_datas_disponiveis')
-        if (datasData && datasData.length > 0) {
-          setDataMinima(datasData[0].data_minima)
-          setDataMaxima(datasData[0].data_maxima)
-          setTotalRegistros(datasData[0].total_registros)
-        }
-      } catch (err) {
-        console.error('Erro ao carregar datas:', err)
-      }
-    }
-    carregarDatas()
-  }, [])
-
-  const carregarRanking = useCallback(async () => {
-    setLoading(true)
-    try {
-      const { data, error } = await supabase.rpc('get_ranking_por_turno', {
-        p_data_inicio: null,
-        p_data_fim: null,
-        p_periodo: filtroAtivo,
-        p_praca: null,
-        p_limite: 1000, // Carrega uma quantidade maior para permitir a busca completa
-      })
-      if (error) throw error
-      setRanking(data || [])
-    } catch (err) {
-      console.error('Erro ao carregar ranking:', err)
-    } finally {
-      setLoading(false)
-    }
-  }, [filtroAtivo])
-
-  useEffect(() => {
-    carregarRanking()
-  }, [carregarRanking])
-
-  // Filtra por turno + busca
-  const entregadoresDoTurno = ranking
-    .filter(r => {
-      const p = r.periodo?.toUpperCase().trim() ?? ''
-      return p === filtroAtivo
-    })
-    .sort((a, b) => Number(a.posicao) - Number(b.posicao))
-
-  const maxValorTurno = entregadoresDoTurno[0]?.total_soma_taxas || 1
-
-  let entregadoresFiltrados = entregadoresDoTurno
-  if (busca.trim()) {
-    const termo = busca.trim().toLowerCase()
-    entregadoresFiltrados = entregadoresDoTurno.filter(r =>
-      r.pessoa_entregadora?.toLowerCase().includes(termo)
-    )
-  } else {
-    entregadoresFiltrados = entregadoresDoTurno.slice(0, LIMITE_ENTREGADORES_POR_TURNO)
+export default async function HubPage() {
+  // Fetch active and past promotions
+  const { data: promocoes, error } = await supabase.rpc('get_promocoes')
+  
+  if (error) {
+    console.error('Error fetching promocoes:', error)
+    return <div className="p-8 text-center text-red-500">Erro ao carregar promoções.</div>
   }
 
-  const turnosExibidos = [filtroAtivo]
-
-  const formatarData = (dateStr: string | null) => {
-    if (!dateStr) return '—'
-    return new Date(dateStr + 'T00:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
-  }
-
-  const getBarraProgresso = (valor: number, maxValor: number) =>
-    maxValor === 0 ? 0 : Math.min(100, (valor / maxValor) * 100)
-
-  const totalBuscaResultados = entregadoresFiltrados.length
+  const ativas = (promocoes as Promocao[]).filter(p => p.status === 'ativa')
+  const encerradas = (promocoes as Promocao[]).filter(p => p.status === 'encerrada')
 
   return (
-    <div className="ranking-page">
-      {/* HEADER */}
-      <header className="header">
-        <span className="header-trophy">🏆</span>
-        <h1 className="header-title">Ranking de Entregadores</h1>
-        <p className="header-subtitle">Fature mais e suba no ranking!</p>
-        {dataMinima && dataMaxima && (
-          <div className="header-dates">
-            <span>📅</span>
-            <span>{formatarData(dataMinima)} até {formatarData(dataMaxima)}</span>
-            {totalRegistros > 0 && (
-              <span style={{ opacity: 0.7 }}>· {totalRegistros.toLocaleString('pt-BR')} registros</span>
-            )}
+    <div className="container mx-auto p-4 md:p-8">
+      <section className="hero mb-12 p-8 rounded-2xl glass flex flex-col items-center text-center">
+        <h1 className="hero-title text-4xl md:text-6xl font-bold mb-4 text-gradient">
+          Central de Promoções
+        </h1>
+        <p className="hero-subtitle text-gray-400 max-w-2xl text-lg mb-8">
+          Acompanhe os rankings de entregadores, descubra os prêmios por turno e veja o histórico de todas as nossas campanhas.
+        </p>
+        
+        <div className="hero-stats grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-4xl">
+          <div className="stat-card p-6 rounded-xl bg-white/5 backdrop-blur border border-white/10">
+            <div className="text-3xl font-bold text-white mb-1">{ativas.length}</div>
+            <div className="text-sm text-gray-400">Promoções Ativas</div>
           </div>
-        )}
-      </header>
-
-      {/* BARRA DE BUSCA */}
-      <div className="busca-wrapper">
-        <div className="busca-input-wrapper">
-          <svg className="busca-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-          </svg>
-          <input
-            type="text"
-            className="busca-input"
-            placeholder="Buscar entregador..."
-            value={busca}
-            onChange={e => setBusca(e.target.value)}
-          />
-          {busca && (
-            <button className="busca-clear" onClick={() => setBusca('')} aria-label="Limpar busca">
-              ✕
-            </button>
-          )}
+          <div className="stat-card p-6 rounded-xl bg-white/5 backdrop-blur border border-white/10">
+            <div className="text-3xl font-bold text-white mb-1">{encerradas.length}</div>
+            <div className="text-sm text-gray-400">Promoções Encerradas</div>
+          </div>
+          <div className="stat-card p-6 rounded-xl bg-white/5 backdrop-blur border border-white/10">
+            <div className="text-3xl font-bold text-white mb-1">
+              {ativas.length + encerradas.length}
+            </div>
+            <div className="text-sm text-gray-400">Total de Campanhas</div>
+          </div>
         </div>
-        {busca && (
-          <span className="busca-resultado">
-            {totalBuscaResultados} resultado{totalBuscaResultados !== 1 ? 's' : ''}
-          </span>
-        )}
-      </div>
+      </section>
 
-      {/* FILTROS */}
-      <div className="filtros-wrapper">
-        {TURNOS_COM_FILTRO.map(key => (
-          <button
-            key={key}
-            className={`filtro-btn ${filtroAtivo === key ? 'active' : ''}`}
-            onClick={() => setFiltroAtivo(key)}
-          >
-            {TURNOS_CONFIG[key].emoji} {TURNOS_CONFIG[key].label.replace(/^[^\s]+\s/, '')}
-          </button>
-        ))}
-      </div>
-
-      {/* CONTEÚDO PRINCIPAL */}
-      <main className="main-container">
-        {loading ? (
-          <div className="loading-container">
-            <div className="loading-spinner" />
-            <p className="loading-text">Carregando ranking...</p>
+      {ativas.length > 0 && (
+        <section className="mb-16">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+              <span className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse-slow"></span>
+              Promoções Ativas
+            </h2>
           </div>
-        ) : ranking.length === 0 ? (
-          <div className="empty-state">
-            <span className="empty-state-emoji">📊</span>
-            <p style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.5rem' }}>Sem dados ainda</p>
-            <p style={{ fontSize: '0.85rem' }}>Aguardando importação da planilha.</p>
+          <div className="grid-promos gap-6">
+            {ativas.map(promo => (
+              <PromoCard key={promo.id} promo={promo} />
+            ))}
           </div>
-        ) : (
-          <div className="turnos-grid">
-            {turnosExibidos.map(turnoKey => {
-              const config = TURNOS_CONFIG[turnoKey]
-              const entregadores = entregadoresFiltrados
-              if (entregadores.length === 0 && !busca) return null
+        </section>
+      )}
 
-              const maxValor = maxValorTurno
-              const isExpandido = turnoExpandido === turnoKey
-
-              return (
-                <section key={turnoKey} className="turno-section">
-                  {/* Header do turno */}
-                  <div
-                    className="turno-header"
-                    style={{ background: config.corGradiente }}
-                    onClick={() => setTurnoExpandido(isExpandido ? null : turnoKey)}
-                  >
-                    <span className="turno-header-emoji">{config.emoji}</span>
-                    <div className="turno-header-info">
-                      <div className="turno-header-nome">{config.label}</div>
-                      <div className="turno-header-horario">{config.horario}</div>
-                    </div>
-                    <div className="turno-header-total">
-                      <div className="turno-header-total-label">Participantes</div>
-                      <div className="turno-header-total-count">{entregadores.length}</div>
-                      <div className="turno-expand-hint">{isExpandido ? '▲ prêmios' : '▼ prêmios'}</div>
-                    </div>
-                  </div>
-
-                  {/* Painel de prêmios (expansível) */}
-                  {isExpandido && (
-                    <div className="premio-panel-wrapper">
-                      <p className="premio-panel-titulo">💰 Premiação do turno</p>
-                      {config.premios.map((p, i) => (
-                        <div key={i} className="premio-row">
-                          <span className="premio-posicao">
-                            {'posicao' in p && p.posicao !== undefined
-                              ? getMedalha(p.posicao as number)
-                              : `${(p as any).posicao_inicio}º ao ${(p as any).posicao_fim}º`}
-                          </span>
-                          <span className="premio-valor">R$ {p.valor.toLocaleString('pt-BR')}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Lista */}
-                  <div className="ranking-list">
-                    {entregadores.length === 0 ? (
-                      <div className="ranking-vazio">
-                        {busca ? `Nenhum resultado para "${busca}"` : 'Nenhum dado para este turno'}
-                      </div>
-                    ) : (
-                      entregadores.map(entregador => {
-                        const pos = Number(entregador.posicao)
-                        const premio = getPremio(turnoKey, pos)
-                        const barra = getBarraProgresso(entregador.total_soma_taxas, maxValor)
-                        const classePos = pos <= 3 ? `posicao-${pos}` : ''
-
-                        return (
-                          <div key={`${turnoKey}-${entregador.id_da_pessoa_entregadora}`} className={`ranking-item ${classePos}`}>
-                            <div className="posicao-medalha">{getMedalha(pos)}</div>
-                            <div className="ranking-info">
-                              <div className="ranking-nome">{entregador.pessoa_entregadora}</div>
-                              <div className="ranking-detalhes">
-                                {entregador.praca && `${entregador.praca} · `}
-                                {entregador.total_corridas_completadas} corridas
-                              </div>
-                              <div className="progress-bar-wrapper">
-                                <div
-                                  className="progress-bar-fill"
-                                  style={{ width: `${barra}%`, background: config.corGradiente }}
-                                />
-                              </div>
-                            </div>
-                            <div className="ranking-valores">
-                              <div className="ranking-total">{formatCurrency(entregador.total_soma_taxas)}</div>
-                              {premio > 0 ? (
-                                <div className="ranking-premio">🏆 {formatCurrency(premio)}</div>
-                              ) : (
-                                <div className="ranking-sem-premio">sem prêmio</div>
-                              )}
-                            </div>
-                          </div>
-                        )
-                      })
-                    )}
-                  </div>
-                </section>
-              )
-            })}
+      {encerradas.length > 0 && (
+        <section>
+          <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-gray-500"></span>
+            Histórico
+          </h2>
+          <div className="timeline pl-4 border-l border-white/10 space-y-8">
+            {encerradas.map(promo => (
+              <div key={promo.id} className="timeline-item relative">
+                <div className="timeline-dot absolute w-3 h-3 bg-rose-500 rounded-full -left-[23px] top-6"></div>
+                <div className="timeline-content">
+                  <PromoCard promo={promo} />
+                </div>
+              </div>
+            ))}
           </div>
-        )}
-      </main>
+        </section>
+      )}
+
+      {ativas.length === 0 && encerradas.length === 0 && (
+        <div className="text-center p-12 text-gray-500 glass rounded-xl">
+          Nenhuma promoção encontrada.
+        </div>
+      )}
     </div>
   )
 }

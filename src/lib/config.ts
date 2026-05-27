@@ -116,3 +116,26 @@ export function getMedalha(posicao: number): string {
   if (posicao === 3) return '🥉'
   return `${posicao}º`
 }
+
+// Helper para calcular prêmio a partir da config JSONB de uma promoção
+export function getPremioFromConfig(configPremios: any[], turno: string, posicao: number): number {
+  const turnoConfig = configPremios.find((c: any) => c.turno === turno)
+  if (!turnoConfig) return 0
+  for (const p of turnoConfig.premios) {
+    if ('posicao' in p && p.posicao === posicao) return p.valor
+    if ('posicao_inicio' in p && posicao >= p.posicao_inicio && posicao <= p.posicao_fim) return p.valor
+  }
+  return 0
+}
+
+// Gerar slug a partir de um nome
+export function gerarSlug(nome: string): string {
+  return nome
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // remove acentos
+    .replace(/[^a-z0-9\s-]/g, '')   // remove caracteres especiais
+    .replace(/\s+/g, '-')            // espaços → hífens
+    .replace(/-+/g, '-')             // múltiplos hífens → um
+    .trim()
+}

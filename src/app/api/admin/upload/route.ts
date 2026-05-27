@@ -90,9 +90,14 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData()
     const file = formData.get('file') as File | null
+    const promocaoId = formData.get('promocao_id') as string | null
 
     if (!file) {
       return NextResponse.json({ error: 'Nenhum arquivo enviado' }, { status: 400 })
+    }
+
+    if (!promocaoId) {
+      return NextResponse.json({ error: 'promocao_id é obrigatório' }, { status: 400 })
     }
 
     const nomeArquivo = file.name
@@ -152,6 +157,7 @@ export async function POST(request: NextRequest) {
             obj[campo] = val !== null && val !== undefined ? String(val).trim() : null
           }
         })
+        obj.promocao_id = promocaoId
         return obj
       })
       .filter(r => r.data_do_periodo && r.periodo && r.id_da_pessoa_entregadora)
