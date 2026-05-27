@@ -14,6 +14,8 @@ export default function EditPromoPage() {
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
+  const [clearingData, setClearingData] = useState(false)
+  const [confirmClearData, setConfirmClearData] = useState(false)
 
   // Custom states for visual prize editor
   const [localPremios, setLocalPremios] = useState<any[]>([])
@@ -200,6 +202,28 @@ export default function EditPromoPage() {
     } finally {
       setDeleting(false)
       setConfirmDelete(false)
+    }
+  }
+
+  const handleClearData = async () => {
+    if (!confirmClearData) {
+      setConfirmClearData(true)
+      return
+    }
+    setClearingData(true)
+    try {
+      const res = await fetch(`/api/promocoes/${id}?apenas_dados=true`, { method: 'DELETE' })
+      if (res.ok) {
+        alert('Dados da planilha excluídos com sucesso!')
+        carregarPromo() // recarregar estatísticas da promoção
+      } else {
+        alert('Erro ao excluir dados da planilha.')
+      }
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setClearingData(false)
+      setConfirmClearData(false)
     }
   }
 
@@ -1028,22 +1052,42 @@ export default function EditPromoPage() {
           </div>
 
           {/* Danger Zone */}
-          <div className="glass p-6 rounded-2xl border border-red-500/30 bg-red-500/5">
-            <h3 className="font-bold text-red-400 mb-2">⚠️ Excluir Promoção</h3>
-            <p className="text-xs text-gray-400 mb-4">
-              Isso removerá a promoção e TODOS os dados de entregas vinculados a ela.
-            </p>
-            {confirmDelete && (
-              <div className="text-xs text-red-400 mb-2 font-medium">Tem certeza? Clique novamente para confirmar.</div>
-            )}
-            <button 
-              onClick={handleDelete}
-              onBlur={() => setConfirmDelete(false)}
-              disabled={deleting}
-              className="admin-btn-danger w-full"
-            >
-              {deleting ? 'Excluindo...' : confirmDelete ? 'Confirmar Exclusão' : 'Excluir Permanentemente'}
-            </button>
+          <div className="glass p-6 rounded-2xl border border-red-500/20 bg-red-500/5 space-y-6">
+            <div>
+              <h3 className="font-bold text-red-400 mb-2">🧹 Limpar Dados da Planilha</h3>
+              <p className="text-xs text-gray-400 mb-4">
+                Isso removerá TODOS os dados de entregas importados para esta promoção, zerando o ranking. A página da promoção continuará ativa.
+              </p>
+              {confirmClearData && (
+                <div className="text-xs text-red-400 mb-2 font-medium">Confirme: Deseja apagar todas as entregas importadas?</div>
+              )}
+              <button 
+                onClick={handleClearData}
+                onBlur={() => setConfirmClearData(false)}
+                disabled={clearingData}
+                className="admin-btn-danger w-full !bg-red-950/40 !border-red-500/30 hover:!bg-red-900/60"
+              >
+                {clearingData ? 'Limpando...' : confirmClearData ? 'Confirmar Exclusão dos Dados' : 'Excluir Apenas Dados (Limpar Planilha)'}
+              </button>
+            </div>
+
+            <div className="pt-4 border-t border-white/5">
+              <h3 className="font-bold text-gray-400 mb-1 text-sm">⚠️ Excluir Promoção Permanentemente</h3>
+              <p className="text-xs text-gray-500 mb-3">
+                Exclui a página da promoção e todo o seu histórico permanentemente.
+              </p>
+              {confirmDelete && (
+                <div className="text-xs text-red-400 mb-2 font-medium">Tem certeza? Clique novamente para confirmar a exclusão da página inteira.</div>
+              )}
+              <button 
+                onClick={handleDelete}
+                onBlur={() => setConfirmDelete(false)}
+                disabled={deleting}
+                className="text-xs text-red-500/60 hover:text-red-400 font-bold transition-all w-full text-left bg-transparent border-none p-0 cursor-pointer"
+              >
+                {deleting ? 'Excluindo página...' : confirmDelete ? 'Confirmar Deleção da Página' : 'Excluir promoção inteira permanentemente'}
+              </button>
+            </div>
           </div>
 
         </div>

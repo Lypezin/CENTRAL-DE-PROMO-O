@@ -114,7 +114,7 @@ export async function PUT(
   }
 }
 
-// DELETE: Deletar promoção e entregas associadas via RPC atômico (requer autenticação admin)
+// DELETE: Deletar promoção e/ou entregas associadas via RPC atômico (requer autenticação admin)
 export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -124,19 +124,35 @@ export async function DELETE(
   }
 
   const { id } = await params
+  const { searchParams } = new URL(request.url)
+  const apenasDados = searchParams.get('apenas_dados') === 'true'
 
   try {
-    // Executa a deleção em lote com privilégios adequados via RPC
-    const { error } = await supabase.rpc('deletar_promocao', { p_id: id })
+    if (apenasDados) {
+      // Executa a deleção apenas dos dados de planilha via RPC
+      const { error } = await supabase.rpc('limpar_dados_promocao', { p_promocao_id: id })
 
-    if (error) {
-      return NextResponse.json(
-        { error: `Erro ao excluir promoção: ${error.message}` },
-        { status: 500 }
-      )
+      if (error) {
+        return NextResponse.json(
+          { error: `Erro ao limpar dados da promoção: ${error.message}` },
+          { status: 500 }
+        )
+      }
+
+      return NextResponse.json({ success: true, apenas_dados: true })
+    } else {
+      // Executa a deleção completa da promoção via RPC
+      const { error } = await supabase.rpc('deletar_promocao', { p_id: id })
+
+      if (error) {
+        return NextResponse.json(
+          { error: `Erro ao excluir promoção: ${error.message}` },
+          { status: 500 }
+        )
+      }
+
+      return NextResponse.json({ success: true })
     }
-
-    return NextResponse.json({ success: true })
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Erro interno'
     return NextResponse.json({ error: msg }, { status: 500 })
