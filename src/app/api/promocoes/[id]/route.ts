@@ -42,7 +42,7 @@ export async function GET(
     stats = statsData[0]
   }
 
-  return NextResponse.json({ ...promocao, stats })
+  return NextResponse.json({ promocao, stats })
 }
 
 // PUT: Atualizar promoção (requer autenticação admin)
