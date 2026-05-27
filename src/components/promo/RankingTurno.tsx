@@ -310,7 +310,7 @@ export default function RankingTurno({
                               {item.pessoa_entregadora}
                             </div>
                             <div className="text-xs md:text-sm text-gray-400 truncate">
-                              {item.praca} • {item.total_corridas_completadas} corridas
+                              {item.praca}
                             </div>
                           </div>
                           <div className="text-right shrink-0">
@@ -387,7 +387,7 @@ export default function RankingTurno({
                             <div className="flex justify-between items-start">
                               <div>
                                 <h4 className="font-bold text-white text-base md:text-lg">{item.pessoa_entregadora}</h4>
-                                <p className="text-xs text-gray-400">{item.praca} • {item.total_corridas_completadas} corridas completadas no total</p>
+                                <p className="text-xs text-gray-400">{item.praca}</p>
                               </div>
                               <div className="text-right">
                                 <div className="text-xs opacity-50 uppercase">Progresso</div>
@@ -512,7 +512,7 @@ export default function RankingTurno({
                             <div className="flex justify-between items-start">
                               <div>
                                 <h4 className="font-bold text-white text-base md:text-lg">{item.pessoa_entregadora}</h4>
-                                <p className="text-xs text-gray-400">{item.praca} • {item.total_corridas_completadas} corridas completadas no total</p>
+                                <p className="text-xs text-gray-400">{item.praca}</p>
                               </div>
                               <div className="text-right">
                                 <div className="text-xs opacity-50 uppercase">Pontuação Atual</div>
