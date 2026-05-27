@@ -310,7 +310,7 @@ export default function RankingTurno({
                               {item.pessoa_entregadora}
                             </div>
                             <div className="text-xs md:text-sm text-gray-400 truncate">
-                              {item.praca} • {item.total_corridas_completadas} corridas
+                              {item.praca} • {item.total_corridas_completadas} corridas {mecanica.metrica !== 'faturamento_taxas' && `• Faturamento: ${formatCurrency(item.total_soma_taxas)}`}
                             </div>
                           </div>
                           <div className="text-right shrink-0">
@@ -381,7 +381,7 @@ export default function RankingTurno({
                             <div className="flex justify-between items-start">
                               <div>
                                 <h4 className="font-bold text-white text-base md:text-lg">{item.pessoa_entregadora}</h4>
-                                <p className="text-xs text-gray-400">{item.praca} • {item.total_corridas_completadas} corridas completadas no total</p>
+                                <p className="text-xs text-gray-400">{item.praca} • {item.total_corridas_completadas} corridas no total • Faturamento: {formatCurrency(item.total_soma_taxas)}</p>
                               </div>
                               <div className="text-right">
                                 <div className="text-xs opacity-50 uppercase">Progresso</div>
@@ -454,7 +454,9 @@ export default function RankingTurno({
                             </div>
                             <div className="truncate">
                               <div className="font-bold text-white text-sm truncate">{item.pessoa_entregadora}</div>
-                              <div className="text-[10px] text-gray-400 uppercase tracking-widest">{item.praca} • {formatScoreValue(getScore(item))}</div>
+                              <div className="text-[10px] text-gray-400 uppercase tracking-widest">
+                                {item.praca} • {formatScoreValue(getScore(item))} {mecanica.metrica !== 'faturamento_taxas' && `• Faturamento: ${formatCurrency(item.total_soma_taxas)}`}
+                              </div>
                             </div>
                             <div className="ml-auto bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-3 py-1 rounded-lg text-xs font-bold shadow-[0_0_10px_rgba(16,185,129,0.1)]">
                               +{formatCurrency(prize)}
@@ -506,7 +508,7 @@ export default function RankingTurno({
                             <div className="flex justify-between items-start">
                               <div>
                                 <h4 className="font-bold text-white text-base md:text-lg">{item.pessoa_entregadora}</h4>
-                                <p className="text-xs text-gray-400">{item.praca} • {item.total_corridas_completadas} corridas completadas no total</p>
+                                <p className="text-xs text-gray-400">{item.praca} • {item.total_corridas_completadas} corridas no total • Faturamento: {formatCurrency(item.total_soma_taxas)}</p>
                               </div>
                               <div className="text-right">
                                 <div className="text-xs opacity-50 uppercase">Pontuação Atual</div>
