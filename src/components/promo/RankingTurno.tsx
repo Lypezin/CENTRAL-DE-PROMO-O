@@ -466,7 +466,7 @@ export default function RankingTurno({
                     <div className="flex-1 min-w-0 pl-2.5 sm:pl-4">Entregador</div>
                     <div className="w-20 hidden sm:block">Praça</div>
                     {mecanica.metrica !== 'corridas_completadas' && (
-                      <div className="w-24 text-right pr-4 hidden sm:block">VALOR</div>
+                      <div className="w-20 sm:w-24 text-right pr-2 sm:pr-4">VALOR</div>
                     )}
                     <div className="w-20 sm:w-32 text-right">Prêmio Estimado</div>
                   </div>
@@ -535,7 +535,7 @@ export default function RankingTurno({
 
                           {/* Custom metric target (only if not completions) */}
                           {mecanica.metrica !== 'corridas_completadas' && (
-                            <div className="w-24 text-right pr-4 font-mono text-xs font-bold text-zinc-400 hidden sm:block">
+                            <div className="w-20 sm:w-24 text-right pr-2 sm:pr-4 font-mono text-xs font-bold text-zinc-400">
                               {formatScoreValue(score)}
                             </div>
                           )}
