@@ -83,12 +83,12 @@ export default function RankingTurno({
           </svg>
         </div>
 
-        <div className="flex flex-wrap gap-2 ranking-filters">
+        <div className="flex overflow-x-auto md:flex-wrap gap-2 ranking-filters w-full md:w-auto pb-1.5 md:pb-0 scrollbar-none">
           {turnosDisponiveis.map(turno => (
             <button
               key={turno}
               onClick={() => setFiltroAtivo(turno)}
-              className={`filter-btn px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
+              className={`filter-btn shrink-0 px-4.5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 flex items-center gap-2 active:scale-95 ${
                 filtroAtivo === turno 
                   ? 'bg-white/10 text-white shadow-lg border border-white/20'
                   : 'bg-transparent text-gray-400 hover:text-white hover:bg-white/5 border border-transparent'
@@ -103,13 +103,13 @@ export default function RankingTurno({
 
       {/* Header and Prize Panel */}
       <div 
-        className="rounded-2xl p-6 shadow-2xl transition-all cursor-pointer hover:opacity-90"
+        className="rounded-2xl p-4 md:p-6 shadow-2xl transition-all cursor-pointer hover:opacity-90 active:scale-[0.99]"
         style={{ background: activeTurnoDisplay.corGradiente }}
         onClick={() => setPainelAberto(!painelAberto)}
       >
         <div className="flex justify-between items-center">
-          <h2 className="text-3xl font-bold text-white flex items-center gap-3">
-            <span className="text-4xl drop-shadow-lg">{activeTurnoDisplay.emoji}</span>
+          <h2 className="text-xl md:text-3xl font-extrabold text-white flex items-center gap-2.5 md:gap-3">
+            <span className="text-2xl md:text-4xl drop-shadow-lg">{activeTurnoDisplay.emoji}</span>
             <span className="drop-shadow-md">Ranking {activeTurnoDisplay.label}</span>
           </h2>
           <svg className={`w-8 h-8 text-white transition-transform ${painelAberto ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">

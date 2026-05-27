@@ -174,10 +174,10 @@ export default function HubContent({ initialPromocoes }: { initialPromocoes: Pro
       {/* Filter and Search Bar */}
       <section className="mb-10 flex flex-col md:flex-row gap-4 items-center justify-between animate-slide-up">
         {/* Categories Tab Toggles */}
-        <div className="flex bg-[#0e0e17]/60 p-1.5 rounded-full border border-white/5 shadow-inner w-full md:w-auto overflow-x-auto shrink-0">
+        <div className="flex bg-[#0e0e17]/60 p-1.5 rounded-full border border-white/5 shadow-inner w-full md:w-auto overflow-x-auto shrink-0 scrollbar-none">
           <button
             onClick={() => setActiveTab('todas')}
-            className={`flex-1 md:flex-initial px-6 py-2 rounded-full text-sm font-bold transition-all duration-300 ${
+            className={`flex-1 md:flex-initial shrink-0 px-6 py-2.5 rounded-full text-sm font-extrabold transition-all duration-300 active:scale-95 ${
               activeTab === 'todas'
                 ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg tab-active-line'
                 : 'text-gray-400 hover:text-white'
@@ -187,7 +187,7 @@ export default function HubContent({ initialPromocoes }: { initialPromocoes: Pro
           </button>
           <button
             onClick={() => setActiveTab('ativas')}
-            className={`flex-1 md:flex-initial px-6 py-2 rounded-full text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 ${
+            className={`flex-1 md:flex-initial shrink-0 px-6 py-2.5 rounded-full text-sm font-extrabold transition-all duration-300 flex items-center justify-center gap-2 active:scale-95 ${
               activeTab === 'ativas'
                 ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg tab-active-line'
                 : 'text-gray-400 hover:text-white'
@@ -198,7 +198,7 @@ export default function HubContent({ initialPromocoes }: { initialPromocoes: Pro
           </button>
           <button
             onClick={() => setActiveTab('encerradas')}
-            className={`flex-1 md:flex-initial px-6 py-2 rounded-full text-sm font-bold transition-all duration-300 ${
+            className={`flex-1 md:flex-initial shrink-0 px-6 py-2.5 rounded-full text-sm font-extrabold transition-all duration-300 active:scale-95 ${
               activeTab === 'encerradas'
                 ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg tab-active-line'
                 : 'text-gray-400 hover:text-white'

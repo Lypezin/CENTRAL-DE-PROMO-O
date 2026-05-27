@@ -252,3 +252,23 @@
     animation: none;
   }
 }
+
+/* Scrollbar utility to hide native bars in swiping containers */
+.scrollbar-none {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Mobile GPU performance and battery optimizations */
+@media (max-width: 768px) {
+  .mesh-container {
+    filter: blur(60px);
+    opacity: 0.35;
+  }
+  .blob {
+    animation: none !important; /* Disables heavy real-time CSS animations on mobile for smooth 60fps scroll and power saving */
+  }
+}
