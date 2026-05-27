@@ -377,7 +377,7 @@ export default function RankingTurno({
                         const pct = Math.min((score / target) * 100, 100)
 
                         return (
-                          <div key={item.id_da_pessoa_entregadora} className="glass p-5 rounded-2xl border-white/10 space-y-4 shadow-lg bg-gradient-to-br from-white/5 to-[#161625]/20">
+                          <div key={item.id_da_pessoa_entregadora} className="glass p-5 rounded-2xl border border-white/10 space-y-4 shadow-lg bg-gradient-to-br from-white/5 to-[#161625]/20">
                             <div className="flex justify-between items-start">
                               <div>
                                 <h4 className="font-bold text-white text-base md:text-lg">{item.pessoa_entregadora}</h4>
@@ -502,7 +502,7 @@ export default function RankingTurno({
                         const nivelMaximo = niveis.length > 0 && score >= niveis[niveis.length - 1].meta
 
                         return (
-                          <div key={item.id_da_pessoa_entregadora} className="glass p-5 rounded-2xl border-white/10 space-y-5 bg-gradient-to-br from-white/5 to-[#161625]/20">
+                          <div key={item.id_da_pessoa_entregadora} className="glass p-5 rounded-2xl border border-white/10 space-y-5 bg-gradient-to-br from-white/5 to-[#161625]/20">
                             <div className="flex justify-between items-start">
                               <div>
                                 <h4 className="font-bold text-white text-base md:text-lg">{item.pessoa_entregadora}</h4>
@@ -517,13 +517,13 @@ export default function RankingTurno({
                             {/* Milestones gauge visualization */}
                             <div className="space-y-3 pt-2">
                               <div className="text-xs font-bold text-gray-400 pl-0.5">Régua de Níveis:</div>
-                              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                              <div className="flex overflow-x-auto gap-3 pb-2 scrollbar-none">
                                 {niveis.map((n: any) => {
                                   const concluido = score >= n.meta
                                   return (
                                     <div 
                                       key={n.nivel} 
-                                      className={`p-3 rounded-xl border text-center transition-all ${
+                                      className={`shrink-0 min-w-[125px] sm:flex-1 p-3 rounded-xl border text-center transition-all ${
                                         concluido 
                                           ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.1)]' 
                                           : 'bg-black/30 border-white/5 text-gray-500'
