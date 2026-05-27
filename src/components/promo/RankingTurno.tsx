@@ -314,9 +314,11 @@ export default function RankingTurno({
                             </div>
                           </div>
                           <div className="text-right shrink-0">
-                            <div className="font-bold text-white text-sm md:text-lg">
-                              {formatScoreValue(score)}
-                            </div>
+                            {mecanica.metrica !== 'corridas_completadas' && (
+                              <div className="font-bold text-white text-sm md:text-lg">
+                                {formatScoreValue(score)}
+                              </div>
+                            )}
                           </div>
                         </div>
                         
