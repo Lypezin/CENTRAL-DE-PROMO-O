@@ -25,6 +25,13 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={inter.className}>
+        {/* Ambient Glowing Background */}
+        <div className="mesh-container">
+          <div className="blob blob-1"></div>
+          <div className="blob blob-2"></div>
+          <div className="blob blob-3"></div>
+        </div>
+        
         <Navbar />
         <main className="pt-20 min-h-screen">
           {children}
