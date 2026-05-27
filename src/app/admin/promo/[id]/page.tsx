@@ -18,6 +18,7 @@ export default function EditPromoPage() {
   // Custom states for visual prize editor
   const [localPremios, setLocalPremios] = useState<any[]>([])
   const [turnoEditorAtivo, setTurnoEditorAtivo] = useState<string>('CAFE_DA_MANHA')
+  const [activeTurnos, setActiveTurnos] = useState<string[]>(['CAFE_DA_MANHA', 'ALMOCO', 'JANTAR', 'MADRUGADA'])
 
   // Upload state
   const [arquivo, setArquivo] = useState<File | null>(null)
@@ -39,6 +40,11 @@ export default function EditPromoPage() {
         setPromo(data.promocao)
         setStats(data.stats)
         setLocalPremios(data.promocao.config_premios || [])
+        const loadedTurnos = data.promocao.config_turnos || ['CAFE_DA_MANHA', 'ALMOCO', 'JANTAR', 'MADRUGADA']
+        setActiveTurnos(loadedTurnos)
+        if (loadedTurnos.length > 0 && !loadedTurnos.includes(turnoEditorAtivo)) {
+          setTurnoEditorAtivo(loadedTurnos[0])
+        }
       }
     } catch (e) {
       console.error(e)
@@ -48,6 +54,25 @@ export default function EditPromoPage() {
   }
 
   // Visual editor helper functions
+  const handleToggleTurno = async (turno: string) => {
+    const novosTurnos = activeTurnos.includes(turno)
+      ? activeTurnos.filter(t => t !== turno)
+      : [...activeTurnos, turno]
+      
+    if (novosTurnos.length === 0) {
+      alert('A promoção precisa de pelo menos um turno ativo!')
+      return
+    }
+    
+    if (turnoEditorAtivo === turno && activeTurnos.includes(turno)) {
+      const remainingActive = novosTurnos.filter(t => t !== turno)
+      setTurnoEditorAtivo(novosTurnos.find(t => t !== turno) || novosTurnos[0])
+    }
+    
+    setActiveTurnos(novosTurnos)
+    await handleUpdate({ config_turnos: novosTurnos })
+  }
+
   const handleUpdateMinimo = (minimo: number) => {
     const novosPremios = [...localPremios]
     let turnoConfig = novosPremios.find(t => t.turno === turnoEditorAtivo)
@@ -70,11 +95,14 @@ export default function EditPromoPage() {
       const premio = turnoConfig.premios[idx]
       if (campo === 'tipo') {
         if (valor === 'single') {
+          delete premio.posicao
           delete premio.posicao_inicio
           delete premio.posicao_fim
           premio.posicao = 1
         } else {
           delete premio.posicao
+          delete premio.posicao_inicio
+          delete premio.posicao_fim
           premio.posicao_inicio = 3
           premio.posicao_fim = 5
         }
@@ -323,6 +351,50 @@ export default function EditPromoPage() {
               <p className="text-gray-400 text-xs">Configure o prêmio de cada classificação e as metas de elegibilidade (como mínimo de corridas).</p>
             </div>
 
+            {/* Seletor de Turnos Ativos */}
+            <div className="bg-white/2 border border-white/5 p-4 rounded-xl space-y-3">
+              <h3 className="text-xs font-bold text-white flex items-center gap-1.5 uppercase tracking-wider text-blue-400">
+                <span>⏰</span> Turnos Habilitados nesta Campanha
+              </h3>
+              <p className="text-gray-400 text-xs leading-relaxed">
+                Marque quais turnos farão parte desta promoção. Somente os turnos marcados aparecerão na página de ranking pública dos entregadores.
+              </p>
+              <div className="flex flex-wrap gap-2.5 pt-1">
+                {[
+                  { key: 'CAFE_DA_MANHA', label: 'Café da Manhã', emoji: '☀️' },
+                  { key: 'ALMOCO', label: 'Almoço', emoji: '🌤️' },
+                  { key: 'JANTAR', label: 'Jantar', emoji: '🌙' },
+                  { key: 'MADRUGADA', label: 'Madrugada', emoji: '⭐' }
+                ].map(t => {
+                  const isChecked = activeTurnos.includes(t.key)
+                  return (
+                    <button
+                      key={t.key}
+                      type="button"
+                      onClick={() => handleToggleTurno(t.key)}
+                      className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-xs font-bold transition-all duration-300 active:scale-95 ${
+                        isChecked 
+                          ? 'bg-blue-500/10 border-blue-500/30 text-white shadow-sm shadow-blue-500/5' 
+                          : 'bg-black/35 border-white/5 text-gray-500 hover:text-gray-300 hover:bg-white/2'
+                      }`}
+                    >
+                      <div className={`w-3.5 h-3.5 rounded border flex items-center justify-center transition-all ${
+                        isChecked 
+                          ? 'bg-blue-600 border-blue-500 text-white' 
+                          : 'border-white/20 text-transparent'
+                      }`}>
+                        <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      <span>{t.emoji}</span>
+                      <span>{t.label}</span>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
             {/* Turnos select pills */}
             <div className="flex bg-black/35 p-1 rounded-xl border border-white/5 overflow-x-auto scrollbar-none gap-1">
               {[
@@ -330,7 +402,7 @@ export default function EditPromoPage() {
                 { key: 'ALMOCO', label: 'Almoço', emoji: '🌤️' },
                 { key: 'JANTAR', label: 'Jantar', emoji: '🌙' },
                 { key: 'MADRUGADA', label: 'Madrugada', emoji: '⭐' }
-              ].map(t => (
+              ].filter(t => activeTurnos.includes(t.key)).map(t => (
                 <button
                   key={t.key}
                   type="button"
