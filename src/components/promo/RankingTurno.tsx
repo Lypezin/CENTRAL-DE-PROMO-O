@@ -468,7 +468,6 @@ export default function RankingTurno({
                     {mecanica.metrica !== 'corridas_completadas' && (
                       <div className="w-24 text-right pr-4 hidden sm:block">Pontuação</div>
                     )}
-                    <div className="w-20 sm:w-28 text-right pr-2 sm:pr-4">Taxas Acumuladas</div>
                     <div className="w-20 sm:w-32 text-right">Prêmio Estimado</div>
                   </div>
 
@@ -541,10 +540,7 @@ export default function RankingTurno({
                             </div>
                           )}
 
-                          {/* Delivery fees earnings (Monospace font matching finance layout) */}
-                          <div className="w-20 sm:w-28 text-right pr-2 sm:pr-4 font-mono text-xs font-bold text-zinc-300">
-                            {formatCurrency(item.total_soma_taxas)}
-                          </div>
+
 
                           {/* Eligibility & Prizes Column */}
                           <div className="w-20 sm:w-32 text-right flex flex-col items-end justify-center font-mono">
