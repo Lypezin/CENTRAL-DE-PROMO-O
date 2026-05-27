@@ -27,8 +27,6 @@ export default function HubContent({ initialPromocoes }: { initialPromocoes: Pro
   const ativas = initialPromocoes.filter(p => p.status === 'ativa')
   const encerradas = initialPromocoes.filter(p => p.status === 'encerrada')
 
-  // Let's find the main active promotion to feature it at the top
-  const featuredPromo = ativas[0] || initialPromocoes[0]
 
   // Estimate total prizes for display (or default to a motivated text)
   const calculateTotalPrizes = () => {
@@ -108,73 +106,6 @@ export default function HubContent({ initialPromocoes }: { initialPromocoes: Pro
           </div>
         </div>
       </section>
-
-      {/* Featured Promo (Exibido apenas quando "ativas" está selecionado e há campanhas) */}
-      {featuredPromo && activeTab === 'ativas' && !searchQuery && (
-        <section className="mb-14 animate-slide-up">
-          <h2 className="text-sm font-extrabold tracking-widest text-gray-400 uppercase mb-4 flex items-center gap-2 pl-1">
-            <span className="w-1.5 h-3 bg-blue-500 rounded-full"></span>
-            Campanha em Destaque
-          </h2>
-          
-          <div className="group relative rounded-3xl overflow-hidden border border-white/10 bg-[#0e0e17]/70 backdrop-blur-xl hover:border-blue-500/30 transition-all duration-500 shadow-2xl p-6 md:p-8 flex flex-col lg:flex-row gap-8 items-center">
-            {/* Top gradient blur reflection */}
-            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600"></div>
-            
-            {/* Promo Info */}
-            <div className="flex-1 space-y-4">
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-xs font-bold text-emerald-400 animate-pulse-slow">
-                  ⚡ ATIVA AGORA
-                </span>
-                {featuredPromo.cidade && (
-                  <span className="px-3 py-1 rounded-full bg-gradient-to-r from-blue-600/30 to-indigo-600/30 border border-blue-400/40 text-xs font-extrabold text-white flex items-center gap-1.5 shadow-[0_0_20px_rgba(59,130,246,0.3)] backdrop-blur">
-                    <span className="animate-bounce">📍</span> {featuredPromo.cidade}
-                  </span>
-                )}
-                <span className="px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-gray-300">
-                  {featuredPromo.tipo === 'ranking_turno' ? '🏆 Ranking por Turno' : '🎯 Desafio'}
-                </span>
-              </div>
-              
-              <h3 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight leading-tight">
-                {featuredPromo.nome}
-              </h3>
-              
-              <p className="text-gray-400 text-sm md:text-base leading-relaxed max-w-3xl">
-                {featuredPromo.descricao || 'Confira os rankings atualizados desta campanha, prêmios definidos por cada turno e detalhes sobre as regras de elegibilidade.'}
-              </p>
-
-              <div className="flex flex-wrap gap-4 pt-2 text-xs md:text-sm text-gray-400">
-                <div className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-xl border border-white/5">
-                  <span className="text-blue-400">📅</span>
-                  <span className="font-semibold">Válido até {featuredPromo.data_fim ? featuredPromo.data_fim.split('-').reverse().join('/') : 'TBD'}</span>
-                </div>
-                {featuredPromo.config_turnos && (
-                  <div className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-xl border border-white/5">
-                    <span className="text-purple-400">⏰</span>
-                    <span className="font-semibold">{(featuredPromo.config_turnos as string[]).filter(t => t !== 'TARDE').length} Turnos de Competição</span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Dynamic CTA card on right */}
-            <div className="w-full lg:w-72 shrink-0 p-6 rounded-2xl bg-white/5 border border-white/5 backdrop-blur flex flex-col items-center justify-center text-center">
-              <span className="text-4xl mb-3">🏅</span>
-              <div className="text-white font-extrabold text-lg mb-1">Acompanhar Ranking</div>
-              <p className="text-xs text-gray-500 mb-5">Veja quem está liderando os turnos e garanta sua fatia do prêmio!</p>
-              
-              <a 
-                href={`/promo/${featuredPromo.slug}`}
-                className="w-full text-center bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-blue-500/20 active:scale-95 transition-all"
-              >
-                Ver Classificação
-              </a>
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* Filter and Search Bar */}
       <section className="mb-10 flex flex-col md:flex-row gap-4 items-center justify-between animate-slide-up">
