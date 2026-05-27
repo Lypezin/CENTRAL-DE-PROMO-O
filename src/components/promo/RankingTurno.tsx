@@ -462,14 +462,14 @@ export default function RankingTurno({
                 <div className="border border-white/[0.04] rounded-xl overflow-hidden bg-zinc-950/20 shadow-inner">
                   {/* Table Header */}
                   <div className="flex items-center px-4 py-2.5 bg-zinc-950/50 border-b border-white/[0.04] text-[9px] font-bold text-zinc-500 uppercase tracking-wider font-mono select-none">
-                    <div className="w-10 text-center">Pos</div>
-                    <div className="flex-1 min-w-0 pl-4">Entregador</div>
+                    <div className="w-8 sm:w-10 text-center">Pos</div>
+                    <div className="flex-1 min-w-0 pl-2.5 sm:pl-4">Entregador</div>
                     <div className="w-20 hidden sm:block">Praça</div>
                     {mecanica.metrica !== 'corridas_completadas' && (
                       <div className="w-24 text-right pr-4 hidden sm:block">Pontuação</div>
                     )}
                     <div className="w-20 sm:w-28 text-right pr-2 sm:pr-4">Taxas Acumuladas</div>
-                    <div className="w-24 sm:w-32 text-right">Prêmio Estimado</div>
+                    <div className="w-20 sm:w-32 text-right">Prêmio Estimado</div>
                   </div>
 
                   {/* Table Body Rows */}
@@ -496,7 +496,7 @@ export default function RankingTurno({
                           className="flex items-center px-4 py-3 hover:bg-white/[0.01] transition-colors duration-150"
                         >
                           {/* Position (Tabular numbers) */}
-                          <div className="w-10 flex justify-center font-mono text-xs font-black">
+                          <div className="w-8 sm:w-10 flex justify-center font-mono text-xs font-black">
                             {isTop1 ? (
                               <span className="text-yellow-400 bg-yellow-500/10 px-1.5 py-0.5 rounded text-[10px]">01</span>
                             ) : isTop2 ? (
@@ -509,7 +509,7 @@ export default function RankingTurno({
                           </div>
 
                           {/* Driver & micro-bar */}
-                          <div className="flex-1 min-w-0 pl-4 flex flex-col justify-center">
+                          <div className="flex-1 min-w-0 pl-2.5 sm:pl-4 flex flex-col justify-center">
                             <div className="font-extrabold text-white text-xs md:text-sm truncate">
                               {item.pessoa_entregadora}
                             </div>
@@ -547,15 +547,15 @@ export default function RankingTurno({
                           </div>
 
                           {/* Eligibility & Prizes Column */}
-                          <div className="w-24 sm:w-32 text-right flex flex-col items-end justify-center font-mono">
+                          <div className="w-20 sm:w-32 text-right flex flex-col items-end justify-center font-mono">
                             {premioTeorico > 0 ? (
                               atingiuMinimo ? (
-                                <span className="inline-flex items-center gap-0.5 text-emerald-400 text-xs font-extrabold tracking-tight">
+                                <span className="inline-flex items-center gap-0.5 text-emerald-400 text-[10px] sm:text-xs font-extrabold tracking-tight">
                                   +{formatCurrency(premio)}
                                 </span>
                               ) : (
                                 <div className="flex flex-col items-end">
-                                  <span className="text-[10px] text-zinc-600 line-through font-bold">
+                                  <span className="text-[9px] sm:text-[10px] text-zinc-600 line-through font-bold">
                                     +{formatCurrency(premioTeorico)}
                                   </span>
                                   <span className="text-[7px] text-amber-500/80 bg-amber-500/5 border border-amber-500/10 px-1 py-0.2 rounded font-extrabold uppercase mt-0.5">
