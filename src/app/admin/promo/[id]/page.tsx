@@ -15,6 +15,10 @@ export default function EditPromoPage() {
   const [deleting, setDeleting] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
 
+  // Custom states for visual prize editor
+  const [localPremios, setLocalPremios] = useState<any[]>([])
+  const [turnoEditorAtivo, setTurnoEditorAtivo] = useState<string>('CAFE_DA_MANHA')
+
   // Upload state
   const [arquivo, setArquivo] = useState<File | null>(null)
   const [uploadLoading, setUploadLoading] = useState(false)
@@ -34,11 +38,71 @@ export default function EditPromoPage() {
         const data = await res.json()
         setPromo(data.promocao)
         setStats(data.stats)
+        setLocalPremios(data.promocao.config_premios || [])
       }
     } catch (e) {
       console.error(e)
     } finally {
       setLoading(false)
+    }
+  }
+
+  // Visual editor helper functions
+  const handleUpdateMinimo = (minimo: number) => {
+    const novosPremios = [...localPremios]
+    let turnoConfig = novosPremios.find(t => t.turno === turnoEditorAtivo)
+    if (!turnoConfig) {
+      turnoConfig = { turno: turnoEditorAtivo, minimo_corridas: 0, premios: [] }
+      novosPremios.push(turnoConfig)
+    }
+    turnoConfig.minimo_corridas = Number(minimo)
+    setLocalPremios(novosPremios)
+  }
+
+  const handleUpdatePremioRow = (idx: number, campo: string, valor: any) => {
+    const novosPremios = [...localPremios]
+    let turnoConfig = novosPremios.find(t => t.turno === turnoEditorAtivo)
+    if (!turnoConfig) {
+      turnoConfig = { turno: turnoEditorAtivo, minimo_corridas: 0, premios: [] }
+      novosPremios.push(turnoConfig)
+    }
+    if (turnoConfig && turnoConfig.premios[idx]) {
+      const premio = turnoConfig.premios[idx]
+      if (campo === 'tipo') {
+        if (valor === 'single') {
+          delete premio.posicao_inicio
+          delete premio.posicao_fim
+          premio.posicao = 1
+        } else {
+          delete premio.posicao
+          premio.posicao_inicio = 3
+          premio.posicao_fim = 5
+        }
+      } else {
+        premio[campo] = Number(valor)
+      }
+      setLocalPremios(novosPremios)
+    }
+  }
+
+  const handleAddPremioRow = () => {
+    const novosPremios = [...localPremios]
+    let turnoConfig = novosPremios.find(t => t.turno === turnoEditorAtivo)
+    if (!turnoConfig) {
+      turnoConfig = { turno: turnoEditorAtivo, minimo_corridas: 0, premios: [] }
+      novosPremios.push(turnoConfig)
+    }
+    if (!turnoConfig.premios) turnoConfig.premios = []
+    turnoConfig.premios.push({ posicao: turnoConfig.premios.length + 1, valor: 100 })
+    setLocalPremios(novosPremios)
+  }
+
+  const handleRemovePremioRow = (idx: number) => {
+    const novosPremios = [...localPremios]
+    const turnoConfig = novosPremios.find(t => t.turno === turnoEditorAtivo)
+    if (turnoConfig && turnoConfig.premios) {
+      turnoConfig.premios.splice(idx, 1)
+      setLocalPremios(novosPremios)
     }
   }
 
@@ -252,16 +316,184 @@ export default function EditPromoPage() {
             </div>
           </div>
 
-          {/* Editor de Prêmios simplificado para este MVP */}
-          <div className="glass p-6 rounded-2xl border border-white/10">
-            <h2 className="text-xl font-bold text-white mb-2">Configuração de Prêmios</h2>
-            <p className="text-gray-400 text-sm mb-4">
-              A configuração visual de prêmios será liberada na próxima atualização.
-              Por enquanto, os prêmios seguem a configuração base gerada na criação.
-            </p>
-            <div className="bg-black/30 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-              <pre>{JSON.stringify(promo.config_premios, null, 2)}</pre>
+          {/* Visual Interactive Prizes & Eligibility Rules Configurator */}
+          <div className="glass p-6 rounded-2xl border border-white/10 space-y-6">
+            <div>
+              <h2 className="text-xl font-bold text-white mb-1">Configuração de Prêmios e Regras por Turno</h2>
+              <p className="text-gray-400 text-xs">Configure o prêmio de cada classificação e as metas de elegibilidade (como mínimo de corridas).</p>
             </div>
+
+            {/* Turnos select pills */}
+            <div className="flex bg-black/35 p-1 rounded-xl border border-white/5 overflow-x-auto scrollbar-none gap-1">
+              {[
+                { key: 'CAFE_DA_MANHA', label: 'Café da Manhã', emoji: '☀️' },
+                { key: 'ALMOCO', label: 'Almoço', emoji: '🌤️' },
+                { key: 'JANTAR', label: 'Jantar', emoji: '🌙' },
+                { key: 'MADRUGADA', label: 'Madrugada', emoji: '⭐' }
+              ].map(t => (
+                <button
+                  key={t.key}
+                  type="button"
+                  onClick={() => setTurnoEditorAtivo(t.key)}
+                  className={`flex-grow md:flex-initial min-w-[120px] px-3 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 active:scale-95 ${
+                    turnoEditorAtivo === t.key 
+                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/10' 
+                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <span>{t.emoji}</span>
+                  {t.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Configs for current active Turno */}
+            {(() => {
+              const turnoConfig = localPremios.find(t => t.turno === turnoEditorAtivo) || {
+                turno: turnoEditorAtivo,
+                minimo_corridas: 0,
+                premios: []
+              }
+
+              return (
+                <div className="space-y-6 animate-fade-in">
+                  
+                  {/* Meta / Regra de Elegibilidade */}
+                  <div className="bg-white/2 border border-white/5 p-4 rounded-xl space-y-3">
+                    <h3 className="text-sm font-bold text-white flex items-center gap-1.5">
+                      <span>🎯</span> Meta de Elegibilidade (Regras)
+                    </h3>
+                    <div className="flex flex-col md:flex-row md:items-center gap-4">
+                      <div className="flex-1 w-full">
+                        <label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1">Mínimo de Corridas Completadas</label>
+                        <input
+                          type="number"
+                          value={turnoConfig.minimo_corridas ?? 0}
+                          onChange={e => handleUpdateMinimo(Number(e.target.value))}
+                          placeholder="Ex: 10"
+                          className="admin-input !py-2 !px-3"
+                          min="0"
+                        />
+                      </div>
+                      <div className="flex-[2] text-xs text-gray-400 leading-relaxed md:pt-4">
+                        O entregador precisa atingir este mínimo de corridas completadas no turno para ter direito ao prêmio acumulado. Caso não atinja, o prêmio fica bloqueado. (0 = sem mínimo).
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Classifications & prizes layout */}
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-sm font-bold text-white flex items-center gap-1.5">
+                        <span>💰</span> Tabela de Premiações
+                      </h3>
+                      <button
+                        type="button"
+                        onClick={handleAddPremioRow}
+                        className="text-xs text-blue-400 hover:text-blue-300 font-extrabold flex items-center gap-1 active:scale-95 transition-all"
+                      >
+                        + Adicionar Linha
+                      </button>
+                    </div>
+
+                    <div className="space-y-3">
+                      {turnoConfig.premios?.map((p: any, idx: number) => {
+                        const isSingle = 'posicao' in p
+                        return (
+                          <div key={idx} className="flex flex-wrap items-center gap-3 bg-[#0e0e17]/50 border border-white/5 p-3 rounded-xl justify-between md:justify-start">
+                            {/* Selector Posicao Unica vs Faixa */}
+                            <select
+                              value={isSingle ? 'single' : 'range'}
+                              onChange={e => handleUpdatePremioRow(idx, 'tipo', e.target.value)}
+                              className="bg-[#12121a] border border-white/10 rounded-lg text-xs text-white px-2 py-1.5 focus:outline-none"
+                            >
+                              <option value="single">Posição Única</option>
+                              <option value="range">Faixa (Lote)</option>
+                            </select>
+
+                            {/* Position Inputs */}
+                            {isSingle ? (
+                              <div className="flex items-center gap-1.5">
+                                <input
+                                  type="number"
+                                  value={p.posicao ?? 1}
+                                  onChange={e => handleUpdatePremioRow(idx, 'posicao', e.target.value)}
+                                  className="w-16 bg-[#12121a] border border-white/10 rounded-lg text-xs text-center text-white px-2 py-1"
+                                  min="1"
+                                />
+                                <span className="text-xs text-gray-400">º Lugar</span>
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-1.5">
+                                <input
+                                  type="number"
+                                  value={p.posicao_inicio ?? 3}
+                                  onChange={e => handleUpdatePremioRow(idx, 'posicao_inicio', e.target.value)}
+                                  className="w-16 bg-[#12121a] border border-white/10 rounded-lg text-xs text-center text-white px-2 py-1"
+                                  min="1"
+                                />
+                                <span className="text-xs text-gray-400">º ao</span>
+                                <input
+                                  type="number"
+                                  value={p.posicao_fim ?? 5}
+                                  onChange={e => handleUpdatePremioRow(idx, 'posicao_fim', e.target.value)}
+                                  className="w-16 bg-[#12121a] border border-white/10 rounded-lg text-xs text-center text-white px-2 py-1"
+                                  min="1"
+                                />
+                                <span className="text-xs text-gray-400">º Lugar</span>
+                              </div>
+                            )}
+
+                            {/* Value input */}
+                            <div className="flex items-center gap-2 ml-0 md:ml-auto">
+                              <span className="text-xs text-gray-500">R$</span>
+                              <input
+                                type="number"
+                                value={p.valor ?? 0}
+                                onChange={e => handleUpdatePremioRow(idx, 'valor', e.target.value)}
+                                className="w-24 bg-[#12121a] border border-white/10 rounded-lg text-xs text-white px-2.5 py-1.5"
+                                placeholder="Valor"
+                                min="0"
+                              />
+                            </div>
+
+                            {/* Trash remove icon */}
+                            <button
+                              type="button"
+                              onClick={() => handleRemovePremioRow(idx)}
+                              className="text-gray-500 hover:text-red-400 p-1 rounded transition-colors"
+                            >
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            </button>
+                          </div>
+                        )
+                      })}
+
+                      {(!turnoConfig.premios || turnoConfig.premios.length === 0) && (
+                        <div className="text-center p-6 bg-white/2 rounded-xl text-xs text-gray-500">
+                          Nenhum prêmio cadastrado para este turno. Clique em "+ Adicionar Linha" para começar.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Save button for shift specific prizes */}
+                  <div className="pt-2 border-t border-white/5 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => handleUpdate({ config_premios: localPremios }).then(() => alert('Prêmios salvos com sucesso!'))}
+                      disabled={saving}
+                      className="admin-btn-primary flex items-center gap-2 !px-5 !py-2 text-xs"
+                    >
+                      {saving ? 'Salvando...' : 'Salvar Regras & Prêmios'}
+                    </button>
+                  </div>
+
+                </div>
+              )
+            })()}
           </div>
         </div>
 

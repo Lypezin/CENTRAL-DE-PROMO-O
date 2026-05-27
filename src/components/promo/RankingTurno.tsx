@@ -119,7 +119,14 @@ export default function RankingTurno({
 
         {painelAberto && (
           <div className="mt-6 pt-6 border-t border-white/20 animate-fade-in text-white/90">
-            <p className="text-sm mb-4 opacity-80">Configuração de prêmios para este turno:</p>
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 mb-4">
+              <p className="text-sm opacity-80">Configuração de prêmios para este turno:</p>
+              {(configPremios?.find(c => c.turno === filtroAtivo)?.minimo_corridas || 0) > 0 && (
+                <span className="text-xs bg-black/35 border border-white/10 px-3 py-1 rounded-full font-medium flex items-center gap-1.5 text-amber-300">
+                  ⚡ Meta de Elegibilidade: Mínimo de <strong>{configPremios?.find(c => c.turno === filtroAtivo)?.minimo_corridas} corridas</strong> completadas no turno
+                </span>
+              )}
+            </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {configPremios?.find(c => c.turno === filtroAtivo)?.premios.map((p: any, idx: number) => (
                 <div key={idx} className="bg-black/20 rounded-lg p-3 text-center backdrop-blur-sm">
@@ -159,7 +166,13 @@ export default function RankingTurno({
         ) : (
           <div className="flex flex-col gap-3">
             {rankingToDisplay.map((item, index) => {
-              const premio = getPremioFromConfig(configPremios, filtroAtivo, item.posicao)
+              const activeTurnoConfig = configPremios?.find(c => c.turno === filtroAtivo)
+              const minimoCorridas = activeTurnoConfig?.minimo_corridas || 0
+              const atingiuMinimo = item.total_corridas_completadas >= minimoCorridas
+
+              const premioTeorico = getPremioFromConfig(configPremios, filtroAtivo, item.posicao)
+              const premio = atingiuMinimo ? premioTeorico : 0
+              
               const progresso = (item.total_soma_taxas / maxTaxa) * 100
               
               return (
@@ -199,11 +212,22 @@ export default function RankingTurno({
                     </div>
                   </div>
 
-                  <div className="shrink-0 flex items-center justify-center min-w-[80px] md:min-w-[100px]">
-                    {premio > 0 ? (
-                      <div className="ranking-prize bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 md:px-3 py-1 rounded-lg text-xs md:text-sm font-bold shadow-[0_0_10px_rgba(16,185,129,0.1)]">
-                        {formatCurrency(premio)}
-                      </div>
+                  <div className="shrink-0 flex flex-col items-center justify-center min-w-[90px] md:min-w-[120px]">
+                    {premioTeorico > 0 ? (
+                      atingiuMinimo ? (
+                        <div className="ranking-prize bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 md:px-3 py-1 rounded-lg text-xs md:text-sm font-bold shadow-[0_0_10px_rgba(16,185,129,0.1)]">
+                          {formatCurrency(premio)}
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center gap-1.5">
+                          <div className="text-xs text-gray-600 line-through font-bold">
+                            {formatCurrency(premioTeorico)}
+                          </div>
+                          <div className="text-[9px] md:text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded font-bold flex items-center gap-0.5 shadow-sm">
+                            Falta {minimoCorridas - item.total_corridas_completadas} corr.
+                          </div>
+                        </div>
+                      )
                     ) : (
                       <div className="text-xs text-gray-600 font-medium hidden md:block">
                         sem prêmio
