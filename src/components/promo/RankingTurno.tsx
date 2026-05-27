@@ -310,7 +310,7 @@ export default function RankingTurno({
                               {item.pessoa_entregadora}
                             </div>
                             <div className="text-xs md:text-sm text-gray-400 truncate">
-                              {item.praca} • {item.total_corridas_completadas} corridas {mecanica.metrica !== 'faturamento_taxas' && `• Faturamento: ${formatCurrency(item.total_soma_taxas)}`}
+                              {item.praca} • {item.total_corridas_completadas} corridas
                             </div>
                           </div>
                           <div className="text-right shrink-0">
@@ -331,24 +331,30 @@ export default function RankingTurno({
                         </div>
                       </div>
 
-                      <div className="shrink-0 flex flex-col items-center justify-center min-w-[90px] md:min-w-[120px]">
+                      <div className="shrink-0 flex flex-col items-end justify-center min-w-[100px] md:min-w-[130px] gap-1.5">
+                        {/* Valor das Taxas (o que o entregador fez) no lugar de destaque */}
+                        <div className="ranking-prize bg-white/5 text-white border border-white/10 px-2.5 py-1 rounded-lg text-xs md:text-sm font-bold shadow-sm">
+                          {formatCurrency(item.total_soma_taxas)}
+                        </div>
+
+                        {/* Valor do prêmio correspondente posicionado próximo (embaixo) */}
                         {premioTeorico > 0 ? (
                           atingiuMinimo ? (
-                            <div className="ranking-prize bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 md:px-3 py-1 rounded-lg text-xs md:text-sm font-bold shadow-[0_0_10px_rgba(16,185,129,0.1)]">
-                              {formatCurrency(premio)}
+                            <div className="text-[10px] md:text-xs text-emerald-400 font-extrabold flex items-center gap-0.5 animate-pulse-slow">
+                              🏆 +{formatCurrency(premio)}
                             </div>
                           ) : (
-                            <div className="flex flex-col items-center gap-1.5">
-                              <div className="text-xs text-gray-600 line-through font-bold">
-                                {formatCurrency(premioTeorico)}
+                            <div className="flex flex-col items-end gap-0.5">
+                              <div className="text-[9px] md:text-[10px] text-gray-600 line-through font-bold">
+                                +{formatCurrency(premioTeorico)}
                               </div>
-                              <div className="text-[9px] md:text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded font-bold flex items-center gap-0.5 shadow-sm">
+                              <div className="text-[8px] md:text-[9px] bg-amber-500/10 text-amber-400 border border-amber-500/20 px-1.5 py-0.2 rounded font-bold">
                                 Falta {minimoCorridas - item.total_corridas_completadas} corr.
                               </div>
                             </div>
                           )
                         ) : (
-                          <div className="text-xs text-gray-600 font-medium hidden md:block">
+                          <div className="text-[9px] md:text-[10px] text-gray-600 font-medium hidden md:block">
                             sem prêmio
                           </div>
                         )}
@@ -381,7 +387,7 @@ export default function RankingTurno({
                             <div className="flex justify-between items-start">
                               <div>
                                 <h4 className="font-bold text-white text-base md:text-lg">{item.pessoa_entregadora}</h4>
-                                <p className="text-xs text-gray-400">{item.praca} • {item.total_corridas_completadas} corridas no total • Faturamento: {formatCurrency(item.total_soma_taxas)}</p>
+                                <p className="text-xs text-gray-400">{item.praca} • {item.total_corridas_completadas} corridas completadas no total</p>
                               </div>
                               <div className="text-right">
                                 <div className="text-xs opacity-50 uppercase">Progresso</div>
@@ -454,9 +460,7 @@ export default function RankingTurno({
                             </div>
                             <div className="truncate">
                               <div className="font-bold text-white text-sm truncate">{item.pessoa_entregadora}</div>
-                              <div className="text-[10px] text-gray-400 uppercase tracking-widest">
-                                {item.praca} • {formatScoreValue(getScore(item))} {mecanica.metrica !== 'faturamento_taxas' && `• Faturamento: ${formatCurrency(item.total_soma_taxas)}`}
-                              </div>
+                              <div className="text-[10px] text-gray-400 uppercase tracking-widest">{item.praca} • {formatScoreValue(getScore(item))}</div>
                             </div>
                             <div className="ml-auto bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-3 py-1 rounded-lg text-xs font-bold shadow-[0_0_10px_rgba(16,185,129,0.1)]">
                               +{formatCurrency(prize)}
@@ -508,7 +512,7 @@ export default function RankingTurno({
                             <div className="flex justify-between items-start">
                               <div>
                                 <h4 className="font-bold text-white text-base md:text-lg">{item.pessoa_entregadora}</h4>
-                                <p className="text-xs text-gray-400">{item.praca} • {item.total_corridas_completadas} corridas no total • Faturamento: {formatCurrency(item.total_soma_taxas)}</p>
+                                <p className="text-xs text-gray-400">{item.praca} • {item.total_corridas_completadas} corridas completadas no total</p>
                               </div>
                               <div className="text-right">
                                 <div className="text-xs opacity-50 uppercase">Pontuação Atual</div>

@@ -114,7 +114,7 @@ export async function PUT(
   }
 }
 
-// DELETE: Deletar promoção e entregas associadas (requer autenticação admin)
+// DELETE: Deletar promoção e entregas associadas via RPC atômico (requer autenticação admin)
 export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -126,28 +126,12 @@ export async function DELETE(
   const { id } = await params
 
   try {
-    // Primeiro deleta entregas associadas
-    const { error: entregasError } = await supabase
-      .from('entregas')
-      .delete()
-      .eq('promocao_id', id)
+    // Executa a deleção em lote com privilégios adequados via RPC
+    const { error } = await supabase.rpc('deletar_promocao', { p_id: id })
 
-    if (entregasError) {
+    if (error) {
       return NextResponse.json(
-        { error: `Erro ao deletar entregas: ${entregasError.message}` },
-        { status: 500 }
-      )
-    }
-
-    // Depois deleta a promoção
-    const { error: promocaoError } = await supabase
-      .from('promocoes')
-      .delete()
-      .eq('id', id)
-
-    if (promocaoError) {
-      return NextResponse.json(
-        { error: `Erro ao deletar promoção: ${promocaoError.message}` },
+        { error: `Erro ao excluir promoção: ${error.message}` },
         { status: 500 }
       )
     }
