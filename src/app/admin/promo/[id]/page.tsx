@@ -39,7 +39,17 @@ export default function EditPromoPage() {
         const data = await res.json()
         const initializedPromo = {
           ...data.promocao,
-          config_regras: data.promocao.config_regras || { limite_ranking: 15, regras_texto: [] }
+          config_regras: {
+            limite_ranking: data.promocao.config_regras?.limite_ranking ?? 15,
+            regras_texto: data.promocao.config_regras?.regras_texto ?? [],
+            mecanica: data.promocao.config_regras?.mecanica || {
+              metrica: 'corridas_completadas',
+              tipo_calculo: 'ranking',
+              agrupamento: 'turno',
+              filtros: [],
+              metas_predefinidas: []
+            }
+          }
         }
         setPromo(initializedPromo)
         setStats(data.stats)
@@ -150,7 +160,17 @@ export default function EditPromoPage() {
         const data = await res.json()
         const initializedData = {
           ...data,
-          config_regras: data.config_regras || { limite_ranking: 15, regras_texto: [] }
+          config_regras: {
+            limite_ranking: data.config_regras?.limite_ranking ?? 15,
+            regras_texto: data.config_regras?.regras_texto ?? [],
+            mecanica: data.config_regras?.mecanica || {
+              metrica: 'corridas_completadas',
+              tipo_calculo: 'ranking',
+              agrupamento: 'turno',
+              filtros: [],
+              metas_predefinidas: []
+            }
+          }
         }
         setPromo(initializedData)
       }
@@ -347,6 +367,295 @@ export default function EditPromoPage() {
                   className="admin-btn-primary"
                 >
                   {saving ? 'Salvando...' : 'Salvar Alterações'}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Mecânica & Tipo de Campanha */}
+          <div className="glass p-6 rounded-2xl border border-white/10 space-y-6">
+            <div>
+              <h2 className="text-xl font-bold text-white mb-1">Mecânica & Tipo de Campanha</h2>
+              <p className="text-gray-400 text-xs">Configure o tipo de pontuação, o agrupamento e o formato de premiação da campanha.</p>
+            </div>
+
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Metrica select */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">Métrica de Desempenho</label>
+                  <select
+                    value={promo.config_regras?.mecanica?.metrica ?? 'corridas_completadas'}
+                    onChange={e => {
+                      const val = e.target.value
+                      setPromo({
+                        ...promo,
+                        config_regras: {
+                          ...(promo.config_regras || {}),
+                          mecanica: {
+                            ...(promo.config_regras?.mecanica || {}),
+                            metrica: val
+                          }
+                        }
+                      })
+                    }}
+                    className="admin-input !bg-[#12121a] !border-white/15"
+                  >
+                    <option value="corridas_completadas">Quantidade de Corridas</option>
+                    <option value="faturamento_taxas">Faturamento Acumulado (Taxas R$)</option>
+                  </select>
+                </div>
+
+                {/* Agrupamento select */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">Escopo de Agrupamento</label>
+                  <select
+                    value={promo.config_regras?.mecanica?.agrupamento ?? 'turno'}
+                    onChange={e => {
+                      const val = e.target.value
+                      const updatedMecanica = {
+                        ...(promo.config_regras?.mecanica || {}),
+                        agrupamento: val
+                      }
+                      setPromo({
+                        ...promo,
+                        config_regras: {
+                          ...(promo.config_regras || {}),
+                          mecanica: updatedMecanica
+                        }
+                      })
+                      if (val === 'geral') {
+                        setTurnoEditorAtivo('GERAL')
+                      } else {
+                        setTurnoEditorAtivo(activeTurnos[0] || 'CAFE_DA_MANHA')
+                      }
+                    }}
+                    className="admin-input !bg-[#12121a] !border-white/15"
+                  >
+                    <option value="turno">Separado por Turnos</option>
+                    <option value="geral">Geral Consolidado (Sem Turno)</option>
+                  </select>
+                </div>
+
+                {/* Tipo de Calculo select */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">Modelo de Recompensa</label>
+                  <select
+                    value={promo.config_regras?.mecanica?.tipo_calculo ?? 'ranking'}
+                    onChange={e => {
+                      const val = e.target.value
+                      setPromo({
+                        ...promo,
+                        config_regras: {
+                          ...(promo.config_regras || {}),
+                          mecanica: {
+                            ...(promo.config_regras?.mecanica || {}),
+                            tipo_calculo: val
+                          }
+                        }
+                      })
+                    }}
+                    className="admin-input !bg-[#12121a] !border-white/15"
+                  >
+                    <option value="ranking">Disputa de Ranking (Top X)</option>
+                    <option value="metas">Metas Individuais Fixas</option>
+                    <option value="niveis">Níveis Progressivos (Milestones)</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Dynamic goals configs depending on selection */}
+              {promo.config_regras?.mecanica?.tipo_calculo === 'metas' && (
+                <div className="bg-white/2 border border-white/5 p-4 rounded-xl space-y-4 animate-fade-in">
+                  <h3 className="text-xs font-bold text-blue-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <span>🎯</span> Configurar Meta e Prêmio Individual
+                  </h3>
+                  <p className="text-xs text-gray-400">Todo entregador que atingir o objetivo abaixo ganhará o prêmio correspondente de forma garantida.</p>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">
+                        Meta Objetivo ({promo.config_regras.mecanica.metrica === 'faturamento_taxas' ? 'Taxas R$' : 'Corridas'})
+                      </label>
+                      <input
+                        type="number"
+                        value={promo.config_regras.mecanica.metas_predefinidas?.[0]?.meta ?? 50}
+                        onChange={e => {
+                          const val = Number(e.target.value)
+                          const updatedM = {
+                            ...(promo.config_regras?.mecanica || {}),
+                            metas_predefinidas: [{
+                              meta: val,
+                              premio: promo.config_regras.mecanica.metas_predefinidas?.[0]?.premio ?? 150
+                            }]
+                          }
+                          setPromo({
+                            ...promo,
+                            config_regras: {
+                              ...(promo.config_regras || {}),
+                              mecanica: updatedM
+                            }
+                          })
+                        }}
+                        className="admin-input !py-2 !px-3"
+                        min="1"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Valor do Prêmio (R$)</label>
+                      <input
+                        type="number"
+                        value={promo.config_regras.mecanica.metas_predefinidas?.[0]?.premio ?? 150}
+                        onChange={e => {
+                          const val = Number(e.target.value)
+                          const updatedM = {
+                            ...(promo.config_regras?.mecanica || {}),
+                            metas_predefinidas: [{
+                              meta: promo.config_regras.mecanica.metas_predefinidas?.[0]?.meta ?? 50,
+                              premio: val
+                            }]
+                          }
+                          setPromo({
+                            ...promo,
+                            config_regras: {
+                              ...(promo.config_regras || {}),
+                              mecanica: updatedM
+                            }
+                          })
+                        }}
+                        className="admin-input !py-2 !px-3"
+                        min="0"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {promo.config_regras?.mecanica?.tipo_calculo === 'niveis' && (
+                <div className="bg-white/2 border border-white/5 p-4 rounded-xl space-y-4 animate-fade-in">
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-xs font-bold text-blue-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <span>📈</span> Configurar Níveis Progressivos
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const arr = [...(promo.config_regras.mecanica.niveis || [])]
+                        arr.push({ nivel: arr.length + 1, meta: (arr[arr.length - 1]?.meta ?? 0) + 30, premio: (arr[arr.length - 1]?.premio ?? 0) + 100 })
+                        setPromo({
+                          ...promo,
+                          config_regras: {
+                            ...(promo.config_regras || {}),
+                            mecanica: {
+                              ...(promo.config_regras?.mecanica || {}),
+                              niveis: arr
+                            }
+                          }
+                        })
+                      }}
+                      className="text-xs text-blue-400 hover:text-blue-300 font-extrabold flex items-center gap-1 active:scale-95 transition-all"
+                    >
+                      + Adicionar Nível
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-400">Adicione patamares de conquistas progressivas (ex: Nível 1: Bronze, Nível 2: Prata, etc.).</p>
+                  
+                  <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+                    {(promo.config_regras.mecanica.niveis || []).map((n: any, idx: number) => (
+                      <div key={idx} className="flex items-center gap-3 bg-[#0e0e17]/50 border border-white/5 p-3 rounded-xl justify-between">
+                        <span className="text-xs font-bold text-white uppercase tracking-wider bg-white/5 border border-white/5 px-2.5 py-1 rounded-md">
+                          Nível {n.nivel}
+                        </span>
+                        
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-gray-500">Meta:</span>
+                          <input
+                            type="number"
+                            value={n.meta}
+                            onChange={e => {
+                              const arr = [...(promo.config_regras.mecanica.niveis || [])]
+                              arr[idx].meta = Number(e.target.value)
+                              setPromo({
+                                ...promo,
+                                config_regras: {
+                                  ...(promo.config_regras || {}),
+                                  mecanica: {
+                                    ...(promo.config_regras?.mecanica || {}),
+                                    niveis: arr
+                                  }
+                                }
+                              })
+                            }}
+                            className="w-20 bg-[#12121a] border border-white/10 rounded-lg text-xs text-center text-white px-2 py-1.5 focus:outline-none focus:border-blue-500"
+                            min="1"
+                          />
+                        </div>
+
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-xs text-gray-500">R$</span>
+                          <input
+                            type="number"
+                            value={n.premio}
+                            onChange={e => {
+                              const arr = [...(promo.config_regras.mecanica.niveis || [])]
+                              arr[idx].premio = Number(e.target.value)
+                              setPromo({
+                                ...promo,
+                                config_regras: {
+                                  ...(promo.config_regras || {}),
+                                  mecanica: {
+                                    ...(promo.config_regras?.mecanica || {}),
+                                    niveis: arr
+                                  }
+                                }
+                              })
+                            }}
+                            className="w-24 bg-[#12121a] border border-white/10 rounded-lg text-xs text-white px-2.5 py-1.5 focus:outline-none focus:border-blue-500"
+                            placeholder="Prêmio"
+                            min="0"
+                          />
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const arr = (promo.config_regras.mecanica.niveis || []).filter((_: any, i: number) => i !== idx)
+                            arr.forEach((item: any, i: number) => { item.nivel = i + 1 })
+                            setPromo({
+                              ...promo,
+                              config_regras: {
+                                ...(promo.config_regras || {}),
+                                mecanica: {
+                                  ...(promo.config_regras?.mecanica || {}),
+                                  niveis: arr
+                                }
+                              }
+                            })
+                          }}
+                          className="text-gray-500 hover:text-red-400 p-1 transition-colors"
+                        >
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      </div>
+                    ))}
+
+                    {(!promo.config_regras.mecanica.niveis || promo.config_regras.mecanica.niveis.length === 0) && (
+                      <div className="text-center py-6 text-xs text-gray-500">Nenhum nível cadastrado. Clique em "+ Adicionar Nível".</div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              <div className="pt-2 border-t border-white/5 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => handleUpdate({ config_regras: promo.config_regras }).then(() => alert('Mecânica da campanha salva com sucesso!'))}
+                  disabled={saving}
+                  className="admin-btn-primary flex items-center gap-2 !px-5 !py-2 text-xs"
+                >
+                  {saving ? 'Salvando...' : 'Salvar Mecânica & Regras'}
                 </button>
               </div>
             </div>
