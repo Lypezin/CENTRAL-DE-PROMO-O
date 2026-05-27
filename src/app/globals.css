@@ -154,7 +154,31 @@
 
 .upload-zone {
   @apply border border-dashed border-zinc-800 rounded-2xl p-10 text-center transition-all cursor-pointer bg-[#050507] hover:border-sky-500/40 hover:bg-zinc-950/50;
+  animation: borderPulse 3s infinite ease-in-out;
 }
 .upload-zone.active {
   @apply border-sky-500 bg-sky-950/10;
+  animation: none;
 }
+
+.admin-input:focus {
+  box-shadow: 0 0 18px -3px rgba(56, 189, 248, 0.16);
+}
+
+/* Shimmer Sparkles for Podium highlights */
+@keyframes borderPulse {
+  0% { border-color: rgba(63, 63, 70, 0.5); }
+  50% { border-color: rgba(56, 189, 248, 0.35); box-shadow: 0 0 15px -5px rgba(56, 189, 248, 0.05); }
+  100% { border-color: rgba(63, 63, 70, 0.5); }
+}
+
+@keyframes shimmerSparkle {
+  0% { opacity: 0.8; filter: brightness(1); }
+  50% { opacity: 1; filter: brightness(1.22) drop-shadow(0 0 6px rgba(255, 255, 255, 0.15)); }
+  100% { opacity: 0.8; filter: brightness(1); }
+}
+
+.podium-sparkle {
+  animation: shimmerSparkle 2.5s infinite ease-in-out;
+}
+

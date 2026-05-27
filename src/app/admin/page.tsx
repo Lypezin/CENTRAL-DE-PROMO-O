@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import StatusBadge from '@/components/ui/StatusBadge'
 import { Promocao } from '@/lib/supabase'
+import LightningBackground from '@/components/ui/LightningBackground'
 
 export default function AdminPage() {
   const [pageState, setPageState] = useState<'login' | 'admin'>('login')
@@ -140,8 +141,12 @@ export default function AdminPage() {
 
   if (pageState === 'login') {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="glass p-8 rounded-2xl max-w-md w-full border border-white/10 animate-slide-up">
+      <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+        {/* Ambient WebGL dynamic background and grid texture */}
+        <LightningBackground />
+        <div className="tech-grid"></div>
+
+        <div className="glass p-8 rounded-2xl max-w-md w-full border border-white/10 animate-slide-up relative z-10">
           {setupRequired === null ? (
             <div className="text-center py-8 text-gray-400">
               <div className="animate-spin text-3xl mb-3 flex justify-center">🔄</div>
@@ -256,7 +261,12 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="container mx-auto p-4 md:p-8">
+    <div className="min-h-screen pb-16 relative overflow-hidden">
+      {/* Ambient WebGL dynamic background and grid texture */}
+      <LightningBackground />
+      <div className="tech-grid"></div>
+
+      <div className="container mx-auto p-4 md:p-8 relative z-10 animate-slide-up">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
           <h1 className="text-3xl font-bold text-white mb-2">Painel Administrativo</h1>
@@ -335,6 +345,7 @@ export default function AdminPage() {
             </tbody>
           </table>
         </div>
+      </div>
       </div>
     </div>
   )

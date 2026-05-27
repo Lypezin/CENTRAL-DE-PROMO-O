@@ -299,7 +299,7 @@ export default function RankingTurno({
                       return (
                         <div className="bg-gradient-to-b from-[#0f1115] to-[#08080a] border border-slate-500/20 rounded-xl p-5 flex flex-col justify-between relative overflow-hidden order-2 sm:order-1">
                           <div className="flex justify-between items-start mb-4">
-                            <span className="text-[10px] font-bold text-slate-400 bg-slate-500/10 border border-slate-500/20 px-2 py-0.5 rounded font-mono uppercase tracking-wider">
+                            <span className="text-[10px] font-bold text-slate-400 bg-slate-500/10 border border-slate-500/20 px-2 py-0.5 rounded font-mono uppercase tracking-wider podium-sparkle">
                               🥈 02 Rank
                             </span>
                             <span className="text-[9px] font-bold text-zinc-500 uppercase font-mono tracking-wider">Prata</span>
@@ -355,10 +355,10 @@ export default function RankingTurno({
                       return (
                         <div className="bg-gradient-to-b from-[#14120e] to-[#08080a] border border-yellow-600/30 rounded-xl p-5 flex flex-col justify-between relative overflow-hidden order-1 sm:order-2 sm:scale-[1.03] shadow-lg shadow-yellow-950/5">
                           {/* Crown background emblem */}
-                          <div className="absolute -right-2 -top-2 text-yellow-600/10 text-6xl pointer-events-none select-none font-bold">👑</div>
+                          <div className="absolute -right-2 -top-2 text-yellow-600/10 text-6xl pointer-events-none select-none font-bold podium-sparkle">👑</div>
                           
                           <div className="flex justify-between items-start mb-4">
-                            <span className="text-[10px] font-bold text-yellow-400 bg-yellow-500/10 border border-yellow-500/20 px-2 py-0.5 rounded font-mono uppercase tracking-wider">
+                            <span className="text-[10px] font-bold text-yellow-400 bg-yellow-500/10 border border-yellow-500/20 px-2 py-0.5 rounded font-mono uppercase tracking-wider podium-sparkle">
                               👑 01 LÍDER
                             </span>
                             <span className="text-[9px] font-bold text-yellow-500 uppercase font-mono tracking-wider">Ouro</span>
@@ -414,7 +414,7 @@ export default function RankingTurno({
                       return (
                         <div className="bg-gradient-to-b from-[#110f0d] to-[#08080a] border border-amber-800/30 rounded-xl p-5 flex flex-col justify-between relative overflow-hidden order-3 sm:order-3">
                           <div className="flex justify-between items-start mb-4">
-                            <span className="text-[10px] font-bold text-amber-500 bg-amber-500/5 border border-amber-800/20 px-2 py-0.5 rounded font-mono uppercase tracking-wider">
+                            <span className="text-[10px] font-bold text-amber-500 bg-amber-500/5 border border-amber-800/20 px-2 py-0.5 rounded font-mono uppercase tracking-wider podium-sparkle">
                               🥉 03 Rank
                             </span>
                             <span className="text-[9px] font-bold text-zinc-500 uppercase font-mono tracking-wider">Bronze</span>
@@ -459,7 +459,7 @@ export default function RankingTurno({
                 )}
 
                 {/* 📋 UNIFIED DATAGRID TABLE LIST (Obsidian Ledger) */}
-                <div className="border border-white/[0.04] rounded-xl overflow-hidden bg-zinc-950/20 shadow-inner">
+                <div className="border border-white/[0.04] rounded-xl overflow-hidden bg-zinc-950/20 shadow-inner animate-fade-in">
                   {/* Table Header */}
                   <div className="flex items-center px-4 py-2.5 bg-zinc-950/50 border-b border-white/[0.04] text-[9px] font-bold text-zinc-500 uppercase tracking-wider font-mono select-none">
                     <div className="w-8 sm:w-10 text-center">Pos</div>
