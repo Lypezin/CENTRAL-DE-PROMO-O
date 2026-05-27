@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/ui/Navbar";
+import LightningBackground from "@/components/ui/LightningBackground";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,6 +26,9 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={inter.className}>
+        {/* Ambient WebGL organic lightning background */}
+        <LightningBackground />
+
         {/* Modern grid line pattern overlay (Pure CSS, 60fps native performance) */}
         <div className="tech-grid"></div>
         
