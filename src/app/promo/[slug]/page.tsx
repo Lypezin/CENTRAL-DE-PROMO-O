@@ -36,8 +36,10 @@ export default async function PromoPage({ params }: { params: Promise<{ slug: st
             </span>
           </div>
           {promo.cidade && (
-            <div className="text-sm font-extrabold tracking-widest text-blue-400 uppercase mb-2 flex items-center gap-1.5 pl-0.5">
-              <span className="text-lg animate-pulse">📍</span> Praça {promo.cidade}
+            <div className="mb-4">
+              <span className="inline-flex items-center gap-2 text-xs md:text-sm font-extrabold tracking-widest text-white uppercase bg-gradient-to-r from-blue-600/35 to-indigo-600/35 border border-blue-400/50 px-4 py-1.5 rounded-full shadow-[0_0_20px_rgba(59,130,246,0.35)] backdrop-blur-md">
+                <span className="animate-bounce">📍</span> Praça: {promo.cidade}
+              </span>
             </div>
           )}
           <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4 leading-tight">
@@ -66,6 +68,7 @@ export default async function PromoPage({ params }: { params: Promise<{ slug: st
             promocaoId={promo.id} 
             configPremios={configPremios} 
             configTurnos={configTurnos} 
+            configRegras={promo.config_regras || {}}
           />
         ) : (
           <div className="text-center p-12 glass rounded-2xl text-gray-400">
@@ -73,6 +76,25 @@ export default async function PromoPage({ params }: { params: Promise<{ slug: st
           </div>
         )}
       </div>
+
+      {/* Regulamento Card */}
+      {promo.config_regras?.regras_texto && promo.config_regras.regras_texto.filter((r: string) => r.trim() !== '').length > 0 && (
+        <div className="mt-12 glass p-6 rounded-2xl border border-white/10 max-w-5xl mx-auto shadow-xl">
+          <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+            <span>📋</span> Regulamento & Regras Gerais
+          </h3>
+          <ul className="space-y-3 pl-1 text-sm text-gray-400">
+            {promo.config_regras.regras_texto
+              .filter((regra: string) => regra.trim() !== '')
+              .map((regra: string, idx: number) => (
+                <li key={idx} className="flex items-start gap-2.5">
+                  <span className="text-blue-500 font-extrabold select-none">•</span>
+                  <span className="leading-relaxed">{regra}</span>
+                </li>
+              ))}
+          </ul>
+        </div>
+      )}
     </div>
   )
 }

@@ -18,7 +18,7 @@ export default function Navbar() {
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <Link href="/" className="navbar-brand flex items-center gap-2 group">
           <span className="text-2xl group-hover:scale-110 transition-transform">🏆</span>
-          <span className="font-bold text-lg text-gradient hidden sm:block">Central de Promoções</span>
+          <span className="font-bold text-sm sm:text-lg text-gradient">Central de Promoções</span>
         </Link>
 
         {/* Desktop Links */}

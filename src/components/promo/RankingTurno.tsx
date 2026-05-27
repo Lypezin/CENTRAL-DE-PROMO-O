@@ -25,11 +25,13 @@ function getPremioFromConfig(configPremios: any[], turno: string, posicao: numbe
 export default function RankingTurno({ 
   promocaoId, 
   configPremios, 
-  configTurnos 
+  configTurnos,
+  configRegras = {}
 }: { 
   promocaoId: string, 
   configPremios: any[], 
-  configTurnos: string[] 
+  configTurnos: string[],
+  configRegras?: any
 }) {
   const turnosDisponiveis = configTurnos.filter(t => t !== 'TARDE')
   
@@ -59,7 +61,8 @@ export default function RankingTurno({
     item.pessoa_entregadora.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  const displayLimit = searchQuery ? filteredRanking.length : Math.min(filteredRanking.length, 15)
+  const limiteRanking = configRegras?.limite_ranking ?? 15
+  const displayLimit = searchQuery ? filteredRanking.length : Math.min(filteredRanking.length, limiteRanking)
   const rankingToDisplay = filteredRanking.slice(0, displayLimit)
   const maxTaxa = rankingToDisplay.length > 0 ? rankingToDisplay[0].total_soma_taxas : 1
 
@@ -130,7 +133,7 @@ export default function RankingTurno({
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {configPremios?.find(c => c.turno === filtroAtivo)?.premios.map((p: any, idx: number) => (
                 <div key={idx} className="bg-black/20 rounded-lg p-3 text-center backdrop-blur-sm">
-                  <div className="font-bold text-lg">
+                  <div className="font-bold text-sm md:text-lg">
                     {p.posicao ? `${p.posicao}º Lugar` : `${p.posicao_inicio}º ao ${p.posicao_fim}º`}
                   </div>
                   <div className="text-emerald-300 font-bold">{formatCurrency(p.valor)}</div>

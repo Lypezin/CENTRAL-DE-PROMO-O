@@ -37,7 +37,11 @@ export default function EditPromoPage() {
       const res = await fetch(`/api/promocoes/${id}`)
       if (res.ok) {
         const data = await res.json()
-        setPromo(data.promocao)
+        const initializedPromo = {
+          ...data.promocao,
+          config_regras: data.promocao.config_regras || { limite_ranking: 15, regras_texto: [] }
+        }
+        setPromo(initializedPromo)
         setStats(data.stats)
         setLocalPremios(data.promocao.config_premios || [])
         const loadedTurnos = data.promocao.config_turnos || ['CAFE_DA_MANHA', 'ALMOCO', 'JANTAR', 'MADRUGADA']
@@ -144,7 +148,11 @@ export default function EditPromoPage() {
       })
       if (res.ok) {
         const data = await res.json()
-        setPromo(data)
+        const initializedData = {
+          ...data,
+          config_regras: data.config_regras || { limite_ranking: 15, regras_texto: [] }
+        }
+        setPromo(initializedData)
       }
     } catch (e) {
       console.error(e)
@@ -339,6 +347,72 @@ export default function EditPromoPage() {
                   className="admin-btn-primary"
                 >
                   {saving ? 'Salvando...' : 'Salvar Alterações'}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Regras Gerais & Regulamento */}
+          <div className="glass p-6 rounded-2xl border border-white/10 space-y-6">
+            <div>
+              <h2 className="text-xl font-bold text-white mb-1">Regulamento & Exibição</h2>
+              <p className="text-gray-400 text-xs">Configure o limite de posições a exibir no ranking e adicione regras de regulamento em texto.</p>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-1">Limite de Exibição no Ranking (Padrão)</label>
+                <select
+                  value={promo.config_regras?.limite_ranking ?? 15}
+                  onChange={e => {
+                    const val = Number(e.target.value)
+                    setPromo({
+                      ...promo,
+                      config_regras: {
+                        ...(promo.config_regras || {}),
+                        limite_ranking: val
+                      }
+                    })
+                  }}
+                  className="admin-input !bg-[#12121a] !border-white/15"
+                >
+                  <option value={10}>Exibir Top 10</option>
+                  <option value={15}>Exibir Top 15 (Recomendado)</option>
+                  <option value={20}>Exibir Top 20</option>
+                  <option value={30}>Exibir Top 30</option>
+                  <option value={50}>Exibir Top 50</option>
+                  <option value={999999}>Exibir Todos os Entregadores</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-1">Regras e Termos da Promoção (um por linha)</label>
+                <textarea
+                  value={(promo.config_regras?.regras_texto || []).join('\n')}
+                  onChange={e => {
+                    const arr = e.target.value.split('\n')
+                    setPromo({
+                      ...promo,
+                      config_regras: {
+                        ...(promo.config_regras || {}),
+                        regras_texto: arr
+                      }
+                    })
+                  }}
+                  rows={4}
+                  className="admin-input !bg-[#12121a] !border-white/15"
+                  placeholder="Ex: Apenas entregas com status finalizado contam.&#10;Manter nota mínima de 4.8.&#10;Turno TARDE desativado nesta praça."
+                />
+              </div>
+
+              <div className="pt-2 border-t border-white/5 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => handleUpdate({ config_regras: promo.config_regras }).then(() => alert('Regulamento e regras salvos com sucesso!'))}
+                  disabled={saving}
+                  className="admin-btn-primary flex items-center gap-2 !px-5 !py-2 text-xs"
+                >
+                  {saving ? 'Salvando...' : 'Salvar Regulamento'}
                 </button>
               </div>
             </div>

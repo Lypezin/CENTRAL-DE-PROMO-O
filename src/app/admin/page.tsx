@@ -7,6 +7,7 @@ import { Promocao } from '@/lib/supabase'
 
 export default function AdminPage() {
   const [pageState, setPageState] = useState<'login' | 'admin'>('login')
+  const [usuario, setUsuario] = useState('')
   const [senha, setSenha] = useState('')
   const [loginLoading, setLoginLoading] = useState(false)
   const [loginErro, setLoginErro] = useState('')
@@ -42,11 +43,11 @@ export default function AdminPage() {
       const res = await fetch('/api/admin/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: senha }),
+        body: JSON.stringify({ username: usuario, password: senha }),
       })
       const data = await res.json()
       if (data.success) setPageState('admin')
-      else setLoginErro('Senha incorreta.')
+      else setLoginErro(data.error || 'Usuário ou senha incorretos.')
     } catch {
       setLoginErro('Erro de conexão.')
     } finally {
@@ -107,6 +108,18 @@ export default function AdminPage() {
           </div>
           
           <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">Usuário de acesso</label>
+              <input
+                type="text"
+                className="admin-input"
+                placeholder="Ex: admin"
+                value={usuario}
+                onChange={e => setUsuario(e.target.value)}
+                required
+              />
+            </div>
+            
             <div>
               <label className="block text-sm font-medium text-gray-400 mb-2">Senha de acesso</label>
               <input

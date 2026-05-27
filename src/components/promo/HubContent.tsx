@@ -128,8 +128,8 @@ export default function HubContent({ initialPromocoes }: { initialPromocoes: Pro
                   ⚡ ATIVA AGORA
                 </span>
                 {featuredPromo.cidade && (
-                  <span className="px-2.5 py-0.5 rounded-full bg-blue-500/15 border border-blue-500/25 text-xs font-bold text-blue-300 flex items-center gap-1.5 shadow-[0_0_12px_rgba(59,130,246,0.1)]">
-                    <span className="animate-pulse">📍</span> {featuredPromo.cidade}
+                  <span className="px-3 py-1 rounded-full bg-gradient-to-r from-blue-600/30 to-indigo-600/30 border border-blue-400/40 text-xs font-extrabold text-white flex items-center gap-1.5 shadow-[0_0_20px_rgba(59,130,246,0.3)] backdrop-blur">
+                    <span className="animate-bounce">📍</span> {featuredPromo.cidade}
                   </span>
                 )}
                 <span className="px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-gray-300">

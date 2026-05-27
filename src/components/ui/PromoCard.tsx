@@ -52,9 +52,9 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
 
           {/* Card Body */}
           {promo.cidade && (
-            <div className="mb-2">
-              <span className="inline-flex items-center gap-1.5 text-[10px] font-extrabold tracking-widest text-blue-300 uppercase bg-blue-500/15 border border-blue-500/25 px-2.5 py-0.5 rounded-full shadow-[0_0_12px_rgba(59,130,246,0.1)]">
-                <span className="animate-pulse">📍</span> {promo.cidade}
+            <div className="mb-2.5">
+              <span className="inline-flex items-center gap-1.5 text-[10px] md:text-xs font-extrabold tracking-widest text-white uppercase bg-gradient-to-r from-blue-600/30 to-indigo-600/30 border border-blue-400/40 px-3 py-1 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.3)] backdrop-blur">
+                <span className="animate-bounce">📍</span> {promo.cidade}
               </span>
             </div>
           )}
