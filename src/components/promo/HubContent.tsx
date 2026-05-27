@@ -7,6 +7,7 @@ import { Promocao } from '@/lib/supabase'
 export default function HubContent({ initialPromocoes }: { initialPromocoes: Promocao[] }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [activeTab, setActiveTab] = useState<'todas' | 'ativas' | 'encerradas'>('ativas')
+  const [isTermsOpen, setIsTermsOpen] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
 
   // Filter promotions based on search and active tab
@@ -204,14 +205,87 @@ export default function HubContent({ initialPromocoes }: { initialPromocoes: Pro
       {/* Footer */}
       <footer className="mt-28 py-10 border-t border-white/5 text-center text-xs text-gray-500 flex flex-col md:flex-row items-center justify-between gap-4">
         <div>
-          &copy; {new Date().getFullYear()} <span className="text-gradient font-bold">Central de Promoções</span>. Todos os direitos reservados.
+          &copy; {new Date().getFullYear()} <span className="text-gradient font-bold">EntreGÔ - Itaim</span>. Todos os direitos reservados.
         </div>
         <div className="flex gap-4">
-          <span className="hover:text-white transition-colors cursor-pointer">Termos de Uso</span>
+          <button 
+            type="button" 
+            onClick={() => setIsTermsOpen(true)}
+            className="hover:text-white transition-colors cursor-pointer bg-transparent border-none outline-none"
+          >
+            Termos de Uso
+          </button>
           <span>&bull;</span>
           <span className="hover:text-white transition-colors cursor-pointer">Suporte ao Entregador</span>
         </div>
       </footer>
+
+      {/* Terms of Use Modal */}
+      {isTermsOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in">
+          <div className="glass max-w-2xl w-full rounded-2xl border border-white/10 p-6 md:p-8 max-h-[85vh] overflow-y-auto relative shadow-2xl animate-slide-up text-left">
+            <button
+              onClick={() => setIsTermsOpen(false)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors p-1.5 rounded-full hover:bg-white/5"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+              <span>📄</span> Termos de Uso e Condições Gerais
+            </h3>
+
+            <div className="space-y-6 text-sm text-gray-300 leading-relaxed pr-1">
+              <section className="space-y-2">
+                <h4 className="font-bold text-white">1. Visão Geral</h4>
+                <p>
+                  Bem-vindo à Central de Promoções da <strong>EntreGÔ - Itaim</strong>. Este portal destina-se a fins de consulta, acompanhamento de desempenho em tempo real, divulgação de rankings semanais e visualização de premiações de corridas por turnos para nossos entregadores parceiros.
+                </p>
+              </section>
+
+              <section className="space-y-2">
+                <h4 className="font-bold text-white">2. Participação e Elegibilidade</h4>
+                <p>
+                  A participação em qualquer campanha ou ranking é voluntária. Os entregadores devem cumprir com todas as regras específicas da campanha detalhada em tela, incluindo o <strong>mínimo de corridas completadas no turno correspondente</strong>, para se tornarem elegíveis aos prêmios acumulados.
+                </p>
+              </section>
+
+              <section className="space-y-2">
+                <h4 className="font-bold text-white">3. Integridade e Fair Play</h4>
+                <p>
+                  Prezamos pelo respeito e honestidade nas ruas. Qualquer atitude fraudulenta, simulação de corridas, agrupamento indevido de entregas, compartilhamento de contas ou manipulação de dados importados acarretará na <strong>desclassificação imediata e irrecorrível</strong> do entregador de qualquer campanha ativa.
+                </p>
+              </section>
+
+              <section className="space-y-2">
+                <h4 className="font-bold text-white">4. Importação e Atualização de Dados</h4>
+                <p>
+                  Os dados apresentados são consolidados e atualizados periodicamente através de relatórios internos da base <strong>EntreGÔ - Itaim</strong>. Embora busquemos a maior precisão possível, divergências cadastrais ou operacionais de corridas devem ser reportadas à liderança de suporte no prazo de até 48 horas após a conclusão da respectiva semana.
+                </p>
+              </section>
+
+              <section className="space-y-2">
+                <h4 className="font-bold text-white">5. Disposições Finais</h4>
+                <p>
+                  A <strong>EntreGÔ - Itaim</strong> reserva-se o direito de ajustar, suspender ou prorrogar prazos e regras das promoções mediante aviso prévio oficial aos entregadores.
+                </p>
+              </section>
+            </div>
+
+            <div className="mt-8 pt-4 border-t border-white/5 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setIsTermsOpen(false)}
+                className="admin-btn-primary !py-2 !px-6 text-xs"
+              >
+                Entendi e Aceito
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   )
