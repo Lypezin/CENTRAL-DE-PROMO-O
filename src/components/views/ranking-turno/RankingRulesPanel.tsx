@@ -29,15 +29,15 @@ function RankingRulesPanelComponent({
 }: RankingRulesPanelProps) {
   return (
     <div 
-      className="bg-[#08080a] border border-white/[0.04] rounded-2xl p-5 md:p-6 shadow-xl transition-all cursor-pointer hover:border-white/[0.08] hover:bg-[#0c0c0f] active:scale-[0.995] relative overflow-hidden select-none"
+      className="bg-[#08080a] border border-white/[0.04] rounded-2xl p-4 md:p-6 shadow-xl transition-all cursor-pointer hover:border-white/[0.08] hover:bg-[#0c0c0f] active:scale-[0.995] relative overflow-hidden select-none"
       onClick={() => setPainelAberto(!painelAberto)}
     >
-      <div className="flex justify-between items-center">
-        <h2 className="text-sm md:text-base font-extrabold text-white flex items-center gap-2.5">
-          <span className="text-lg transition-transform duration-300 group-hover:scale-110">
+      <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center items-start w-full">
+        <h2 className="text-xs xs:text-sm md:text-base font-extrabold text-white flex items-center gap-2 flex-1 min-w-0 pr-2">
+          <span className="text-base sm:text-lg transition-transform duration-300 shrink-0">
             {isMetas ? '🎯' : isNiveis ? '📈' : activeTurnoDisplay.emoji}
           </span>
-          <span className="tracking-tight text-gradient">
+          <span className="tracking-tight text-gradient truncate max-w-full sm:whitespace-normal">
             {isMetas 
               ? 'Desafio de Meta Individual' 
               : isNiveis 
@@ -47,9 +47,11 @@ function RankingRulesPanelComponent({
               : `Ranking ${activeTurnoDisplay.label}`}
           </span>
         </h2>
-        <div className="flex items-center gap-2">
-          <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono">Ver Regras</span>
-          <svg className={`w-4 h-4 text-zinc-500 transition-transform duration-300 ${painelAberto ? 'rotate-180 text-white' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="flex items-center gap-1.5 self-end sm:self-auto shrink-0 bg-white/[0.02] border border-white/[0.04] sm:border-none sm:bg-transparent px-2.5 py-1 sm:p-0 rounded-lg">
+          <span className="text-[9px] sm:text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono">
+            <span className="hidden sm:inline">Ver </span>Regras
+          </span>
+          <svg className={`w-3.5 h-3.5 text-zinc-500 transition-transform duration-300 ${painelAberto ? 'rotate-180 text-white' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
           </svg>
         </div>
