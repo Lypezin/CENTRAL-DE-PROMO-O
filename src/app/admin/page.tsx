@@ -2,10 +2,14 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import StatusBadge from '@/components/ui/StatusBadge'
 import { supabase, Promocao } from '@/lib/supabase'
+import { useToast } from '@/components/ui/Toast'
 
 export default function AdminPage() {
+  const router = useRouter()
+  const toast = useToast()
   const [isMounted, setIsMounted] = useState(false)
   const [pageState, setPageState] = useState<'login' | 'admin'>('login')
   const [usuario, setUsuario] = useState('')
@@ -186,13 +190,14 @@ export default function AdminPage() {
       
       if (res.ok) {
         const data = await res.json()
-        window.location.href = `/admin/promo/${data.id}`
+        toast.success('Promoção criada com sucesso!')
+        router.push(`/admin/promo/${data.id}`)
       } else {
-        alert('Erro ao criar promoção.')
+        toast.error('Erro ao criar promoção.')
       }
     } catch (e) {
       console.error(e)
-      alert('Erro de conexão.')
+      toast.error('Erro de conexão.')
     } finally {
       setCreating(false)
     }
@@ -234,8 +239,9 @@ export default function AdminPage() {
               
               <form onSubmit={handleRegister} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Nome Completo</label>
+                  <label htmlFor="reg-nome" className="block text-sm font-medium text-gray-400 mb-2">Nome Completo</label>
                   <input
+                    id="reg-nome"
                     type="text"
                     className="admin-input"
                     placeholder="Ex: Luiz Fernando"
@@ -246,8 +252,9 @@ export default function AdminPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">E-mail de acesso</label>
+                  <label htmlFor="reg-email" className="block text-sm font-medium text-gray-400 mb-2">E-mail de acesso</label>
                   <input
+                    id="reg-email"
                     type="email"
                     className="admin-input"
                     placeholder="Ex: seu@email.com"
@@ -258,8 +265,9 @@ export default function AdminPage() {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Senha</label>
+                  <label htmlFor="reg-senha" className="block text-sm font-medium text-gray-400 mb-2">Senha</label>
                   <input
+                    id="reg-senha"
                     type="password"
                     className="admin-input"
                     placeholder="Mínimo 6 caracteres"
@@ -291,8 +299,9 @@ export default function AdminPage() {
               
               <form onSubmit={handleLogin} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">E-mail de acesso</label>
+                  <label htmlFor="login-email" className="block text-sm font-medium text-gray-400 mb-2">E-mail de acesso</label>
                   <input
+                    id="login-email"
                     type="email"
                     className="admin-input"
                     placeholder="Ex: admin@centraldepromocoes.com.br"
@@ -303,8 +312,9 @@ export default function AdminPage() {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Senha de acesso</label>
+                  <label htmlFor="login-senha" className="block text-sm font-medium text-gray-400 mb-2">Senha de acesso</label>
                   <input
+                    id="login-senha"
                     type="password"
                     className="admin-input"
                     placeholder="Digite a senha"
@@ -395,11 +405,11 @@ export default function AdminPage() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-white/10 bg-white/5">
-                <th className="p-4 text-sm font-medium text-gray-400">Promoção</th>
-                <th className="p-4 text-sm font-medium text-gray-400">Status</th>
-                <th className="p-4 text-sm font-medium text-gray-400">Tipo</th>
-                <th className="p-4 text-sm font-medium text-gray-400">Período</th>
-                <th className="p-4 text-sm font-medium text-gray-400">Ações</th>
+                <th scope="col" className="p-4 text-sm font-medium text-gray-400">Promoção</th>
+                <th scope="col" className="p-4 text-sm font-medium text-gray-400">Status</th>
+                <th scope="col" className="p-4 text-sm font-medium text-gray-400">Tipo</th>
+                <th scope="col" className="p-4 text-sm font-medium text-gray-400">Período</th>
+                <th scope="col" className="p-4 text-sm font-medium text-gray-400">Ações</th>
               </tr>
             </thead>
             <tbody>

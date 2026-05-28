@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { Promocao } from '@/lib/supabase'
+import { useToast } from '@/components/ui/Toast'
 
 interface CampaignMechanicsFormProps {
   promo: Promocao
@@ -20,11 +21,12 @@ export default function CampaignMechanicsForm({
   activeTurnos,
   setTurnoEditorAtivo
 }: CampaignMechanicsFormProps) {
+  const toast = useToast()
   
   const handleSaveMechanics = () => {
     onSave({
       config_regras: promo.config_regras
-    }).then(() => alert('Mecânica e regulamento salvos com sucesso!'))
+    }).then(() => toast.success('Mecânica e regulamento salvos com sucesso!'))
   }
 
   const formatScoreLabel = (metrica: string) => {
@@ -57,8 +59,9 @@ export default function CampaignMechanicsForm({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Metric Selector */}
             <div>
-              <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Métrica de Desempenho</label>
+              <label htmlFor="mecanica-metrica" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Métrica de Desempenho</label>
               <select
+                id="mecanica-metrica"
                 value={mecanica.metrica ?? 'corridas_completadas'}
                 onChange={e => {
                   const val = e.target.value
@@ -82,8 +85,9 @@ export default function CampaignMechanicsForm({
 
             {/* Scope Selector */}
             <div>
-              <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Escopo de Agrupamento</label>
+              <label htmlFor="mecanica-agrupamento" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Escopo de Agrupamento</label>
               <select
+                id="mecanica-agrupamento"
                 value={mecanica.agrupamento ?? 'turno'}
                 onChange={e => {
                   const val = e.target.value
@@ -112,8 +116,9 @@ export default function CampaignMechanicsForm({
 
             {/* Calculation Selector */}
             <div>
-              <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Modelo de Recompensa</label>
+              <label htmlFor="mecanica-calculo" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Modelo de Recompensa</label>
               <select
+                id="mecanica-calculo"
                 value={mecanica.tipo_calculo ?? 'ranking'}
                 onChange={e => {
                   const val = e.target.value
@@ -345,8 +350,9 @@ export default function CampaignMechanicsForm({
         
         <div className="space-y-4">
           <div>
-            <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Limite de Posições (Visão Geral)</label>
+            <label htmlFor="regras-limite" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Limite de Posições (Visão Geral)</label>
             <select
+              id="regras-limite"
               value={promo.config_regras?.limite_ranking ?? 15}
               onChange={e => {
                 const val = Number(e.target.value)
@@ -370,8 +376,9 @@ export default function CampaignMechanicsForm({
           </div>
 
           <div>
-            <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Regras e Termos da Promoção (um por linha)</label>
+            <label htmlFor="regras-texto" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Regras e Termos da Promoção (um por linha)</label>
             <textarea
+              id="regras-texto"
               value={(promo.config_regras?.regras_texto || []).join('\n')}
               onChange={e => {
                 const arr = e.target.value.split('\n')

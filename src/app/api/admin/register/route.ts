@@ -2,10 +2,40 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabaseServer'
 import { hashPassword, createSession } from '@/lib/auth'
 
+interface RateLimitEntry {
+  count: number
+  resetTime: number
+}
+
+const rateLimitMap = new Map<string, RateLimitEntry>()
+const RATE_LIMIT_LIMIT = 10
+const RATE_LIMIT_WINDOW = 60 * 1000
+
 export async function POST(request: NextRequest) {
   try {
     const { name, email, password } = await request.json()
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'desconhecido'
+
+    // Simple In-Memory Rate Limiting
+    const clientKey = `${ip}:${email || 'unknown'}`
+    const now = Date.now()
+    const rateInfo = rateLimitMap.get(clientKey)
+
+    if (rateInfo) {
+      if (now > rateInfo.resetTime) {
+        rateLimitMap.set(clientKey, { count: 1, resetTime: now + RATE_LIMIT_WINDOW })
+      } else {
+        rateInfo.count += 1
+        if (rateInfo.count > RATE_LIMIT_LIMIT) {
+          return NextResponse.json(
+            { success: false, error: 'Muitas tentativas de cadastro. Por favor, aguarde um minuto e tente novamente.' },
+            { status: 429 }
+          )
+        }
+      }
+    } else {
+      rateLimitMap.set(clientKey, { count: 1, resetTime: now + RATE_LIMIT_WINDOW })
+    }
 
     if (!name || !email || !password) {
       return NextResponse.json({ success: false, error: 'Todos os campos são obrigatórios' }, { status: 400 })

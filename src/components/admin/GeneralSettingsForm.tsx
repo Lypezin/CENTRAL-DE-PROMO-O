@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { Promocao } from '@/lib/supabase'
+import { useToast } from '@/components/ui/Toast'
 
 interface GeneralSettingsFormProps {
   promo: Promocao
@@ -11,6 +12,8 @@ interface GeneralSettingsFormProps {
 }
 
 export default function GeneralSettingsForm({ promo, setPromo, onSave, saving }: GeneralSettingsFormProps) {
+  const toast = useToast()
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     onSave({
@@ -19,7 +22,7 @@ export default function GeneralSettingsForm({ promo, setPromo, onSave, saving }:
       descricao: promo.descricao,
       data_inicio: promo.data_inicio,
       data_fim: promo.data_fim
-    }).then(() => alert('Alterações gerais salvas com sucesso!'))
+    }).then(() => toast.success('Alterações gerais salvas com sucesso!'))
   }
 
   return (
@@ -31,8 +34,9 @@ export default function GeneralSettingsForm({ promo, setPromo, onSave, saving }:
       <div className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Nome da Promoção</label>
+            <label htmlFor="geral-nome" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Nome da Promoção</label>
             <input 
+              id="geral-nome"
               type="text" 
               value={promo.nome}
               onChange={e => setPromo({ ...promo, nome: e.target.value })}
@@ -42,8 +46,9 @@ export default function GeneralSettingsForm({ promo, setPromo, onSave, saving }:
           </div>
           
           <div>
-            <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Cidade / Praça</label>
+            <label htmlFor="geral-cidade" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Cidade / Praça</label>
             <input 
+              id="geral-cidade"
               type="text" 
               value={promo.cidade || ''}
               placeholder="Ex: São Paulo, Rio de Janeiro, Campinas..."
@@ -54,8 +59,9 @@ export default function GeneralSettingsForm({ promo, setPromo, onSave, saving }:
         </div>
         
         <div>
-          <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Descrição</label>
+          <label htmlFor="geral-descricao" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Descrição</label>
           <textarea 
+            id="geral-descricao"
             value={promo.descricao || ''}
             onChange={e => setPromo({ ...promo, descricao: e.target.value })}
             rows={3}
@@ -66,8 +72,9 @@ export default function GeneralSettingsForm({ promo, setPromo, onSave, saving }:
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Data de Início</label>
+            <label htmlFor="geral-inicio" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Data de Início</label>
             <input 
+              id="geral-inicio"
               type="date" 
               value={promo.data_inicio || ''}
               onChange={e => setPromo({ ...promo, data_inicio: e.target.value })}
@@ -75,8 +82,9 @@ export default function GeneralSettingsForm({ promo, setPromo, onSave, saving }:
             />
           </div>
           <div>
-            <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Data de Término</label>
+            <label htmlFor="geral-fim" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Data de Término</label>
             <input 
+              id="geral-fim"
               type="date" 
               value={promo.data_fim || ''}
               onChange={e => setPromo({ ...promo, data_fim: e.target.value })}

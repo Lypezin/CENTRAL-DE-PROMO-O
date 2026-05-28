@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { Promocao } from '@/lib/supabase'
+import { useToast } from '@/components/ui/Toast'
 
 interface TurnoPrizesConfiguratorProps {
   promo: Promocao
@@ -28,6 +29,7 @@ export default function TurnoPrizesConfigurator({
   saving,
   handleUpdate
 }: TurnoPrizesConfiguratorProps) {
+  const toast = useToast()
 
   const handleToggleTurno = async (turno: string) => {
     const novosTurnos = activeTurnos.includes(turno)
@@ -35,7 +37,7 @@ export default function TurnoPrizesConfigurator({
       : [...activeTurnos, turno]
       
     if (novosTurnos.length === 0) {
-      alert('A promoção precisa de pelo menos um turno ativo!')
+      toast.warning('A promoção precisa de pelo menos um turno ativo!')
       return
     }
     
@@ -109,7 +111,7 @@ export default function TurnoPrizesConfigurator({
   const handleSavePrizes = () => {
     onSave({
       config_premios: localPremios
-    }).then(() => alert('Regras de prêmios salvas com sucesso!'))
+    }).then(() => toast.success('Regras de prêmios salvas com sucesso!'))
   }
 
   const turnoConfigObj = localPremios.find(t => t.turno === turnoEditorAtivo) || {
@@ -208,8 +210,9 @@ export default function TurnoPrizesConfigurator({
           </h3>
           <div className="flex flex-col md:flex-row md:items-center gap-4">
             <div className="flex-1 w-full">
-              <label className="block text-[9px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1">Mínimo de Corridas no Turno</label>
+              <label htmlFor="turno-minimo" className="block text-[9px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1">Mínimo de Corridas no Turno</label>
               <input
+                id="turno-minimo"
                 type="number"
                 value={turnoConfigObj.minimo_corridas ?? 0}
                 onChange={e => handleUpdateMinimo(Number(e.target.value))}

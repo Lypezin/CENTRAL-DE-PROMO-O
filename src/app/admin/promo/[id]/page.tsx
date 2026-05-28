@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import StatusBadge from '@/components/ui/StatusBadge'
 import { Promocao, PromocaoStats } from '@/lib/supabase'
+import { useToast } from '@/components/ui/Toast'
 
 // Admin Subcomponents
 import StatsOverview from '@/components/admin/StatsOverview'
@@ -15,6 +16,8 @@ import TurnoPrizesConfigurator from '@/components/admin/TurnoPrizesConfigurator'
 
 export default function EditPromoPage() {
   const { id } = useParams()
+  const router = useRouter()
+  const toast = useToast()
   const [promo, setPromo] = useState<Promocao | null>(null)
   const [stats, setStats] = useState<PromocaoStats | null>(null)
   const [loading, setLoading] = useState(true)
@@ -98,10 +101,11 @@ export default function EditPromoPage() {
         setPromo(initializedData)
         setLocalPremios(data.config_premios || [])
         setActiveTurnos(data.config_turnos || ['CAFE_DA_MANHA', 'ALMOCO', 'JANTAR', 'MADRUGADA'])
+        toast.success('Promoção atualizada com sucesso!')
       }
     } catch (e) {
       console.error(e)
-      alert('Erro ao atualizar promoção.')
+      toast.error('Erro ao atualizar promoção.')
     } finally {
       setSaving(false)
     }
@@ -116,12 +120,14 @@ export default function EditPromoPage() {
     try {
       const res = await fetch(`/api/promocoes/${id}`, { method: 'DELETE' })
       if (res.ok) {
-        window.location.href = '/admin'
+        toast.success('Promoção excluída com sucesso!')
+        router.push('/admin')
       } else {
-        alert('Erro ao excluir promoção.')
+        toast.error('Erro ao excluir promoção.')
       }
     } catch (e) {
       console.error(e)
+      toast.error('Erro ao excluir promoção.')
     } finally {
       setDeleting(false)
       setConfirmDelete(false)
@@ -137,13 +143,14 @@ export default function EditPromoPage() {
     try {
       const res = await fetch(`/api/promocoes/${id}?apenas_dados=true`, { method: 'DELETE' })
       if (res.ok) {
-        alert('Dados da planilha excluídos com sucesso!')
+        toast.success('Dados da planilha excluídos com sucesso!')
         carregarPromo() // Recarrega estatísticas zeradas
       } else {
-        alert('Erro ao excluir dados da planilha.')
+        toast.error('Erro ao excluir dados da planilha.')
       }
     } catch (e) {
       console.error(e)
+      toast.error('Erro ao excluir dados da planilha.')
     } finally {
       setClearingData(false)
       setConfirmClearData(false)

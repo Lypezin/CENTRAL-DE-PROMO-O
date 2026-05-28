@@ -23,18 +23,27 @@ const Lightning: React.FC<LightningProps> = ({
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const resizeCanvas = () => {
-      canvas.width = canvas.clientWidth;
-      canvas.height = canvas.clientHeight;
-    };
-    resizeCanvas();
-    window.addEventListener("resize", resizeCanvas);
-
     const gl = canvas.getContext("webgl");
     if (!gl) {
       console.error("WebGL not supported");
       return;
     }
+
+    let resizeTimeout: NodeJS.Timeout;
+    const resizeCanvas = () => {
+      canvas.width = canvas.clientWidth;
+      canvas.height = canvas.clientHeight;
+      gl.viewport(0, 0, canvas.width, canvas.height);
+    };
+    resizeCanvas();
+
+    const handleResize = () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        resizeCanvas();
+      }, 150);
+    };
+    window.addEventListener("resize", handleResize);
 
     const vertexShaderSource = `
       attribute vec2 aPosition;
@@ -186,8 +195,6 @@ const Lightning: React.FC<LightningProps> = ({
     let animationFrameId: number;
 
     const render = () => {
-      resizeCanvas();
-      gl.viewport(0, 0, canvas.width, canvas.height);
       gl.uniform2f(iResolutionLocation, canvas.width, canvas.height);
       const currentTime = performance.now();
       gl.uniform1f(iTimeLocation, (currentTime - startTime) / 1000.0);
@@ -202,7 +209,8 @@ const Lightning: React.FC<LightningProps> = ({
     render();
 
     return () => {
-      window.removeEventListener("resize", resizeCanvas);
+      window.removeEventListener("resize", handleResize);
+      clearTimeout(resizeTimeout);
       cancelAnimationFrame(animationFrameId);
     };
   }, [hue, xOffset, speed, intensity, size]);
