@@ -9,22 +9,20 @@ export default function HubContent({ initialPromocoes }: { initialPromocoes: Pro
   const [activeTab, setActiveTab] = useState<'todas' | 'ativas' | 'encerradas'>('ativas')
   const [isTermsOpen, setIsTermsOpen] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
-  const [onlineCount, setOnlineCount] = useState<number>(1)
+  const [onlineCount, setOnlineCount] = useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      return (window as any).__onlineCount || 1
+    }
+    return 1
+  })
 
   useEffect(() => {
-    // Escuta a presença em tempo real por WebSockets
-    const channel = supabase.channel('online_presence_hub')
-
-    channel
-      .on('presence', { event: 'sync' }, () => {
-        const state = channel.presenceState()
-        const count = Object.keys(state).length
-        setOnlineCount(count > 0 ? count : 1)
-      })
-      .subscribe()
-
+    const handleUpdate = (e: Event) => {
+      setOnlineCount((e as CustomEvent).detail)
+    }
+    window.addEventListener('online_presence_update', handleUpdate)
     return () => {
-      channel.unsubscribe()
+      window.removeEventListener('online_presence_update', handleUpdate)
     }
   }, [])
 

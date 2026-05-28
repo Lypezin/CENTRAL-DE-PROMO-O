@@ -20,11 +20,26 @@ export default function AdminPage() {
   const [creating, setCreating] = useState(false)
 
   // Estados de análise de tráfego
-  const [onlineCount, setOnlineCount] = useState<number>(0)
+  const [onlineCount, setOnlineCount] = useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      return (window as any).__onlineCount || 1
+    }
+    return 1
+  })
   const [totalVisits, setTotalVisits] = useState<number>(0)
 
   useEffect(() => {
     setIsMounted(true)
+  }, [])
+
+  useEffect(() => {
+    const handleUpdate = (e: Event) => {
+      setOnlineCount((e as CustomEvent).detail)
+    }
+    window.addEventListener('online_presence_update', handleUpdate)
+    return () => {
+      window.removeEventListener('online_presence_update', handleUpdate)
+    }
   }, [])
 
   useEffect(() => {
@@ -47,22 +62,10 @@ export default function AdminPage() {
       carregarPromocoes()
       carregarAnalytics()
 
-      // 1. Escuta a presença em tempo real por WebSockets (sincronização instantânea)
-      const channel = supabase.channel('online_presence_hub')
-
-      channel
-        .on('presence', { event: 'sync' }, () => {
-          const state = channel.presenceState()
-          const count = Object.keys(state).length
-          setOnlineCount(count > 0 ? count : 1)
-        })
-        .subscribe()
-
-      // 2. Polling apenas para atualizar visitas totais a cada 10s
+      // Polling apenas para atualizar visitas totais a cada 10s
       const interval = setInterval(carregarAnalytics, 10000)
       return () => {
         clearInterval(interval)
-        channel.unsubscribe()
       }
     }
   }, [pageState])

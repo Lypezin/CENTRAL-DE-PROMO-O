@@ -35,6 +35,13 @@ export default function VisitorTracker() {
     })
 
     channel
+      .on('presence', { event: 'sync' }, () => {
+        const state = channel.presenceState()
+        const count = Object.keys(state).length
+        const finalCount = count > 0 ? count : 1
+        ;(window as any).__onlineCount = finalCount
+        window.dispatchEvent(new CustomEvent('online_presence_update', { detail: finalCount }))
+      })
       .subscribe(async (status) => {
         if (status === 'SUBSCRIBED') {
           await channel.track({ online_at: new Date().toISOString() })
