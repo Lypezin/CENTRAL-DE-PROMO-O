@@ -182,10 +182,34 @@
   animation: shimmerSparkle 2.5s infinite ease-in-out;
 }
 
-/* Glassmorphism utility */
+/* Glassmorphism utility aprimorado */
 .glass {
-  background: rgba(8, 8, 10, 0.6) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  background: rgba(8, 8, 10, 0.55) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  box-shadow: 
+    0 10px 40px -10px rgba(0, 0, 0, 0.5),
+    inset 0 1px 1px rgba(255, 255, 255, 0.02) !important;
 }
+
+/* Floating animation for Podium Crown and other premium features */
+@keyframes float {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-6px) rotate(3deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+/* Glow classes for modern luxury touches */
+.glow-yellow-neon {
+  box-shadow: 0 0 15px -3px rgba(234, 179, 8, 0.25);
+}
+
+.glow-sky-neon {
+  box-shadow: 0 0 15px -3px rgba(56, 189, 248, 0.25);
+}
+

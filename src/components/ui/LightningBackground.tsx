@@ -193,8 +193,10 @@ const Lightning: React.FC<LightningProps> = ({
 
     const startTime = performance.now();
     let animationFrameId: number;
+    let isPaused = false;
 
     const render = () => {
+      if (isPaused) return;
       gl.uniform2f(iResolutionLocation, canvas.width, canvas.height);
       const currentTime = performance.now();
       gl.uniform1f(iTimeLocation, (currentTime - startTime) / 1000.0);
@@ -208,8 +210,22 @@ const Lightning: React.FC<LightningProps> = ({
     };
     render();
 
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        isPaused = true;
+        cancelAnimationFrame(animationFrameId);
+      } else {
+        if (isPaused) {
+          isPaused = false;
+          render();
+        }
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
     return () => {
       window.removeEventListener("resize", handleResize);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
       clearTimeout(resizeTimeout);
       cancelAnimationFrame(animationFrameId);
     };

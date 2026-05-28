@@ -99,6 +99,18 @@ export async function POST(request: NextRequest) {
     }
 
     const nomeArquivo = file.name
+    const extensao = nomeArquivo.split('.').pop()?.toLowerCase()
+    const mimeAceitos = [
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+      'application/vnd.ms-excel', // .xls
+    ]
+
+    // Validação de segurança: bloquear uploads de arquivos maliciosos ou extensões incompatíveis
+    if (!['xlsx', 'xls'].includes(extensao || '') && !mimeAceitos.includes(file.type)) {
+      await logAction('upload_erro', `Tentativa de upload de arquivo inválido: ${nomeArquivo} (Type: ${file.type})`, 'error', { ip }, ip)
+      return NextResponse.json({ error: 'Tipo de arquivo inválido. Apenas planilhas Excel (.xlsx ou .xls) são permitidas.' }, { status: 400 })
+    }
+
     const tamanhoMB = (file.size / 1024 / 1024).toFixed(2)
 
     await logAction('upload_inicio', `Arquivo: ${nomeArquivo} (${tamanhoMB}MB)`, 'success', { nome: nomeArquivo, tamanho_bytes: file.size }, ip)
