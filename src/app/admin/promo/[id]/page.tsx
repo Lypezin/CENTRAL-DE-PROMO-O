@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import StatusBadge from '@/components/ui/StatusBadge'
@@ -29,11 +29,7 @@ export default function EditPromoPage() {
   const [turnoEditorAtivo, setTurnoEditorAtivo] = useState<string>('CAFE_DA_MANHA')
   const [activeTurnos, setActiveTurnos] = useState<string[]>(['CAFE_DA_MANHA', 'ALMOCO', 'JANTAR', 'MADRUGADA'])
 
-  useEffect(() => {
-    carregarPromo()
-  }, [id])
-
-  const carregarPromo = async () => {
+  const carregarPromo = useCallback(async () => {
     try {
       const res = await fetch(`/api/promocoes/${id}`)
       if (res.ok) {
@@ -67,7 +63,12 @@ export default function EditPromoPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [id, turnoEditorAtivo])
+
+  useEffect(() => {
+    carregarPromo()
+  }, [carregarPromo])
+
 
   const handleUpdate = async (fields: Partial<Promocao>) => {
     setSaving(true)

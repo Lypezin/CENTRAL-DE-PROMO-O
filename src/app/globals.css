@@ -182,3 +182,10 @@
   animation: shimmerSparkle 2.5s infinite ease-in-out;
 }
 
+/* Glassmorphism utility */
+.glass {
+  background: rgba(8, 8, 10, 0.6) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+}

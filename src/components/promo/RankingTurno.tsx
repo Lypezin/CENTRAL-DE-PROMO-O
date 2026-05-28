@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { supabase, EntregaRanking } from '@/lib/supabase'
-import { formatCurrency, getMedalha } from '@/lib/config'
+import { formatCurrency, getMedalha, getPremioFromConfig } from '@/lib/config'
 
 const TURNO_DISPLAY: Record<string, { label: string; emoji: string; cor: string; corGradiente: string }> = {
   'CAFE_DA_MANHA': { label: 'Café da Manhã', emoji: '☀️', cor: '#38bdf8', corGradiente: 'linear-gradient(135deg, #0284c7, #38bdf8)' },
@@ -13,15 +13,6 @@ const TURNO_DISPLAY: Record<string, { label: string; emoji: string; cor: string;
   'GERAL': { label: 'Geral', emoji: '🏆', cor: '#e4e4e7', corGradiente: 'linear-gradient(135deg, #71717a, #e4e4e7)' }
 }
 
-function getPremioFromConfig(configPremios: any[], turno: string, posicao: number): number {
-  const turnoConfig = configPremios?.find((c: any) => c.turno === turno)
-  if (!turnoConfig) return 0
-  for (const p of turnoConfig.premios) {
-    if ('posicao' in p && p.posicao === posicao) return p.valor
-    if ('posicao_inicio' in p && posicao >= p.posicao_inicio && posicao <= p.posicao_fim) return p.valor
-  }
-  return 0
-}
 
 export default function RankingTurno({ 
   promocaoId, 
@@ -45,7 +36,9 @@ export default function RankingTurno({
   const isMetas = mecanica.tipo_calculo === 'metas'
   const isNiveis = mecanica.tipo_calculo === 'niveis'
   
-  const turnosDisponiveis = isGeral ? ['GERAL'] : configTurnos.filter(t => t !== 'TARDE')
+  const turnosDisponiveis = useMemo(() => {
+    return isGeral ? ['GERAL'] : configTurnos.filter(t => t !== 'TARDE')
+  }, [isGeral, configTurnos])
   
   const [filtroAtivo, setFiltroAtivo] = useState(isGeral ? 'GERAL' : (turnosDisponiveis[0] || 'CAFE_DA_MANHA'))
   const [searchQuery, setSearchQuery] = useState('')
@@ -65,7 +58,8 @@ export default function RankingTurno({
     } else if (!isGeral && filtroAtivo === 'GERAL') {
       setFiltroAtivo(turnosDisponiveis[0] || 'CAFE_DA_MANHA')
     }
-  }, [isGeral, configTurnos])
+  }, [isGeral, turnosDisponiveis, filtroAtivo])
+
 
   useEffect(() => {
     async function fetchRanking() {
@@ -305,7 +299,6 @@ export default function RankingTurno({
                       const minimoCorridas = activeTurnoConfig?.minimo_corridas || 0
                       const atingiuMinimo = item.total_corridas_completadas >= minimoCorridas
                       const premioTeorico = getPremioFromConfig(configPremios, filtroAtivo, 2)
-                      const premio = atingiuMinimo ? premioTeorico : 0
                       const score = getScore(item)
                       const progresso = (score / maxScore) * 100
 
@@ -360,7 +353,6 @@ export default function RankingTurno({
                       const minimoCorridas = activeTurnoConfig?.minimo_corridas || 0
                       const atingiuMinimo = item.total_corridas_completadas >= minimoCorridas
                       const premioTeorico = getPremioFromConfig(configPremios, filtroAtivo, 1)
-                      const premio = atingiuMinimo ? premioTeorico : 0
                       const score = getScore(item)
                       const progresso = (score / maxScore) * 100
 
@@ -418,7 +410,6 @@ export default function RankingTurno({
                       const minimoCorridas = activeTurnoConfig?.minimo_corridas || 0
                       const atingiuMinimo = item.total_corridas_completadas >= minimoCorridas
                       const premioTeorico = getPremioFromConfig(configPremios, filtroAtivo, 3)
-                      const premio = atingiuMinimo ? premioTeorico : 0
                       const score = getScore(item)
                       const progresso = (score / maxScore) * 100
 

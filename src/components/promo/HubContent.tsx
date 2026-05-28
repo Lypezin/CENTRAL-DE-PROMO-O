@@ -9,14 +9,16 @@ export default function HubContent({ initialPromocoes }: { initialPromocoes: Pro
   const [activeTab, setActiveTab] = useState<'todas' | 'ativas' | 'encerradas'>('ativas')
   const [isTermsOpen, setIsTermsOpen] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
-  const [onlineCount, setOnlineCount] = useState<number>(() => {
-    if (typeof window !== 'undefined') {
-      return (window as any).__onlineCount || 1
-    }
-    return 1
-  })
+  const [onlineCount, setOnlineCount] = useState<number>(1)
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const count = (window as any).__onlineCount
+      if (typeof count === 'number') {
+        setOnlineCount(count)
+      }
+    }
+
     const handleUpdate = (e: Event) => {
       setOnlineCount((e as CustomEvent).detail)
     }
@@ -25,6 +27,7 @@ export default function HubContent({ initialPromocoes }: { initialPromocoes: Pro
       window.removeEventListener('online_presence_update', handleUpdate)
     }
   }, [])
+
 
   // Otimização: calcular contadores e estatísticas apenas quando initialPromocoes mudar
   const totalCampanhas = useMemo(() => initialPromocoes.length, [initialPromocoes])

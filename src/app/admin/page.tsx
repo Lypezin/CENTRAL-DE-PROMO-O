@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import StatusBadge from '@/components/ui/StatusBadge'
 import { supabase, Promocao } from '@/lib/supabase'
@@ -16,16 +16,11 @@ export default function AdminPage() {
   const [setupRequired, setSetupRequired] = useState<boolean | null>(null)
   const [nomeAdmin, setNomeAdmin] = useState('')
   const [promocoes, setPromocoes] = useState<Promocao[]>([])
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [creating, setCreating] = useState(false)
 
   // Estados de análise de tráfego
-  const [onlineCount, setOnlineCount] = useState<number>(() => {
-    if (typeof window !== 'undefined') {
-      return (window as any).__onlineCount || 1
-    }
-    return 1
-  })
+  const [onlineCount, setOnlineCount] = useState<number>(1)
   const [totalVisits, setTotalVisits] = useState<number>(0)
 
   useEffect(() => {
@@ -33,6 +28,13 @@ export default function AdminPage() {
   }, [])
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const count = (window as any).__onlineCount
+      if (typeof count === 'number') {
+        setOnlineCount(count)
+      }
+    }
+
     const handleUpdate = (e: Event) => {
       setOnlineCount((e as CustomEvent).detail)
     }
@@ -57,20 +59,7 @@ export default function AdminPage() {
     verificarSetup()
   }, [])
 
-  useEffect(() => {
-    if (pageState === 'admin') {
-      carregarPromocoes()
-      carregarAnalytics()
-
-      // Polling apenas para atualizar visitas totais a cada 10s
-      const interval = setInterval(carregarAnalytics, 10000)
-      return () => {
-        clearInterval(interval)
-      }
-    }
-  }, [pageState])
-
-  const carregarAnalytics = async () => {
+  const carregarAnalytics = useCallback(async () => {
     try {
       const res = await fetch('/api/admin/analytics')
       if (res.ok) {
@@ -81,9 +70,9 @@ export default function AdminPage() {
     } catch (e) {
       console.error('Erro ao carregar analíticos:', e)
     }
-  }
+  }, [])
 
-  const carregarPromocoes = async () => {
+  const carregarPromocoes = useCallback(async () => {
     setLoading(true)
     try {
       const res = await fetch('/api/promocoes')
@@ -96,7 +85,20 @@ export default function AdminPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    if (pageState === 'admin') {
+      carregarPromocoes()
+      carregarAnalytics()
+
+      // Polling apenas para atualizar visitas totais a cada 10s
+      const interval = setInterval(carregarAnalytics, 10000)
+      return () => {
+        clearInterval(interval)
+      }
+    }
+  }, [pageState, carregarPromocoes, carregarAnalytics])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
