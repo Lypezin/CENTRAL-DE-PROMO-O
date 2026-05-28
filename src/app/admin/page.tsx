@@ -18,6 +18,10 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false)
   const [creating, setCreating] = useState(false)
 
+  // Estados de análise de tráfego
+  const [onlineCount, setOnlineCount] = useState<number>(0)
+  const [totalVisits, setTotalVisits] = useState<number>(0)
+
   useEffect(() => {
     async function verificarSetup() {
       try {
@@ -34,8 +38,28 @@ export default function AdminPage() {
   }, [])
 
   useEffect(() => {
-    if (pageState === 'admin') carregarPromocoes()
+    if (pageState === 'admin') {
+      carregarPromocoes()
+      carregarAnalytics()
+
+      // Polling a cada 10s para manter dados online atualizados
+      const interval = setInterval(carregarAnalytics, 10000)
+      return () => clearInterval(interval)
+    }
   }, [pageState])
+
+  const carregarAnalytics = async () => {
+    try {
+      const res = await fetch('/api/admin/analytics')
+      if (res.ok) {
+        const data = await res.json()
+        setOnlineCount(data.online || 0)
+        setTotalVisits(data.total || 0)
+      }
+    } catch (e) {
+      console.error('Erro ao carregar analíticos:', e)
+    }
+  }
 
   const carregarPromocoes = async () => {
     setLoading(true)
@@ -279,6 +303,41 @@ export default function AdminPage() {
           >
             {creating ? 'Criando...' : <><span className="text-xl">+</span> Nova Promoção</>}
           </button>
+        </div>
+      </div>
+
+      {/* Analytics Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        {/* Active Online Users Card */}
+        <div className="glass p-5 rounded-2xl border border-white/10 bg-gradient-to-br from-[#08080a] to-[#0d2215]/20 relative overflow-hidden group shadow-xl flex items-center justify-between">
+          <div>
+            <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1 select-none flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              Pessoas Online
+            </div>
+            <div className="text-3xl font-black text-white font-mono">{onlineCount}</div>
+          </div>
+          <div className="text-emerald-500/25 bg-emerald-500/5 p-3 rounded-xl border border-emerald-500/10">
+            <svg className="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+          </div>
+        </div>
+
+        {/* Total Hits/Visits Card */}
+        <div className="glass p-5 rounded-2xl border border-white/10 bg-gradient-to-br from-[#08080a] to-[#0d1525]/20 relative overflow-hidden group shadow-xl flex items-center justify-between">
+          <div>
+            <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1 select-none">
+              💻 Visitas Totais (Acumuladas)
+            </div>
+            <div className="text-3xl font-black text-white font-mono">{totalVisits.toLocaleString('pt-BR')}</div>
+          </div>
+          <div className="text-zinc-500/25 bg-white/5 p-3 rounded-xl border border-white/[0.04]">
+            <svg className="w-5 h-5 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+          </div>
         </div>
       </div>
 

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/ui/Navbar";
+import VisitorTracker from "@/components/ui/VisitorTracker";
 import LightningBackground from "@/components/ui/LightningBackground";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -33,6 +34,7 @@ export default function RootLayout({
         <div className="tech-grid"></div>
         
         <Navbar />
+        <VisitorTracker />
         <main className="pt-16 min-h-screen">
           {children}
         </main>
