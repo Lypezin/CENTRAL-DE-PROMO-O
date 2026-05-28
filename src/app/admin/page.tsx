@@ -6,6 +6,7 @@ import StatusBadge from '@/components/ui/StatusBadge'
 import { supabase, Promocao } from '@/lib/supabase'
 
 export default function AdminPage() {
+  const [isMounted, setIsMounted] = useState(false)
   const [pageState, setPageState] = useState<'login' | 'admin'>('login')
   const [usuario, setUsuario] = useState('')
   const [senha, setSenha] = useState('')
@@ -21,6 +22,10 @@ export default function AdminPage() {
   // Estados de análise de tráfego
   const [onlineCount, setOnlineCount] = useState<number>(0)
   const [totalVisits, setTotalVisits] = useState<number>(0)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   useEffect(() => {
     async function verificarSetup() {
@@ -174,6 +179,19 @@ export default function AdminPage() {
     } finally {
       setCreating(false)
     }
+  }
+
+  // Pre-render loading shell during hydration and server rendering
+  if (!isMounted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-[#030303]">
+        <div className="tech-grid"></div>
+        <div className="glass p-8 rounded-2xl max-w-md w-full border border-white/10 relative z-10 text-center py-8 text-gray-400">
+          <div className="animate-spin text-3xl mb-3 flex justify-center">🔄</div>
+          Carregando portal...
+        </div>
+      </div>
+    )
   }
 
   if (pageState === 'login') {
