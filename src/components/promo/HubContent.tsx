@@ -1,14 +1,32 @@
 'use client'
 
-import { useState, useRef, useMemo } from 'react'
+import { useState, useRef, useMemo, useEffect } from 'react'
 import PromoCard from '@/components/ui/PromoCard'
-import { Promocao } from '@/lib/supabase'
+import { supabase, Promocao } from '@/lib/supabase'
 
 export default function HubContent({ initialPromocoes }: { initialPromocoes: Promocao[] }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [activeTab, setActiveTab] = useState<'todas' | 'ativas' | 'encerradas'>('ativas')
   const [isTermsOpen, setIsTermsOpen] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
+  const [onlineCount, setOnlineCount] = useState<number>(1)
+
+  useEffect(() => {
+    // Escuta a presença em tempo real por WebSockets
+    const channel = supabase.channel('online_presence_hub')
+
+    channel
+      .on('presence', { event: 'sync' }, () => {
+        const state = channel.presenceState()
+        const count = Object.keys(state).length
+        setOnlineCount(count > 0 ? count : 1)
+      })
+      .subscribe()
+
+    return () => {
+      channel.unsubscribe()
+    }
+  }, [])
 
   // Otimização: calcular contadores e estatísticas apenas quando initialPromocoes mudar
   const totalCampanhas = useMemo(() => initialPromocoes.length, [initialPromocoes])
@@ -57,9 +75,16 @@ export default function HubContent({ initialPromocoes }: { initialPromocoes: Pro
       {/* Hero Header Section */}
       <section className="mb-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8 pt-8">
         <div className="max-w-2xl text-left">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-sky-950/20 border border-sky-900/30 text-[10px] font-bold text-sky-400 mb-4 uppercase tracking-wider font-mono">
-            <span className="w-1.5 h-1.5 bg-sky-400 rounded-full animate-pulse"></span>
-            Painel Operacional
+          <div className="flex flex-wrap items-center gap-2 mb-4">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-sky-950/20 border border-sky-900/30 text-[10px] font-bold text-sky-400 uppercase tracking-wider font-mono">
+              <span className="w-1.5 h-1.5 bg-sky-400 rounded-full animate-pulse"></span>
+              Painel Operacional
+            </div>
+
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-emerald-950/20 border border-emerald-900/30 text-[10px] font-bold text-emerald-400 uppercase tracking-wider font-mono">
+              <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span>
+              {onlineCount} {onlineCount === 1 ? 'entregador online' : 'entregadores online'}
+            </div>
           </div>
           <h1 className="text-3xl md:text-5xl font-black text-white mb-4 tracking-tight leading-tight">
             Central de Promoções

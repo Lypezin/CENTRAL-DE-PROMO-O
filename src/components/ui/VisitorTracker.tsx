@@ -1,17 +1,18 @@
 'use client'
 
 import { useEffect } from 'react'
+import { supabase } from '@/lib/supabase'
 
 export default function VisitorTracker() {
   useEffect(() => {
-    // Gera um ID de sessão único se não existir no sessionStorage
+    // 1. Gera um ID de sessão único se não existir no sessionStorage
     let sessionId = sessionStorage.getItem('visitor_session_id')
     if (!sessionId) {
       sessionId = 'sess_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
       sessionStorage.setItem('visitor_session_id', sessionId)
     }
 
-    const ping = async () => {
+    const logHistoricVisit = async () => {
       try {
         await fetch('/api/visit', {
           method: 'POST',
@@ -19,16 +20,31 @@ export default function VisitorTracker() {
           body: JSON.stringify({ session_id: sessionId })
         })
       } catch (e) {
-        console.error('Erro ao registrar batimento de visita:', e)
+        console.error('Erro ao registrar batimento de visita histórico:', e)
       }
     }
+    logHistoricVisit()
 
-    // Dispara o ping imediatamente na montagem
-    ping()
+    // 2. Conecta ao canal de presença em tempo real via Supabase WebSockets
+    const channel = supabase.channel('online_presence_hub', {
+      config: {
+        presence: {
+          key: sessionId,
+        },
+      },
+    })
 
-    // Agenda pings periódicos a cada 30 segundos
-    const interval = setInterval(ping, 30000)
-    return () => clearInterval(interval)
+    channel
+      .subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          await channel.track({ online_at: new Date().toISOString() })
+        }
+      })
+
+    // Desconecta e limpa o rastreador ao desmontar (fechar aba ou sair)
+    return () => {
+      channel.unsubscribe()
+    }
   }, [])
 
   return null
