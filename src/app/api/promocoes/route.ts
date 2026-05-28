@@ -1,16 +1,11 @@
 import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
-import { createClient } from '@supabase/supabase-js'
+import { supabaseAdmin } from '@/lib/supabaseServer'
 import { gerarSlug } from '@/lib/config'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+import { getAuthenticatedUser } from '@/lib/auth'
 
 async function isAuthenticated(): Promise<boolean> {
-  const cookieStore = await cookies()
-  return cookieStore.get('admin_auth')?.value === 'true'
+  const user = await getAuthenticatedUser()
+  return user !== null
 }
 
 // GET: Listar promoções (público, com filtro opcional por status)
@@ -18,7 +13,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const status = searchParams.get('status')
 
-  let query = supabase
+  let query = supabaseAdmin
     .from('promocoes')
     .select('*')
     .order('created_at', { ascending: false })
@@ -52,7 +47,7 @@ export async function POST(request: Request) {
 
     const slug = gerarSlug(nome.trim())
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('promocoes')
       .insert({
         slug,

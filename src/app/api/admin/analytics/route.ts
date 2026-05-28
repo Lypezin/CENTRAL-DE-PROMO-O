@@ -1,19 +1,10 @@
 import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
-
-async function isAuthenticated(): Promise<boolean> {
-  const cookieStore = await cookies()
-  return cookieStore.get('admin_auth')?.value === 'true'
-}
+import { supabaseAdmin } from '@/lib/supabaseServer'
+import { getAuthenticatedUser } from '@/lib/auth'
 
 export async function GET() {
-  if (!(await isAuthenticated())) {
+  const user = await getAuthenticatedUser()
+  if (!user) {
     return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
   }
 
@@ -22,11 +13,11 @@ export async function GET() {
     const oneMinuteAgo = new Date(Date.now() - 60000).toISOString()
 
     const [onlineRes, totalRes] = await Promise.all([
-      supabase
+      supabaseAdmin
         .from('visitas_log')
         .select('*', { count: 'exact', head: true })
         .gte('last_ping', oneMinuteAgo),
-      supabase
+      supabaseAdmin
         .from('visitas_log')
         .select('*', { count: 'exact', head: true })
     ])

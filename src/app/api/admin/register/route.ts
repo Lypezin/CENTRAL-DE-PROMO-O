@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-import crypto from 'crypto'
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+import { supabaseAdmin } from '@/lib/supabaseServer'
+import { hashPassword, createSession } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,13 +15,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'A senha deve ter no mínimo 6 caracteres' }, { status: 400 })
     }
 
-    // Hash password using native SHA-256
-    const senhaHash = crypto.createHash('sha256').update(password).digest('hex')
+    // Hash password using secure PBKDF2-SHA512
+    const secureHash = hashPassword(password)
 
     // Call database function to safely register the first admin
     const { data: success, error } = await supabaseAdmin.rpc('register_first_admin', {
       p_usuario: email,
-      p_senha_hash: senhaHash,
+      p_senha_hash: secureHash,
       p_nome: name
     })
 
@@ -43,17 +38,15 @@ export async function POST(request: NextRequest) {
       acao: 'setup_primeiro_admin',
       detalhe: `Primeiro administrador (${name} - ${email}) registrado com sucesso`,
       status: 'success',
-      metadata: { email, nome: name },
+      metadata: { email, nome: name, seguranca: 'pbkdf2' },
       ip,
     })
 
     const response = NextResponse.json({ success: true, nome: name })
-    response.cookies.set('admin_auth', 'true', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 60 * 60 * 8, // 8 horas
-    })
+    await createSession(email, name)
+    
+    // Clear legacy cookie just in case it exists
+    response.cookies.delete('admin_auth')
 
     return response
   } catch (error) {
@@ -61,3 +54,4 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: false, error: msg }, { status: 500 })
   }
 }
+

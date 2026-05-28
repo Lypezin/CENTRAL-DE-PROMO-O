@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-import crypto from 'crypto'
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+import { supabaseAdmin } from '@/lib/supabaseServer'
+import { verifyPassword, hashPassword, createSession } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
   const { username, password } = await request.json()
@@ -15,35 +10,63 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: false, error: 'Usuário e senha são obrigatórios' }, { status: 400 })
   }
 
-  // Hash password using native SHA-256
-  const senhaHash = crypto.createHash('sha256').update(password).digest('hex')
-
-  // Check login in database via secure SECURITY DEFINER RPC
-  const { data, error } = await supabaseAdmin.rpc('check_admin_login', {
-    p_usuario: username,
-    p_senha_hash: senhaHash
+  // Retrieve admin user using secure RPC bridge
+  const { data, error } = await supabaseAdmin.rpc('get_admin_by_username', {
+    p_usuario: username
   })
 
-  if (!error && data && data.length > 0) {
+  if (error) {
+    return NextResponse.json({ success: false, error: 'Erro de conexão com o banco de dados' }, { status: 500 })
+  }
+
+  if (data && data.length > 0) {
     const admin = data[0]
 
-    // Log login success
-    await supabaseAdmin.from('admin_logs').insert({
-      acao: 'login_sucesso',
-      detalhe: `Login do administrador ${admin.nome} (${username}) realizado com sucesso`,
-      status: 'success',
-      metadata: { admin_id: admin.id, nome: admin.nome },
-      ip,
-    })
+    // Verify password using PBKDF2 (and check legacy SHA-256)
+    const isValid = verifyPassword(password, admin.senha)
 
-    const response = NextResponse.json({ success: true, nome: admin.nome })
-    response.cookies.set('admin_auth', 'true', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 60 * 60 * 8, // 8 horas
-    })
-    return response
+    if (isValid) {
+      const isLegacyHash = !admin.senha.startsWith('pbkdf2:')
+
+      // Silent Automatic Security Migration: Upgrade SHA-256 legacy hash to PBKDF2
+      if (isLegacyHash) {
+        const secureHash = hashPassword(password)
+        
+        // Update database with the new PBKDF2 salted hash
+        const { error: updateError } = await supabaseAdmin
+          .from('admin_usuarios')
+          .update({ senha: secureHash })
+          .eq('id', admin.id)
+
+        if (!updateError) {
+          await supabaseAdmin.from('admin_logs').insert({
+            acao: 'seguranca_migracao_senha',
+            detalhe: `Senha do administrador ${admin.nome} (${username}) migrada com sucesso de SHA-256 para PBKDF2-SHA512.`,
+            status: 'success',
+            metadata: { admin_id: admin.id, migrado: true },
+            ip,
+          })
+        }
+      }
+
+      // Log login success
+      await supabaseAdmin.from('admin_logs').insert({
+        acao: 'login_sucesso',
+        detalhe: `Login do administrador ${admin.nome} (${username}) realizado com sucesso`,
+        status: 'success',
+        metadata: { admin_id: admin.id, nome: admin.nome, seguranca: isLegacyHash ? 'migrado' : 'pbkdf2' },
+        ip,
+      })
+
+      // Create signed session cookie (sets admin_auth_session)
+      const response = NextResponse.json({ success: true, nome: admin.nome })
+      await createSession(username, admin.nome)
+      
+      // Clear legacy cookie just in case it exists
+      response.cookies.delete('admin_auth')
+      
+      return response
+    }
   }
 
   // Log login failure
@@ -57,3 +80,4 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({ success: false, error: 'Usuário ou senha incorretos' }, { status: 401 })
 }
+

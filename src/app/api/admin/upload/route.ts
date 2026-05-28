@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { supabaseAdmin } from '@/lib/supabaseServer'
 import * as XLSX from 'xlsx'
 import { normalizarPeriodo } from '@/lib/config'
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+import { verifySessionToken } from '@/lib/auth'
 
 function isAuthenticated(request: NextRequest): boolean {
-  return request.cookies.get('admin_auth')?.value === 'true'
+  const token = request.cookies.get('admin_auth_session')?.value
+  if (!token) return false
+  return verifySessionToken(token) !== null
 }
 
 function getIp(request: NextRequest): string {

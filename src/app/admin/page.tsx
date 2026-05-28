@@ -45,18 +45,30 @@ export default function AdminPage() {
   }, [])
 
   useEffect(() => {
-    async function verificarSetup() {
+    async function inicializarPortal() {
       try {
-        const res = await fetch('/api/admin/setup-check')
-        if (res.ok) {
-          const data = await res.json()
-          setSetupRequired(data.setupRequired)
+        const setupRes = await fetch('/api/admin/setup-check')
+        if (setupRes.ok) {
+          const setupData = await setupRes.json()
+          setSetupRequired(setupData.setupRequired)
+
+          // Se o setup já foi concluído, tenta fazer auto-login
+          if (!setupData.setupRequired) {
+            const verifyRes = await fetch('/api/admin/verify')
+            if (verifyRes.ok) {
+              const verifyData = await verifyRes.json()
+              if (verifyData.authenticated) {
+                setPageState('admin')
+                setNomeAdmin(verifyData.name || '')
+              }
+            }
+          }
         }
       } catch (e) {
-        console.error(e)
+        console.error('Erro na inicialização do portal:', e)
       }
     }
-    verificarSetup()
+    inicializarPortal()
   }, [])
 
   const carregarAnalytics = useCallback(async () => {

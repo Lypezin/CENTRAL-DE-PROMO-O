@@ -1,15 +1,10 @@
 import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+import { supabaseAdmin } from '@/lib/supabaseServer'
+import { getAuthenticatedUser } from '@/lib/auth'
 
 async function isAuthenticated(): Promise<boolean> {
-  const cookieStore = await cookies()
-  return cookieStore.get('admin_auth')?.value === 'true'
+  const user = await getAuthenticatedUser()
+  return user !== null
 }
 
 // GET: Buscar promoção por ID + estatísticas (público)
@@ -19,7 +14,7 @@ export async function GET(
 ) {
   const { id } = await params
 
-  const { data: promocao, error } = await supabase
+  const { data: promocao, error } = await supabaseAdmin
     .from('promocoes')
     .select('*')
     .eq('id', id)
@@ -34,7 +29,7 @@ export async function GET(
 
   // Buscar estatísticas via RPC
   let stats = null
-  const { data: statsData } = await supabase.rpc('get_promocao_stats', {
+  const { data: statsData } = await supabaseAdmin.rpc('get_promocao_stats', {
     p_promocao_id: id,
   })
 
@@ -89,7 +84,7 @@ export async function PUT(
 
     updates.updated_at = new Date().toISOString()
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('promocoes')
       .update(updates)
       .eq('id', id)
@@ -130,7 +125,7 @@ export async function DELETE(
   try {
     if (apenasDados) {
       // Executa a deleção apenas dos dados de planilha via RPC
-      const { error } = await supabase.rpc('limpar_dados_promocao', { p_promocao_id: id })
+      const { error } = await supabaseAdmin.rpc('limpar_dados_promocao', { p_promocao_id: id })
 
       if (error) {
         return NextResponse.json(
@@ -142,7 +137,7 @@ export async function DELETE(
       return NextResponse.json({ success: true, apenas_dados: true })
     } else {
       // Executa a deleção completa da promoção via RPC
-      const { error } = await supabase.rpc('deletar_promocao', { p_id: id })
+      const { error } = await supabaseAdmin.rpc('deletar_promocao', { p_id: id })
 
       if (error) {
         return NextResponse.json(
