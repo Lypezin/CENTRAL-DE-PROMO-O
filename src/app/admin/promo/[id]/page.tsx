@@ -7,6 +7,7 @@ import StatusBadge from '@/components/ui/StatusBadge'
 import { Promocao, PromocaoStats, supabase } from '@/lib/supabase'
 import { useToast } from '@/components/ui/Toast'
 import { getPremioFromConfig } from '@/lib/config'
+import * as XLSX from 'xlsx'
 
 // Admin Subcomponents
 import StatsOverview from '@/components/admin/StatsOverview'
@@ -176,75 +177,61 @@ export default function EditPromoPage() {
         ? ['GERAL'] 
         : (activeTurnos && activeTurnos.length > 0 ? activeTurnos : ['CAFE_DA_MANHA', 'ALMOCO', 'JANTAR', 'MADRUGADA'])
       
-      const allRows: any[] = []
+      // Limite do ranking visível
+      const limiteRanking = promo.config_regras?.limite_ranking ?? 15
+      
+      // Criar novo Workbook do Excel
+      const wb = XLSX.utils.book_new()
+      let hasData = false
       
       for (const turno of turnos) {
         const { data, error } = await supabase.rpc('get_ranking_por_promocao', {
           p_promocao_id: promo.id,
           p_periodo: turno,
-          p_limite: 1000
+          p_limite: limiteRanking
         })
         
-        if (!error && data) {
-          data.forEach((row: any) => {
+        if (!error && data && data.length > 0) {
+          hasData = true
+          // Dupla garantia de que apenas o ranking visível será exportado
+          const visibleData = data.slice(0, limiteRanking)
+          
+          // Formata as linhas para o Excel
+          const sheetRows = visibleData.map((row: any) => {
             const premio = getPremioFromConfig(localPremios || [], turno, row.posicao)
-            allRows.push({
-              periodo: TURNO_LABELS[turno] || turno,
-              posicao: row.posicao,
-              entregador: row.pessoa_entregadora,
-              id_entregador: row.id_da_pessoa_entregadora,
-              praca: row.praca,
-              corridas: row.total_corridas_completadas,
-              taxas: row.total_soma_taxas,
-              premio: premio
-            })
+            return {
+              'Posição': row.posicao,
+              'Entregador': row.pessoa_entregadora,
+              'ID Entregador': row.id_da_pessoa_entregadora,
+              'Praça/Cidade': row.praca,
+              'Corridas Completadas': row.total_corridas_completadas,
+              'Total Taxas (BRL)': row.total_soma_taxas,
+              'Prêmio Estimado (BRL)': premio
+            }
           })
+          
+          // Cria a planilha a partir dos dados JSON
+          const ws = XLSX.utils.json_to_sheet(sheetRows)
+          
+          // Nome da aba limitado a 31 caracteres (limite máximo suportado pelo Excel)
+          const rawSheetName = TURNO_LABELS[turno] || turno
+          const sheetName = rawSheetName.slice(0, 31)
+          
+          // Adiciona a planilha ao workbook
+          XLSX.utils.book_append_sheet(wb, ws, sheetName)
         }
       }
       
-      if (allRows.length === 0) {
+      if (!hasData) {
         toast.error('Nenhum dado encontrado para exportar.')
         setExporting(false)
         return
       }
       
-      const headers = [
-        'Período', 
-        'Posição', 
-        'Entregador', 
-        'ID Entregador', 
-        'Praça/Cidade', 
-        'Corridas Completadas', 
-        'Total Taxas (BRL)', 
-        'Prêmio Estimado (BRL)'
-      ]
+      // Escrever arquivo Excel (.xlsx) e disparar o download
+      XLSX.writeFile(wb, `ranking_${promo.slug}_${new Date().toISOString().slice(0, 10)}.xlsx`)
       
-      const csvRows = [
-        headers.join(';'), // Ponto e vírgula para compatibilidade com Excel em PT-BR
-        ...allRows.map(row => [
-          row.periodo,
-          row.posicao,
-          `"${row.entregador.replace(/"/g, '""')}"`,
-          `"${row.id_entregador}"`,
-          `"${row.praca}"`,
-          row.corridas,
-          row.taxas.toFixed(2).replace('.', ','),
-          row.premio.toFixed(2).replace('.', ',')
-        ].join(';'))
-      ]
-      
-      const csvContent = '\uFEFF' + csvRows.join('\n') // UTF-8 BOM
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.setAttribute('href', url)
-      link.setAttribute('download', `ranking_${promo.slug}_${new Date().toISOString().slice(0, 10)}.csv`)
-      link.style.visibility = 'hidden'
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      
-      toast.success('Ranking exportado com sucesso!')
+      toast.success('Ranking exportado para Excel com sucesso!')
     } catch (e) {
       console.error(e)
       toast.error('Erro ao exportar ranking.')
@@ -294,7 +281,7 @@ export default function EditPromoPage() {
                   </>
                 ) : (
                   <>
-                    <span>📥</span> Exportar Ranking (CSV)
+                    <span>📥</span> Exportar Ranking (Excel)
                   </>
                 )}
               </button>
