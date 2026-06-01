@@ -4,8 +4,9 @@ import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import StatusBadge from '@/components/ui/StatusBadge'
-import { Promocao, PromocaoStats } from '@/lib/supabase'
+import { Promocao, PromocaoStats, supabase } from '@/lib/supabase'
 import { useToast } from '@/components/ui/Toast'
+import { getPremioFromConfig } from '@/lib/config'
 
 // Admin Subcomponents
 import StatsOverview from '@/components/admin/StatsOverview'
@@ -13,6 +14,14 @@ import ExcelImportZone from '@/components/admin/ExcelImportZone'
 import GeneralSettingsForm from '@/components/admin/GeneralSettingsForm'
 import CampaignMechanicsForm from '@/components/admin/CampaignMechanicsForm'
 import TurnoPrizesConfigurator from '@/components/admin/TurnoPrizesConfigurator'
+const TURNO_LABELS: Record<string, string> = {
+  'CAFE_DA_MANHA': 'Café da Manhã',
+  'ALMOCO': 'Almoço',
+  'TARDE': 'Tarde',
+  'JANTAR': 'Jantar',
+  'MADRUGADA': 'Madrugada',
+  'GERAL': 'Geral'
+}
 
 export default function EditPromoPage() {
   const { id } = useParams()
@@ -26,6 +35,7 @@ export default function EditPromoPage() {
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [clearingData, setClearingData] = useState(false)
   const [confirmClearData, setConfirmClearData] = useState(false)
+  const [exporting, setExporting] = useState(false)
 
   // Subcomponents Visual Editor States
   const [localPremios, setLocalPremios] = useState<any[]>([])
@@ -157,6 +167,92 @@ export default function EditPromoPage() {
     }
   }
 
+  const handleExportRanking = async () => {
+    if (!promo) return
+    setExporting(true)
+    try {
+      const agrupamento = promo.config_regras?.mecanica?.agrupamento || 'turno'
+      const turnos = agrupamento === 'geral' 
+        ? ['GERAL'] 
+        : (activeTurnos && activeTurnos.length > 0 ? activeTurnos : ['CAFE_DA_MANHA', 'ALMOCO', 'JANTAR', 'MADRUGADA'])
+      
+      const allRows: any[] = []
+      
+      for (const turno of turnos) {
+        const { data, error } = await supabase.rpc('get_ranking_por_promocao', {
+          p_promocao_id: promo.id,
+          p_periodo: turno,
+          p_limite: 1000
+        })
+        
+        if (!error && data) {
+          data.forEach((row: any) => {
+            const premio = getPremioFromConfig(localPremios || [], turno, row.posicao)
+            allRows.push({
+              periodo: TURNO_LABELS[turno] || turno,
+              posicao: row.posicao,
+              entregador: row.pessoa_entregadora,
+              id_entregador: row.id_da_pessoa_entregadora,
+              praca: row.praca,
+              corridas: row.total_corridas_completadas,
+              taxas: row.total_soma_taxas,
+              premio: premio
+            })
+          })
+        }
+      }
+      
+      if (allRows.length === 0) {
+        toast.error('Nenhum dado encontrado para exportar.')
+        setExporting(false)
+        return
+      }
+      
+      const headers = [
+        'Período', 
+        'Posição', 
+        'Entregador', 
+        'ID Entregador', 
+        'Praça/Cidade', 
+        'Corridas Completadas', 
+        'Total Taxas (BRL)', 
+        'Prêmio Estimado (BRL)'
+      ]
+      
+      const csvRows = [
+        headers.join(';'), // Ponto e vírgula para compatibilidade com Excel em PT-BR
+        ...allRows.map(row => [
+          row.periodo,
+          row.posicao,
+          `"${row.entregador.replace(/"/g, '""')}"`,
+          `"${row.id_entregador}"`,
+          `"${row.praca}"`,
+          row.corridas,
+          row.taxas.toFixed(2).replace('.', ','),
+          row.premio.toFixed(2).replace('.', ',')
+        ].join(';'))
+      ]
+      
+      const csvContent = '\uFEFF' + csvRows.join('\n') // UTF-8 BOM
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.setAttribute('href', url)
+      link.setAttribute('download', `ranking_${promo.slug}_${new Date().toISOString().slice(0, 10)}.csv`)
+      link.style.visibility = 'hidden'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      
+      toast.success('Ranking exportado com sucesso!')
+    } catch (e) {
+      console.error(e)
+      toast.error('Erro ao exportar ranking.')
+    } finally {
+      setExporting(false)
+    }
+  }
+
   if (loading) return <div className="p-8 text-center text-white font-mono">Carregando portal...</div>
   if (!promo) return <div className="p-8 text-center text-red-500 font-mono">Promoção não encontrada.</div>
 
@@ -186,6 +282,22 @@ export default function EditPromoPage() {
             </div>
             
             <div className="flex flex-wrap gap-2.5">
+              <button
+                onClick={handleExportRanking}
+                disabled={exporting}
+                className="admin-btn-secondary hover:!text-sky-400 !py-2 !px-4 text-xs flex items-center gap-1.5"
+              >
+                {exporting ? (
+                  <>
+                    <span className="animate-spin inline-block w-2.5 h-2.5 border border-current border-t-transparent rounded-full mr-1"></span>
+                    Exportando...
+                  </>
+                ) : (
+                  <>
+                    <span>📥</span> Exportar Ranking (CSV)
+                  </>
+                )}
+              </button>
               <Link 
                 href={`/promo/${promo.slug}`}
                 target="_blank"
