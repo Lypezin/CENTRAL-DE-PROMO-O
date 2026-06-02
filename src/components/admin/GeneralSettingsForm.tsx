@@ -21,7 +21,8 @@ export default function GeneralSettingsForm({ promo, setPromo, onSave, saving }:
       cidade: promo.cidade,
       descricao: promo.descricao,
       data_inicio: promo.data_inicio,
-      data_fim: promo.data_fim
+      data_fim: promo.data_fim,
+      status: promo.status
     }).then(() => toast.success('Alterações gerais salvas com sucesso!'))
   }
 
@@ -70,7 +71,7 @@ export default function GeneralSettingsForm({ promo, setPromo, onSave, saving }:
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label htmlFor="geral-inicio" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Data de Início</label>
             <input 
@@ -90,6 +91,19 @@ export default function GeneralSettingsForm({ promo, setPromo, onSave, saving }:
               onChange={e => setPromo({ ...promo, data_fim: e.target.value })}
               className="admin-input"
             />
+          </div>
+          <div>
+            <label htmlFor="geral-status" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Status da Promoção</label>
+            <select
+              id="geral-status"
+              value={promo.status}
+              onChange={e => setPromo({ ...promo, status: e.target.value as 'rascunho' | 'ativa' | 'encerrada' })}
+              className="admin-input bg-[#0f0f15]"
+            >
+              <option value="rascunho">📝 Rascunho</option>
+              <option value="ativa">🟢 Ativa (Em andamento)</option>
+              <option value="encerrada">🔴 Encerrada (Terminada)</option>
+            </select>
           </div>
         </div>
 
