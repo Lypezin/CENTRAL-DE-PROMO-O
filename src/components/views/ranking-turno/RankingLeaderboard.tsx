@@ -74,8 +74,8 @@ function RankingLeaderboardComponent({
                 </div>
                 <div className="space-y-3 mt-auto relative z-10">
                   <div className="flex justify-between items-center text-[10px] font-mono border-t border-white/[0.02] pt-2">
-                    <span className="text-zinc-500">VALOR/SCORE:</span>
-                    <span className="text-white font-bold">{formatScoreValue(score)}</span>
+                    <span className="text-zinc-500">VALOR:</span>
+                    <span className="text-white font-bold">{formatCurrency(item.total_soma_taxas)}</span>
                   </div>
                   {premioTeorico > 0 && (
                     <div className="flex justify-between items-center text-[10px] font-mono">
@@ -122,8 +122,8 @@ function RankingLeaderboardComponent({
                 </div>
                 <div className="space-y-3 mt-auto relative z-10">
                   <div className="flex justify-between items-center text-[10px] font-mono border-t border-yellow-600/10 pt-2.5">
-                    <span className="text-zinc-500">VALOR/SCORE:</span>
-                    <span className="text-white font-extrabold text-xs">{formatScoreValue(score)}</span>
+                    <span className="text-zinc-500">VALOR:</span>
+                    <span className="text-white font-extrabold text-xs">{formatCurrency(item.total_soma_taxas)}</span>
                   </div>
                   {premioTeorico > 0 && (
                     <div className="flex justify-between items-center text-[10px] font-mono">
@@ -169,8 +169,8 @@ function RankingLeaderboardComponent({
                 </div>
                 <div className="space-y-3 mt-auto relative z-10">
                   <div className="flex justify-between items-center text-[10px] font-mono border-t border-white/[0.02] pt-2">
-                    <span className="text-zinc-500">VALOR/SCORE:</span>
-                    <span className="text-white font-bold">{formatScoreValue(score)}</span>
+                    <span className="text-zinc-500">VALOR:</span>
+                    <span className="text-white font-bold">{formatCurrency(item.total_soma_taxas)}</span>
                   </div>
                   {premioTeorico > 0 && (
                     <div className="flex justify-between items-center text-[10px] font-mono">
@@ -222,7 +222,7 @@ function RankingLeaderboardComponent({
                   </div>
 
                   <div className="mt-auto w-full text-center border-t border-white/[0.02] pt-1">
-                    <div className="text-[9.5px] font-mono text-slate-300 font-bold leading-tight">{formatScoreValue(score)}</div>
+                    <div className="text-[9.5px] font-mono text-slate-300 font-bold leading-tight">{formatCurrency(item.total_soma_taxas)}</div>
                     {premioTeorico > 0 && (
                       <div className={`text-[10px] font-mono font-black ${atingiuMinimo ? 'text-emerald-400' : 'text-zinc-600 line-through'}`}>
                         +{formatCurrency(premioTeorico)}
@@ -258,7 +258,7 @@ function RankingLeaderboardComponent({
                   </div>
 
                   <div className="mt-auto w-full text-center border-t border-yellow-600/10 pt-1">
-                    <div className="text-[10.5px] font-mono text-yellow-300 font-extrabold leading-tight">{formatScoreValue(score)}</div>
+                    <div className="text-[10.5px] font-mono text-yellow-300 font-extrabold leading-tight">{formatCurrency(item.total_soma_taxas)}</div>
                     {premioTeorico > 0 && (
                       <div className={`text-[11px] font-mono font-black ${atingiuMinimo ? 'text-yellow-400' : 'text-zinc-600 line-through'}`}>
                         +{formatCurrency(premioTeorico)}
@@ -291,7 +291,7 @@ function RankingLeaderboardComponent({
                   </div>
 
                   <div className="mt-auto w-full text-center border-t border-white/[0.02] pt-1">
-                    <div className="text-[9.5px] font-mono text-slate-300 font-bold leading-tight">{formatScoreValue(score)}</div>
+                    <div className="text-[9.5px] font-mono text-slate-300 font-bold leading-tight">{formatCurrency(item.total_soma_taxas)}</div>
                     {premioTeorico > 0 && (
                       <div className={`text-[10px] font-mono font-black ${atingiuMinimo ? 'text-emerald-400' : 'text-zinc-600 line-through'}`}>
                         +{formatCurrency(premioTeorico)}
@@ -379,7 +379,7 @@ function RankingLeaderboardComponent({
 
                 {/* Metric value */}
                 <div className="w-18 sm:w-28 text-right pr-1 sm:pr-5 font-mono text-[12.5px] sm:text-xs font-bold text-zinc-300 group-hover:text-white transition-colors shrink-0">
-                  {formatScoreValue(score)}
+                  {formatCurrency(item.total_soma_taxas)}
                 </div>
 
                 {/* Eligibility & Prizes Column */}
