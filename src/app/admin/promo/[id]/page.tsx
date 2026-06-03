@@ -7,7 +7,6 @@ import StatusBadge from '@/components/ui/StatusBadge'
 import { Promocao, PromocaoStats, supabase } from '@/lib/supabase'
 import { useToast } from '@/components/ui/Toast'
 import { getPremioFromConfig } from '@/lib/config'
-import * as XLSX from 'xlsx'
 
 // Admin Subcomponents
 import StatsOverview from '@/components/admin/StatsOverview'
@@ -172,6 +171,7 @@ export default function EditPromoPage() {
     if (!promo) return
     setExporting(true)
     try {
+      const XLSX = await import('xlsx')
       const agrupamento = promo.config_regras?.mecanica?.agrupamento || 'turno'
       const turnos = agrupamento === 'geral' 
         ? ['GERAL'] 

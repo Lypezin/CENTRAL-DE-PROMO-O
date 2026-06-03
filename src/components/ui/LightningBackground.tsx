@@ -31,8 +31,9 @@ const Lightning: React.FC<LightningProps> = ({
 
     let resizeTimeout: NodeJS.Timeout;
     const resizeCanvas = () => {
-      canvas.width = canvas.clientWidth;
-      canvas.height = canvas.clientHeight;
+      const dpr = typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 1.5) : 1;
+      canvas.width = Math.floor(canvas.clientWidth * dpr);
+      canvas.height = Math.floor(canvas.clientHeight * dpr);
       gl.viewport(0, 0, canvas.width, canvas.height);
     };
     resizeCanvas();
@@ -221,11 +222,28 @@ const Lightning: React.FC<LightningProps> = ({
         }
       }
     };
+
+    const handleBlur = () => {
+      isPaused = true;
+      cancelAnimationFrame(animationFrameId);
+    };
+
+    const handleFocus = () => {
+      if (isPaused && !document.hidden) {
+        isPaused = false;
+        render();
+      }
+    };
+
     document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("blur", handleBlur);
+    window.addEventListener("focus", handleFocus);
 
     return () => {
       window.removeEventListener("resize", handleResize);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("blur", handleBlur);
+      window.removeEventListener("focus", handleFocus);
       clearTimeout(resizeTimeout);
       cancelAnimationFrame(animationFrameId);
     };
