@@ -45,7 +45,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Nome é obrigatório' }, { status: 400 })
     }
 
-    const slug = gerarSlug(nome.trim())
+    let slug = gerarSlug(nome.trim())
+
+    // Verificar se o slug já existe para garantir unicidade
+    const { data: existente } = await supabaseAdmin
+      .from('promocoes')
+      .select('id')
+      .eq('slug', slug)
+      .maybeSingle()
+
+    if (existente) {
+      slug = `${slug}-${Math.random().toString(36).substring(2, 6)}`
+    }
 
     const { data, error } = await supabaseAdmin
       .from('promocoes')
