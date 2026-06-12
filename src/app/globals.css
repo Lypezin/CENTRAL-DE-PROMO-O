@@ -493,12 +493,12 @@ body.tema-copa .brand-dot {
 }
 
 body.tema-copa .nav-active-line {
-  background: linear-gradient(90deg, #2dd27e, #f4d66a, #d33b3b) !important;
+  background: linear-gradient(90deg, #10b981, #fbbf24) !important;
 }
 
 body.tema-copa .promo-card-top-bar {
-  background: linear-gradient(90deg, #0f8a4b 0%, #f4d66a 42%, #d33b3b 68%, #2a398d 100%) !important;
-  box-shadow: 0 0 18px rgba(244, 214, 106, 0.16);
+  background: linear-gradient(90deg, #052e16 0%, #10b981 50%, #fbbf24 100%) !important;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.1);
 }
 
 body.tema-copa .obsidian-card:hover .promo-card-title {
@@ -611,26 +611,9 @@ body.tema-copa nav {
     inset 0 -1px 0 rgba(45, 210, 126, 0.06);
 }
 
+/* Clean navigation logo styling */
 body.tema-copa nav a:first-child span {
-  text-shadow: 0 0 16px rgba(244, 214, 106, 0.08);
-}
-
-body.tema-copa nav a:first-child::after {
-  content: "26";
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 18px;
-  margin-left: 2px;
-  border-radius: 999px;
-  border: 1px solid rgba(244, 214, 106, 0.24);
-  background: rgba(244, 214, 106, 0.08);
-  color: rgba(244, 214, 106, 0.78);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-  font-size: 9px;
-  font-weight: 900;
-  letter-spacing: 0.04em;
+  text-shadow: 0 0 16px rgba(251, 191, 36, 0.12);
 }
 
 body.tema-copa .glass {
@@ -729,16 +712,11 @@ body.tema-copa .hub-stat-card::before {
   background: linear-gradient(90deg, transparent, rgba(244, 214, 106, 0.34), transparent);
 }
 
-body.tema-copa .hub-stat-card:nth-child(2) {
+/* Keep stat cards uniform and clean */
+body.tema-copa .hub-stat-card:nth-child(n) {
   background:
-    radial-gradient(circle at 20% 0%, rgba(42, 57, 141, 0.12), transparent 38%),
-    linear-gradient(135deg, rgba(5, 12, 35, 0.76), rgba(8, 8, 10, 0.86)) !important;
-}
-
-body.tema-copa .hub-stat-card:nth-child(3) {
-  background:
-    radial-gradient(circle at 20% 0%, rgba(211, 59, 59, 0.1), transparent 34%),
-    linear-gradient(135deg, rgba(24, 8, 8, 0.72), rgba(8, 8, 10, 0.86)) !important;
+    radial-gradient(circle at 20% 0%, rgba(251, 191, 36, 0.04), transparent 40%),
+    linear-gradient(135deg, rgba(4, 18, 10, 0.65), rgba(2, 6, 3, 0.8)) !important;
 }
 
 body.tema-copa .promo-card-top-bar {
