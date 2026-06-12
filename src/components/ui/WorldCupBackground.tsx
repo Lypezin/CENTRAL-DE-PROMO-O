@@ -227,208 +227,274 @@ const CopaWebGLShader: React.FC<CopaShaderProps> = ({
   return <canvas ref={canvasRef} className="w-full h-full relative" />
 }
 
-const CONFETTI_COLORS = ['#10b981', '#34d399', '#fbbf24', '#f59e0b', '#ffffff', '#60a5fa']
-const PARTICLE_COUNT = 24
-
-interface CleanParticle {
-  left: string
-  width: string
-  height: string
-  bg: string
-  duration: string
-  delay: string
-  rx: number
-  ry: number
-  rz: number
-  borderRadius: string
+// Highly polished, physics-based canvas particles
+interface Particle {
+  x: number
+  y: number
+  vx: number
+  vy: number
+  rotation: number
+  rotationSpeed: number
+  wobble: number
+  wobbleSpeed: number
+  width: number
+  height: number
   opacity: number
+  colorType: 'gold' | 'green' | 'blue' | 'white'
   type: 'confetti' | 'star' | 'ball'
-}
-
-function generateCleanParticles(): CleanParticle[] {
-  return Array.from({ length: PARTICLE_COUNT }, (_, index) => {
-    const isStar = index % 4 === 0
-    const isBall = index % 6 === 0
-    const type = isStar ? 'star' : isBall ? 'ball' : 'confetti'
-
-    const size = type === 'confetti' 
-      ? 4 + Math.random() * 5 
-      : type === 'star'
-        ? 8 + Math.random() * 6
-        : 10 + Math.random() * 6
-
-    return {
-      left: `${Math.random() * 100}%`,
-      width: `${size}px`,
-      height: type === 'confetti' ? `${size * (1.2 + Math.random() * 0.8)}px` : `${size}px`,
-      bg: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
-      duration: `${12 + Math.random() * 8}s`,
-      delay: `${Math.random() * 12}s`,
-      rx: Math.random() * 2 - 1,
-      ry: Math.random() * 2 - 1,
-      rz: Math.random() * 2 - 1,
-      borderRadius: type === 'ball' ? '50%' : type === 'confetti' && Math.random() > 0.5 ? '50%' : '2px',
-      opacity: type === 'ball' ? 0.22 : type === 'star' ? 0.45 : 0.6,
-      type
-    }
-  })
 }
 
 export default function WorldCupBackground() {
   const [isMounted, setIsMounted] = useState(false)
-  const [particles] = useState<CleanParticle[]>(generateCleanParticles)
-  const containerRef = useRef<HTMLDivElement>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const animFrameIdRef = useRef<number | null>(null)
+  const isPausedRef = useRef<boolean>(false)
 
   useEffect(() => {
     setIsMounted(true)
+  }, [])
 
-    const container = containerRef.current
-    if (!container) return
+  useEffect(() => {
+    if (!isMounted) return
 
-    const handleVisibility = () => {
-      if (document.hidden) {
-        container.classList.add('wc-paused')
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    let width = (canvas.width = window.innerWidth)
+    let height = (canvas.height = window.innerHeight)
+
+    const handleResize = () => {
+      width = canvas.width = window.innerWidth
+      height = canvas.height = window.innerHeight
+    }
+    window.addEventListener('resize', handleResize)
+
+    // Generate high quality particles
+    const particleCount = 28
+    const particles: Particle[] = []
+
+    const colorTypes: ('gold' | 'green' | 'blue' | 'white')[] = ['gold', 'green', 'blue', 'white', 'gold']
+
+    for (let i = 0; i < particleCount; i++) {
+      const typeRand = Math.random()
+      const type = typeRand < 0.65 ? 'confetti' : typeRand < 0.88 ? 'star' : 'ball'
+
+      const size = type === 'confetti'
+        ? 5 + Math.random() * 6
+        : type === 'star'
+          ? 10 + Math.random() * 6
+          : 12 + Math.random() * 8
+
+      particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height - height - 20, // Start above screen
+        vx: (Math.random() * 1.5 - 0.75),
+        vy: type === 'ball' ? 1.5 + Math.random() * 1.5 : 1.0 + Math.random() * 1.5,
+        rotation: Math.random() * Math.PI * 2,
+        rotationSpeed: (Math.random() * 0.08 - 0.04),
+        wobble: Math.random() * Math.PI * 2,
+        wobbleSpeed: 0.03 + Math.random() * 0.05,
+        width: size,
+        height: type === 'confetti' ? size * (1.2 + Math.random() * 0.8) : size,
+        opacity: type === 'ball' ? 0.25 : type === 'star' ? 0.6 : 0.75,
+        colorType: colorTypes[i % colorTypes.length],
+        type
+      })
+    }
+
+    const drawConfetti = (p: Particle) => {
+      if (!ctx) return
+      ctx.save()
+      ctx.translate(p.x, p.y)
+      ctx.rotate(p.rotation)
+      
+      // 3D Tumbling simulation using wobble
+      const flipScale = Math.sin(p.wobble)
+      ctx.scale(flipScale, 1)
+
+      const grad = ctx.createLinearGradient(-p.width / 2, 0, p.width / 2, 0)
+      const absFlip = Math.abs(flipScale)
+      const shine = absFlip * 40 + 40 // Dynamic metallic shine
+
+      if (p.colorType === 'gold') {
+        grad.addColorStop(0, `hsl(45, 100%, ${shine - 15}%)`)
+        grad.addColorStop(0.5, `hsl(48, 100%, ${shine + 15}%)`)
+        grad.addColorStop(1, `hsl(45, 100%, ${shine - 25}%)`)
+      } else if (p.colorType === 'green') {
+        grad.addColorStop(0, `hsl(142, 72%, ${shine - 15}%)`)
+        grad.addColorStop(0.5, `hsl(142, 75%, ${shine + 10}%)`)
+        grad.addColorStop(1, `hsl(142, 72%, ${shine - 20}%)`)
+      } else if (p.colorType === 'blue') {
+        grad.addColorStop(0, `hsl(220, 85%, ${shine - 20}%)`)
+        grad.addColorStop(0.5, `hsl(220, 90%, ${shine + 10}%)`)
+        grad.addColorStop(1, `hsl(220, 85%, ${shine - 25}%)`)
       } else {
-        container.classList.remove('wc-paused')
+        grad.addColorStop(0, `hsl(0, 0%, ${shine + 10}%)`)
+        grad.addColorStop(0.5, `hsl(0, 0%, ${shine + 20}%)`)
+        grad.addColorStop(1, `hsl(0, 0%, ${shine - 10}%)`)
+      }
+
+      ctx.fillStyle = grad
+      ctx.globalAlpha = p.opacity
+      ctx.fillRect(-p.width / 2, -p.height / 2, p.width, p.height)
+      ctx.restore()
+    }
+
+    const drawStar = (p: Particle) => {
+      if (!ctx) return
+      ctx.save()
+      ctx.translate(p.x, p.y)
+      ctx.rotate(p.rotation)
+      
+      const pulse = 0.8 + 0.4 * Math.sin(p.wobble)
+      ctx.scale(pulse, pulse)
+
+      const radialGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, p.width)
+      radialGrad.addColorStop(0, 'rgba(255, 255, 255, 0.95)')
+      radialGrad.addColorStop(0.4, 'rgba(251, 191, 36, 0.85)')
+      radialGrad.addColorStop(1, 'rgba(251, 191, 36, 0)')
+
+      ctx.fillStyle = radialGrad
+      ctx.globalAlpha = p.opacity
+      
+      ctx.beginPath()
+      ctx.moveTo(0, -p.width)
+      ctx.quadraticCurveTo(0, 0, p.width, 0)
+      ctx.quadraticCurveTo(0, 0, 0, p.width)
+      ctx.quadraticCurveTo(0, 0, -p.width, 0)
+      ctx.quadraticCurveTo(0, 0, 0, -p.width)
+      ctx.closePath()
+      ctx.fill()
+      ctx.restore()
+    }
+
+    const drawBall = (p: Particle) => {
+      if (!ctx) return
+      ctx.save()
+      ctx.translate(p.x, p.y)
+      ctx.rotate(p.rotation)
+      ctx.globalAlpha = p.opacity
+
+      const ballGrad = ctx.createRadialGradient(-p.width * 0.2, -p.width * 0.2, 0, 0, 0, p.width)
+      ballGrad.addColorStop(0, '#ffffff')
+      ballGrad.addColorStop(0.75, '#e2e8f0')
+      ballGrad.addColorStop(1, '#cbd5e1')
+      
+      ctx.fillStyle = ballGrad
+      ctx.beginPath()
+      ctx.arc(0, 0, p.width, 0, Math.PI * 2)
+      ctx.fill()
+
+      ctx.strokeStyle = 'rgba(15, 23, 42, 0.35)'
+      ctx.lineWidth = 1
+
+      // Central pentagon
+      ctx.beginPath()
+      const r = p.width * 0.38
+      for (let i = 0; i < 5; i++) {
+        const angle = (i * Math.PI * 2) / 5 - Math.PI / 2
+        const px = Math.cos(angle) * r
+        const py = Math.sin(angle) * r
+        if (i === 0) ctx.moveTo(px, py)
+        else ctx.lineTo(px, py)
+      }
+      ctx.closePath()
+      ctx.stroke()
+
+      // Pentagon radiating lines
+      for (let i = 0; i < 5; i++) {
+        const angle = (i * Math.PI * 2) / 5 - Math.PI / 2
+        const px1 = Math.cos(angle) * r
+        const py1 = Math.sin(angle) * r
+        const px2 = Math.cos(angle) * p.width
+        const py2 = Math.sin(angle) * p.width
+        ctx.beginPath()
+        ctx.moveTo(px1, py1)
+        ctx.lineTo(px2, py2)
+        ctx.stroke()
+      }
+
+      ctx.restore()
+    }
+
+    const updateAndDraw = () => {
+      if (isPausedRef.current) return
+      ctx.clearRect(0, 0, width, height)
+
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i]
+
+        // Update physics
+        p.rotation += p.rotationSpeed
+        p.wobble += p.wobbleSpeed
+        
+        // Sway movement (wind simulation)
+        p.x += p.vx + Math.sin(p.wobble) * 0.3
+        p.y += p.vy
+
+        // Reset if off-screen
+        if (p.y > height + 30) {
+          p.y = -30
+          p.x = Math.random() * width
+          p.vy = p.type === 'ball' ? 1.5 + Math.random() * 1.5 : 1.0 + Math.random() * 1.5
+          p.vx = (Math.random() * 1.5 - 0.75)
+        }
+
+        // Draw based on type
+        if (p.type === 'star') {
+          drawStar(p)
+        } else if (p.type === 'ball') {
+          drawBall(p)
+        } else {
+          drawConfetti(p)
+        }
+      }
+
+      animFrameIdRef.current = requestAnimationFrame(updateAndDraw)
+    }
+
+    updateAndDraw()
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        isPausedRef.current = true
+        if (animFrameIdRef.current) cancelAnimationFrame(animFrameIdRef.current)
+      } else {
+        isPausedRef.current = false
+        updateAndDraw()
       }
     }
 
-    document.addEventListener('visibilitychange', handleVisibility)
-    return () => document.removeEventListener('visibilitychange', handleVisibility)
-  }, [])
+    document.addEventListener("visibilitychange", handleVisibilityChange)
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      document.removeEventListener("visibilitychange", handleVisibilityChange)
+      if (animFrameIdRef.current) cancelAnimationFrame(animFrameIdRef.current)
+    }
+  }, [isMounted])
 
   if (!isMounted) return null
 
   return (
-    <div 
-      ref={containerRef}
-      className="fixed inset-0 z-[-2] pointer-events-none overflow-hidden bg-[#020503]"
-    >
-      <style>{`
-        @keyframes cleanConfettiFall {
-          0% {
-            transform: translateY(-10vh) rotate3d(var(--rx), var(--ry), var(--rz), 0deg);
-            opacity: 0;
-          }
-          10% {
-            opacity: var(--op);
-          }
-          90% {
-            opacity: var(--op);
-          }
-          100% {
-            transform: translateY(110vh) translateX(var(--drift)) rotate3d(var(--rx), var(--ry), var(--rz), 360deg);
-            opacity: 0;
-          }
-        }
-
-        .wc-paused * {
-          animation-play-state: paused !important;
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .wc-falling-layer {
-            display: none !important;
-          }
-        }
-      `}</style>
-
+    <div className="fixed inset-0 z-[-2] pointer-events-none overflow-hidden bg-[#020503]">
       {/* WebGL Fluid Copa Gradient Mesh */}
       <div className="absolute inset-0 opacity-[0.45] mix-blend-screen">
         <CopaWebGLShader speed={0.4} intensity={0.9} />
       </div>
 
+      {/* Layered Interactive Canvas for high performance falling particles */}
+      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full mix-blend-screen" />
+
       {/* Very clean dark vignette to blend WebGL into deep obsidian background */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_25%,transparent_20%,#020503_85%)]"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_25%,transparent_20%,#020503_85%)]" />
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#020503]/50 to-[#020503] pointer-events-none" />
 
       {/* Subtle modern digital grid overlay (Clean, no movement, low opacity) */}
       <div className="absolute inset-0 opacity-[0.06] [background-image:linear-gradient(rgba(251,191,36,0.15)_1px,transparent_1px),linear-gradient(90deg,rgba(251,191,36,0.15)_1px,transparent_1px)] [background-size:60px_60px] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_80%)] pointer-events-none" />
-
-      {/* Clean, slow-falling animated layer */}
-      <div className="wc-falling-layer absolute inset-0">
-        {particles.map((p, i) => {
-          if (p.type === 'star') {
-            return (
-              <div
-                key={`p-${i}`}
-                style={{
-                  position: 'absolute',
-                  left: p.left,
-                  top: '-25px',
-                  width: p.width,
-                  height: p.height,
-                  backgroundColor: '#fbbf24',
-                  clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)',
-                  opacity: 0,
-                  willChange: 'transform, opacity',
-                  animation: `cleanConfettiFall ${p.duration} ${p.delay} linear infinite`,
-                  ['--rx' as string]: p.rx,
-                  ['--ry' as string]: p.ry,
-                  ['--rz' as string]: p.rz,
-                  ['--op' as string]: p.opacity,
-                  ['--drift' as string]: `${(i % 4 - 2) * 15}px`,
-                }}
-              />
-            )
-          }
-
-          if (p.type === 'ball') {
-            return (
-              <div
-                key={`p-${i}`}
-                className="flex items-center justify-center"
-                style={{
-                  position: 'absolute',
-                  left: p.left,
-                  top: '-25px',
-                  width: p.width,
-                  height: p.height,
-                  background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.7) 0%, rgba(148,163,184,0.4) 100%)',
-                  borderRadius: '50%',
-                  border: '1px solid rgba(255,255,255,0.15)',
-                  boxShadow: 'inset -2px -2px 5px rgba(0,0,0,0.3)',
-                  opacity: 0,
-                  willChange: 'transform, opacity',
-                  animation: `cleanConfettiFall ${p.duration} ${p.delay} linear infinite`,
-                  ['--rx' as string]: p.rx,
-                  ['--ry' as string]: p.ry,
-                  ['--rz' as string]: p.rz,
-                  ['--op' as string]: p.opacity,
-                  ['--drift' as string]: `${(i % 4 - 2) * 15}px`,
-                }}
-              >
-                {/* Minimalist geometry suggesting soccer stitches */}
-                <div style={{ width: '60%', height: '60%', border: '1px dashed rgba(255,255,255,0.25)', borderRadius: '50%' }} />
-              </div>
-            )
-          }
-
-          // Confetti
-          return (
-            <div
-              key={`p-${i}`}
-              style={{
-                position: 'absolute',
-                left: p.left,
-                top: '-20px',
-                width: p.width,
-                height: p.height,
-                backgroundColor: p.bg,
-                borderRadius: p.borderRadius,
-                opacity: 0,
-                willChange: 'transform, opacity',
-                animation: `cleanConfettiFall ${p.duration} ${p.delay} linear infinite`,
-                ['--rx' as string]: p.rx,
-                ['--ry' as string]: p.ry,
-                ['--rz' as string]: p.rz,
-                ['--op' as string]: p.opacity,
-                ['--drift' as string]: `${(i % 4 - 2) * 15}px`,
-              }}
-            />
-          )
-        })}
-      </div>
     </div>
   )
 }
