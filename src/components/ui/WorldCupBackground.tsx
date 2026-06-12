@@ -8,7 +8,7 @@ interface CopaShaderProps {
 }
 
 const CopaWebGLShader: React.FC<CopaShaderProps> = ({
-  speed = 0.5,
+  speed = 0.35,
   intensity = 0.85,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -54,14 +54,12 @@ const CopaWebGLShader: React.FC<CopaShaderProps> = ({
       uniform float uSpeed;
       uniform float uIntensity;
 
-      // 2D Hash function
       float hash(vec2 p) {
         p = fract(p * vec2(123.34, 456.21));
         p += dot(p, p + 45.32);
         return fract(p.x * p.y);
       }
 
-      // 2D Value Noise
       float noise(vec2 p) {
         vec2 ip = floor(p);
         vec2 fp = fract(p);
@@ -75,7 +73,6 @@ const CopaWebGLShader: React.FC<CopaShaderProps> = ({
         return mix(mix(a, b, fp.x), mix(c, d, fp.x), fp.y);
       }
 
-      // Fractional Brownian Motion for fluid look
       float fbm(vec2 p) {
         float v = 0.0;
         float a = 0.5;
@@ -88,14 +85,12 @@ const CopaWebGLShader: React.FC<CopaShaderProps> = ({
       }
 
       void main() {
-        // Normalized and aspect-corrected coordinates
         vec2 uv = gl_FragCoord.xy / iResolution.xy;
         vec2 p = uv * 2.0 - 1.0;
         p.x *= iResolution.x / iResolution.y;
 
         float time = iTime * uSpeed;
 
-        // Domain warping to create organic fluid structures
         vec2 q = vec2(
           fbm(p + vec2(0.0, 0.0) + time * 0.1),
           fbm(p + vec2(2.4, 5.2) + time * 0.08)
@@ -108,31 +103,25 @@ const CopaWebGLShader: React.FC<CopaShaderProps> = ({
 
         float f = fbm(p + 4.0 * r);
 
-        // Core colors for Copa (Premium Green, Yellow/Gold, Deep Blue)
-        vec3 colorDarkGreen = vec3(0.004, 0.06, 0.015);  // Very dark base green
-        vec3 colorEmerald = vec3(0.01, 0.18, 0.07);    // Mid emerald green
-        vec3 colorGold = vec3(0.38, 0.24, 0.03);       // Rich gold (low brightness for BG)
-        vec3 colorBlue = vec3(0.01, 0.04, 0.16);       // Premium deep blue
+        vec3 colorDarkGreen = vec3(0.003, 0.05, 0.012);  
+        vec3 colorEmerald = vec3(0.008, 0.15, 0.06);    
+        vec3 colorGold = vec3(0.35, 0.22, 0.02);       
+        vec3 colorBlue = vec3(0.01, 0.03, 0.14);       
 
-        // Interpolate colors based on noise features
         vec3 col = mix(colorDarkGreen, colorEmerald, f);
-        col = mix(col, colorBlue, length(q) * 0.6);
-        col = mix(col, colorGold, r.y * 0.7);
+        col = mix(col, colorBlue, length(q) * 0.5);
+        col = mix(col, colorGold, r.y * 0.65);
 
-        // Bright highlights where the warp interfaces meet
         float highlight = smoothstep(0.45, 0.8, f * length(r));
-        col += vec3(0.15, 0.11, 0.01) * highlight;
+        col += vec3(0.12, 0.09, 0.01) * highlight;
 
-        // Subtle stadium light flare from top-center
         vec2 lightPos = vec2(0.0, 1.2);
         float lightDistance = length(p - lightPos);
         float lightGlow = smoothstep(1.8, 0.0, lightDistance);
-        col += vec3(0.35, 0.28, 0.05) * lightGlow * 0.18;
+        col += vec3(0.32, 0.25, 0.04) * lightGlow * 0.15;
 
-        // Scale color intensity
         col *= uIntensity;
 
-        // Output color
         gl_FragColor = vec4(col, 1.0);
       }
     `
@@ -238,17 +227,112 @@ const CopaWebGLShader: React.FC<CopaShaderProps> = ({
   return <canvas ref={canvasRef} className="w-full h-full relative" />
 }
 
+const CONFETTI_COLORS = ['#10b981', '#34d399', '#fbbf24', '#f59e0b', '#ffffff', '#60a5fa']
+const PARTICLE_COUNT = 24
+
+interface CleanParticle {
+  left: string
+  width: string
+  height: string
+  bg: string
+  duration: string
+  delay: string
+  rx: number
+  ry: number
+  rz: number
+  borderRadius: string
+  opacity: number
+  type: 'confetti' | 'star' | 'ball'
+}
+
+function generateCleanParticles(): CleanParticle[] {
+  return Array.from({ length: PARTICLE_COUNT }, (_, index) => {
+    const isStar = index % 4 === 0
+    const isBall = index % 6 === 0
+    const type = isStar ? 'star' : isBall ? 'ball' : 'confetti'
+
+    const size = type === 'confetti' 
+      ? 4 + Math.random() * 5 
+      : type === 'star'
+        ? 8 + Math.random() * 6
+        : 10 + Math.random() * 6
+
+    return {
+      left: `${Math.random() * 100}%`,
+      width: `${size}px`,
+      height: type === 'confetti' ? `${size * (1.2 + Math.random() * 0.8)}px` : `${size}px`,
+      bg: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
+      duration: `${12 + Math.random() * 8}s`,
+      delay: `${Math.random() * 12}s`,
+      rx: Math.random() * 2 - 1,
+      ry: Math.random() * 2 - 1,
+      rz: Math.random() * 2 - 1,
+      borderRadius: type === 'ball' ? '50%' : type === 'confetti' && Math.random() > 0.5 ? '50%' : '2px',
+      opacity: type === 'ball' ? 0.22 : type === 'star' ? 0.45 : 0.6,
+      type
+    }
+  })
+}
+
 export default function WorldCupBackground() {
   const [isMounted, setIsMounted] = useState(false)
+  const [particles] = useState<CleanParticle[]>(generateCleanParticles)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     setIsMounted(true)
+
+    const container = containerRef.current
+    if (!container) return
+
+    const handleVisibility = () => {
+      if (document.hidden) {
+        container.classList.add('wc-paused')
+      } else {
+        container.classList.remove('wc-paused')
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibility)
+    return () => document.removeEventListener('visibilitychange', handleVisibility)
   }, [])
 
   if (!isMounted) return null
 
   return (
-    <div className="fixed inset-0 z-[-2] pointer-events-none overflow-hidden bg-[#020503]">
+    <div 
+      ref={containerRef}
+      className="fixed inset-0 z-[-2] pointer-events-none overflow-hidden bg-[#020503]"
+    >
+      <style>{`
+        @keyframes cleanConfettiFall {
+          0% {
+            transform: translateY(-10vh) rotate3d(var(--rx), var(--ry), var(--rz), 0deg);
+            opacity: 0;
+          }
+          10% {
+            opacity: var(--op);
+          }
+          90% {
+            opacity: var(--op);
+          }
+          100% {
+            transform: translateY(110vh) translateX(var(--drift)) rotate3d(var(--rx), var(--ry), var(--rz), 360deg);
+            opacity: 0;
+          }
+        }
+
+        .wc-paused * {
+          animation-play-state: paused !important;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .wc-falling-layer {
+            display: none !important;
+          }
+        }
+      `}</style>
+
       {/* WebGL Fluid Copa Gradient Mesh */}
       <div className="absolute inset-0 opacity-[0.45] mix-blend-screen">
         <CopaWebGLShader speed={0.4} intensity={0.9} />
@@ -260,6 +344,91 @@ export default function WorldCupBackground() {
 
       {/* Subtle modern digital grid overlay (Clean, no movement, low opacity) */}
       <div className="absolute inset-0 opacity-[0.06] [background-image:linear-gradient(rgba(251,191,36,0.15)_1px,transparent_1px),linear-gradient(90deg,rgba(251,191,36,0.15)_1px,transparent_1px)] [background-size:60px_60px] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_80%)] pointer-events-none" />
+
+      {/* Clean, slow-falling animated layer */}
+      <div className="wc-falling-layer absolute inset-0">
+        {particles.map((p, i) => {
+          if (p.type === 'star') {
+            return (
+              <div
+                key={`p-${i}`}
+                style={{
+                  position: 'absolute',
+                  left: p.left,
+                  top: '-25px',
+                  width: p.width,
+                  height: p.height,
+                  backgroundColor: '#fbbf24',
+                  clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)',
+                  opacity: 0,
+                  willChange: 'transform, opacity',
+                  animation: `cleanConfettiFall ${p.duration} ${p.delay} linear infinite`,
+                  ['--rx' as string]: p.rx,
+                  ['--ry' as string]: p.ry,
+                  ['--rz' as string]: p.rz,
+                  ['--op' as string]: p.opacity,
+                  ['--drift' as string]: `${(i % 4 - 2) * 15}px`,
+                }}
+              />
+            )
+          }
+
+          if (p.type === 'ball') {
+            return (
+              <div
+                key={`p-${i}`}
+                className="flex items-center justify-center"
+                style={{
+                  position: 'absolute',
+                  left: p.left,
+                  top: '-25px',
+                  width: p.width,
+                  height: p.height,
+                  background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.7) 0%, rgba(148,163,184,0.4) 100%)',
+                  borderRadius: '50%',
+                  border: '1px solid rgba(255,255,255,0.15)',
+                  boxShadow: 'inset -2px -2px 5px rgba(0,0,0,0.3)',
+                  opacity: 0,
+                  willChange: 'transform, opacity',
+                  animation: `cleanConfettiFall ${p.duration} ${p.delay} linear infinite`,
+                  ['--rx' as string]: p.rx,
+                  ['--ry' as string]: p.ry,
+                  ['--rz' as string]: p.rz,
+                  ['--op' as string]: p.opacity,
+                  ['--drift' as string]: `${(i % 4 - 2) * 15}px`,
+                }}
+              >
+                {/* Minimalist geometry suggesting soccer stitches */}
+                <div style={{ width: '60%', height: '60%', border: '1px dashed rgba(255,255,255,0.25)', borderRadius: '50%' }} />
+              </div>
+            )
+          }
+
+          // Confetti
+          return (
+            <div
+              key={`p-${i}`}
+              style={{
+                position: 'absolute',
+                left: p.left,
+                top: '-20px',
+                width: p.width,
+                height: p.height,
+                backgroundColor: p.bg,
+                borderRadius: p.borderRadius,
+                opacity: 0,
+                willChange: 'transform, opacity',
+                animation: `cleanConfettiFall ${p.duration} ${p.delay} linear infinite`,
+                ['--rx' as string]: p.rx,
+                ['--ry' as string]: p.ry,
+                ['--rz' as string]: p.rz,
+                ['--op' as string]: p.opacity,
+                ['--drift' as string]: `${(i % 4 - 2) * 15}px`,
+              }}
+            />
+          )
+        })}
+      </div>
     </div>
   )
 }
