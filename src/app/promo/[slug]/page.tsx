@@ -2,6 +2,7 @@ import { supabase } from '@/lib/supabase'
 import { notFound } from 'next/navigation'
 import RankingTurno from '@/components/promo/RankingTurno'
 import StatusBadge from '@/components/ui/StatusBadge'
+import CopaThemeForcer from '@/components/promo/CopaThemeForcer'
 
 export const revalidate = 0 // Disable cache for real-time data accuracy
 
@@ -51,7 +52,8 @@ export default async function PromoPage({ params }: { params: Promise<{ slug: st
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 animate-slide-up">
+    <div className={`max-w-7xl mx-auto px-4 md:px-8 py-8 animate-slide-up ${promo.destaque_copa ? 'promo-page-copa' : ''}`}>
+      {promo.destaque_copa && <CopaThemeForcer />}
       {/* Back button link */}
       <div className="mb-6">
         <a href="/" className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-zinc-500 hover:text-white transition-colors duration-200 font-mono">

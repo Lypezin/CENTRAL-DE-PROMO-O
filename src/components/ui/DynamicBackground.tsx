@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import LightningBackground from './LightningBackground'
 import WorldCupBackground from './WorldCupBackground'
 
@@ -9,9 +9,25 @@ interface DynamicBackgroundProps {
 }
 
 export default function DynamicBackground({ temaAtivo }: DynamicBackgroundProps) {
+  const [forcedTheme, setForcedTheme] = useState<'raios' | 'copa' | null>(null)
+
+  useEffect(() => {
+    const handleForceTheme = (e: Event) => {
+      const customEvent = e as CustomEvent<'raios' | 'copa' | null>
+      setForcedTheme(customEvent.detail)
+    }
+
+    window.addEventListener('force_theme_change', handleForceTheme)
+    return () => {
+      window.removeEventListener('force_theme_change', handleForceTheme)
+    }
+  }, [])
+
+  const currentTheme = forcedTheme || temaAtivo
+
   // Add/remove theme class on body element based on active theme
   useEffect(() => {
-    if (temaAtivo === 'copa') {
+    if (currentTheme === 'copa') {
       document.body.classList.add('tema-copa')
       document.body.classList.remove('tema-raios')
     } else {
@@ -21,7 +37,8 @@ export default function DynamicBackground({ temaAtivo }: DynamicBackgroundProps)
     return () => {
       document.body.classList.remove('tema-copa', 'tema-raios')
     }
-  }, [temaAtivo])
+  }, [currentTheme])
 
-  return temaAtivo === 'copa' ? <WorldCupBackground /> : <LightningBackground />
+  return currentTheme === 'copa' ? <WorldCupBackground /> : <LightningBackground />
 }
+
