@@ -41,7 +41,7 @@ export default async function RootLayout({
 
   return (
     <html lang="pt-BR">
-      <body className={inter.className}>
+      <body className={`${inter.className} tema-${temaAtivo}`}>
         <ToastProvider>
           {/* Dynamic theme background (raios or copa) */}
           <DynamicBackground temaAtivo={temaAtivo} />

@@ -592,7 +592,7 @@ body.tema-copa .copa-hero-panel::before {
   background: linear-gradient(90deg, rgba(15, 138, 75, 0.18), rgba(244, 214, 106, 0.08), transparent 68%);
   border-radius: 24px;
   opacity: 0.64;
-  filter: blur(22px);
+  filter: blur(14px);
 }
 
 body.tema-copa .copa-edition-badge {
@@ -601,9 +601,189 @@ body.tema-copa .copa-edition-badge {
   color: #f4d66a !important;
 }
 
+body.tema-copa nav {
+  background:
+    linear-gradient(90deg, rgba(2, 6, 4, 0.92), rgba(3, 13, 8, 0.82), rgba(2, 6, 4, 0.92)) !important;
+  border-bottom-color: rgba(244, 214, 106, 0.1) !important;
+  box-shadow:
+    0 10px 28px -24px rgba(0, 0, 0, 0.9),
+    inset 0 -1px 0 rgba(45, 210, 126, 0.06);
+}
+
+body.tema-copa nav a:first-child span {
+  text-shadow: 0 0 16px rgba(244, 214, 106, 0.08);
+}
+
+body.tema-copa nav a:first-child::after {
+  content: "26";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 18px;
+  margin-left: 2px;
+  border-radius: 999px;
+  border: 1px solid rgba(244, 214, 106, 0.24);
+  background: rgba(244, 214, 106, 0.08);
+  color: rgba(244, 214, 106, 0.78);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+
+body.tema-copa .glass {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.035), transparent 36%),
+    rgba(3, 13, 8, 0.74) !important;
+  border-color: rgba(244, 214, 106, 0.12) !important;
+  box-shadow:
+    0 18px 54px -28px rgba(0, 0, 0, 0.95),
+    0 0 24px -18px rgba(244, 214, 106, 0.34),
+    inset 0 1px 1px rgba(255,255,255,0.04) !important;
+}
+
+body.tema-copa .obsidian-card span[class*="border-emerald"],
+body.tema-copa .glass span[class*="border-emerald"] {
+  background-color: rgba(15, 138, 75, 0.12) !important;
+  border-color: rgba(45, 210, 126, 0.28) !important;
+  color: #58e69a !important;
+}
+
+body.tema-copa .obsidian-card span[class*="border-red"],
+body.tema-copa .glass span[class*="border-red"] {
+  background-color: rgba(211, 59, 59, 0.1) !important;
+  border-color: rgba(211, 59, 59, 0.28) !important;
+  color: #ff8a8a !important;
+}
+
+body.tema-copa .obsidian-card span[class*="border-zinc"],
+body.tema-copa .glass span[class*="border-zinc"] {
+  background-color: rgba(244, 214, 106, 0.07) !important;
+  border-color: rgba(244, 214, 106, 0.16) !important;
+  color: rgba(244, 214, 106, 0.72) !important;
+}
+
+body.tema-copa footer {
+  border-top-color: rgba(244, 214, 106, 0.08) !important;
+}
+
+body.tema-copa footer span.text-white,
+body.tema-copa footer button:hover,
+body.tema-copa footer span:hover {
+  color: #f4d66a !important;
+}
+
+@keyframes copaSheen {
+  0% {
+    transform: translate3d(-120%, 0, 0) skewX(-18deg);
+    opacity: 0;
+  }
+  18% {
+    opacity: 0.58;
+  }
+  42%, 100% {
+    transform: translate3d(220%, 0, 0) skewX(-18deg);
+    opacity: 0;
+  }
+}
+
+@keyframes copaStatusPulse {
+  0%, 100% {
+    opacity: 0.74;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.35);
+  }
+}
+
+body.tema-copa .copa-hero-panel h1::after {
+  content: "CANADA / MEXICO / USA";
+  display: block;
+  margin-top: 0.75rem;
+  color: rgba(244, 214, 106, 0.68);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+
+body.tema-copa .copa-edition-badge {
+  position: relative;
+  overflow: hidden;
+}
+
+body.tema-copa .copa-edition-badge::after,
+body.tema-copa .hub-stat-card::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 38%;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+  animation: copaSheen 5.8s ease-in-out infinite;
+}
+
+body.tema-copa .hub-stat-card {
+  overflow: hidden;
+}
+
+body.tema-copa .hub-stat-card::before {
+  content: "";
+  position: absolute;
+  inset: auto 16px 0 16px;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(244, 214, 106, 0.34), transparent);
+}
+
+body.tema-copa .hub-stat-card:nth-child(2) {
+  background:
+    radial-gradient(circle at 20% 0%, rgba(42, 57, 141, 0.12), transparent 38%),
+    linear-gradient(135deg, rgba(5, 12, 35, 0.76), rgba(8, 8, 10, 0.86)) !important;
+}
+
+body.tema-copa .hub-stat-card:nth-child(3) {
+  background:
+    radial-gradient(circle at 20% 0%, rgba(211, 59, 59, 0.1), transparent 34%),
+    linear-gradient(135deg, rgba(24, 8, 8, 0.72), rgba(8, 8, 10, 0.86)) !important;
+}
+
+body.tema-copa .promo-card-top-bar {
+  position: relative;
+  overflow: hidden;
+}
+
+body.tema-copa .promo-card-top-bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+  transform: translateX(-120%);
+  opacity: 0;
+  transition: transform 540ms cubic-bezier(0.16, 1, 0.3, 1), opacity 220ms ease;
+}
+
+body.tema-copa .obsidian-card:hover .promo-card-top-bar::after {
+  transform: translateX(120%);
+  opacity: 0.42;
+}
+
+body.tema-copa .hub-filter-btn span[class*="rounded-full"],
+body.tema-copa span.animate-pulse {
+  animation: copaStatusPulse 2.8s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   body.tema-copa .copa-shimmer,
   body.tema-copa .copa-badge-glow,
+  body.tema-copa .copa-edition-badge::after,
+  body.tema-copa .hub-stat-card::after,
+  body.tema-copa .hub-filter-btn span[class*="rounded-full"],
+  body.tema-copa span.animate-pulse,
   .animate-slide-up,
   .animate-fade-in,
   .animate-float,
