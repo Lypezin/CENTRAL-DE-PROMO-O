@@ -785,69 +785,39 @@ body.tema-copa span.animate-pulse {
   background-clip: text;
 }
 
-/* Animated Border Beam container wrapping the card */
-.copa-border-beam-container {
-  position: relative;
-  border-radius: 16px;
-  overflow: hidden;
-  padding: 1.5px; /* Border width */
-  isolation: isolate;
-  background: rgba(255, 255, 255, 0.03);
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  height: 100%;
-}
-
-.copa-border-beam-container::before {
-  content: "";
-  position: absolute;
-  width: 160%;
-  height: 160%;
-  top: -30%;
-  left: -30%;
-  background: conic-gradient(
-    from 0deg,
-    transparent 30%,
-    #fbbf24 45%,
-    #10b981 55%,
-    transparent 70%
-  );
-  animation: borderBeamRotate 6s linear infinite;
-  z-index: 0;
-  pointer-events: none;
-  will-change: transform;
-}
-
-@keyframes borderBeamRotate {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-/* Inner card styling inside border beam */
-.card-tema-copa {
-  background: linear-gradient(135deg, rgba(4, 25, 12, 0.95) 0%, rgba(1, 6, 3, 0.98) 100%) !important;
-  border: 1px solid rgba(251, 191, 36, 0.04) !important;
+/* Glowing, animated border and background for featured World Cup cards */
+.obsidian-card.card-tema-copa {
+  background: linear-gradient(135deg, rgba(4, 25, 12, 0.75) 0%, rgba(2, 8, 4, 0.95) 100%) !important;
+  border: 1px solid rgba(251, 191, 36, 0.3) !important;
+  animation: cardCopaGlow 4s infinite ease-in-out !important;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
-  z-index: 10;
+  position: relative;
 }
 
-/* Responsive link hover interaction */
-a:hover .copa-border-beam-container {
+@keyframes cardCopaGlow {
+  0%, 100% {
+    border-color: rgba(251, 191, 36, 0.25);
+    box-shadow: 
+      0 20px 45px -15px rgba(0, 0, 0, 0.95),
+      0 0 15px -3px rgba(251, 191, 36, 0.12),
+      inset 0 1px 1px rgba(255, 255, 255, 0.05);
+  }
+  50% {
+    border-color: rgba(16, 185, 129, 0.55);
+    box-shadow: 
+      0 20px 45px -15px rgba(0, 0, 0, 0.95),
+      0 0 25px 3px rgba(16, 185, 129, 0.28),
+      inset 0 1px 1px rgba(255, 255, 255, 0.08);
+  }
+}
+
+.obsidian-card.card-tema-copa:hover {
+  background: linear-gradient(135deg, rgba(6, 36, 17, 0.82) 0%, rgba(3, 12, 6, 0.96) 100%) !important;
+  border-color: rgba(251, 191, 36, 0.65) !important;
   box-shadow: 
     0 25px 50px -12px rgba(0, 0, 0, 0.95),
-    0 0 35px -5px rgba(251, 191, 36, 0.38);
-  transform: translateY(-6px) scale(1.02);
-}
-
-a:hover .copa-border-beam-container::before {
-  animation-duration: 3s; /* Rotate faster on hover */
-}
-
-a:hover .card-tema-copa {
-  background: linear-gradient(135deg, rgba(6, 36, 17, 0.96) 0%, rgba(2, 12, 6, 0.98) 100%) !important;
-  border-color: rgba(251, 191, 36, 0.15) !important;
+    0 0 35px -5px rgba(251, 191, 36, 0.45),
+    inset 0 1px 1px rgba(255, 255, 255, 0.1) !important;
+  transform: translateY(-6px) scale(1.02) !important;
 }
 
