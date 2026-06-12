@@ -46,6 +46,7 @@ export interface Promocao {
   config_turnos: string[] | null
   config_regras: any
   cidade: string | null
+  destaque_copa?: boolean
   created_at: string
   updated_at: string
 }

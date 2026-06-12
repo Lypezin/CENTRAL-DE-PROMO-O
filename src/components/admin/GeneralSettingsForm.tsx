@@ -22,7 +22,8 @@ export default function GeneralSettingsForm({ promo, setPromo, onSave, saving }:
       descricao: promo.descricao,
       data_inicio: promo.data_inicio,
       data_fim: promo.data_fim,
-      status: promo.status
+      status: promo.status,
+      destaque_copa: promo.destaque_copa
     }).then(() => toast.success('Alterações gerais salvas com sucesso!'))
   }
 
@@ -107,11 +108,27 @@ export default function GeneralSettingsForm({ promo, setPromo, onSave, saving }:
           </div>
         </div>
 
-        <div className="pt-4 border-t border-white/[0.04] flex justify-end">
+        <div className="pt-4 border-t border-white/[0.04] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="flex items-center gap-3">
+            <label className="relative inline-flex items-center cursor-pointer select-none">
+              <input 
+                type="checkbox" 
+                checked={promo.destaque_copa || false}
+                onChange={e => setPromo({ ...promo, destaque_copa: e.target.checked })}
+                className="sr-only peer"
+              />
+              <div className="w-11 h-6 bg-zinc-800 rounded-full peer peer-focus:ring-2 peer-focus:ring-amber-500/50 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-zinc-400 after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-600 peer-checked:after:bg-white"></div>
+              <span className="ml-3 text-xs font-bold text-zinc-300 font-mono flex items-center gap-1">
+                🏆 Destaque Tema Copa do Mundo
+              </span>
+            </label>
+            <p className="text-[10px] text-zinc-500 hidden xl:block">Destaca o cartão público no Hub com o tema da Copa.</p>
+          </div>
+
           <button 
             type="submit"
             disabled={saving}
-            className="admin-btn-primary !px-6 !py-2.5 flex items-center gap-2"
+            className="admin-btn-primary !px-6 !py-2.5 flex items-center gap-2 shrink-0 w-full sm:w-auto justify-center"
           >
             {saving ? (
               <>

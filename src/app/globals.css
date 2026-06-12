@@ -431,43 +431,47 @@ body.tema-copa .tech-grid {
   opacity: 0.62;
 }
 
-body.tema-copa .obsidian-card {
-  background: rgba(4, 18, 10, 0.65);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(251, 191, 36, 0.15);
+body.tema-copa .obsidian-card,
+.obsidian-card.card-tema-copa {
+  background: rgba(4, 18, 10, 0.65) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border: 1px solid rgba(251, 191, 36, 0.22) !important;
   box-shadow:
     0 20px 50px -20px rgba(0, 0, 0, 0.9),
     inset 0 1px 1px rgba(255, 255, 255, 0.08),
     inset 0 -1px 1px rgba(251, 191, 36, 0.05);
   isolation: isolate;
   position: relative;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
-body.tema-copa .obsidian-card::after {
+body.tema-copa .obsidian-card::after,
+.obsidian-card.card-tema-copa::after {
   content: "";
   position: absolute;
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background: radial-gradient(circle at 50% 0%, rgba(251, 191, 36, 0.08), transparent 60%);
+  background: radial-gradient(circle at 50% 0%, rgba(251, 191, 36, 0.12), transparent 60%);
   opacity: 0.5;
   border-radius: inherit;
   transition: opacity 0.4s ease;
 }
 
-body.tema-copa .obsidian-card:hover {
-  background: rgba(6, 24, 13, 0.75);
-  border-color: rgba(251, 191, 36, 0.4);
+body.tema-copa .obsidian-card:hover,
+.obsidian-card.card-tema-copa:hover {
+  background: rgba(6, 24, 13, 0.75) !important;
+  border-color: rgba(251, 191, 36, 0.45) !important;
   box-shadow:
     0 25px 50px -15px rgba(0, 0, 0, 0.95),
     0 0 30px -10px rgba(251, 191, 36, 0.3),
-    inset 0 1px 1px rgba(255, 255, 255, 0.15);
-  transform: translateY(-4px) scale(1.01);
+    inset 0 1px 1px rgba(255, 255, 255, 0.15) !important;
+  transform: translateY(-4px) scale(1.01) !important;
 }
 
-body.tema-copa .obsidian-card:hover::after {
+body.tema-copa .obsidian-card:hover::after,
+.obsidian-card.card-tema-copa:hover::after {
   opacity: 1;
 }
 
@@ -496,26 +500,31 @@ body.tema-copa .nav-active-line {
   background: linear-gradient(90deg, #10b981, #fbbf24) !important;
 }
 
-body.tema-copa .promo-card-top-bar {
+body.tema-copa .promo-card-top-bar,
+.card-tema-copa .promo-card-top-bar {
   background: linear-gradient(90deg, #052e16 0%, #10b981 50%, #fbbf24 100%) !important;
-  box-shadow: 0 0 12px rgba(16, 185, 129, 0.1);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.1) !important;
 }
 
-body.tema-copa .obsidian-card:hover .promo-card-title {
+body.tema-copa .obsidian-card:hover .promo-card-title,
+.card-tema-copa:hover .promo-card-title {
   color: #f4d66a !important;
 }
 
-body.tema-copa .promo-card-tag {
+body.tema-copa .promo-card-tag,
+.card-tema-copa .promo-card-tag {
   color: #f4d66a !important;
   background-color: rgba(215, 169, 40, 0.08) !important;
   border-color: rgba(244, 214, 106, 0.2) !important;
 }
 
-body.tema-copa .promo-card-action {
+body.tema-copa .promo-card-action,
+.card-tema-copa .promo-card-action {
   color: #2dd27e !important;
 }
 
-body.tema-copa .obsidian-card:hover .promo-card-action {
+body.tema-copa .obsidian-card:hover .promo-card-action,
+.card-tema-copa:hover .promo-card-action {
   color: #f4d66a !important;
 }
 
@@ -719,12 +728,14 @@ body.tema-copa .hub-stat-card:nth-child(n) {
     linear-gradient(135deg, rgba(4, 18, 10, 0.65), rgba(2, 6, 3, 0.8)) !important;
 }
 
-body.tema-copa .promo-card-top-bar {
+body.tema-copa .promo-card-top-bar,
+.card-tema-copa .promo-card-top-bar {
   position: relative;
   overflow: hidden;
 }
 
-body.tema-copa .promo-card-top-bar::after {
+body.tema-copa .promo-card-top-bar::after,
+.card-tema-copa .promo-card-top-bar::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -734,7 +745,8 @@ body.tema-copa .promo-card-top-bar::after {
   transition: transform 540ms cubic-bezier(0.16, 1, 0.3, 1), opacity 220ms ease;
 }
 
-body.tema-copa .obsidian-card:hover .promo-card-top-bar::after {
+body.tema-copa .obsidian-card:hover .promo-card-top-bar::after,
+.card-tema-copa:hover .promo-card-top-bar::after {
   transform: translateX(120%);
   opacity: 0.42;
 }

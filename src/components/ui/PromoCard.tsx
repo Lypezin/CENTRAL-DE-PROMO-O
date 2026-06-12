@@ -15,7 +15,7 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
 
   return (
     <Link href={`/promo/${promo.slug}`} className="block w-full h-full">
-      <div className="obsidian-card h-full flex flex-col relative group overflow-hidden">
+      <div className={`obsidian-card h-full flex flex-col relative group overflow-hidden ${promo.destaque_copa ? 'card-tema-copa' : ''}`}>
         {/* Accent thin top bar */}
         <div className={`h-[3px] w-full shrink-0 transition-all duration-300 group-hover:h-[4px] promo-card-top-bar ${
           isRanking 
@@ -26,7 +26,14 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
         <div className="p-6 flex flex-col flex-grow">
           {/* Card Header */}
           <div className="flex justify-between items-start mb-4">
-            <StatusBadge status={promo.status} />
+            <div className="flex items-center gap-2">
+              <StatusBadge status={promo.status} />
+              {promo.destaque_copa && (
+                <span className="text-[9px] font-black tracking-wider text-amber-400 bg-amber-950/20 border border-amber-900/30 px-2 py-0.5 rounded uppercase font-mono animate-pulse flex items-center gap-0.5">
+                  🏆 COPA
+                </span>
+              )}
+            </div>
             <span className="text-[9px] font-extrabold tracking-wider text-zinc-500 uppercase px-2.5 py-1 rounded-md bg-zinc-900/30 border border-zinc-800/80 font-mono">
               {isRanking ? 'RANKING' : 'DESAFIO'}
             </span>

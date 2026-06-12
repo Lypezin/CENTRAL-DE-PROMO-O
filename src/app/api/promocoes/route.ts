@@ -15,7 +15,7 @@ export async function GET(request: Request) {
 
   let query = supabaseAdmin
     .from('promocoes')
-    .select('id, slug, nome, descricao, tipo, status, data_inicio, data_fim, cidade, created_at, updated_at')
+    .select('id, slug, nome, descricao, tipo, status, data_inicio, data_fim, cidade, created_at, updated_at, destaque_copa')
     .order('created_at', { ascending: false })
 
   if (status) {
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json()
-    const { nome, descricao, tipo, data_inicio, data_fim, config_premios, config_turnos, cidade } = body
+    const { nome, descricao, tipo, data_inicio, data_fim, config_premios, config_turnos, cidade, destaque_copa } = body
 
     if (!nome || typeof nome !== 'string' || nome.trim().length === 0) {
       return NextResponse.json({ error: 'Nome é obrigatório' }, { status: 400 })
@@ -72,6 +72,7 @@ export async function POST(request: Request) {
         config_turnos: config_turnos || null,
         config_regras: null,
         cidade: cidade || null,
+        destaque_copa: destaque_copa ?? false,
       })
       .select()
       .single()

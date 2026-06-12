@@ -66,6 +66,7 @@ export async function PUT(
       'config_turnos',
       'config_regras',
       'cidade',
+      'destaque_copa',
     ]
 
     const updates: Record<string, unknown> = {}
