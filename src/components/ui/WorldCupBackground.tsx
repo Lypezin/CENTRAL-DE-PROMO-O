@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 
 const CONFETTI_COLORS = ['#0f8a4b', '#2dd27e', '#d7a928', '#f4d66a', '#eefdf4', '#3a4ea3', '#d33b3b']
@@ -192,14 +193,14 @@ export default function WorldCupBackground() {
           }
         }
 
-        @keyframes wcAura {
+        @keyframes wcHeroImage {
           0%, 100% {
-            transform: translate3d(-50%, 0, 0) scale(1);
-            opacity: 0.58;
+            transform: translate3d(-50%, -50%, 0) scale(1);
+            opacity: 0.23;
           }
           50% {
-            transform: translate3d(-50%, -1.4%, 0) scale(1.025);
-            opacity: 0.78;
+            transform: translate3d(-50%, -51.2%, 0) scale(1.018);
+            opacity: 0.34;
           }
         }
 
@@ -211,6 +212,17 @@ export default function WorldCupBackground() {
           50% {
             transform: translate3d(0, -10px, 0);
             opacity: 0.34;
+          }
+        }
+
+        @keyframes wcLightSweep {
+          0%, 100% {
+            transform: translate3d(-18%, 0, 0) rotate(-8deg);
+            opacity: 0.16;
+          }
+          50% {
+            transform: translate3d(18%, -1%, 0) rotate(-8deg);
+            opacity: 0.28;
           }
         }
 
@@ -226,11 +238,24 @@ export default function WorldCupBackground() {
       `}</style>
 
       <div className="absolute inset-0 opacity-[0.18] [background-image:linear-gradient(rgba(238,253,244,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(238,253,244,0.06)_1px,transparent_1px)] [background-size:72px_72px] [mask-image:linear-gradient(to_bottom,transparent,black_24%,black_72%,transparent)]" />
+      <div className="wc-motion absolute left-1/2 top-[43%] h-[min(720px,82vh)] w-[min(1260px,118vw)] -translate-x-1/2 -translate-y-1/2 opacity-25 mix-blend-screen [animation:wcHeroImage_13s_ease-in-out_infinite]">
+        <Image
+          src="/copa/premium-trophy-bg.webp"
+          alt=""
+          aria-hidden="true"
+          fill
+          sizes="100vw"
+          quality={75}
+          loading="eager"
+          unoptimized
+          className="object-cover [mask-image:radial-gradient(ellipse_at_center,black_0%,black_42%,transparent_74%)]"
+        />
+      </div>
+      <div className="wc-motion absolute left-1/2 top-[8%] h-[78vh] w-[26vw] min-w-[220px] -translate-x-1/2 rounded-full opacity-20 blur-sm [background:linear-gradient(90deg,transparent,rgba(244,214,106,0.42),transparent)] [animation:wcLightSweep_11s_ease-in-out_infinite]" />
       <div className="wc-motion absolute left-[7%] top-[17%] h-16 w-[36vw] max-w-[420px] -rotate-12 rounded-full opacity-24 [background:linear-gradient(90deg,transparent,rgba(211,59,59,0.3),rgba(244,214,106,0.22),transparent)] [animation:wcRibbonDrift_9s_ease-in-out_infinite]" />
       <div className="wc-motion absolute right-[-4%] top-[28%] h-20 w-[42vw] max-w-[520px] rotate-12 rounded-full opacity-20 [background:linear-gradient(90deg,transparent,rgba(42,57,141,0.3),rgba(45,210,126,0.2),transparent)] [animation:wcRibbonDrift_10.5s_ease-in-out_infinite_reverse]" />
-      <div className="wc-motion absolute left-1/2 top-[6%] h-[58vh] w-[58vh] -translate-x-1/2 rounded-full border border-amber-200/[0.08] opacity-70 [background:radial-gradient(circle_at_50%_28%,rgba(244,214,106,0.16),transparent_16%),radial-gradient(circle_at_50%_63%,rgba(15,138,75,0.16),transparent_32%)] [animation:wcAura_12s_ease-in-out_infinite]" />
+      <div className="absolute left-1/2 top-[6%] h-[58vh] w-[58vh] -translate-x-1/2 rounded-full border border-amber-200/[0.08] opacity-60 [background:radial-gradient(circle_at_50%_28%,rgba(244,214,106,0.12),transparent_16%),radial-gradient(circle_at_50%_63%,rgba(15,138,75,0.12),transparent_32%)]" />
       <div className="absolute left-1/2 top-[13%] h-[46vh] w-[46vh] -translate-x-1/2 rounded-full border border-emerald-300/[0.06] opacity-70" />
-      <div className="absolute left-1/2 top-[18%] h-[34vh] w-[18vh] -translate-x-1/2 opacity-[0.16] [clip-path:polygon(36%_0,64%_0,70%_22%,58%_22%,60%_44%,76%_44%,70%_64%,59%_64%,66%_100%,34%_100%,41%_64%,30%_64%,24%_44%,40%_44%,42%_22%,30%_22%)] [background:linear-gradient(180deg,#f7e08a,#d7a928_38%,#0f8a4b_100%)]" />
       <div className="absolute inset-x-0 bottom-0 h-[34vh] opacity-35 [background:linear-gradient(160deg,transparent_0_44%,rgba(238,253,244,0.12)_44.4%,transparent_45%),linear-gradient(20deg,transparent_0_47%,rgba(238,253,244,0.1)_47.4%,transparent_48%),linear-gradient(90deg,transparent_0_49.6%,rgba(238,253,244,0.12)_50%,transparent_50.4%)]" />
 
       {/* Confetti particles */}

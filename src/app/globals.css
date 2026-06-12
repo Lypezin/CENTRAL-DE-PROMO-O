@@ -699,18 +699,6 @@ body.tema-copa footer span:hover {
   }
 }
 
-body.tema-copa .copa-hero-panel h1::after {
-  content: "CANADA / MEXICO / USA";
-  display: block;
-  margin-top: 0.75rem;
-  color: rgba(244, 214, 106, 0.68);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-}
-
 body.tema-copa .copa-edition-badge {
   position: relative;
   overflow: hidden;
