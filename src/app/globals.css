@@ -814,6 +814,7 @@ body.tema-copa span.animate-pulse {
   animation: borderBeamRotate 6s linear infinite;
   z-index: 0;
   pointer-events: none;
+  will-change: transform;
 }
 
 @keyframes borderBeamRotate {

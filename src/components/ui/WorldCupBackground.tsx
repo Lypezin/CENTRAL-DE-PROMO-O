@@ -25,9 +25,14 @@ const CopaWebGLShader: React.FC<CopaShaderProps> = ({
 
     let resizeTimeout: NodeJS.Timeout
     const resizeCanvas = () => {
+      const isMobile = window.innerWidth < 768
+      // Performance optimization: Render WebGL background at 50% scale on mobile.
+      // Since it is a smooth blur gradient mesh, lower resolution is visually identical but saves 75% GPU power.
+      const resolutionScale = isMobile ? 0.5 : 1.0
       const dpr = typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 1.5) : 1
-      canvas.width = Math.floor(canvas.clientWidth * dpr)
-      canvas.height = Math.floor(canvas.clientHeight * dpr)
+      
+      canvas.width = Math.floor(canvas.clientWidth * dpr * resolutionScale)
+      canvas.height = Math.floor(canvas.clientHeight * dpr * resolutionScale)
       gl.viewport(0, 0, canvas.width, canvas.height)
     }
     resizeCanvas()
@@ -267,8 +272,9 @@ export default function WorldCupBackground() {
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    // Setup device pixel ratio for super-sharp graphics
-    const dpr = typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 1.5) : 1
+    const isMobile = window.innerWidth < 768
+    // Performance optimization: Maximize mobile frame rate by capping DPR at 1.0 (limits total pixels drawn)
+    const dpr = typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, isMobile ? 1.0 : 1.5) : 1
     let width = window.innerWidth
     let height = window.innerHeight
 
@@ -362,8 +368,9 @@ export default function WorldCupBackground() {
       offscreenStarRef.current = starCanvas
     }
 
-    // Generate high quality particles
-    const particleCount = 28
+    // Performance optimization: Render half the particles on mobile screens (12 vs 28)
+    // Decreases physics computations and canvas draw operations by >50%.
+    const particleCount = isMobile ? 12 : 28
     const particles: Particle[] = []
     const colorTypes: ('gold' | 'green' | 'blue' | 'white')[] = ['gold', 'green', 'blue', 'white', 'gold']
 
@@ -403,9 +410,8 @@ export default function WorldCupBackground() {
       ctx.scale(flipScale, 1)
 
       const absFlip = Math.abs(flipScale)
-      const shine = Math.floor(absFlip * 40 + 40) // HSL brightness optimization
+      const shine = Math.floor(absFlip * 40 + 40) 
 
-      // Avoid creating full canvas gradients on every frame for better performance
       if (p.colorType === 'gold') {
         ctx.fillStyle = `hsl(45, 100%, ${shine}%)`
       } else if (p.colorType === 'green') {
@@ -433,7 +439,6 @@ export default function WorldCupBackground() {
       ctx.scale(pulse, pulse)
       ctx.globalAlpha = p.opacity
       
-      // Draw pre-rendered star
       const size = p.width * 2
       ctx.drawImage(starImg, -p.width, -p.width, size, size)
       ctx.restore()
@@ -448,7 +453,6 @@ export default function WorldCupBackground() {
       ctx.rotate(p.rotation)
       ctx.globalAlpha = p.opacity
 
-      // Draw pre-rendered ball
       const size = p.width * 2
       ctx.drawImage(ballImg, -p.width, -p.width, size, size)
       ctx.restore()
@@ -486,7 +490,6 @@ export default function WorldCupBackground() {
       animFrameIdRef.current = requestAnimationFrame(updateAndDraw)
     }
 
-    // High performance loop lifecycle control to prevent multiple parallel loops
     const startLoop = () => {
       if (animFrameIdRef.current) cancelAnimationFrame(animFrameIdRef.current)
       isPausedRef.current = false

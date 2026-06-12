@@ -31,9 +31,11 @@ const Lightning: React.FC<LightningProps> = ({
 
     let resizeTimeout: NodeJS.Timeout;
     const resizeCanvas = () => {
+      const isMobile = window.innerWidth < 768;
+      const scale = isMobile ? 0.55 : 1.0;
       const dpr = typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 1.5) : 1;
-      canvas.width = Math.floor(canvas.clientWidth * dpr);
-      canvas.height = Math.floor(canvas.clientHeight * dpr);
+      canvas.width = Math.floor(canvas.clientWidth * dpr * scale);
+      canvas.height = Math.floor(canvas.clientHeight * dpr * scale);
       gl.viewport(0, 0, canvas.width, canvas.height);
     };
     resizeCanvas();
