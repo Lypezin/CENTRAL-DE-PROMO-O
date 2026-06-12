@@ -777,3 +777,50 @@ body.tema-copa span.animate-pulse {
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   PREMIUM COPA HIGHLIGHT CARD OVERRIDES
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Gold title gradient */
+.text-gradient-copa {
+  background: linear-gradient(135deg, #ffffff 0%, #f4d66a 50%, #eab308 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glowing, animated border and background for featured World Cup cards */
+.obsidian-card.card-tema-copa {
+  background: linear-gradient(135deg, rgba(4, 25, 12, 0.75) 0%, rgba(2, 8, 4, 0.92) 100%) !important;
+  border: 1px solid rgba(251, 191, 36, 0.28) !important;
+  animation: cardCopaGlow 5s infinite ease-in-out !important;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+@keyframes cardCopaGlow {
+  0%, 100% {
+    border-color: rgba(251, 191, 36, 0.25);
+    box-shadow: 
+      0 20px 45px -15px rgba(0, 0, 0, 0.95),
+      0 0 15px -3px rgba(251, 191, 36, 0.15),
+      inset 0 1px 1px rgba(255, 255, 255, 0.05);
+  }
+  50% {
+    border-color: rgba(16, 185, 129, 0.55);
+    box-shadow: 
+      0 20px 45px -15px rgba(0, 0, 0, 0.95),
+      0 0 25px 3px rgba(16, 185, 129, 0.32),
+      inset 0 1px 1px rgba(255, 255, 255, 0.08);
+  }
+}
+
+.obsidian-card.card-tema-copa:hover {
+  background: linear-gradient(135deg, rgba(6, 36, 17, 0.82) 0%, rgba(3, 12, 6, 0.96) 100%) !important;
+  border-color: rgba(251, 191, 36, 0.65) !important;
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.95),
+    0 0 35px -5px rgba(251, 191, 36, 0.45),
+    inset 0 1px 1px rgba(255, 255, 255, 0.1) !important;
+  transform: translateY(-6px) scale(1.02) !important;
+}
+
