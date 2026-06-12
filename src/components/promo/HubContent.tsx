@@ -102,14 +102,14 @@ export default function HubContent({ initialPromocoes }: { initialPromocoes: Pro
             </div>
 
             {isCopa && (
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-amber-950/20 border border-amber-800/30 text-[10px] font-bold text-amber-400 uppercase tracking-wider font-mono copa-shimmer">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-amber-950/20 border border-amber-800/30 text-[10px] font-bold text-amber-400 uppercase tracking-wider font-mono copa-shimmer copa-badge-glow">
                 ⚽ Edição Copa
               </div>
             )}
           </div>
           <h1 className="text-3xl md:text-5xl font-black text-white mb-4 tracking-tight leading-tight">
             Central de Promoções
-            {isCopa && <span className="text-lg md:text-2xl font-bold text-amber-400/80 ml-3">🏆</span>}
+            {isCopa && <span className="text-lg md:text-2xl font-bold text-amber-400/80 ml-3 gold-text-glow">🏆</span>}
           </h1>
           <p className="text-zinc-400 text-sm md:text-base leading-relaxed max-w-xl">
             Acompanhe o seu progresso em tempo real, veja a premiação de cada turno, consulte o histórico de campanhas e dispute as melhores colocações!
@@ -119,7 +119,7 @@ export default function HubContent({ initialPromocoes }: { initialPromocoes: Pro
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full lg:w-auto lg:min-w-[500px]">
           {/* Stat 1 */}
-          <div className="bg-[#08080a] border border-white/[0.04] rounded-2xl p-5 relative overflow-hidden group">
+          <div className="bg-[#08080a] border border-white/[0.04] rounded-2xl p-5 relative overflow-hidden group hub-stat-card">
             <div className="text-2xl font-bold text-white mb-0.5 font-mono tracking-tight">{ativas.length}</div>
             <div className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider font-mono">Promoções Ativas</div>
             <div className="absolute top-4 right-4 text-sky-500/25">
@@ -130,7 +130,7 @@ export default function HubContent({ initialPromocoes }: { initialPromocoes: Pro
           </div>
 
           {/* Stat 2 */}
-          <div className="bg-[#08080a] border border-white/[0.04] rounded-2xl p-5 relative overflow-hidden group">
+          <div className="bg-[#08080a] border border-white/[0.04] rounded-2xl p-5 relative overflow-hidden group hub-stat-card">
             <div className="text-2xl font-bold text-white mb-0.5 font-mono tracking-tight">{encerradas.length}</div>
             <div className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider font-mono">Histórico</div>
             <div className="absolute top-4 right-4 text-indigo-500/25">
@@ -141,7 +141,7 @@ export default function HubContent({ initialPromocoes }: { initialPromocoes: Pro
           </div>
 
           {/* Stat 3 */}
-          <div className="bg-[#08080a] border border-white/[0.04] rounded-2xl p-5 relative overflow-hidden group">
+          <div className="bg-[#08080a] border border-white/[0.04] rounded-2xl p-5 relative overflow-hidden group hub-stat-card">
             <div className="text-2xl font-bold text-emerald-400 mb-0.5 font-mono tracking-tight">{totalPrizesLabel}</div>
             <div className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider font-mono">Prêmios Acumulados</div>
             <div className="absolute top-4 right-4 text-emerald-500/25">
