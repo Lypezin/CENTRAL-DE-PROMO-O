@@ -794,6 +794,22 @@ body.tema-copa span.animate-pulse {
   position: relative;
 }
 
+/* Dashed Tactical Inner Border for extra Copa decoration */
+.obsidian-card.card-tema-copa::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border: 1px dashed rgba(16, 185, 129, 0.28);
+  border-radius: 12px;
+  pointer-events: none;
+  z-index: 1;
+  transition: border-color 0.4s ease;
+}
+
+.obsidian-card.card-tema-copa:hover::before {
+  border-color: rgba(251, 191, 36, 0.45);
+}
+
 @keyframes cardCopaGlow {
   0%, 100% {
     border-color: rgba(251, 191, 36, 0.25);

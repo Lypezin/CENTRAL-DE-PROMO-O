@@ -35,7 +35,7 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-400/10 to-transparent -translate-x-[150%] group-hover:translate-x-[150%] transition-transform duration-[1200ms] ease-in-out pointer-events-none z-20" />
         )}
 
-        {/* Ambient background glow orbs inside the card to completely reformulate it */}
+        {/* Ambient background glow orbs inside the card */}
         {isCopa && (
           <>
             <div className="absolute -right-[15%] -top-[15%] w-[180px] h-[180px] rounded-full bg-amber-500/[0.08] blur-[45px] pointer-events-none group-hover:bg-amber-500/[0.12] transition-colors duration-500 z-0" />
@@ -47,13 +47,26 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
           </>
         )}
 
-        {/* Decorative Golden Corners for Copa card borders */}
+        {/* EXTRA BORDER DECORATIONS (COPA THEME ONLY) */}
         {isCopa && (
           <>
-            <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-amber-400 rounded-tl-[12px] pointer-events-none z-20" />
-            <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-amber-400 rounded-tr-[12px] pointer-events-none z-20" />
-            <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-amber-400 rounded-bl-[12px] pointer-events-none z-20" />
-            <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-amber-400 rounded-br-[12px] pointer-events-none z-20" />
+            {/* 1. Corner Golden Star Sparkles */}
+            <span className="absolute top-0.5 left-1 text-[7px] text-amber-400 pointer-events-none z-25 animate-pulse">★</span>
+            <span className="absolute top-0.5 right-1.5 text-[7px] text-amber-400 pointer-events-none z-25 animate-pulse">★</span>
+            <span className="absolute bottom-0.5 left-1 text-[7px] text-amber-400 pointer-events-none z-25 animate-pulse">★</span>
+            <span className="absolute bottom-0.5 right-1.5 text-[7px] text-amber-400 pointer-events-none z-25 animate-pulse">★</span>
+
+            {/* 2. Side Mid-border Golden Ticks */}
+            <div className="absolute top-1/2 -left-[0.5px] w-[5px] h-[1px] bg-amber-400/80 -translate-y-1/2 pointer-events-none z-20" />
+            <div className="absolute top-1/2 -right-[0.5px] w-[5px] h-[1px] bg-amber-400/80 -translate-y-1/2 pointer-events-none z-20" />
+            <div className="absolute left-1/2 -top-[0.5px] w-[1px] h-[5px] bg-amber-400/80 -translate-x-1/2 pointer-events-none z-20" />
+            <div className="absolute left-1/2 -bottom-[0.5px] w-[1px] h-[5px] bg-amber-400/80 -translate-x-1/2 pointer-events-none z-20" />
+
+            {/* 3. Decorative Corner Brackets */}
+            <div className="absolute top-0 left-0 w-3.5 h-3.5 border-t-2 border-l-2 border-amber-400 rounded-tl-[12px] pointer-events-none z-20" />
+            <div className="absolute top-0 right-0 w-3.5 h-3.5 border-t-2 border-r-2 border-amber-400 rounded-tr-[12px] pointer-events-none z-20" />
+            <div className="absolute bottom-0 left-0 w-3.5 h-3.5 border-b-2 border-l-2 border-amber-400 rounded-bl-[12px] pointer-events-none z-20" />
+            <div className="absolute bottom-0 right-0 w-3.5 h-3.5 border-b-2 border-r-2 border-amber-400 rounded-br-[12px] pointer-events-none z-20" />
           </>
         )}
 
