@@ -2,7 +2,21 @@
 
 import { useState, useRef, useMemo, useEffect } from 'react'
 import PromoCard from '@/components/ui/PromoCard'
-import { supabase, Promocao } from '@/lib/supabase'
+import { Promocao } from '@/lib/supabase'
+
+type PrizeItem = {
+  valor?: number
+}
+
+type PrizeConfig = {
+  premios?: PrizeItem[]
+}
+
+declare global {
+  interface Window {
+    __onlineCount?: number
+  }
+}
 
 export default function HubContent({ initialPromocoes }: { initialPromocoes: Promocao[] }) {
   const [searchQuery, setSearchQuery] = useState('')
@@ -14,9 +28,9 @@ export default function HubContent({ initialPromocoes }: { initialPromocoes: Pro
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const count = (window as any).__onlineCount
+      const count = window.__onlineCount
       if (typeof count === 'number') {
-        setOnlineCount(count)
+        queueMicrotask(() => setOnlineCount(count))
       }
     }
 
@@ -26,7 +40,7 @@ export default function HubContent({ initialPromocoes }: { initialPromocoes: Pro
     window.addEventListener('online_presence_update', handleUpdate)
 
     // Detect Copa theme from body class
-    setIsCopa(document.body.classList.contains('tema-copa'))
+    queueMicrotask(() => setIsCopa(document.body.classList.contains('tema-copa')))
     const observer = new MutationObserver(() => {
       setIsCopa(document.body.classList.contains('tema-copa'))
     })
@@ -40,7 +54,6 @@ export default function HubContent({ initialPromocoes }: { initialPromocoes: Pro
 
 
   // Otimização: calcular contadores e estatísticas apenas quando initialPromocoes mudar
-  const totalCampanhas = useMemo(() => initialPromocoes.length, [initialPromocoes])
   const ativas = useMemo(() => initialPromocoes.filter(p => p.status === 'ativa'), [initialPromocoes])
   const encerradas = useMemo(() => initialPromocoes.filter(p => p.status === 'encerrada'), [initialPromocoes])
 
@@ -66,9 +79,9 @@ export default function HubContent({ initialPromocoes }: { initialPromocoes: Pro
     let total = 0
     initialPromocoes.forEach(p => {
       if (p.config_premios && Array.isArray(p.config_premios)) {
-        p.config_premios.forEach((c: any) => {
+        ;(p.config_premios as PrizeConfig[]).forEach((c) => {
           if (c.premios && Array.isArray(c.premios)) {
-            c.premios.forEach((pr: any) => {
+            c.premios.forEach((pr) => {
               if (pr.valor) {
                 total += pr.valor
               }
@@ -85,7 +98,7 @@ export default function HubContent({ initialPromocoes }: { initialPromocoes: Pro
       
       {/* Hero Header Section */}
       <section className="mb-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8 pt-8">
-        <div className="max-w-2xl text-left">
+        <div className={`max-w-2xl text-left ${isCopa ? 'copa-hero-panel' : ''}`}>
           <div className="flex flex-wrap items-center gap-2 mb-4">
             <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider font-mono ${
               isCopa
@@ -102,12 +115,12 @@ export default function HubContent({ initialPromocoes }: { initialPromocoes: Pro
             </div>
 
             {isCopa && (
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-amber-950/20 border border-amber-800/30 text-[10px] font-bold text-amber-400 uppercase tracking-wider font-mono copa-shimmer copa-badge-glow">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-amber-950/20 border border-amber-800/30 text-[10px] font-bold text-amber-400 uppercase tracking-wider font-mono copa-shimmer copa-badge-glow copa-edition-badge">
                 ⚽ Edição Copa
               </div>
             )}
           </div>
-          <h1 className="text-3xl md:text-5xl font-black text-white mb-4 tracking-tight leading-tight">
+          <h1 className={`text-3xl md:text-5xl font-black text-white mb-4 tracking-tight leading-tight ${isCopa ? 'text-gradient-neon' : ''}`}>
             Central de Promoções
             {isCopa && <span className="text-lg md:text-2xl font-bold text-amber-400/80 ml-3 gold-text-glow">🏆</span>}
           </h1>
