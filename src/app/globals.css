@@ -413,16 +413,14 @@ body.tema-copa .copa-badge-glow {
 
 /* Copa premium polish: restrained, performant overrides */
 body.tema-copa {
-  --copa-primary: #0f8a4b;
-  --copa-accent: #d7a928;
-  --copa-glow: #f4d66a;
-  --copa-bg: #020604;
-  --copa-blue: #2a398d;
-  --copa-red: #d33b3b;
-  background-image:
-    radial-gradient(ellipse 78% 44% at 50% -20%, rgba(244, 214, 106, 0.1), transparent),
-    radial-gradient(ellipse 56% 56% at 12% 0%, rgba(15, 138, 75, 0.12), transparent),
-    radial-gradient(ellipse 48% 44% at 88% 10%, rgba(42, 57, 141, 0.08), transparent);
+  --copa-primary: #16a34a;
+  --copa-accent: #f59e0b;
+  --copa-glow: #fbbf24;
+  --copa-bg: #020804;
+  --copa-blue: #1e3a8a;
+  --copa-red: #ef4444;
+  background-color: var(--copa-bg);
+  background-image: none; /* Handled entirely by WorldCupBackground now for better performance and depth */
 }
 
 body.tema-copa .tech-grid {
@@ -434,15 +432,17 @@ body.tema-copa .tech-grid {
 }
 
 body.tema-copa .obsidian-card {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent 34%),
-    linear-gradient(145deg, rgba(4, 18, 10, 0.9), rgba(7, 8, 9, 0.94) 54%, rgba(8, 8, 10, 0.98));
-  border-color: rgba(244, 214, 106, 0.1);
+  background: rgba(4, 18, 10, 0.65);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(251, 191, 36, 0.15);
   box-shadow:
-    0 18px 48px -22px rgba(0, 0, 0, 0.95),
-    inset 0 1px 0 rgba(255, 255, 255, 0.035);
+    0 20px 50px -20px rgba(0, 0, 0, 0.9),
+    inset 0 1px 1px rgba(255, 255, 255, 0.08),
+    inset 0 -1px 1px rgba(251, 191, 36, 0.05);
   isolation: isolate;
   position: relative;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 body.tema-copa .obsidian-card::after {
@@ -451,23 +451,24 @@ body.tema-copa .obsidian-card::after {
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background:
-    radial-gradient(circle at 18% 0%, rgba(45, 210, 126, 0.12), transparent 28%),
-    radial-gradient(circle at 86% 12%, rgba(244, 214, 106, 0.1), transparent 26%);
-  opacity: 0.52;
-  transition: opacity 260ms cubic-bezier(0.16, 1, 0.3, 1);
+  background: radial-gradient(circle at 50% 0%, rgba(251, 191, 36, 0.08), transparent 60%);
+  opacity: 0.5;
+  border-radius: inherit;
+  transition: opacity 0.4s ease;
 }
 
 body.tema-copa .obsidian-card:hover {
-  border-color: rgba(244, 214, 106, 0.28);
+  background: rgba(6, 24, 13, 0.75);
+  border-color: rgba(251, 191, 36, 0.4);
   box-shadow:
-    0 18px 44px -18px rgba(0, 0, 0, 0.95),
-    0 0 28px -14px rgba(244, 214, 106, 0.32),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    0 25px 50px -15px rgba(0, 0, 0, 0.95),
+    0 0 30px -10px rgba(251, 191, 36, 0.3),
+    inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  transform: translateY(-4px) scale(1.01);
 }
 
 body.tema-copa .obsidian-card:hover::after {
-  opacity: 0.86;
+  opacity: 1;
 }
 
 body.tema-copa .tab-active-indicator {

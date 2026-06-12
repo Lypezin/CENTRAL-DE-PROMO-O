@@ -3,10 +3,11 @@
 import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 
-const CONFETTI_COLORS = ['#0f8a4b', '#2dd27e', '#d7a928', '#f4d66a', '#eefdf4', '#3a4ea3', '#d33b3b']
+const CONFETTI_COLORS = ['#16a34a', '#22c55e', '#fbbf24', '#f59e0b', '#ffffff', '#eab308']
 
-const PARTICLE_COUNT = 26
-const DECORATION_COUNT = 8
+const PARTICLE_COUNT = 40
+const DECORATION_COUNT = 15
+const ORB_COUNT = 4
 
 interface Particle {
   left: string
@@ -26,7 +27,8 @@ interface Particle {
 
 interface Decoration {
   left: string
-  type: 'ribbon' | 'ball' | 'star'
+  top?: string
+  type: 'ribbon' | 'ball' | 'star' | 'sparkle'
   size: string
   duration: string
   delay: string
@@ -38,34 +40,45 @@ interface Decoration {
   opacity: number
 }
 
+interface Orb {
+  left: string
+  top: string
+  size: string
+  bg: string
+  duration: string
+  delay: string
+}
+
 function generateParticles(): Particle[] {
   return Array.from({ length: PARTICLE_COUNT }, (_, index) => {
-    const size = 4 + Math.random() * 7
-    const isCircle = Math.random() > 0.72
+    const size = 3 + Math.random() * 8
+    const isCircle = Math.random() > 0.6
     const layer = index % 3
     let blur = 'none'
-    let opacity = 0.56
+    let opacity = 0.8
     let zIndex = -2
+
     if (layer === 0) {
-      blur = 'blur(1px)'
-      opacity = 0.25
+      blur = 'blur(1.5px)'
+      opacity = 0.4
       zIndex = -3
     } else if (layer === 2) {
-      opacity = 0.72
+      blur = 'blur(0.5px)'
+      opacity = 0.9
       zIndex = -1
     }
 
     return {
       left: `${Math.random() * 100}%`,
       width: `${size}px`,
-      height: isCircle ? `${size}px` : `${size * (1.3 + Math.random() * 0.7)}px`,
+      height: isCircle ? `${size}px` : `${size * (1.5 + Math.random())}px`,
       bg: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
-      duration: `${11 + Math.random() * 10}s`,
-      delay: `${Math.random() * 14}s`,
+      duration: `${10 + Math.random() * 15}s`,
+      delay: `${Math.random() * 15}s`,
       rx: Math.random() * 2 - 1,
       ry: Math.random() * 2 - 1,
       rz: Math.random() * 2 - 1,
-      borderRadius: isCircle ? '50%' : '1px',
+      borderRadius: isCircle ? '50%' : '2px',
       blur,
       zIndex,
       opacity,
@@ -75,32 +88,38 @@ function generateParticles(): Particle[] {
 
 function generateDecorations(): Decoration[] {
   return Array.from({ length: DECORATION_COUNT }, (_, i) => {
-    const types: ('ribbon' | 'ball' | 'star')[] = ['ribbon', 'ball', 'star']
+    const types: ('ribbon' | 'ball' | 'star' | 'sparkle')[] = ['ribbon', 'ball', 'star', 'sparkle', 'star']
     const type = types[i % types.length]
     
-    let size = '12px'
-    let duration = '8s'
+    let size = '14px'
+    let duration = '12s'
     let bg = '#fbbf24'
-    let opacity = 0.7
+    let opacity = 0.8
 
     if (type === 'ribbon') {
-      size = `${13 + Math.random() * 7}px`
-      duration = `${14 + Math.random() * 7}s`
+      size = `${15 + Math.random() * 10}px`
+      duration = `${15 + Math.random() * 10}s`
       bg = CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)]
     } else if (type === 'ball') {
-      size = `${10 + Math.random() * 6}px`
-      duration = `${16 + Math.random() * 7}s`
+      size = `${12 + Math.random() * 8}px`
+      duration = `${18 + Math.random() * 8}s`
       bg = '#ffffff'
-      opacity = 0.36
+      opacity = 0.5
+    } else if (type === 'sparkle') {
+      size = `${4 + Math.random() * 6}px`
+      duration = `${6 + Math.random() * 8}s`
+      bg = '#ffffff'
+      opacity = 0.9
     } else {
-      size = `${8 + Math.random() * 6}px`
-      duration = `${13 + Math.random() * 7}s`
-      bg = '#fbbf24'
-      opacity = 0.55
+      size = `${10 + Math.random() * 8}px`
+      duration = `${14 + Math.random() * 8}s`
+      bg = '#f59e0b'
+      opacity = 0.7
     }
 
     return {
-      left: `${Math.random() * 95}%`,
+      left: `${Math.random() * 100}%`,
+      top: type === 'sparkle' ? `${Math.random() * 100}%` : undefined,
       type,
       size,
       duration,
@@ -109,18 +128,38 @@ function generateDecorations(): Decoration[] {
       rx: Math.random() * 2 - 1,
       ry: Math.random() * 2 - 1,
       rz: Math.random() * 2 - 1,
-      blur: i % 4 === 0 ? 'blur(0.5px)' : 'none',
+      blur: i % 3 === 0 ? 'blur(1px)' : 'none',
       opacity,
     }
   })
+}
+
+function generateOrbs(): Orb[] {
+  const colors = [
+    'rgba(22, 163, 74, 0.15)', // Green
+    'rgba(245, 158, 11, 0.12)', // Gold
+    'rgba(34, 197, 94, 0.1)',  // Light Green
+    'rgba(251, 191, 36, 0.15)'  // Bright Gold
+  ]
+  return Array.from({ length: ORB_COUNT }, (_, i) => ({
+    left: `${Math.random() * 80 + 10}%`,
+    top: `${Math.random() * 80 + 10}%`,
+    size: `${300 + Math.random() * 400}px`,
+    bg: colors[i % colors.length],
+    duration: `${20 + Math.random() * 20}s`,
+    delay: `-${Math.random() * 10}s`,
+  }))
 }
 
 export default function WorldCupBackground() {
   const containerRef = useRef<HTMLDivElement>(null)
   const [particles] = useState<Particle[]>(generateParticles)
   const [decorations] = useState<Decoration[]>(generateDecorations)
+  const [orbs] = useState<Orb[]>(generateOrbs)
+  const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
+    setIsMounted(true)
     const container = containerRef.current
     if (!container) return
 
@@ -136,94 +175,81 @@ export default function WorldCupBackground() {
     return () => document.removeEventListener('visibilitychange', handleVisibility)
   }, [])
 
+  if (!isMounted) return null
+
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-[-2] pointer-events-none overflow-hidden"
-      style={{
-        background: `
-          radial-gradient(ellipse 72% 44% at 50% -16%, rgba(244, 214, 106, 0.16), transparent 68%),
-          radial-gradient(ellipse 58% 52% at 82% 14%, rgba(42, 57, 141, 0.1), transparent 66%),
-          radial-gradient(ellipse 58% 62% at 12% 22%, rgba(15, 138, 75, 0.16), transparent 68%),
-          linear-gradient(180deg, #020504 0%, #03130a 46%, #010302 100%)
-        `,
-      }}
+      className="fixed inset-0 z-[-2] pointer-events-none overflow-hidden bg-[#020804]"
     >
       <style>{`
         @keyframes confettiFall {
           0% {
-            transform: translateY(-12vh) rotate3d(var(--rx), var(--ry), var(--rz), 0deg);
+            transform: translateY(-15vh) translateX(0) rotate3d(var(--rx), var(--ry), var(--rz), 0deg);
             opacity: 0;
           }
-          8% {
+          10% {
             opacity: var(--op);
           }
           90% {
             opacity: var(--op);
           }
           100% {
-            transform: translateY(112vh) translateX(var(--drift)) rotate3d(var(--rx), var(--ry), var(--rz), 320deg);
+            transform: translateY(115vh) translateX(var(--drift)) rotate3d(var(--rx), var(--ry), var(--rz), 720deg);
             opacity: 0;
           }
         }
 
         @keyframes spiralFall {
           0% {
-            transform: translateY(-12vh) translateX(0) rotate(0deg);
+            transform: translateY(-15vh) translateX(0) rotate(0deg);
             opacity: 0;
           }
           10% { opacity: var(--op); }
-          50% { transform: translateY(50vh) translateX(25px) rotate(180deg); }
+          50% { transform: translateY(50vh) translateX(40px) rotate(360deg); }
           90% { opacity: var(--op); }
           100% {
-            transform: translateY(112vh) translateX(-18px) rotate(320deg);
+            transform: translateY(115vh) translateX(-20px) rotate(720deg);
             opacity: 0;
           }
         }
 
-        @keyframes ballFall {
+        @keyframes ballBounceFall {
           0% {
-            transform: translateY(-12vh) rotate(0deg);
+            transform: translateY(-15vh) translateX(0) rotate(0deg);
             opacity: 0;
           }
           10% { opacity: var(--op); }
+          30% { transform: translateY(30vh) translateX(20px) rotate(180deg); }
+          50% { transform: translateY(50vh) translateX(0px) rotate(360deg); }
+          70% { transform: translateY(80vh) translateX(-20px) rotate(540deg); }
+          90% { opacity: var(--op); }
           100% {
-            transform: translateY(112vh) rotate(680deg);
+            transform: translateY(115vh) translateX(10px) rotate(720deg);
             opacity: 0;
           }
         }
 
-        @keyframes wcHeroImage {
-          0%, 100% {
-            transform: translate3d(-50%, -50%, 0) scale(1);
-            opacity: 0.23;
-          }
-          50% {
-            transform: translate3d(-50%, -51.2%, 0) scale(1.018);
-            opacity: 0.34;
-          }
+        @keyframes sparklePulse {
+          0%, 100% { opacity: 0; transform: scale(0.5) rotate(0deg); }
+          50% { opacity: var(--op); transform: scale(1.5) rotate(180deg); filter: brightness(1.5) drop-shadow(0 0 10px rgba(255,255,255,0.8)); }
         }
 
-        @keyframes wcRibbonDrift {
-          0%, 100% {
-            transform: translate3d(0, 0, 0);
-            opacity: 0.22;
-          }
-          50% {
-            transform: translate3d(0, -10px, 0);
-            opacity: 0.34;
-          }
+        @keyframes orbFloat {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          33% { transform: translate(30px, -50px) scale(1.1); }
+          66% { transform: translate(-20px, 20px) scale(0.9); }
         }
 
-        @keyframes wcLightSweep {
-          0%, 100% {
-            transform: translate3d(-18%, 0, 0) rotate(-8deg);
-            opacity: 0.16;
-          }
-          50% {
-            transform: translate3d(18%, -1%, 0) rotate(-8deg);
-            opacity: 0.28;
-          }
+        @keyframes sweepLight {
+          0% { transform: translateX(-100%) skewX(-15deg); opacity: 0; }
+          50% { opacity: 0.1; }
+          100% { transform: translateX(200%) skewX(-15deg); opacity: 0; }
+        }
+
+        @keyframes gridPan {
+          0% { transform: translateY(0); }
+          100% { transform: translateY(50px); }
         }
 
         .wc-paused * {
@@ -237,36 +263,42 @@ export default function WorldCupBackground() {
         }
       `}</style>
 
-      <div className="absolute inset-0 opacity-[0.18] [background-image:linear-gradient(rgba(238,253,244,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(238,253,244,0.06)_1px,transparent_1px)] [background-size:72px_72px] [mask-image:linear-gradient(to_bottom,transparent,black_24%,black_72%,transparent)]" />
-      <div className="wc-motion absolute left-1/2 top-[43%] h-[min(720px,82vh)] w-[min(1260px,118vw)] -translate-x-1/2 -translate-y-1/2 opacity-25 mix-blend-screen [animation:wcHeroImage_13s_ease-in-out_infinite]">
-        <Image
-          src="/copa/premium-trophy-bg.webp"
-          alt=""
-          aria-hidden="true"
-          fill
-          sizes="100vw"
-          quality={75}
-          loading="eager"
-          unoptimized
-          className="object-cover [mask-image:radial-gradient(ellipse_at_center,black_0%,black_42%,transparent_74%)]"
+      {/* Deep Mesh Gradient Background */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-green-900/20 via-[#020804] to-[#020804]"></div>
+
+      {/* Floating Animated Orbs for Depth */}
+      {orbs.map((orb, i) => (
+        <div
+          key={`orb-${i}`}
+          className="wc-motion absolute rounded-full blur-[80px] mix-blend-screen"
+          style={{
+            left: orb.left,
+            top: orb.top,
+            width: orb.size,
+            height: orb.size,
+            background: orb.bg,
+            animation: `orbFloat ${orb.duration} ease-in-out infinite alternate`,
+            animationDelay: orb.delay,
+            zIndex: -5,
+          }}
         />
-      </div>
-      <div className="wc-motion absolute left-1/2 top-[8%] h-[78vh] w-[26vw] min-w-[220px] -translate-x-1/2 rounded-full opacity-20 blur-sm [background:linear-gradient(90deg,transparent,rgba(244,214,106,0.42),transparent)] [animation:wcLightSweep_11s_ease-in-out_infinite]" />
-      <div className="wc-motion absolute left-[7%] top-[17%] h-16 w-[36vw] max-w-[420px] -rotate-12 rounded-full opacity-24 [background:linear-gradient(90deg,transparent,rgba(211,59,59,0.3),rgba(244,214,106,0.22),transparent)] [animation:wcRibbonDrift_9s_ease-in-out_infinite]" />
-      <div className="wc-motion absolute right-[-4%] top-[28%] h-20 w-[42vw] max-w-[520px] rotate-12 rounded-full opacity-20 [background:linear-gradient(90deg,transparent,rgba(42,57,141,0.3),rgba(45,210,126,0.2),transparent)] [animation:wcRibbonDrift_10.5s_ease-in-out_infinite_reverse]" />
-      <div className="absolute left-1/2 top-[6%] h-[58vh] w-[58vh] -translate-x-1/2 rounded-full border border-amber-200/[0.08] opacity-60 [background:radial-gradient(circle_at_50%_28%,rgba(244,214,106,0.12),transparent_16%),radial-gradient(circle_at_50%_63%,rgba(15,138,75,0.12),transparent_32%)]" />
-      <div className="absolute left-1/2 top-[13%] h-[46vh] w-[46vh] -translate-x-1/2 rounded-full border border-emerald-300/[0.06] opacity-70" />
-      <div className="absolute inset-x-0 bottom-0 h-[34vh] opacity-35 [background:linear-gradient(160deg,transparent_0_44%,rgba(238,253,244,0.12)_44.4%,transparent_45%),linear-gradient(20deg,transparent_0_47%,rgba(238,253,244,0.1)_47.4%,transparent_48%),linear-gradient(90deg,transparent_0_49.6%,rgba(238,253,244,0.12)_50%,transparent_50.4%)]" />
+      ))}
+
+      {/* Premium Hex Grid Overlay */}
+      <div className="absolute inset-0 opacity-[0.15] [background-image:linear-gradient(rgba(251,191,36,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(251,191,36,0.1)_1px,transparent_1px)] [background-size:40px_40px] [mask-image:radial-gradient(ellipse_at_center,black_10%,transparent_70%)] [animation:gridPan_20s_linear_infinite]" />
+
+      {/* Majestic Sweeping Light */}
+      <div className="wc-motion absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-green-400/10 to-transparent skew-x-[-15deg] [animation:sweepLight_8s_ease-in-out_infinite]" />
 
       {/* Confetti particles */}
       {particles.map((p, i) => (
         <div
           key={`c-${i}`}
-          className="wc-motion"
+          className="wc-motion shadow-[0_0_8px_rgba(0,0,0,0.3)]"
           style={{
             position: 'absolute',
             left: p.left,
-            top: '-15px',
+            top: '-20px',
             width: p.width,
             height: p.height,
             backgroundColor: p.bg,
@@ -280,15 +312,14 @@ export default function WorldCupBackground() {
             ['--ry' as string]: p.ry,
             ['--rz' as string]: p.rz,
             ['--op' as string]: p.opacity,
-            ['--drift' as string]: `${(i % 5 - 2) * 12}px`,
+            ['--drift' as string]: `${(i % 5 - 2) * 30}px`,
           }}
         />
       ))}
 
-      {/* Premium Decorations (Ribbons, Golden Stars, Soccer Balls) */}
+      {/* Premium Decorations */}
       {decorations.map((dec, i) => {
         if (dec.type === 'ribbon') {
-          // Spirals / Ribbons represented by hollow borders
           return (
             <div
               key={`dec-${i}`}
@@ -296,10 +327,10 @@ export default function WorldCupBackground() {
               style={{
                 position: 'absolute',
                 left: dec.left,
-                top: '-25px',
+                top: '-30px',
                 width: dec.size,
-                height: `${parseFloat(dec.size) * 2}px`,
-                borderLeft: `2px solid ${dec.bg}`,
+                height: `${parseFloat(dec.size) * 3}px`,
+                borderLeft: `3px solid ${dec.bg}`,
                 borderBottom: `2px dashed ${dec.bg}`,
                 borderRadius: '50% 0 50% 0',
                 opacity: 0,
@@ -308,45 +339,65 @@ export default function WorldCupBackground() {
                 animation: `spiralFall ${dec.duration} ${dec.delay} ease-in-out infinite`,
                 ['--op' as string]: dec.opacity,
                 zIndex: -2,
+                boxShadow: `inset 0 0 10px ${dec.bg}40`,
               }}
             />
           )
         }
 
         if (dec.type === 'ball') {
-          // Stylized soccer ball vector (CSS pure grid)
           return (
             <div
               key={`dec-${i}`}
-              className="wc-motion flex items-center justify-center"
+              className="wc-motion flex items-center justify-center shadow-lg"
               style={{
                 position: 'absolute',
                 left: dec.left,
-                top: '-25px',
+                top: '-30px',
                 width: dec.size,
                 height: dec.size,
-                background: 'radial-gradient(circle at 35% 35%, #ffffff 0%, #cbd5e1 100%)',
+                background: 'radial-gradient(circle at 30% 30%, #ffffff 0%, #94a3b8 100%)',
                 borderRadius: '50%',
-                boxShadow: 'inset -2px -2px 5px rgba(0,0,0,0.2), 0 0 8px rgba(255,255,255,0.4)',
+                boxShadow: 'inset -3px -3px 8px rgba(0,0,0,0.4), 0 5px 15px rgba(0,0,0,0.3)',
                 opacity: 0,
                 filter: dec.blur,
                 willChange: 'transform, opacity',
-                animation: `ballFall ${dec.duration} ${dec.delay} linear infinite`,
+                animation: `ballBounceFall ${dec.duration} ${dec.delay} linear infinite`,
                 ['--op' as string]: dec.opacity,
                 zIndex: -1,
               }}
             >
-              {/* Inner details to suggest a football texture */}
               <div 
                 style={{
-                  width: '60%',
-                  height: '60%',
-                  border: '1px double rgba(15,23,42,0.25)',
+                  width: '65%',
+                  height: '65%',
+                  border: '1px solid rgba(15,23,42,0.3)',
                   borderRadius: '50%',
-                  background: 'repeating-conic-gradient(from 0deg, transparent 0deg 30deg, rgba(15,23,42,0.15) 30deg 60deg)'
+                  background: 'repeating-conic-gradient(from 0deg, transparent 0deg 36deg, rgba(15,23,42,0.2) 36deg 72deg)'
                 }}
               />
             </div>
+          )
+        }
+
+        if (dec.type === 'sparkle') {
+          return (
+            <div
+              key={`dec-${i}`}
+              className="wc-motion"
+              style={{
+                position: 'absolute',
+                left: dec.left,
+                top: dec.top,
+                width: dec.size,
+                height: dec.size,
+                background: 'radial-gradient(circle, #ffffff 0%, transparent 70%)',
+                opacity: 0,
+                animation: `sparklePulse ${dec.duration} ${dec.delay} ease-in-out infinite`,
+                ['--op' as string]: dec.opacity,
+                zIndex: -1,
+              }}
+            />
           )
         }
 
@@ -354,15 +405,14 @@ export default function WorldCupBackground() {
         return (
           <div
             key={`dec-${i}`}
-            className="wc-motion"
+            className="wc-motion drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]"
             style={{
               position: 'absolute',
               left: dec.left,
-              top: '-20px',
+              top: '-30px',
               width: dec.size,
               height: dec.size,
               backgroundColor: dec.bg,
-              // Star clip path for premium clean visual
               clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)',
               opacity: 0,
               filter: dec.blur,
@@ -372,14 +422,15 @@ export default function WorldCupBackground() {
               ['--ry' as string]: dec.ry,
               ['--rz' as string]: dec.rz,
               ['--op' as string]: dec.opacity,
+              ['--drift' as string]: `${(i % 3 - 1) * 20}px`,
               zIndex: -2,
             }}
           />
         )
       })}
 
-      {/* Vignette organic shadow mask to blend background cleanly into content */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,transparent_12%,rgba(2,6,3,0.34)_58%,#020603_100%)]" />
+      {/* Dark Vignette to focus content */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,transparent_20%,rgba(2,8,4,0.6)_80%,#020804_100%)] pointer-events-none" />
     </div>
   )
 }
