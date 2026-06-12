@@ -17,7 +17,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 group">
           <span className="font-extrabold text-sm sm:text-base tracking-tight text-white flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 bg-sky-500 rounded-full animate-pulse"></span>
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse brand-dot"></span>
             EntreGÔ <span className="text-zinc-500 font-normal">|</span> <span className="text-zinc-300 font-medium">Central de Promoções</span>
           </span>
         </Link>
@@ -36,7 +36,7 @@ export default function Navbar() {
               >
                 {link.label}
                 {isActive && (
-                  <span className="absolute -bottom-[19px] left-0 w-full h-[1px] bg-white" />
+                  <span className="absolute -bottom-[19px] left-0 w-full h-[1px] bg-white nav-active-line" />
                 )}
               </Link>
             )

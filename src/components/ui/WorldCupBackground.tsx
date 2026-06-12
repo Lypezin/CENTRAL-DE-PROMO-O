@@ -40,9 +40,9 @@ function generateConfetti(): Particle[] {
       bg: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
       duration: `${8 + Math.random() * 10}s`,
       delay: `${Math.random() * 15}s`,
-      rotateX: Math.random() * 360,
-      rotateY: Math.random() * 360,
-      rotateZ: Math.random() * 360,
+      rotateX: Math.random() * 2 - 1,
+      rotateY: Math.random() * 2 - 1,
+      rotateZ: Math.random() * 2 - 1,
       borderRadius: isCircle ? '50%' : '2px',
     }
   })

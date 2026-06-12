@@ -316,3 +316,63 @@ body.tema-copa.animations-paused * {
   animation-play-state: paused !important;
 }
 
+/* Copa theme overrides for new class hooks */
+body.tema-copa .brand-dot {
+  background-color: #22c55e !important;
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.8) !important;
+}
+
+body.tema-copa .nav-active-line {
+  background: linear-gradient(90deg, #22c55e, #d4a425) !important;
+}
+
+body.tema-copa .promo-card-top-bar {
+  background: linear-gradient(90deg, #166534 0%, #d4a425 50%, #22c55e 100%) !important;
+}
+
+body.tema-copa .obsidian-card:hover .promo-card-title {
+  color: #fbbf24 !important;
+}
+
+body.tema-copa .promo-card-tag {
+  color: #fbbf24 !important;
+  background-color: rgba(212, 164, 37, 0.08) !important;
+  border-color: rgba(212, 164, 37, 0.2) !important;
+}
+
+body.tema-copa .promo-card-action {
+  color: #22c55e !important;
+}
+body.tema-copa .obsidian-card:hover .promo-card-action {
+  color: #fbbf24 !important;
+}
+
+body.tema-copa .hub-filter-bar {
+  background-color: rgba(4, 26, 10, 0.6) !important;
+  border-color: rgba(26, 107, 55, 0.3) !important;
+}
+
+body.tema-copa .hub-filter-btn {
+  transition: all 0.3s ease;
+}
+body.tema-copa .hub-filter-btn[class*="text-white"] {
+  background-color: #166534 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 12px rgba(22, 101, 52, 0.4) !important;
+}
+body.tema-copa .hub-filter-btn:not([class*="text-white"]) {
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+body.tema-copa .hub-filter-btn:not([class*="text-white"]):hover {
+  color: #22c55e !important;
+}
+
+body.tema-copa .hub-search-input {
+  background-color: rgba(4, 26, 10, 0.5) !important;
+  border-color: rgba(26, 107, 55, 0.3) !important;
+}
+body.tema-copa .hub-search-input:focus {
+  border-color: #22c55e !important;
+  box-shadow: 0 0 15px rgba(34, 197, 150, 0.15) !important;
+}
+
