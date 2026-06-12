@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import StatusBadge from '@/components/ui/StatusBadge'
 import { supabase, Promocao } from '@/lib/supabase'
 import { useToast } from '@/components/ui/Toast'
+import SiteConfigPanel from '@/components/admin/SiteConfigPanel'
 
 export default function AdminPage() {
   const router = useRouter()
@@ -364,6 +365,9 @@ export default function AdminPage() {
           </button>
         </div>
       </div>
+
+      {/* Site Configuration */}
+      <SiteConfigPanel />
 
       {/* Analytics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">

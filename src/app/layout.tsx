@@ -3,7 +3,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/ui/Navbar";
 import VisitorTracker from "@/components/ui/VisitorTracker";
-import LightningBackground from "@/components/ui/LightningBackground";
+import DynamicBackground from "@/components/ui/DynamicBackground";
+import { supabaseAdmin } from "@/lib/supabaseServer";
 import { ToastProvider } from "@/components/ui/Toast";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -18,17 +19,32 @@ export const viewport: Viewport = {
   initialScale: 1,
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Fetch active theme from Supabase (server-side)
+  let temaAtivo: 'raios' | 'copa' = 'raios'
+  try {
+    const { data } = await supabaseAdmin
+      .from('configuracoes')
+      .select('valor')
+      .eq('chave', 'tema_hub')
+      .single()
+    if (data?.valor?.tema_ativo) {
+      temaAtivo = data.valor.tema_ativo
+    }
+  } catch {
+    // Default to 'raios' if table doesn't exist yet
+  }
+
   return (
     <html lang="pt-BR">
       <body className={inter.className}>
         <ToastProvider>
-          {/* Ambient WebGL organic lightning background */}
-          <LightningBackground />
+          {/* Dynamic theme background (raios or copa) */}
+          <DynamicBackground temaAtivo={temaAtivo} />
 
           {/* Modern grid line pattern overlay (Pure CSS, 60fps native performance) */}
           <div className="tech-grid"></div>

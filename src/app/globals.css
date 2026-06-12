@@ -213,3 +213,106 @@
   box-shadow: 0 0 15px -3px rgba(56, 189, 248, 0.25);
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   TEMA COPA DO MUNDO - Conditional styles when body.tema-copa
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Copa CSS Custom Properties */
+body.tema-copa {
+  --copa-primary: #1a6b37;
+  --copa-accent: #d4a425;
+  --copa-glow: #fbbf24;
+  --copa-bg: #041a0a;
+  background-image: 
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(26, 107, 55, 0.12), transparent),
+    radial-gradient(ellipse 50% 50% at 50% 100%, rgba(212, 164, 37, 0.06), transparent);
+}
+
+/* Copa grid overlay - green tinted */
+body.tema-copa .tech-grid {
+  background-image: linear-gradient(rgba(26, 107, 55, 0.015) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(26, 107, 55, 0.015) 1px, transparent 1px);
+}
+
+/* Copa card styling - gold shimmer border */
+body.tema-copa .obsidian-card {
+  border-color: rgba(212, 164, 37, 0.08);
+}
+body.tema-copa .obsidian-card:hover {
+  border-color: rgba(212, 164, 37, 0.18);
+  box-shadow: 
+    0 12px 40px -10px rgba(0, 0, 0, 0.8),
+    0 0 25px -5px rgba(212, 164, 37, 0.08);
+}
+
+/* Copa glow overrides */
+body.tema-copa .glow-sky-neon {
+  box-shadow: 0 0 15px -3px rgba(212, 164, 37, 0.25);
+}
+
+body.tema-copa .tab-active-indicator {
+  background: #d4a425;
+  box-shadow: 0 0 10px rgba(212, 164, 37, 0.5);
+}
+
+/* Copa text gradient override */
+body.tema-copa .text-gradient-neon {
+  background: linear-gradient(135deg, #22c55e 0%, #d4a425 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Confetti Animation */
+@keyframes confettiFall {
+  0% {
+    transform: translateY(-10vh) rotate(0deg) rotateX(0deg);
+    opacity: 0;
+  }
+  5% {
+    opacity: 0.8;
+  }
+  95% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(110vh) rotate(720deg) rotateX(360deg);
+    opacity: 0;
+  }
+}
+
+/* Star Pulse Animation */
+@keyframes starPulse {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.3);
+  }
+}
+
+/* Gold Shimmer for Copa cards */
+@keyframes shimmerGold {
+  0% {
+    border-color: rgba(212, 164, 37, 0.06);
+  }
+  50% {
+    border-color: rgba(212, 164, 37, 0.18);
+    box-shadow: 0 0 20px -5px rgba(212, 164, 37, 0.06);
+  }
+  100% {
+    border-color: rgba(212, 164, 37, 0.06);
+  }
+}
+
+body.tema-copa .copa-shimmer {
+  animation: shimmerGold 3s infinite ease-in-out;
+}
+
+/* Paused state for Copa animations (tab hidden) */
+body.tema-copa.animations-paused * {
+  animation-play-state: paused !important;
+}
+

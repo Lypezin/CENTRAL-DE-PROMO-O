@@ -10,6 +10,7 @@ export default function HubContent({ initialPromocoes }: { initialPromocoes: Pro
   const [isTermsOpen, setIsTermsOpen] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const [onlineCount, setOnlineCount] = useState<number>(1)
+  const [isCopa, setIsCopa] = useState<boolean>(false)
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -23,8 +24,17 @@ export default function HubContent({ initialPromocoes }: { initialPromocoes: Pro
       setOnlineCount((e as CustomEvent).detail)
     }
     window.addEventListener('online_presence_update', handleUpdate)
+
+    // Detect Copa theme from body class
+    setIsCopa(document.body.classList.contains('tema-copa'))
+    const observer = new MutationObserver(() => {
+      setIsCopa(document.body.classList.contains('tema-copa'))
+    })
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] })
+
     return () => {
       window.removeEventListener('online_presence_update', handleUpdate)
+      observer.disconnect()
     }
   }, [])
 
@@ -77,8 +87,12 @@ export default function HubContent({ initialPromocoes }: { initialPromocoes: Pro
       <section className="mb-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8 pt-8">
         <div className="max-w-2xl text-left">
           <div className="flex flex-wrap items-center gap-2 mb-4">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-sky-950/20 border border-sky-900/30 text-[10px] font-bold text-sky-400 uppercase tracking-wider font-mono">
-              <span className="w-1.5 h-1.5 bg-sky-400 rounded-full animate-pulse"></span>
+            <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider font-mono ${
+              isCopa
+                ? 'bg-green-950/20 border border-green-900/30 text-green-400'
+                : 'bg-sky-950/20 border border-sky-900/30 text-sky-400'
+            }`}>
+              <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${isCopa ? 'bg-green-400' : 'bg-sky-400'}`}></span>
               Painel Operacional
             </div>
 
@@ -86,9 +100,16 @@ export default function HubContent({ initialPromocoes }: { initialPromocoes: Pro
               <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span>
               {onlineCount} {onlineCount === 1 ? 'entregador online' : 'entregadores online'}
             </div>
+
+            {isCopa && (
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-amber-950/20 border border-amber-800/30 text-[10px] font-bold text-amber-400 uppercase tracking-wider font-mono copa-shimmer">
+                ⚽ Edição Copa
+              </div>
+            )}
           </div>
           <h1 className="text-3xl md:text-5xl font-black text-white mb-4 tracking-tight leading-tight">
             Central de Promoções
+            {isCopa && <span className="text-lg md:text-2xl font-bold text-amber-400/80 ml-3">🏆</span>}
           </h1>
           <p className="text-zinc-400 text-sm md:text-base leading-relaxed max-w-xl">
             Acompanhe o seu progresso em tempo real, veja a premiação de cada turno, consulte o histórico de campanhas e dispute as melhores colocações!
