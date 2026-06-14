@@ -16,6 +16,7 @@ export interface EntregaRanking {
   total_corridas_completadas: number
   total_corridas_aceitas: number
   total_pedidos_concluidos: number
+  total_pontos: number
 }
 
 export interface DatasDisponiveis {

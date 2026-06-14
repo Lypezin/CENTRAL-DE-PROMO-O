@@ -109,11 +109,15 @@ export default function RankingTurno({
   }, [filteredRanking, displayLimit])
   
   const getScore = useCallback((item: EntregaRanking) => {
-    return mecanica.metrica === 'faturamento_taxas' ? item.total_soma_taxas : item.total_corridas_completadas
+    if (mecanica.metrica === 'faturamento_taxas') return item.total_soma_taxas
+    if (mecanica.metrica === 'pontos') return item.total_pontos
+    return item.total_corridas_completadas
   }, [mecanica.metrica])
 
   const formatScoreValue = useCallback((val: number) => {
-    return mecanica.metrica === 'faturamento_taxas' ? formatCurrency(val) : `${val} corr.`
+    if (mecanica.metrica === 'faturamento_taxas') return formatCurrency(val)
+    if (mecanica.metrica === 'pontos') return `${val} pts`
+    return `${val} corr.`
   }, [mecanica.metrica])
 
   const maxScore = useMemo(() => {

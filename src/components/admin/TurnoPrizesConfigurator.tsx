@@ -80,6 +80,8 @@ export default function TurnoPrizesConfigurator({
           premio.posicao_inicio = 3
           premio.posicao_fim = 5
         }
+      } else if (campo === 'descricao') {
+        premio[campo] = valor
       } else {
         premio[campo] = Number(valor)
       }
@@ -301,6 +303,18 @@ export default function TurnoPrizesConfigurator({
                       className="w-24 bg-[#0c0c0f] border border-white/10 rounded-lg text-xs text-white px-2.5 py-1.5 focus:outline-none focus:border-sky-500"
                       placeholder="Valor"
                       min="0"
+                    />
+                  </div>
+
+                  {/* Descrição do prêmio (opcional - para kits/itens físicos) */}
+                  <div className="flex-1 min-w-[120px]">
+                    <label className="block text-[9px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1">Descrição (Opcional)</label>
+                    <input
+                      type="text"
+                      value={p.descricao || ''}
+                      onChange={e => handleUpdatePremioRow(idx, 'descricao', e.target.value)}
+                      placeholder="Ex: Kit Entregador"
+                      className="admin-input !bg-[#0b0b0d] !py-1.5 !px-2 text-[11px]"
                     />
                   </div>
 

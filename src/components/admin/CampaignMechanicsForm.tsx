@@ -30,7 +30,9 @@ export default function CampaignMechanicsForm({
   }
 
   const formatScoreLabel = (metrica: string) => {
-    return metrica === 'faturamento_taxas' ? 'Taxas R$' : 'Corridas'
+    if (metrica === 'faturamento_taxas') return 'Taxas R$'
+    if (metrica === 'pontos') return 'Pontos'
+    return 'Corridas'
   }
 
   const mecanica = promo.config_regras?.mecanica || {
@@ -65,21 +67,30 @@ export default function CampaignMechanicsForm({
                 value={mecanica.metrica ?? 'corridas_completadas'}
                 onChange={e => {
                   const val = e.target.value
+                  const updates: any = { metrica: val }
+                  // Força agrupamento geral quando a métrica for pontos
+                  if (val === 'pontos') {
+                    updates.agrupamento = 'geral'
+                  }
                   setPromo({
                     ...promo,
                     config_regras: {
                       ...(promo.config_regras || {}),
                       mecanica: {
                         ...mecanica,
-                        metrica: val
+                        ...updates
                       }
                     }
                   })
+                  if (val === 'pontos') {
+                    setTurnoEditorAtivo('GERAL')
+                  }
                 }}
                 className="admin-input !bg-[#0b0b0d] !border-white/10"
               >
                 <option value="corridas_completadas">Quantidade de Corridas</option>
                 <option value="faturamento_taxas">Faturamento Acumulado (Taxas R$)</option>
+                <option value="pontos">Pontuação Acumulada (Pontos)</option>
               </select>
             </div>
 

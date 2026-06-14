@@ -1023,4 +1023,126 @@ body.tema-copa span.animate-pulse {
   color: #d1d5db !important;
 }
 
+/* ==========================================================================
+   TEMA COPA DO MUNDO - Customizações Adicionais para a Página Interna
+   ========================================================================== */
+
+/* Validade e ícones */
+body.tema-copa .val-icon {
+  color: #f59e0b !important; /* amber-500 */
+}
+
+body.tema-copa .bullet-indicator {
+  color: #f59e0b !important; /* amber-500 */
+}
+
+/* Cards do Podium na Copa */
+body.tema-copa .copa-podium-card {
+  background: rgba(4, 20, 11, 0.75) !important;
+  border: 1px solid rgba(245, 158, 11, 0.25) !important;
+  box-shadow: 
+    0 15px 45px -10px rgba(0, 0, 0, 0.9),
+    0 0 25px -10px rgba(245, 158, 11, 0.15) !important;
+}
+
+body.tema-copa .copa-podium-1 {
+  background: linear-gradient(135deg, rgba(8, 38, 18, 0.85), rgba(4, 20, 11, 0.9)) !important;
+  border: 1px solid rgba(245, 158, 11, 0.45) !important;
+  box-shadow: 
+    0 25px 60px -12px rgba(0, 0, 0, 0.95),
+    0 0 40px -8px rgba(245, 158, 11, 0.35) !important;
+}
+
+body.tema-copa .copa-podium-1::after {
+  background: radial-gradient(circle at 50% 0%, rgba(245, 158, 11, 0.22), transparent 70%) !important;
+  opacity: 1 !important;
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+}
+
+body.tema-copa .copa-podium-2 {
+  background: linear-gradient(135deg, rgba(6, 26, 13, 0.8), rgba(3, 14, 8, 0.85)) !important;
+  border: 1px solid rgba(209, 213, 219, 0.3) !important;
+  box-shadow: 
+    0 20px 45px -10px rgba(0, 0, 0, 0.9),
+    0 0 25px -10px rgba(209, 213, 219, 0.15) !important;
+}
+
+body.tema-copa .copa-podium-2::after {
+  background: radial-gradient(circle at 50% 0%, rgba(209, 213, 219, 0.12), transparent 60%) !important;
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+}
+
+body.tema-copa .copa-podium-3 {
+  background: linear-gradient(135deg, rgba(6, 26, 13, 0.8), rgba(3, 14, 8, 0.85)) !important;
+  border: 1px solid rgba(180, 83, 9, 0.3) !important;
+  box-shadow: 
+    0 20px 45px -10px rgba(0, 0, 0, 0.9),
+    0 0 25px -10px rgba(180, 83, 9, 0.15) !important;
+}
+
+body.tema-copa .copa-podium-3::after {
+  background: radial-gradient(circle at 50% 0%, rgba(180, 83, 9, 0.12), transparent 60%) !important;
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+}
+
+/* Podium Mobile */
+body.tema-copa .copa-podium-mobile {
+  background: rgba(4, 20, 11, 0.4) !important;
+  border-color: rgba(245, 158, 11, 0.18) !important;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.6) !important;
+}
+
+body.tema-copa .copa-podium-mobile-card {
+  background: rgba(3, 15, 8, 0.9) !important;
+  border-color: rgba(245, 158, 11, 0.18) !important;
+}
+
+body.tema-copa .copa-podium-mobile-1 {
+  background: rgba(6, 28, 14, 0.95) !important;
+  border-color: rgba(245, 158, 11, 0.4) !important;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.18) !important;
+}
+
+/* Tabela de Ranking da Copa */
+body.tema-copa .copa-leaderboard-table {
+  border-color: rgba(245, 158, 11, 0.22) !important;
+  background: rgba(4, 20, 11, 0.55) !important;
+}
+
+body.tema-copa .copa-leaderboard-table .divide-zinc-900\/60 > div {
+  border-bottom-color: rgba(245, 158, 11, 0.08) !important;
+}
+
+body.tema-copa .copa-leaderboard-table .divide-zinc-900\/60 > div:hover {
+  background-color: rgba(245, 158, 11, 0.02) !important;
+  border-left-color: rgba(245, 158, 11, 0.4) !important;
+}
+
+/* Badges de Prêmio Internos */
+body.tema-copa .copa-prize-badge {
+  background: rgba(6, 28, 14, 0.6) !important;
+  border-color: rgba(245, 158, 11, 0.18) !important;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+  transition: all 0.25s ease !important;
+}
+
+body.tema-copa .copa-prize-badge:hover {
+  background: rgba(8, 38, 18, 0.75) !important;
+  border-color: rgba(245, 158, 11, 0.35) !important;
+  transform: translateY(-1px) !important;
+}
+
+
 

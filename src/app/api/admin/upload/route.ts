@@ -51,6 +51,7 @@ const MAPA_COLUNAS: Record<string, string> = {
   'numero_de_corridas_canceladas_pela_pessoa_entregadora': 'numero_de_corridas_canceladas_pela_pessoa_entregadora',
   'numero_de_pedidos_aceitos_e_concluidos': 'numero_de_pedidos_aceitos_e_concluidos',
   'soma_das_taxas_das_corridas_aceitas': 'soma_das_taxas_das_corridas_aceitas',
+  'pontos': 'pontos',
 }
 
 function normalizarColuna(col: string): string {
@@ -168,9 +169,13 @@ export async function POST(request: NextRequest) {
           }
         })
         obj.promocao_id = promocaoId
+        // Fallback: se periodo não veio no Excel, usar GERAL
+        if (!obj.periodo || obj.periodo === '') {
+          obj.periodo = 'GERAL'
+        }
         return obj
       })
-      .filter(r => r.data_do_periodo && r.periodo && r.id_da_pessoa_entregadora)
+      .filter(r => r.data_do_periodo && r.id_da_pessoa_entregadora)
 
     const linhasIgnoradas = rows.length - registros.length
 
@@ -186,7 +191,8 @@ export async function POST(request: NextRequest) {
       'numero_de_corridas_completadas',
       'numero_de_corridas_canceladas_pela_pessoa_entregadora',
       'numero_de_pedidos_aceitos_e_concluidos',
-      'soma_das_taxas_das_corridas_aceitas'
+      'soma_das_taxas_das_corridas_aceitas',
+      'pontos'
     ]
 
     for (const r of registros) {
