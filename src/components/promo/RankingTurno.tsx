@@ -101,8 +101,8 @@ export default function RankingTurno({
 
   const displayLimit = useMemo(() => {
     const limiteRanking = configRegras?.limite_ranking ?? 15
-    return searchQuery ? filteredRanking.length : Math.min(filteredRanking.length, limiteRanking)
-  }, [filteredRanking, searchQuery, configRegras])
+    return debouncedSearchQuery ? filteredRanking.length : Math.min(filteredRanking.length, limiteRanking)
+  }, [filteredRanking, debouncedSearchQuery, configRegras])
 
   const rankingToDisplay = useMemo(() => {
     return filteredRanking.slice(0, displayLimit)
@@ -188,7 +188,7 @@ export default function RankingTurno({
             {/* RENDER MODE A: RANKING LEADERBOARD (Top X) */}
             {!isMetas && !isNiveis && (
               <RankingLeaderboard 
-                searchQuery={searchQuery}
+                searchQuery={debouncedSearchQuery}
                 rankingToDisplay={rankingToDisplay}
                 activeTurnoConfig={activeTurnoConfig}
                 configPremios={configPremios}
@@ -204,7 +204,7 @@ export default function RankingTurno({
             {/* RENDER MODE B: META INDIVIDUAL E PROGRESSO */}
             {isMetas && (
               <RankingMetas 
-                searchQuery={searchQuery}
+                searchQuery={debouncedSearchQuery}
                 filteredRanking={filteredRanking}
                 rankingData={rankingData}
                 mecanica={mecanica}
@@ -217,7 +217,7 @@ export default function RankingTurno({
             {/* RENDER MODE C: NÍVEIS PROGRESSIVOS */}
             {isNiveis && (
               <RankingNiveis 
-                searchQuery={searchQuery}
+                searchQuery={debouncedSearchQuery}
                 filteredRanking={filteredRanking}
                 rankingData={rankingData}
                 mecanica={mecanica}

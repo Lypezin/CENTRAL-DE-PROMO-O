@@ -25,11 +25,11 @@ const CopaWebGLShader: React.FC<CopaShaderProps> = ({
 
     let resizeTimeout: NodeJS.Timeout
     const resizeCanvas = () => {
-      const isMobile = window.innerWidth < 768
-      // Performance optimization: Render WebGL background at 50% scale on mobile.
-      // Since it is a smooth blur gradient mesh, lower resolution is visually identical but saves 75% GPU power.
-      const resolutionScale = isMobile ? 0.5 : 1.0
-      const dpr = typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 1.5) : 1
+      // Performance optimization: WebGL fluid mesh generates soft blurry gradients.
+      // Rendering at a fixed low resolution (30% scale, max dpr 1.0) decreases the total pixel
+      // rendering workload by over 90% while browser-level bilinear filtering keeps the blur perfectly smooth.
+      const resolutionScale = 0.3
+      const dpr = 1.0
       
       canvas.width = Math.floor(canvas.clientWidth * dpr * resolutionScale)
       canvas.height = Math.floor(canvas.clientHeight * dpr * resolutionScale)
@@ -81,7 +81,7 @@ const CopaWebGLShader: React.FC<CopaShaderProps> = ({
       float fbm(vec2 p) {
         float v = 0.0;
         float a = 0.5;
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 3; i++) {
           v += a * noise(p);
           p *= 2.05;
           a *= 0.5;
@@ -273,8 +273,9 @@ export default function WorldCupBackground() {
     if (!ctx) return
 
     const isMobile = window.innerWidth < 768
-    // Performance optimization: Maximize mobile frame rate by capping DPR at 1.0 (limits total pixels drawn)
-    const dpr = typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, isMobile ? 1.0 : 1.5) : 1
+    // Performance optimization: Cap DPR for particle background at 1.0 on all devices.
+    // Avoids drawing high density of pixels on high-DPI screens without visual degradation.
+    const dpr = 1.0
     let width = window.innerWidth
     let height = window.innerHeight
 
@@ -368,9 +369,9 @@ export default function WorldCupBackground() {
       offscreenStarRef.current = starCanvas
     }
 
-    // Performance optimization: Render half the particles on mobile screens (12 vs 28)
-    // Decreases physics computations and canvas draw operations by >50%.
-    const particleCount = isMobile ? 12 : 28
+    // Performance optimization: Render reduced particles (10 on mobile, 18 on desktop)
+    // to minimize drawing operations and CPU physics simulation overhead.
+    const particleCount = isMobile ? 10 : 18
     const particles: Particle[] = []
     const colorTypes: ('gold' | 'green' | 'blue' | 'white')[] = ['gold', 'green', 'blue', 'white', 'gold']
 

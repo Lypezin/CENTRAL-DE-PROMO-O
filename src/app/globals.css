@@ -184,9 +184,9 @@
 
 /* Glassmorphism utility aprimorado */
 .glass {
-  background: rgba(8, 8, 10, 0.55) !important;
-  backdrop-filter: blur(16px) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
+  background: rgba(8, 8, 10, 0.78) !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
   border: 1px solid rgba(255, 255, 255, 0.05) !important;
   box-shadow: 
     0 10px 40px -10px rgba(0, 0, 0, 0.5),
@@ -433,9 +433,9 @@ body.tema-copa .tech-grid {
 
 body.tema-copa .obsidian-card,
 .obsidian-card.card-tema-copa {
-  background: rgba(4, 18, 10, 0.65) !important;
-  backdrop-filter: blur(24px) !important;
-  -webkit-backdrop-filter: blur(24px) !important;
+  background: rgba(4, 18, 10, 0.88) !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
   border: 1px solid rgba(251, 191, 36, 0.22) !important;
   box-shadow:
     0 20px 50px -20px rgba(0, 0, 0, 0.9),
@@ -845,9 +845,9 @@ body.tema-copa span.animate-pulse {
 .promo-page-copa .bg-\[\#08080a\],
 .promo-page-copa .bg-zinc-950\/20,
 .promo-page-copa .bg-zinc-900\/30 {
-  background: rgba(3, 20, 8, 0.6) !important;
-  backdrop-filter: blur(16px) saturate(120%);
-  -webkit-backdrop-filter: blur(16px) saturate(120%);
+  background: rgba(3, 20, 8, 0.8) !important;
+  backdrop-filter: blur(6px) saturate(120%);
+  -webkit-backdrop-filter: blur(6px) saturate(120%);
   border: 1px solid rgba(212, 164, 37, 0.22) !important;
   box-shadow: 
     0 15px 35px -10px rgba(0, 0, 0, 0.85),
