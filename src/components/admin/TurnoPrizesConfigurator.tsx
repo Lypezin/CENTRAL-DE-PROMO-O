@@ -146,6 +146,7 @@ export default function TurnoPrizesConfigurator({
           {[
             { key: 'CAFE_DA_MANHA', label: 'Café da Manhã', emoji: '☀️' },
             { key: 'ALMOCO', label: 'Almoço', emoji: '🌤️' },
+            { key: 'TARDE', label: 'Tarde', emoji: '🌅' },
             { key: 'JANTAR', label: 'Jantar', emoji: '🌙' },
             { key: 'MADRUGADA', label: 'Madrugada', emoji: '⭐' }
           ].map(t => {
@@ -183,6 +184,7 @@ export default function TurnoPrizesConfigurator({
         {[
           { key: 'CAFE_DA_MANHA', label: 'Café da Manhã', emoji: '☀️' },
           { key: 'ALMOCO', label: 'Almoço', emoji: '🌤️' },
+          { key: 'TARDE', label: 'Tarde', emoji: '🌅' },
           { key: 'JANTAR', label: 'Jantar', emoji: '🌙' },
           { key: 'MADRUGADA', label: 'Madrugada', emoji: '⭐' }
         ].filter(t => activeTurnos.includes(t.key)).map(t => (

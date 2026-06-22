@@ -174,10 +174,11 @@ export default function AdminPage() {
         nome: `Nova Promoção ${new Date().toLocaleDateString()}`,
         tipo: 'ranking_turno',
         status: 'rascunho',
-        config_turnos: ['CAFE_DA_MANHA', 'ALMOCO', 'JANTAR', 'MADRUGADA'],
+        config_turnos: ['CAFE_DA_MANHA', 'ALMOCO', 'TARDE', 'JANTAR', 'MADRUGADA'],
         config_premios: [
           { turno: "CAFE_DA_MANHA", premios: [{ posicao: 1, valor: 300 }, { posicao: 2, valor: 200 }, { posicao_inicio: 3, posicao_fim: 5, valor: 100 }] },
           { turno: "ALMOCO", premios: [{ posicao: 1, valor: 1500 }, { posicao: 2, valor: 1000 }, { posicao: 3, valor: 500 }, { posicao_inicio: 4, posicao_fim: 10, valor: 300 }, { posicao_inicio: 11, posicao_fim: 15, valor: 100 }] },
+          { turno: "TARDE", premios: [{ posicao: 1, valor: 300 }, { posicao: 2, valor: 200 }, { posicao_inicio: 3, posicao_fim: 5, valor: 100 }] },
           { turno: "JANTAR", premios: [{ posicao: 1, valor: 1500 }, { posicao: 2, valor: 1000 }, { posicao: 3, valor: 500 }, { posicao_inicio: 4, posicao_fim: 10, valor: 300 }, { posicao_inicio: 11, posicao_fim: 15, valor: 100 }] },
           { turno: "MADRUGADA", premios: [{ posicao: 1, valor: 300 }, { posicao: 2, valor: 200 }, { posicao_inicio: 3, posicao_fim: 5, valor: 100 }] }
         ]

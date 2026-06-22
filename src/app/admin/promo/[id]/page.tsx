@@ -40,7 +40,7 @@ export default function EditPromoPage() {
   // Subcomponents Visual Editor States
   const [localPremios, setLocalPremios] = useState<any[]>([])
   const [turnoEditorAtivo, setTurnoEditorAtivo] = useState<string>('CAFE_DA_MANHA')
-  const [activeTurnos, setActiveTurnos] = useState<string[]>(['CAFE_DA_MANHA', 'ALMOCO', 'JANTAR', 'MADRUGADA'])
+  const [activeTurnos, setActiveTurnos] = useState<string[]>(['CAFE_DA_MANHA', 'ALMOCO', 'TARDE', 'JANTAR', 'MADRUGADA'])
 
   const carregarPromo = useCallback(async () => {
     try {
@@ -65,7 +65,7 @@ export default function EditPromoPage() {
         setPromo(initializedPromo)
         setStats(data.stats)
         setLocalPremios(data.promocao.config_premios || [])
-        const loadedTurnos = data.promocao.config_turnos || ['CAFE_DA_MANHA', 'ALMOCO', 'JANTAR', 'MADRUGADA']
+        const loadedTurnos = data.promocao.config_turnos || ['CAFE_DA_MANHA', 'ALMOCO', 'TARDE', 'JANTAR', 'MADRUGADA']
         setActiveTurnos(loadedTurnos)
         if (loadedTurnos.length > 0 && !loadedTurnos.includes(turnoEditorAtivo)) {
           setTurnoEditorAtivo(loadedTurnos[0])
@@ -110,7 +110,7 @@ export default function EditPromoPage() {
         }
         setPromo(initializedData)
         setLocalPremios(data.config_premios || [])
-        setActiveTurnos(data.config_turnos || ['CAFE_DA_MANHA', 'ALMOCO', 'JANTAR', 'MADRUGADA'])
+        setActiveTurnos(data.config_turnos || ['CAFE_DA_MANHA', 'ALMOCO', 'TARDE', 'JANTAR', 'MADRUGADA'])
         toast.success('Promoção atualizada com sucesso!')
       }
     } catch (e) {
@@ -175,7 +175,7 @@ export default function EditPromoPage() {
       const agrupamento = promo.config_regras?.mecanica?.agrupamento || 'turno'
       const turnos = agrupamento === 'geral' 
         ? ['GERAL'] 
-        : (activeTurnos && activeTurnos.length > 0 ? activeTurnos : ['CAFE_DA_MANHA', 'ALMOCO', 'JANTAR', 'MADRUGADA'])
+        : (activeTurnos && activeTurnos.length > 0 ? activeTurnos : ['CAFE_DA_MANHA', 'ALMOCO', 'TARDE', 'JANTAR', 'MADRUGADA'])
       
       // Limite do ranking visível
       const limiteRanking = promo.config_regras?.limite_ranking ?? 15

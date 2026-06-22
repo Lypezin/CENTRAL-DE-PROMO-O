@@ -17,7 +17,7 @@ export default async function PromoPage({ params }: { params: Promise<{ slug: st
 
   const promo = promocoes[0]
   const configPremios = promo.config_premios || []
-  const configTurnos = promo.config_turnos || ['CAFE_DA_MANHA', 'ALMOCO', 'JANTAR', 'MADRUGADA']
+  const configTurnos = promo.config_turnos || ['CAFE_DA_MANHA', 'ALMOCO', 'TARDE', 'JANTAR', 'MADRUGADA']
 
   const formatData = (dataStr: string | null) => {
     if (!dataStr) return 'TBD'

@@ -42,7 +42,7 @@ export default function RankingTurno({
   const isNiveis = mecanica.tipo_calculo === 'niveis'
   
   const turnosDisponiveis = useMemo(() => {
-    return isGeral ? ['GERAL'] : configTurnos.filter(t => t !== 'TARDE')
+    return isGeral ? ['GERAL'] : configTurnos
   }, [isGeral, configTurnos])
   
   const [filtroAtivo, setFiltroAtivo] = useState(isGeral ? 'GERAL' : (turnosDisponiveis[0] || 'CAFE_DA_MANHA'))
