@@ -21,6 +21,7 @@ const TURNO_DISPLAY: Record<string, { label: string; emoji: string; cor: string;
 }
 
 export default function RankingTurno({ 
+  promocaoId,
   configPremios, 
   configTurnos,
   configRegras = {},
