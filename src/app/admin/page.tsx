@@ -64,8 +64,13 @@ export default function AdminPage() {
     try {
       const res = await fetch('/api/promocoes')
       if (res.ok) {
-        const data = await res.json()
-        setPromocoes(data)
+        const data: Promocao[] = await res.json()
+        const sortedData = data.sort((a, b) => {
+          const aOrdem = a.config_regras?.ordem ?? 999
+          const bOrdem = b.config_regras?.ordem ?? 999
+          return aOrdem - bOrdem
+        })
+        setPromocoes(sortedData)
       }
     } catch (e) {
       console.error(e)
@@ -87,6 +92,31 @@ export default function AdminPage() {
   const handleLogout = async () => {
     await fetch('/api/admin/logout', { method: 'POST' })
     setPageState('login')
+  }
+
+  const handleReorder = async (newOrder: Promocao[]) => {
+    setPromocoes(newOrder) // Optimistic update
+    
+    try {
+      const updates = newOrder.map((promo, index) => ({
+        id: promo.id,
+        config_regras: promo.config_regras
+      }))
+
+      const res = await fetch('/api/promocoes/reorder', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates)
+      })
+
+      if (!res.ok) {
+        throw new Error('Falha ao reordenar')
+      }
+      toast.success('Ordem atualizada com sucesso!')
+    } catch (e) {
+      console.error(e)
+      toast.error('Erro ao salvar nova ordem. Atualize a página.')
+    }
   }
 
   const handleCriarPromocao = async () => {
@@ -248,7 +278,7 @@ export default function AdminPage() {
             <p className="text-xs text-zinc-500 mt-1">Selecione uma promoção ativa ou arquivada para editar regras e painéis.</p>
           </div>
           
-          <AdminPromoList promocoes={promocoes} loading={loading} />
+          <AdminPromoList promocoes={promocoes} loading={loading} onReorder={handleReorder} />
         </div>
 
       </div>

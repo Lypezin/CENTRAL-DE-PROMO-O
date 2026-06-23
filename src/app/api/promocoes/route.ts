@@ -15,7 +15,7 @@ export async function GET(request: Request) {
 
   let query = supabaseAdmin
     .from('promocoes')
-    .select('id, slug, nome, descricao, tipo, status, data_inicio, data_fim, cidade, created_at, updated_at, destaque_copa')
+    .select('id, slug, nome, descricao, tipo, status, data_inicio, data_fim, cidade, created_at, updated_at, destaque_copa, config_regras')
     .order('created_at', { ascending: false })
 
   if (status) {

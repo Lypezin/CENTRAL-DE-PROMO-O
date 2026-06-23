@@ -148,26 +148,6 @@ export default function GeneralSettingsForm({
             />
           </div>
 
-          <div className="flex flex-col">
-            <label htmlFor="geral-ordem" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Ordem de Exibição</label>
-            <input 
-              id="geral-ordem"
-              type="number" 
-              min="1"
-              max="999"
-              value={promo.config_regras?.ordem ?? 999}
-              onChange={e => setPromo({ 
-                ...promo, 
-                config_regras: { 
-                  ...(promo.config_regras || {}), 
-                  ordem: parseInt(e.target.value) || 999 
-                } 
-              })}
-              className="admin-input bg-[#0f0f15]"
-              title="Quanto menor o número, primeiro aparece (Ex: 1, 2, 3...)"
-            />
-          </div>
-
           {/* Campo Limite de Ranking (Agora Centralizado com Layout Limpo) */}
           <div className="flex flex-col">
             <label htmlFor="geral-limite" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Limite (Ranking)</label>
