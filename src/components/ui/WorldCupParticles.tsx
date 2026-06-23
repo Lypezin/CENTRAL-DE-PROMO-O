@@ -228,41 +228,53 @@ export default function WorldCupParticles() {
       ctx.restore()
     }
 
+    let lastRenderTime = performance.now()
+    const targetFPS = 45
+    const frameInterval = 1000 / targetFPS
+
     const updateAndDraw = () => {
       if (isPausedRef.current) return
-      ctx.clearRect(0, 0, width, height)
-
-      for (let i = 0; i < particles.length; i++) {
-        const p = particles[i]
-
-        p.rotation += p.rotationSpeed
-        p.wobble += p.wobbleSpeed
+      animFrameIdRef.current = requestAnimationFrame(updateAndDraw)
+      
+      const currentTime = performance.now()
+      const elapsed = currentTime - lastRenderTime
+      
+      if (elapsed > frameInterval) {
+        lastRenderTime = currentTime - (elapsed % frameInterval)
         
-        p.x += p.vx + Math.sin(p.wobble) * 0.25
-        p.y += p.vy
+        ctx.clearRect(0, 0, width, height)
 
-        if (p.y > height + 30) {
-          p.y = -30
-          p.x = Math.random() * width
-          p.vy = p.type === 'ball' ? 1.4 + Math.random() * 1.2 : 0.9 + Math.random() * 1.3
-          p.vx = (Math.random() * 1.2 - 0.6)
-        }
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i]
 
-        if (p.type === 'star') {
-          drawStar(p)
-        } else if (p.type === 'ball') {
-          drawBall(p)
-        } else {
-          drawConfetti(p)
+          p.rotation += p.rotationSpeed
+          p.wobble += p.wobbleSpeed
+          
+          p.x += p.vx + Math.sin(p.wobble) * 0.25
+          p.y += p.vy
+
+          if (p.y > height + 30) {
+            p.y = -30
+            p.x = Math.random() * width
+            p.vy = p.type === 'ball' ? 1.4 + Math.random() * 1.2 : 0.9 + Math.random() * 1.3
+            p.vx = (Math.random() * 1.2 - 0.6)
+          }
+
+          if (p.type === 'star') {
+            drawStar(p)
+          } else if (p.type === 'ball') {
+            drawBall(p)
+          } else {
+            drawConfetti(p)
+          }
         }
       }
-
-      animFrameIdRef.current = requestAnimationFrame(updateAndDraw)
     }
 
     const startLoop = () => {
       if (animFrameIdRef.current) cancelAnimationFrame(animFrameIdRef.current)
       isPausedRef.current = false
+      lastRenderTime = performance.now()
       updateAndDraw()
     }
 

@@ -29,8 +29,19 @@ const CopaWebGLShader: React.FC<CopaShaderProps> = ({
       const resolutionScale = 0.3
       const dpr = 1.0
       
-      canvas.width = Math.floor(canvas.clientWidth * dpr * resolutionScale)
-      canvas.height = Math.floor(canvas.clientHeight * dpr * resolutionScale)
+      let newWidth = Math.floor(canvas.clientWidth * dpr * resolutionScale)
+      let newHeight = Math.floor(canvas.clientHeight * dpr * resolutionScale)
+      
+      // Cap maximum resolution to prevent 4K/Ultra-wide GPU strain
+      const maxPixels = 800 * 600
+      if (newWidth * newHeight > maxPixels) {
+        const scale = Math.sqrt(maxPixels / (newWidth * newHeight))
+        newWidth = Math.floor(newWidth * scale)
+        newHeight = Math.floor(newHeight * scale)
+      }
+
+      canvas.width = newWidth
+      canvas.height = newHeight
       gl.viewport(0, 0, canvas.width, canvas.height)
     }
     resizeCanvas()
@@ -90,16 +101,26 @@ const CopaWebGLShader: React.FC<CopaShaderProps> = ({
     const startTime = performance.now()
     let animationFrameId: number
     let isPaused = false
+    let lastRenderTime = performance.now()
+    const targetFPS = 42 // Reduced FPS to save GPU
+    const frameInterval = 1000 / targetFPS
 
     const render = () => {
       if (isPaused) return
-      gl.uniform2f(iResolutionLocation, canvas.width, canvas.height)
-      const currentTime = performance.now()
-      gl.uniform1f(iTimeLocation, (currentTime - startTime) / 1000.0)
-      gl.uniform1f(uSpeedLocation, speed)
-      gl.uniform1f(uIntensityLocation, intensity)
-      gl.drawArrays(gl.TRIANGLES, 0, 6)
       animationFrameId = requestAnimationFrame(render)
+      
+      const currentTime = performance.now()
+      const elapsed = currentTime - lastRenderTime
+      
+      if (elapsed > frameInterval) {
+        lastRenderTime = currentTime - (elapsed % frameInterval)
+        
+        gl.uniform2f(iResolutionLocation, canvas.width, canvas.height)
+        gl.uniform1f(iTimeLocation, (currentTime - startTime) / 1000.0)
+        gl.uniform1f(uSpeedLocation, speed)
+        gl.uniform1f(uIntensityLocation, intensity)
+        gl.drawArrays(gl.TRIANGLES, 0, 6)
+      }
     }
     render()
 
