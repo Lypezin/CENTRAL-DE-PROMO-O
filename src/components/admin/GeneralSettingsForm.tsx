@@ -125,29 +125,51 @@ export default function GeneralSettingsForm({
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 mb-6">
+          <div className="flex flex-col">
             <label htmlFor="geral-inicio" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Data de Início</label>
             <input 
               id="geral-inicio"
               type="date" 
               value={promo.data_inicio || ''}
               onChange={e => setPromo({ ...promo, data_inicio: e.target.value })}
-              className="admin-input"
+              className="admin-input bg-[#0f0f15]"
             />
           </div>
-          <div>
+
+          <div className="flex flex-col">
             <label htmlFor="geral-fim" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Data de Término</label>
             <input 
               id="geral-fim"
               type="date" 
               value={promo.data_fim || ''}
               onChange={e => setPromo({ ...promo, data_fim: e.target.value })}
-              className="admin-input"
+              className="admin-input bg-[#0f0f15]"
             />
           </div>
-          <div>
-            <label htmlFor="geral-status" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Status da Promoção</label>
+
+          {/* Campo Limite de Ranking (Agora Centralizado com Layout Limpo) */}
+          <div className="flex flex-col">
+            <label htmlFor="geral-limite" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Limite (Ranking)</label>
+            <input 
+              id="geral-limite"
+              type="number" 
+              min="1"
+              max="500"
+              value={promo.config_regras?.limite_ranking ?? 15}
+              onChange={e => setPromo({ 
+                ...promo, 
+                config_regras: { 
+                  ...(promo.config_regras || {}), 
+                  limite_ranking: parseInt(e.target.value) || 15 
+                } 
+              })}
+              className="admin-input bg-[#0f0f15]"
+            />
+          </div>
+
+          <div className="flex flex-col">
+            <label htmlFor="geral-status" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Status</label>
             <select
               id="geral-status"
               value={promo.status}
@@ -161,23 +183,24 @@ export default function GeneralSettingsForm({
           </div>
         </div>
 
-        <div className="pt-4 border-t border-white/[0.04] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
-            <div className="flex items-center gap-4">
-              <label className="relative inline-flex items-center cursor-pointer select-none">
+        <div className="pt-5 border-t border-white/[0.04] flex flex-col sm:flex-row justify-between items-center gap-6">
+          <div className="flex items-center gap-6 w-full sm:w-auto p-4 sm:p-0 bg-white/[0.01] sm:bg-transparent rounded-xl border border-white/5 sm:border-transparent">
+            {/* Toggles Destaques Visuais */}
+            <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 w-full justify-around">
+              <label className="relative inline-flex items-center cursor-pointer select-none group">
                 <input 
                   type="checkbox" 
                   checked={promo.destaque_copa || false}
                   onChange={e => setPromo({ ...promo, destaque_copa: e.target.checked })}
                   className="sr-only peer"
                 />
-                <div className="w-9 h-5 bg-zinc-800 rounded-full peer peer-focus:ring-2 peer-focus:ring-amber-500/50 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-zinc-400 after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-600 peer-checked:after:bg-white"></div>
-                <span className="ml-2 text-[10px] font-bold text-zinc-300 font-mono flex items-center gap-1">
-                  🏆 Copa
+                <div className="w-10 h-5 bg-zinc-800 rounded-full peer peer-focus:ring-2 peer-focus:ring-amber-500/50 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-zinc-400 after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-600 peer-checked:after:bg-white"></div>
+                <span className="ml-3 text-[11px] font-bold text-zinc-400 group-hover:text-zinc-200 transition-colors font-mono flex items-center gap-1.5 uppercase">
+                  🏆 Destaque Copa
                 </span>
               </label>
 
-              <label className="relative inline-flex items-center cursor-pointer select-none pl-2 border-l border-white/10">
+              <label className="relative inline-flex items-center cursor-pointer select-none group sm:pl-6 sm:border-l border-white/10">
                 <input 
                   type="checkbox" 
                   checked={promo.config_regras?.tema_ninja || false}
@@ -190,32 +213,11 @@ export default function GeneralSettingsForm({
                   })}
                   className="sr-only peer"
                 />
-                <div className="w-9 h-5 bg-zinc-800 rounded-full peer peer-focus:ring-2 peer-focus:ring-zinc-400/50 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-zinc-400 after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-600 peer-checked:after:bg-white"></div>
-                <span className="ml-2 text-[10px] font-bold text-zinc-300 font-mono flex items-center gap-1">
-                  🥋 Faixa Preta
+                <div className="w-10 h-5 bg-zinc-800 rounded-full peer peer-focus:ring-2 peer-focus:ring-zinc-400/50 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-zinc-400 after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-500 peer-checked:after:bg-white shadow-[0_0_10px_rgba(255,255,255,0.0)] peer-checked:shadow-[0_0_10px_rgba(255,255,255,0.1)]"></div>
+                <span className="ml-3 text-[11px] font-bold text-zinc-400 group-hover:text-zinc-200 transition-colors font-mono flex items-center gap-1.5 uppercase">
+                  🥋 Tema Faixa Preta
                 </span>
               </label>
-            </div>
-
-            {/* Novo Campo: Limite de Ranking */}
-            <div className="flex items-center gap-2 pl-0 sm:pl-4 sm:border-l border-white/10">
-              <label htmlFor="geral-limite" className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono">Limite no Ranking:</label>
-              <input 
-                id="geral-limite"
-                type="number" 
-                min="1"
-                max="500"
-                value={promo.config_regras?.limite_ranking ?? 15}
-                onChange={e => setPromo({ 
-                  ...promo, 
-                  config_regras: { 
-                    ...(promo.config_regras || {}), 
-                    limite_ranking: parseInt(e.target.value) || 15 
-                  } 
-                })}
-                className="admin-input w-20 !py-1 !text-center bg-[#0f0f15]"
-              />
-              <span className="text-[9px] text-zinc-500 hidden xl:block ml-2">pessoas max. visíveis</span>
             </div>
           </div>
 

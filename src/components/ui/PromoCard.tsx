@@ -66,26 +66,26 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
           </>
         )}
 
-        {/* EXTRA BORDER DECORATIONS (COPA THEME ONLY) */}
-        {isCopa && (
+        {/* EXTRA BORDER DECORATIONS (COPA & NINJA THEMES) */}
+        {(isCopa || isNinja) && (
           <>
-            {/* 1. Corner Golden Star Sparkles */}
-            <span className="absolute top-0.5 left-1 text-[7px] text-amber-400 pointer-events-none z-25 animate-pulse">★</span>
-            <span className="absolute top-0.5 right-1.5 text-[7px] text-amber-400 pointer-events-none z-25 animate-pulse">★</span>
-            <span className="absolute bottom-0.5 left-1 text-[7px] text-amber-400 pointer-events-none z-25 animate-pulse">★</span>
-            <span className="absolute bottom-0.5 right-1.5 text-[7px] text-amber-400 pointer-events-none z-25 animate-pulse">★</span>
+            {/* 1. Corner Sparkles */}
+            <span className={`absolute top-0.5 left-1 text-[7px] pointer-events-none z-25 animate-pulse ${isCopa ? 'text-amber-400' : 'text-zinc-400'}`}>★</span>
+            <span className={`absolute top-0.5 right-1.5 text-[7px] pointer-events-none z-25 animate-pulse ${isCopa ? 'text-amber-400' : 'text-zinc-400'}`}>★</span>
+            <span className={`absolute bottom-0.5 left-1 text-[7px] pointer-events-none z-25 animate-pulse ${isCopa ? 'text-amber-400' : 'text-zinc-400'}`}>★</span>
+            <span className={`absolute bottom-0.5 right-1.5 text-[7px] pointer-events-none z-25 animate-pulse ${isCopa ? 'text-amber-400' : 'text-zinc-400'}`}>★</span>
 
-            {/* 2. Side Mid-border Golden Ticks */}
-            <div className="absolute top-1/2 -left-[0.5px] w-[5px] h-[1px] bg-amber-400/80 -translate-y-1/2 pointer-events-none z-20" />
-            <div className="absolute top-1/2 -right-[0.5px] w-[5px] h-[1px] bg-amber-400/80 -translate-y-1/2 pointer-events-none z-20" />
-            <div className="absolute left-1/2 -top-[0.5px] w-[1px] h-[5px] bg-amber-400/80 -translate-x-1/2 pointer-events-none z-20" />
-            <div className="absolute left-1/2 -bottom-[0.5px] w-[1px] h-[5px] bg-amber-400/80 -translate-x-1/2 pointer-events-none z-20" />
+            {/* 2. Side Mid-border Ticks */}
+            <div className={`absolute top-1/2 -left-[0.5px] w-[5px] h-[1px] -translate-y-1/2 pointer-events-none z-20 ${isCopa ? 'bg-amber-400/80' : 'bg-zinc-400/80'}`} />
+            <div className={`absolute top-1/2 -right-[0.5px] w-[5px] h-[1px] -translate-y-1/2 pointer-events-none z-20 ${isCopa ? 'bg-amber-400/80' : 'bg-zinc-400/80'}`} />
+            <div className={`absolute left-1/2 -top-[0.5px] w-[1px] h-[5px] -translate-x-1/2 pointer-events-none z-20 ${isCopa ? 'bg-amber-400/80' : 'bg-zinc-400/80'}`} />
+            <div className={`absolute left-1/2 -bottom-[0.5px] w-[1px] h-[5px] -translate-x-1/2 pointer-events-none z-20 ${isCopa ? 'bg-amber-400/80' : 'bg-zinc-400/80'}`} />
 
             {/* 3. Decorative Corner Brackets */}
-            <div className="absolute top-0 left-0 w-3.5 h-3.5 border-t-2 border-l-2 border-amber-400 rounded-tl-[12px] pointer-events-none z-20" />
-            <div className="absolute top-0 right-0 w-3.5 h-3.5 border-t-2 border-r-2 border-amber-400 rounded-tr-[12px] pointer-events-none z-20" />
-            <div className="absolute bottom-0 left-0 w-3.5 h-3.5 border-b-2 border-l-2 border-amber-400 rounded-bl-[12px] pointer-events-none z-20" />
-            <div className="absolute bottom-0 right-0 w-3.5 h-3.5 border-b-2 border-r-2 border-amber-400 rounded-br-[12px] pointer-events-none z-20" />
+            <div className={`absolute top-0 left-0 w-3.5 h-3.5 border-t-2 border-l-2 rounded-tl-[12px] pointer-events-none z-20 ${isCopa ? 'border-amber-400' : 'border-zinc-500'}`} />
+            <div className={`absolute top-0 right-0 w-3.5 h-3.5 border-t-2 border-r-2 rounded-tr-[12px] pointer-events-none z-20 ${isCopa ? 'border-amber-400' : 'border-zinc-500'}`} />
+            <div className={`absolute bottom-0 left-0 w-3.5 h-3.5 border-b-2 border-l-2 rounded-bl-[12px] pointer-events-none z-20 ${isCopa ? 'border-amber-400' : 'border-zinc-500'}`} />
+            <div className={`absolute bottom-0 right-0 w-3.5 h-3.5 border-b-2 border-r-2 rounded-br-[12px] pointer-events-none z-20 ${isCopa ? 'border-amber-400' : 'border-zinc-500'}`} />
           </>
         )}
 
