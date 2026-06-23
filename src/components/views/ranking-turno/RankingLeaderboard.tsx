@@ -228,7 +228,7 @@ function RankingLeaderboardComponent({
             const scoreFormatted = formatScoreValue(score)
 
             return (
-              <div className="w-[32%] flex flex-col justify-end items-center h-full">
+              <div className="w-[30%] flex flex-col justify-end items-center h-full">
                 <div className="bg-[#08080a] border border-slate-500/15 rounded-t-xl h-32 w-full flex flex-col justify-between p-2 relative shadow-lg copa-podium-mobile-card copa-podium-mobile-2">
                   {/* Rank circle */}
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-[#101014] border border-slate-400/40 flex items-center justify-center text-[10px] font-black text-slate-300 font-mono shadow-md">
@@ -265,7 +265,7 @@ function RankingLeaderboardComponent({
             const scoreFormatted = formatScoreValue(score)
 
             return (
-              <div className="w-[36%] flex flex-col justify-end items-center h-full scale-[1.03] z-10">
+              <div className="w-[34%] flex flex-col justify-end items-center h-full scale-[1.03] z-10">
                 <div className="bg-[#09090c] border border-yellow-600/35 rounded-t-xl h-38 w-full flex flex-col justify-between p-2 relative shadow-xl glow-yellow-neon copa-podium-mobile-card copa-podium-mobile-1">
                   {/* Floating Crown */}
                   <div className="absolute -top-10 left-1/2 -translate-x-1/2 text-xl animate-float">👑</div>
@@ -305,7 +305,7 @@ function RankingLeaderboardComponent({
             const scoreFormatted = formatScoreValue(score)
 
             return (
-              <div className="w-[32%] flex flex-col justify-end items-center h-full">
+              <div className="w-[30%] flex flex-col justify-end items-center h-full">
                 <div className="bg-[#08080a] border border-amber-800/20 rounded-t-xl h-28 w-full flex flex-col justify-between p-2 relative shadow-lg copa-podium-mobile-card copa-podium-mobile-3">
                   {/* Rank circle */}
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-[#101014] border border-amber-700/40 flex items-center justify-center text-[10px] font-black text-amber-500 font-mono shadow-md">
