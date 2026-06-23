@@ -24,7 +24,14 @@ export default async function HubPage() {
   }
 
   // Filter out drafts from the public view just in case
-  const publicPromocoes = (promocoes as Promocao[] || []).filter(p => p.status !== 'rascunho')
+  const publicPromocoes = (promocoes as Promocao[] || [])
+    .filter(p => p.status !== 'rascunho')
+    .sort((a, b) => {
+      const ordemA = a.config_regras?.ordem ?? 999
+      const ordemB = b.config_regras?.ordem ?? 999
+      if (ordemA !== ordemB) return ordemA - ordemB
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    })
 
   return (
     <div className="min-h-screen pb-16">

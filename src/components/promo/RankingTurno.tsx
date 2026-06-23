@@ -21,15 +21,16 @@ const TURNO_DISPLAY: Record<string, { label: string; emoji: string; cor: string;
 }
 
 export default function RankingTurno({ 
-  promocaoId, 
   configPremios, 
   configTurnos,
-  configRegras = {}
+  configRegras = {},
+  isCopa = false
 }: { 
   promocaoId: string
   configPremios: any[]
   configTurnos: string[]
   configRegras?: any
+  isCopa?: boolean
 }) {
   const mecanica = useMemo(() => configRegras?.mecanica || {
     metrica: 'corridas_completadas',
@@ -198,6 +199,7 @@ export default function RankingTurno({
                 maxScore={maxScore}
                 formatCurrency={formatCurrency}
                 mecanica={mecanica}
+                isCopa={isCopa}
               />
             )}
 
@@ -211,6 +213,7 @@ export default function RankingTurno({
                 getScore={getScore}
                 formatScoreValue={formatScoreValue}
                 formatCurrency={formatCurrency}
+                isCopa={isCopa}
               />
             )}
 
@@ -224,6 +227,7 @@ export default function RankingTurno({
                 getScore={getScore}
                 formatScoreValue={formatScoreValue}
                 formatCurrency={formatCurrency}
+                isCopa={isCopa}
               />
             )}
           </div>

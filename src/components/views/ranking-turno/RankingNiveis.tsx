@@ -11,6 +11,7 @@ interface RankingNiveisProps {
   getScore: (item: EntregaRanking) => number
   formatScoreValue: (val: number) => string
   formatCurrency: (val: number) => string
+  isCopa?: boolean
 }
 
 function RankingNiveisComponent({
@@ -20,7 +21,8 @@ function RankingNiveisComponent({
   mecanica,
   getScore,
   formatScoreValue,
-  formatCurrency
+  formatCurrency,
+  isCopa
 }: RankingNiveisProps) {
   
   const niveis = useMemo(() => {
@@ -67,7 +69,7 @@ function RankingNiveisComponent({
                   <div className="flex justify-between items-start">
                     <div>
                       <h4 className="font-extrabold text-white text-sm md:text-base tracking-tight">{item.pessoa_entregadora}</h4>
-                      <p className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider mt-0.5 font-mono">📍 {item.praca}</p>
+                      {!isCopa && <p className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider mt-0.5 font-mono">📍 {item.praca}</p>}
                     </div>
                     <div className="text-right">
                       <div className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider mb-0.5 font-mono font-bold">VALOR ACUMULADO</div>
@@ -186,7 +188,7 @@ function RankingNiveisComponent({
                   <div className="truncate">
                     <div className="font-bold text-white text-xs truncate">{item.pessoa_entregadora}</div>
                     <div className="text-[9px] text-zinc-500 uppercase tracking-wider font-mono mt-0.5">
-                      📍 {item.praca} • {formatScoreValue(getScore(item))}
+                      {!isCopa && `📍 ${item.praca} • `}{formatScoreValue(getScore(item))}
                     </div>
                   </div>
                   <div className="ml-auto bg-emerald-500/15 text-emerald-300 border border-emerald-500/20 px-2.5 py-1 rounded-lg text-[10px] font-black font-mono">

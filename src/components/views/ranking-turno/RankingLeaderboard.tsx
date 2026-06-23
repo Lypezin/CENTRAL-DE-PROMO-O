@@ -15,6 +15,7 @@ interface RankingLeaderboardProps {
   maxScore: number
   formatCurrency: (val: number) => string
   mecanica: any
+  isCopa?: boolean
 }
 
 function RankingLeaderboardComponent({
@@ -27,7 +28,8 @@ function RankingLeaderboardComponent({
   formatScoreValue,
   maxScore,
   formatCurrency,
-  mecanica
+  mecanica,
+  isCopa
 }: RankingLeaderboardProps) {
   
   const minimoCorridas = useMemo(() => {
@@ -75,7 +77,7 @@ function RankingLeaderboardComponent({
                 </div>
                 <div className="mb-4 relative z-10">
                   <div className="font-extrabold text-white text-base truncate mb-0.5 group-hover:text-sky-300 transition-colors">{item.pessoa_entregadora}</div>
-                  <div className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider font-mono">📍 {item.praca}</div>
+                  {!isCopa && <div className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider font-mono">📍 {item.praca}</div>}
                 </div>
                 <div className="space-y-3 mt-auto relative z-10">
                   <div className="flex justify-between items-center text-[10px] font-mono border-t border-white/[0.02] pt-2">
@@ -128,7 +130,7 @@ function RankingLeaderboardComponent({
                 </div>
                 <div className="mb-4 relative z-10">
                   <div className="font-black text-white text-lg truncate mb-0.5 group-hover:text-yellow-400 transition-colors">{item.pessoa_entregadora}</div>
-                  <div className="text-[9px] text-yellow-500/70 font-bold uppercase tracking-wider font-mono">📍 {item.praca}</div>
+                  {!isCopa && <div className="text-[9px] text-yellow-500/70 font-bold uppercase tracking-wider font-mono">📍 {item.praca}</div>}
                 </div>
                 <div className="space-y-3 mt-auto relative z-10">
                   <div className="flex justify-between items-center text-[10px] font-mono border-t border-yellow-600/10 pt-2.5">
@@ -180,7 +182,7 @@ function RankingLeaderboardComponent({
                 </div>
                 <div className="mb-4 relative z-10">
                   <div className="font-extrabold text-white text-base truncate mb-0.5 group-hover:text-amber-400 transition-colors">{item.pessoa_entregadora}</div>
-                  <div className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider font-mono">📍 {item.praca}</div>
+                  {!isCopa && <div className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider font-mono">📍 {item.praca}</div>}
                 </div>
                 <div className="space-y-3 mt-auto relative z-10">
                   <div className="flex justify-between items-center text-[10px] font-mono border-t border-white/[0.02] pt-2">
@@ -238,7 +240,7 @@ function RankingLeaderboardComponent({
                       LÍDER
                     </span>
                   </div>
-                  <span className="text-[10px] text-yellow-500/80 font-bold uppercase tracking-wider font-mono">📍 {item.praca}</span>
+                  {!isCopa && <span className="text-[10px] text-yellow-500/80 font-bold uppercase tracking-wider font-mono">📍 {item.praca}</span>}
                 </div>
                 
                 <div className="mb-2 relative z-10">
@@ -284,7 +286,7 @@ function RankingLeaderboardComponent({
                     <div className="w-6 h-6 rounded-full bg-[#101014] border border-slate-400/40 flex items-center justify-center text-[10px] font-black text-slate-300 font-mono">
                       2
                     </div>
-                    <span className="text-[8px] text-zinc-500 font-bold uppercase tracking-wider font-mono bg-zinc-900 px-1.5 py-0.5 rounded">📍 {item.praca}</span>
+                    {!isCopa && <span className="text-[8px] text-zinc-500 font-bold uppercase tracking-wider font-mono bg-zinc-900 px-1.5 py-0.5 rounded">📍 {item.praca}</span>}
                   </div>
                   
                   <div className="text-xs font-black text-slate-100 truncate w-full relative z-10 mb-3">{item.pessoa_entregadora}</div>
@@ -320,7 +322,7 @@ function RankingLeaderboardComponent({
                     <div className="w-6 h-6 rounded-full bg-[#101014] border border-amber-700/40 flex items-center justify-center text-[10px] font-black text-amber-500 font-mono">
                       3
                     </div>
-                    <span className="text-[8px] text-zinc-500 font-bold uppercase tracking-wider font-mono bg-zinc-900 px-1.5 py-0.5 rounded">📍 {item.praca}</span>
+                    {!isCopa && <span className="text-[8px] text-zinc-500 font-bold uppercase tracking-wider font-mono bg-zinc-900 px-1.5 py-0.5 rounded">📍 {item.praca}</span>}
                   </div>
                   
                   <div className="text-xs font-black text-slate-100 truncate w-full relative z-10 mb-3">{item.pessoa_entregadora}</div>
@@ -396,7 +398,7 @@ function RankingLeaderboardComponent({
                   </div>
                   
                   <div className="flex items-center gap-2 mt-1 sm:hidden">
-                    <span className="text-[9px] font-bold text-zinc-500 uppercase font-mono">📍 {item.praca}</span>
+                    {!isCopa && <span className="text-[9px] font-bold text-zinc-500 uppercase font-mono">📍 {item.praca}</span>}
                   </div>
 
                   {/* Micro progress track */}
@@ -412,7 +414,7 @@ function RankingLeaderboardComponent({
 
                 {/* Hub / Praça (Desktop only) */}
                 <div className="w-24 hidden sm:flex items-center text-[10px] font-bold text-zinc-500 uppercase font-mono shrink-0">
-                  {item.praca}
+                  {!isCopa ? item.praca : ''}
                 </div>
 
                 {/* Metric value */}
