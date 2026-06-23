@@ -86,7 +86,7 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
             fill="none" 
             stroke="currentColor" 
             strokeWidth="1.0" 
-            className="absolute -right-2 -bottom-2 w-28 h-28 text-amber-500 opacity-[0.08] group-hover:opacity-[0.14] group-hover:scale-105 group-hover:rotate-6 transition-all duration-500 pointer-events-none select-none animate-float z-0"
+            className="absolute -right-4 -bottom-4 w-36 h-36 text-amber-500 opacity-[0.06] group-hover:opacity-[0.15] group-hover:scale-110 group-hover:rotate-12 transition-all duration-700 pointer-events-none select-none animate-float z-0"
           >
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 15a4 4 0 0 0 4-4V6H8v5a4 4 0 0 0 4 4ZM12 15v4m0 0H8m4 0h4m-8-8H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2v5ZM16 5h2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-2V5Z" />
           </svg>
@@ -126,15 +126,15 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
           )}
 
           {/* Title with HEXA highlight */}
-          <h3 className={`text-lg font-bold mb-2 transition-all duration-300 tracking-tight promo-card-title ${
+          <h3 className={`text-lg sm:text-xl font-bold mb-2 transition-all duration-300 tracking-tight promo-card-title ${
             isCopa 
-              ? 'text-amber-100 group-hover:brightness-125 group-hover:scale-[1.01] transform-origin-left'
+              ? 'text-amber-100 group-hover:brightness-125 group-hover:scale-[1.02] transform-origin-left'
               : 'text-white group-hover:text-sky-400'
           }`}>
             {isCopa && /hexa/i.test(promo.nome) ? (
               promo.nome.split(/(hexa)/i).map((part, index) => 
                 /hexa/i.test(part) ? (
-                  <span key={index} className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 via-amber-400 to-yellow-200 animate-pulse drop-shadow-[0_0_12px_rgba(251,191,36,0.8)] font-black text-[22px] mx-1 inline-block transform -skew-x-6">
+                  <span key={index} className="text-transparent bg-clip-text bg-gradient-to-br from-yellow-100 via-amber-400 to-yellow-500 animate-pulse drop-shadow-[0_0_15px_rgba(251,191,36,0.9)] font-black text-[24px] sm:text-[26px] ml-2.5 mr-1 inline-block transform -skew-x-12 italic">
                     {part.toUpperCase()}
                   </span>
                 ) : (
@@ -187,13 +187,13 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
               </span>
             </div>
             
-            <div className={`flex items-center gap-1 font-extrabold tracking-wider uppercase text-[9px] transition-all duration-200 promo-card-action ${
+            <div className={`flex items-center gap-1 font-extrabold tracking-wider uppercase text-[10px] transition-all duration-300 promo-card-action ${
               isCopa 
-                ? 'text-amber-400 group-hover:text-amber-300 group-hover:scale-105' 
+                ? 'text-amber-400 group-hover:text-amber-300 group-hover:scale-105 bg-amber-500/10 px-3 py-1.5 rounded-lg border border-amber-500/20 shadow-inner' 
                 : 'text-sky-400 group-hover:text-white'
             }`}>
-              <span>Acompanhar</span>
-              <svg className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <span>{isRanking ? 'VER RANKING' : 'ACESSAR'}</span>
+              <svg className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
               </svg>
             </div>
