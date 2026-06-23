@@ -65,6 +65,7 @@ function RankingLeaderboardComponent({
       )}
 
       <LeaderboardTable 
+        searchQuery={searchQuery}
         rankingToDisplay={rankingToDisplay}
         configPremios={configPremios}
         filtroAtivo={filtroAtivo}
