@@ -54,7 +54,7 @@ function RankingFiltersComponent({
 
       {/* Shift selector (Segmented Tray UI - Premium Apple Style) */}
       {!isGeral && (
-        <div className="flex flex-nowrap bg-zinc-950/80 p-1 rounded-xl border border-zinc-900 w-full md:w-auto overflow-x-auto shrink-0 scrollbar-none gap-1 shadow-inner">
+        <div className="flex flex-nowrap bg-[#050508]/80 sm:bg-zinc-950/80 p-1 rounded-xl sm:border border-white/[0.04] sm:border-zinc-900 w-[calc(100%+16px)] -mx-2 sm:mx-0 sm:w-auto overflow-x-auto overflow-y-hidden snap-x snap-mandatory shrink-0 scrollbar-none gap-1 shadow-inner">
           {turnosDisponiveis.map(turno => {
             const display = turnoDisplay[turno]
             const isSelected = filtroAtivo === turno
@@ -62,9 +62,9 @@ function RankingFiltersComponent({
               <button
                 key={turno}
                 onClick={() => setFiltroAtivo(turno)}
-                className={`flex-grow md:flex-initial px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer whitespace-nowrap ${
+                className={`snap-center flex-grow md:flex-initial px-5 py-3 sm:py-2 min-h-[44px] rounded-lg text-xs font-black uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-2 active:scale-95 cursor-pointer whitespace-nowrap ${
                   isSelected 
-                    ? 'bg-zinc-900 text-white shadow-md border border-white/[0.02]'
+                    ? 'bg-zinc-900 text-white shadow-md border border-white/[0.04]'
                     : 'text-zinc-500 hover:text-zinc-300'
                 }`}
               >

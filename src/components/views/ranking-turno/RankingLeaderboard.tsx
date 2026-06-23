@@ -210,50 +210,10 @@ function RankingLeaderboardComponent({
         </div>
       )}
 
-      {/* 🏆 MOBILE COMPACT PODIUM SECTION (Lado a lado horizontal premium proeminente e legível, sem estouros) */}
+      {/* 🏆 MOBILE COMPACT PODIUM SECTION (App-Like Stack UI) */}
       {!searchQuery && (podiumData.first || podiumData.second || podiumData.third) && (
-        <div className="sm:hidden flex items-end justify-center gap-2 mb-6 pt-12 pb-2 select-none w-full max-w-full overflow-hidden px-1 h-52 relative border rounded-2xl bg-zinc-950/20 border-white/[0.02] copa-podium-mobile">
-          {/* Gold Glow Mask */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center_top,rgba(234,179,8,0.06),transparent_50%)] pointer-events-none"></div>
-
-          {/* 2nd Place (Esquerda) */}
-          {podiumData.second && (() => {
-            const item = podiumData.second
-            const atingiuMinimo = item.total_corridas_completadas >= minimoCorridas
-            const premioInfo = getPremioInfoFromConfig(configPremios, filtroAtivo, 2)
-            const premioTeoricoValor = premioInfo.valor || 0
-            const premioTeoricoDesc = premioInfo.descricao || ''
-            const temPremio = premioTeoricoValor > 0 || premioTeoricoDesc !== ''
-            const score = getScore(item)
-            const scoreFormatted = formatScoreValue(score)
-
-            return (
-              <div className="w-[30%] flex flex-col justify-end items-center h-full">
-                <div className="bg-[#08080a] border border-slate-500/15 rounded-t-xl h-32 w-full flex flex-col justify-between p-2 relative shadow-lg copa-podium-mobile-card copa-podium-mobile-2">
-                  {/* Rank circle */}
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-[#101014] border border-slate-400/40 flex items-center justify-center text-[10px] font-black text-slate-300 font-mono shadow-md">
-                    2
-                  </div>
-                  
-                  <div className="mt-2 text-center w-full min-w-0 flex flex-col items-center">
-                    <div className="text-[10px] font-black text-slate-100 truncate w-full px-1">{item.pessoa_entregadora}</div>
-                    <div className="text-[8.5px] font-semibold text-zinc-500 font-mono mt-0.5 truncate w-full">📍 {item.praca}</div>
-                  </div>
-
-                  <div className="mt-auto w-full text-center border-t border-white/[0.02] pt-1">
-                    <div className="text-[9.5px] font-mono text-slate-300 font-bold leading-tight truncate px-1" title={scoreFormatted}>{scoreFormatted}</div>
-                    {temPremio && (
-                      <div className={`text-[9.5px] font-mono font-black truncate px-0.5 ${atingiuMinimo ? 'text-emerald-400' : 'text-zinc-600 line-through'}`} title={premioTeoricoDesc || formatCurrency(premioTeoricoValor)}>
-                        {premioTeoricoDesc ? `🎁 ${premioTeoricoDesc}` : `+${formatCurrency(premioTeoricoValor)}`}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )
-          })()}
-
-          {/* 1st Place (Centro - Mais alto, Coroa e Neon) */}
+        <div className="sm:hidden flex flex-col gap-3 mb-6 select-none w-full max-w-full overflow-hidden px-1">
+          {/* 1st Place (Hero Card Total Width) */}
           {podiumData.first && (() => {
             const item = podiumData.first
             const atingiuMinimo = item.total_corridas_completadas >= minimoCorridas
@@ -265,88 +225,136 @@ function RankingLeaderboardComponent({
             const scoreFormatted = formatScoreValue(score)
 
             return (
-              <div className="w-[34%] flex flex-col justify-end items-center h-full scale-[1.03] z-10">
-                <div className="bg-[#09090c] border border-yellow-600/35 rounded-t-xl h-38 w-full flex flex-col justify-between p-2 relative shadow-xl glow-yellow-neon copa-podium-mobile-card copa-podium-mobile-1">
-                  {/* Floating Crown */}
-                  <div className="absolute -top-10 left-1/2 -translate-x-1/2 text-xl animate-float">👑</div>
-                  
-                  {/* Rank circle */}
-                  <div className="absolute -top-4.5 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-[#14120f] border border-yellow-500/50 flex items-center justify-center text-xs font-black text-yellow-400 font-mono shadow-md">
-                    1
+              <div className="w-full relative rounded-2xl overflow-hidden shadow-2xl p-4 bg-[#09090c] border border-yellow-600/35 glow-yellow-neon copa-podium-mobile-1">
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(234,179,8,0.15),transparent_70%)] pointer-events-none"></div>
+                <div className="absolute top-2 right-2 text-4xl opacity-20 rotate-12 pointer-events-none select-none">👑</div>
+                
+                <div className="flex items-center justify-between mb-3 relative z-10">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-[#14120f] border-2 border-yellow-500 flex items-center justify-center text-sm font-black text-yellow-400 font-mono shadow-[0_0_10px_rgba(234,179,8,0.3)]">
+                      1
+                    </div>
+                    <span className="text-[10px] font-black text-yellow-400 bg-yellow-500/10 border border-yellow-500/20 px-2 py-0.5 rounded-md font-mono uppercase tracking-wider">
+                      LÍDER
+                    </span>
                   </div>
-                  
-                  <div className="mt-3 text-center w-full min-w-0 flex flex-col items-center">
-                    <div className="text-[12px] font-black text-white truncate w-full px-1">{item.pessoa_entregadora}</div>
-                    <div className="text-[9px] font-bold text-yellow-500/80 font-mono mt-0.5 truncate w-full">📍 {item.praca}</div>
-                  </div>
+                  <span className="text-[10px] text-yellow-500/80 font-bold uppercase tracking-wider font-mono">📍 {item.praca}</span>
+                </div>
+                
+                <div className="mb-2 relative z-10">
+                  <div className="text-xl font-black text-white truncate w-full">{item.pessoa_entregadora}</div>
+                </div>
 
-                  <div className="mt-auto w-full text-center border-t border-yellow-600/10 pt-1">
-                    <div className="text-[10.5px] font-mono text-yellow-300 font-extrabold leading-tight truncate px-1" title={scoreFormatted}>{scoreFormatted}</div>
-                    {temPremio && (
-                      <div className={`text-[10px] font-mono font-black truncate px-0.5 ${atingiuMinimo ? 'text-yellow-400' : 'text-zinc-600 line-through'}`} title={premioTeoricoDesc || formatCurrency(premioTeoricoValor)}>
-                        {premioTeoricoDesc ? `🎁 ${premioTeoricoDesc}` : `+${formatCurrency(premioTeoricoValor)}`}
-                      </div>
-                    )}
+                <div className="flex justify-between items-end mt-4 pt-3 border-t border-yellow-600/10 relative z-10">
+                  <div>
+                    <div className="text-[10px] text-zinc-500 font-mono uppercase mb-0.5">{mecanica.metrica === 'pontos' ? 'PONTOS:' : mecanica.metrica === 'corridas_completadas' ? 'CORRIDAS:' : 'VALOR:'}</div>
+                    <div className="text-2xl font-mono text-yellow-400 font-black leading-none">{scoreFormatted}</div>
                   </div>
+                  
+                  {temPremio && (
+                    <div className="text-right flex flex-col items-end">
+                       <div className="text-[9px] text-zinc-500 font-mono mb-1">Prêmio:</div>
+                       <div className={`text-xs font-black px-2 py-1 rounded-md ${atingiuMinimo ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-zinc-800/50 text-zinc-500 line-through border border-zinc-700/50'}`}>
+                         {premioTeoricoDesc ? `🎁 ${premioTeoricoDesc}` : `+${formatCurrency(premioTeoricoValor)}`}
+                       </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )
           })()}
 
-          {/* 3rd Place (Direita) */}
-          {podiumData.third && (() => {
-            const item = podiumData.third
-            const atingiuMinimo = item.total_corridas_completadas >= minimoCorridas
-            const premioInfo = getPremioInfoFromConfig(configPremios, filtroAtivo, 3)
-            const premioTeoricoValor = premioInfo.valor || 0
-            const premioTeoricoDesc = premioInfo.descricao || ''
-            const temPremio = premioTeoricoValor > 0 || premioTeoricoDesc !== ''
-            const score = getScore(item)
-            const scoreFormatted = formatScoreValue(score)
+          <div className="grid grid-cols-2 gap-3 w-full">
+            {/* 2nd Place (Esquerda) */}
+            {podiumData.second && (() => {
+              const item = podiumData.second
+              const atingiuMinimo = item.total_corridas_completadas >= minimoCorridas
+              const premioInfo = getPremioInfoFromConfig(configPremios, filtroAtivo, 2)
+              const premioTeoricoValor = premioInfo.valor || 0
+              const premioTeoricoDesc = premioInfo.descricao || ''
+              const temPremio = premioTeoricoValor > 0 || premioTeoricoDesc !== ''
+              const score = getScore(item)
+              const scoreFormatted = formatScoreValue(score)
 
-            return (
-              <div className="w-[30%] flex flex-col justify-end items-center h-full">
-                <div className="bg-[#08080a] border border-amber-800/20 rounded-t-xl h-28 w-full flex flex-col justify-between p-2 relative shadow-lg copa-podium-mobile-card copa-podium-mobile-3">
-                  {/* Rank circle */}
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-[#101014] border border-amber-700/40 flex items-center justify-center text-[10px] font-black text-amber-500 font-mono shadow-md">
-                    3
+              return (
+                <div className="bg-[#08080a] border border-slate-500/20 rounded-2xl p-3 relative shadow-lg copa-podium-mobile-2 overflow-hidden flex flex-col">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(148,163,184,0.1),transparent_50%)] pointer-events-none"></div>
+                  
+                  <div className="flex items-start justify-between mb-2 relative z-10">
+                    <div className="w-6 h-6 rounded-full bg-[#101014] border border-slate-400/40 flex items-center justify-center text-[10px] font-black text-slate-300 font-mono">
+                      2
+                    </div>
+                    <span className="text-[8px] text-zinc-500 font-bold uppercase tracking-wider font-mono bg-zinc-900 px-1.5 py-0.5 rounded">📍 {item.praca}</span>
                   </div>
                   
-                  <div className="mt-2 text-center w-full min-w-0 flex flex-col items-center">
-                    <div className="text-[9.5px] font-extrabold text-slate-100 truncate w-full px-1">{item.pessoa_entregadora}</div>
-                    <div className="text-[8.5px] font-semibold text-zinc-500 font-mono mt-0.5 truncate w-full">📍 {item.praca}</div>
-                  </div>
-
-                  <div className="mt-auto w-full text-center border-t border-white/[0.02] pt-1">
-                    <div className="text-[9.5px] font-mono text-slate-300 font-bold leading-tight truncate px-1" title={scoreFormatted}>{scoreFormatted}</div>
+                  <div className="text-xs font-black text-slate-100 truncate w-full relative z-10 mb-3">{item.pessoa_entregadora}</div>
+                  
+                  <div className="mt-auto pt-2 border-t border-white/[0.02] relative z-10">
+                    <div className="text-[12px] font-mono text-slate-300 font-bold leading-tight">{scoreFormatted}</div>
                     {temPremio && (
-                      <div className={`text-[9.5px] font-mono font-black truncate px-0.5 ${atingiuMinimo ? 'text-emerald-400' : 'text-zinc-600 line-through'}`} title={premioTeoricoDesc || formatCurrency(premioTeoricoValor)}>
+                      <div className={`text-[9px] font-mono font-black mt-1 ${atingiuMinimo ? 'text-emerald-400' : 'text-zinc-600 line-through'}`}>
                         {premioTeoricoDesc ? `🎁 ${premioTeoricoDesc}` : `+${formatCurrency(premioTeoricoValor)}`}
                       </div>
                     )}
                   </div>
                 </div>
-              </div>
-            )
-          })()}
+              )
+            })()}
+
+            {/* 3rd Place (Direita) */}
+            {podiumData.third && (() => {
+              const item = podiumData.third
+              const atingiuMinimo = item.total_corridas_completadas >= minimoCorridas
+              const premioInfo = getPremioInfoFromConfig(configPremios, filtroAtivo, 3)
+              const premioTeoricoValor = premioInfo.valor || 0
+              const premioTeoricoDesc = premioInfo.descricao || ''
+              const temPremio = premioTeoricoValor > 0 || premioTeoricoDesc !== ''
+              const score = getScore(item)
+              const scoreFormatted = formatScoreValue(score)
+
+              return (
+                <div className="bg-[#08080a] border border-amber-800/30 rounded-2xl p-3 relative shadow-lg copa-podium-mobile-3 overflow-hidden flex flex-col">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(180,83,9,0.1),transparent_50%)] pointer-events-none"></div>
+                  
+                  <div className="flex items-start justify-between mb-2 relative z-10">
+                    <div className="w-6 h-6 rounded-full bg-[#101014] border border-amber-700/40 flex items-center justify-center text-[10px] font-black text-amber-500 font-mono">
+                      3
+                    </div>
+                    <span className="text-[8px] text-zinc-500 font-bold uppercase tracking-wider font-mono bg-zinc-900 px-1.5 py-0.5 rounded">📍 {item.praca}</span>
+                  </div>
+                  
+                  <div className="text-xs font-black text-slate-100 truncate w-full relative z-10 mb-3">{item.pessoa_entregadora}</div>
+                  
+                  <div className="mt-auto pt-2 border-t border-white/[0.02] relative z-10">
+                    <div className="text-[12px] font-mono text-slate-300 font-bold leading-tight">{scoreFormatted}</div>
+                    {temPremio && (
+                      <div className={`text-[9px] font-mono font-black mt-1 ${atingiuMinimo ? 'text-emerald-400' : 'text-zinc-600 line-through'}`}>
+                        {premioTeoricoDesc ? `🎁 ${premioTeoricoDesc}` : `+${formatCurrency(premioTeoricoValor)}`}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )
+            })()}
+          </div>
         </div>
       )}
 
-      {/* 📋 UNIFIED DATAGRID TABLE LIST (Obsidian Ledger responsiva, sem transbordar horizontalmente) */}
-      <div className="border border-white/[0.04] rounded-2xl overflow-hidden bg-zinc-950/20 shadow-2xl shadow-black/80 animate-slide-up w-full max-w-full copa-leaderboard-table">
-        {/* Table Header */}
-        <div className="flex items-center px-3 sm:px-5 py-3 bg-zinc-950/50 border-b border-white/[0.04] text-[9px] sm:text-[9px] font-bold text-zinc-500 uppercase tracking-wider font-mono select-none w-full">
-          <div className="w-8 sm:w-12 shrink-0 text-center">Pos</div>
+      {/* 📋 UNIFIED DATAGRID TABLE LIST (App-Like List no Mobile, Ledger no Desktop) */}
+      <div className="border-y sm:border sm:rounded-2xl overflow-hidden border-white/[0.04] bg-[#050508]/80 sm:bg-zinc-950/20 shadow-none sm:shadow-2xl sm:shadow-black/80 animate-slide-up w-[calc(100%+16px)] sm:w-full -mx-2 sm:mx-0 max-w-none sm:max-w-full copa-leaderboard-table">
+        {/* Table Header (Desktop and Mobile) */}
+        <div className="flex items-center px-3 sm:px-5 py-2.5 sm:py-3 bg-black/40 sm:bg-zinc-950/50 border-b border-white/[0.04] text-[9px] sm:text-[9px] font-bold text-zinc-500 uppercase tracking-wider font-mono select-none w-full">
+          <div className="w-10 sm:w-12 shrink-0 text-center">Pos</div>
           <div className="flex-1 min-w-0 pl-2 sm:pl-5">Entregador</div>
           <div className="w-24 hidden sm:block shrink-0">Praça</div>
-          <div className="w-18 sm:w-28 shrink-0 text-right pr-1 sm:pr-5">
+          <div className="w-18 sm:w-28 shrink-0 text-right pr-2 sm:pr-5">
             {mecanica.metrica === 'pontos' ? 'PONTOS' : mecanica.metrica === 'corridas_completadas' ? 'CORRIDAS' : 'VALOR'}
           </div>
-          <div className="w-22 sm:w-36 shrink-0 text-right">Prêmio</div>
+          <div className="w-24 sm:w-36 shrink-0 text-right">Prêmio</div>
         </div>
 
         {/* Table Body Rows */}
-        <div className="divide-y divide-zinc-900/60 font-sans w-full">
+        <div className="divide-y divide-white/[0.03] font-sans w-full">
           {rankingToDisplay.map((item) => {
             const atingiuMinimo = item.total_corridas_completadas >= minimoCorridas
             const premioTeorico = getPremioFromConfig(configPremios, filtroAtivo, item.posicao)
@@ -366,29 +374,29 @@ function RankingLeaderboardComponent({
             return (
               <div 
                 key={item.id_da_pessoa_entregadora}
-                className="flex items-center px-3 sm:px-5 py-3 sm:py-3.5 hover:bg-white/[0.01] transition-all duration-200 group border-l-2 border-transparent hover:border-sky-500/40 w-full"
+                className={`flex items-center px-2 sm:px-5 py-4 sm:py-3.5 hover:bg-white/[0.02] transition-all duration-200 group border-l-2 border-transparent hover:border-sky-500/40 w-full ${isTop1 ? 'bg-yellow-500/[0.02]' : isTop2 ? 'bg-slate-500/[0.02]' : isTop3 ? 'bg-amber-500/[0.02]' : ''}`}
               >
                 {/* Position (Tabular numbers) */}
-                <div className="w-8 sm:w-12 shrink-0 flex justify-center font-mono text-xs font-black">
+                <div className="w-10 sm:w-12 shrink-0 flex justify-center font-mono font-black">
                   {isTop1 ? (
-                    <span className="text-yellow-400 bg-yellow-500/10 px-1.5 py-0.5 rounded-lg text-[8px] sm:text-[9px] border border-yellow-500/20 font-bold tracking-tighter">1º</span>
+                    <span className="text-yellow-400 bg-yellow-500/10 px-2 py-1 rounded-md text-[9px] sm:text-[9px] border border-yellow-500/20 font-bold tracking-tighter">1º</span>
                   ) : isTop2 ? (
-                    <span className="text-slate-400 bg-slate-500/10 px-1.5 py-0.5 rounded-lg text-[8px] sm:text-[9px] border border-slate-500/20 font-bold tracking-tighter">2º</span>
+                    <span className="text-slate-300 bg-slate-500/10 px-2 py-1 rounded-md text-[9px] sm:text-[9px] border border-slate-500/20 font-bold tracking-tighter">2º</span>
                   ) : isTop3 ? (
-                    <span className="text-amber-500 bg-amber-500/10 px-1.5 py-0.5 rounded-lg text-[8px] sm:text-[9px] border border-amber-500/20 font-bold tracking-tighter">3º</span>
+                    <span className="text-amber-500 bg-amber-500/10 px-2 py-1 rounded-md text-[9px] sm:text-[9px] border border-amber-500/20 font-bold tracking-tighter">3º</span>
                   ) : (
-                    <span className="text-zinc-500">{(item.posicao < 10 ? `0${item.posicao}` : item.posicao)}</span>
+                    <span className="text-zinc-500 text-xs">{(item.posicao < 10 ? `0${item.posicao}` : item.posicao)}</span>
                   )}
                 </div>
 
                 {/* Driver Name & Micro-bar */}
-                <div className="flex-1 min-w-0 pl-2 sm:pl-5 flex flex-col justify-center">
-                  <div className="font-extrabold text-white text-[12.5px] sm:text-[14px] truncate group-hover:text-sky-300 transition-colors">
+                <div className="flex-1 min-w-0 pl-3 sm:pl-5 flex flex-col justify-center">
+                  <div className="font-black text-slate-100 text-[14px] sm:text-[14px] truncate group-hover:text-sky-300 transition-colors tracking-tight">
                     {item.pessoa_entregadora}
                   </div>
                   
-                  <div className="flex items-center gap-2 mt-0.5 sm:hidden">
-                    <span className="text-[8px] font-bold text-zinc-600 uppercase font-mono">{item.praca}</span>
+                  <div className="flex items-center gap-2 mt-1 sm:hidden">
+                    <span className="text-[9px] font-bold text-zinc-500 uppercase font-mono">📍 {item.praca}</span>
                   </div>
 
                   {/* Micro progress track */}
@@ -408,45 +416,45 @@ function RankingLeaderboardComponent({
                 </div>
 
                 {/* Metric value */}
-                <div className="w-18 sm:w-28 text-right pr-1 sm:pr-5 font-mono text-[12.5px] sm:text-xs font-bold text-zinc-300 group-hover:text-white transition-colors shrink-0">
+                <div className="w-20 sm:w-28 text-right pr-3 sm:pr-5 font-mono text-[14px] sm:text-xs font-black text-zinc-200 group-hover:text-white transition-colors shrink-0">
                   {scoreFormatted}
                 </div>
 
                 {/* Eligibility & Prizes Column */}
-                <div className="w-22 sm:w-36 text-right flex flex-col items-end justify-center font-mono shrink-0">
+                <div className="w-24 sm:w-36 text-right flex flex-col items-end justify-center font-mono shrink-0">
                   {temDescricao ? (
                     atingiuMinimo ? (
-                      <span className="inline-flex items-center gap-0.5 text-sky-400 text-[9px] sm:text-[10px] font-extrabold tracking-tight bg-sky-500/5 px-2 py-0.5 rounded border border-sky-500/10 truncate max-w-[120px] sm:max-w-none" title={premioInfo.descricao}>
+                      <span className="inline-flex items-center gap-0.5 text-sky-400 text-[10px] font-black tracking-tight bg-sky-500/10 px-2 py-1 rounded border border-sky-500/20 truncate max-w-[120px] sm:max-w-none" title={premioInfo.descricao}>
                         🎁 {premioInfo.descricao}
                       </span>
                     ) : (
                       <div className="flex flex-col items-end leading-none">
-                        <span className="text-[9px] sm:text-[10px] text-zinc-600 line-through font-bold truncate max-w-[120px] sm:max-w-none" title={premioInfo.descricao}>
+                        <span className="text-[10px] text-zinc-600 line-through font-bold truncate max-w-[120px] sm:max-w-none" title={premioInfo.descricao}>
                           🎁 {premioInfo.descricao}
                         </span>
-                        <span className="text-[8px] sm:text-[9px] text-amber-500 bg-amber-500/5 border border-amber-500/10 px-1 py-0.2 rounded font-extrabold uppercase mt-0.5 tracking-tighter sm:tracking-wider">
-                          Falta {minimoCorridas - item.total_corridas_completadas} c.
+                        <span className="text-[8px] sm:text-[9px] text-amber-500 bg-amber-500/10 border border-amber-500/20 px-1 py-0.5 rounded font-black uppercase mt-1 tracking-tighter">
+                          Falta {minimoCorridas - item.total_corridas_completadas}
                         </span>
                       </div>
                     )
                   ) : premioTeorico > 0 ? (
                     atingiuMinimo ? (
-                      <span className="inline-flex items-center gap-0.5 text-emerald-400 text-[10px] sm:text-xs font-extrabold tracking-tight bg-emerald-500/5 px-2 py-0.5 rounded border border-emerald-500/10">
+                      <span className="inline-flex items-center gap-0.5 text-emerald-400 text-[11px] font-black tracking-tight bg-emerald-500/10 px-2 py-1 rounded border border-emerald-500/20">
                         +{formatCurrency(premio)}
                       </span>
                     ) : (
                       <div className="flex flex-col items-end leading-none">
-                        <span className="text-[9px] sm:text-[10px] text-zinc-600 line-through font-bold">
+                        <span className="text-[10px] text-zinc-600 line-through font-bold">
                           +{formatCurrency(premioTeorico)}
                         </span>
-                        <span className="text-[8px] sm:text-[9px] text-amber-500 bg-amber-500/5 border border-amber-500/10 px-1 py-0.2 rounded font-extrabold uppercase mt-0.5 tracking-tighter sm:tracking-wider">
-                          Falta {minimoCorridas - item.total_corridas_completadas} c.
+                        <span className="text-[8px] sm:text-[9px] text-amber-500 bg-amber-500/10 border border-amber-500/20 px-1 py-0.5 rounded font-black uppercase mt-1 tracking-tighter">
+                          Falta {minimoCorridas - item.total_corridas_completadas}
                         </span>
                       </div>
                     )
                   ) : (
-                    <span className="text-[8px] sm:text-[9px] text-zinc-700 font-bold uppercase tracking-wider select-none">
-                      Sem prêmio
+                    <span className="text-[9px] text-zinc-700 font-bold uppercase tracking-wider select-none">
+                      -
                     </span>
                   )}
                 </div>
