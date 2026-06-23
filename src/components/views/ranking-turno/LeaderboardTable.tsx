@@ -68,7 +68,7 @@ export const LeaderboardTable = memo(function LeaderboardTable({
                 ) : isTop3 ? (
                   <span className="text-amber-500 bg-amber-500/10 px-2 py-1 rounded-md text-[9px] sm:text-[9px] border border-amber-500/20 font-bold tracking-tighter">3º</span>
                 ) : (
-                  <span className="text-zinc-500 text-xs">{(item.posicao < 10 ? \`0\${item.posicao}\` : item.posicao)}</span>
+                  <span className="text-zinc-500 text-xs">{(item.posicao < 10 ? `0${item.posicao}` : item.posicao)}</span>
                 )}
               </div>
 
@@ -88,7 +88,7 @@ export const LeaderboardTable = memo(function LeaderboardTable({
                     className={`h-full rounded-full transition-all duration-1000 ease-out ${
                       isTop1 ? 'bg-yellow-500' : isTop2 ? 'bg-slate-400' : isTop3 ? 'bg-amber-600' : 'bg-sky-500'
                     }`}
-                    style={{ width: \`\${progresso}%\` }}
+                    style={{ width: `${progresso}%` }}
                   ></div>
                 </div>
               </div>
