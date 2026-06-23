@@ -162,7 +162,7 @@ export default function GeneralSettingsForm({
         </div>
 
         <div className="pt-4 border-t border-white/[0.04] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
             <label className="relative inline-flex items-center cursor-pointer select-none">
               <input 
                 type="checkbox" 
@@ -175,7 +175,27 @@ export default function GeneralSettingsForm({
                 🏆 Destaque Tema Copa do Mundo
               </span>
             </label>
-            <p className="text-[10px] text-zinc-500 hidden xl:block">Destaca o cartão público no Hub com o tema da Copa.</p>
+
+            {/* Novo Campo: Limite de Ranking */}
+            <div className="flex items-center gap-2 pl-0 sm:pl-4 sm:border-l border-white/10">
+              <label htmlFor="geral-limite" className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono">Limite no Ranking:</label>
+              <input 
+                id="geral-limite"
+                type="number" 
+                min="1"
+                max="500"
+                value={promo.config_regras?.limite_ranking ?? 15}
+                onChange={e => setPromo({ 
+                  ...promo, 
+                  config_regras: { 
+                    ...(promo.config_regras || {}), 
+                    limite_ranking: parseInt(e.target.value) || 15 
+                  } 
+                })}
+                className="admin-input w-20 !py-1 !text-center bg-[#0f0f15]"
+              />
+              <span className="text-[9px] text-zinc-500 hidden xl:block ml-2">pessoas max. visíveis</span>
+            </div>
           </div>
 
           <button 
