@@ -23,7 +23,8 @@ export default function GeneralSettingsForm({ promo, setPromo, onSave, saving }:
       data_inicio: promo.data_inicio,
       data_fim: promo.data_fim,
       status: promo.status,
-      destaque_copa: promo.destaque_copa
+      destaque_copa: promo.destaque_copa,
+      config_regras: promo.config_regras
     }).then(() => toast.success('Alterações gerais salvas com sucesso!'))
   }
 
@@ -34,7 +35,7 @@ export default function GeneralSettingsForm({ promo, setPromo, onSave, saving }:
       </h2>
       
       <div className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label htmlFor="geral-nome" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Nome da Promoção</label>
             <input 
@@ -57,6 +58,32 @@ export default function GeneralSettingsForm({ promo, setPromo, onSave, saving }:
               onChange={e => setPromo({ ...promo, cidade: e.target.value })}
               className="admin-input"
             />
+          </div>
+
+          <div>
+            <label htmlFor="geral-metrica" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Métrica de Desempenho</label>
+            <select
+              id="geral-metrica"
+              value={promo.config_regras?.mecanica?.metrica ?? 'corridas_completadas'}
+              onChange={e => {
+                const val = e.target.value
+                setPromo({
+                  ...promo,
+                  config_regras: {
+                    ...(promo.config_regras || {}),
+                    mecanica: {
+                      ...(promo.config_regras?.mecanica || {}),
+                      metrica: val
+                    }
+                  }
+                })
+              }}
+              className="admin-input bg-[#0f0f15] !border-white/10"
+            >
+              <option value="corridas_completadas">🏁 Quantidade de Corridas</option>
+              <option value="faturamento_taxas">💰 Faturamento Acumulado (Taxas R$)</option>
+              <option value="pontos">⚡ Pontuação Acumulada (Pontos)</option>
+            </select>
           </div>
         </div>
         
