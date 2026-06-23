@@ -1,0 +1,216 @@
+@theme {
+  --color-background: #030303;
+  --color-surface: #08080a;
+  --color-surface-hover: #0c0c0f;
+  --color-border-subtle: rgba(255, 255, 255, 0.04);
+  --color-primary: #3b82f6;
+  --color-accent-green: #10b981;
+}
+
+@layer base {
+  :root {
+    --background: #030303;
+    --foreground: #f4f4f7;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  body {
+    background-color: var(--background);
+    background-image: 
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(56, 189, 248, 0.07), transparent),
+      radial-gradient(ellipse 50% 50% at 50% 100%, rgba(99, 102, 241, 0.03), transparent);
+    background-attachment: fixed;
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+}
+
+/* Elegant Tech Grid Pattern Overlay (Ultra subtle) */
+.tech-grid {
+  position: fixed;
+  inset: 0;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.007) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255, 255, 255, 0.007) 1px, transparent 1px);
+  background-size: 40px 40px;
+  background-position: center top;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.8;
+}
+
+/* Base Card Obsidian Layout */
+.obsidian-card {
+  background: #08080a;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 16px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+}
+
+.obsidian-card:hover {
+  background: #0c0c0f;
+  border-color: rgba(255, 255, 255, 0.09);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 12px 40px -10px rgba(0, 0, 0, 0.8),
+    0 0 20px -2px rgba(255, 255, 255, 0.01);
+}
+
+/* Text Gradients */
+.text-gradient {
+  background: linear-gradient(135deg, #ffffff 30%, #e2e8f0 70%, #94a3b8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-neon {
+  background: linear-gradient(135deg, #38bdf8 0%, #6366f1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Responsive grid for promos */
+.grid-promos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+}
+
+/* Animations */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+/* Custom modern scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #030303; 
+}
+::-webkit-scrollbar-thumb {
+  background: #18181b; 
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #27272a; 
+}
+
+/* Hide native scrollbar helpers */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* Tab indicator sliding effect base */
+.tab-active-indicator {
+  position: absolute;
+  bottom: 0;
+  height: 2px;
+  background: #38bdf8;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Form Styles */
+.admin-input {
+  @apply w-full bg-[#08080a] border border-white/[0.04] rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-sky-500/80 focus:ring-1 focus:ring-sky-500/40 transition-all font-sans;
+}
+
+.admin-btn-primary {
+  @apply bg-white hover:bg-zinc-200 text-black font-extrabold py-2.5 px-6 rounded-xl transition-all duration-200 active:scale-[0.98] shadow-sm;
+}
+
+.admin-btn-secondary {
+  @apply bg-zinc-900/60 hover:bg-zinc-900 text-white border border-zinc-800/80 font-bold py-2.5 px-6 rounded-xl transition-all duration-200 active:scale-[0.98];
+}
+
+.admin-btn-danger {
+  @apply bg-red-950/20 hover:bg-red-950/40 text-red-400 border border-red-900/40 font-bold py-2.5 px-6 rounded-xl transition-all duration-200 active:scale-[0.98];
+}
+
+.upload-zone {
+  @apply border border-dashed border-zinc-800 rounded-2xl p-10 text-center transition-all cursor-pointer bg-[#050507] hover:border-sky-500/40 hover:bg-zinc-950/50;
+  animation: borderPulse 3s infinite ease-in-out;
+}
+.upload-zone.active {
+  @apply border-sky-500 bg-sky-950/10;
+  animation: none;
+}
+
+.admin-input:focus {
+  box-shadow: 0 0 18px -3px rgba(56, 189, 248, 0.16);
+}
+
+/* Shimmer Sparkles for Podium highlights */
+@keyframes borderPulse {
+  0% { border-color: rgba(63, 63, 70, 0.5); }
+  50% { border-color: rgba(56, 189, 248, 0.35); box-shadow: 0 0 15px -5px rgba(56, 189, 248, 0.05); }
+  100% { border-color: rgba(63, 63, 70, 0.5); }
+}
+
+@keyframes shimmerSparkle {
+  0% { opacity: 0.8; filter: brightness(1); }
+  50% { opacity: 1; filter: brightness(1.22) drop-shadow(0 0 6px rgba(255, 255, 255, 0.15)); }
+  100% { opacity: 0.8; filter: brightness(1); }
+}
+
+.podium-sparkle {
+  animation: shimmerSparkle 2.5s infinite ease-in-out;
+}
+
+/* Glassmorphism utility aprimorado */
+.glass {
+  background: rgba(8, 8, 10, 0.78) !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  box-shadow: 
+    0 10px 40px -10px rgba(0, 0, 0, 0.5),
+    inset 0 1px 1px rgba(255, 255, 255, 0.02) !important;
+}
+
+/* Floating animation for Podium Crown and other premium features */
+@keyframes float {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-6px) rotate(3deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+/* Glow classes for modern luxury touches */
+.glow-yellow-neon {
+  box-shadow: 0 0 15px -3px rgba(234, 179, 8, 0.25);
+}
+
+.glow-sky-neon {
+  box-shadow: 0 0 15px -3px rgba(56, 189, 248, 0.25);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TEMA COPA DO MUNDO - Conditional styles when body.tema-copa
+   ═══════════════════════════════════════════════════════════════ */
