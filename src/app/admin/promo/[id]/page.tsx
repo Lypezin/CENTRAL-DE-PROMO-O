@@ -38,7 +38,7 @@ export default function EditPromoPage() {
     handleDelete,
     handleClearData,
     handleExportRanking
-  } = usePromoEditor(id)
+  } = usePromoEditor(id as string)
 
   if (loading) return <div className="p-8 text-center text-white font-mono">Carregando portal...</div>
   if (!promo) return <div className="p-8 text-center text-red-500 font-mono">Promoção não encontrada.</div>
