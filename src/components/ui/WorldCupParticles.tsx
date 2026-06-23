@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 interface Particle {
   x: number
@@ -26,6 +26,7 @@ export default function WorldCupParticles() {
   const isPausedRef = useRef<boolean>(false)
   const offscreenBallRef = useRef<HTMLCanvasElement | null>(null)
   const offscreenStarRef = useRef<HTMLCanvasElement | null>(null)
+  const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
     setIsMounted(true)

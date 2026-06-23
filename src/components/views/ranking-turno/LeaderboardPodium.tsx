@@ -22,7 +22,7 @@ export const LeaderboardPodium = memo(function LeaderboardPodium({
   return (
     <>
 {/* 🏆 DESKTOP PODIUM SECTION (Cards tridimensionais grandes para PC) */}
-      {!searchQuery && (podiumData.first || podiumData.second || podiumData.third) && (
+      {(podiumData.first || podiumData.second || podiumData.third) && (
         <div className="hidden sm:grid grid-cols-3 gap-6 mb-4 pt-4 items-end select-none">
           
           {/* 2nd Place (Silver Card) */}
@@ -185,7 +185,7 @@ export const LeaderboardPodium = memo(function LeaderboardPodium({
       )}
 
       {/* 🏆 MOBILE COMPACT PODIUM SECTION (App-Like Stack UI) */}
-      {!searchQuery && (podiumData.first || podiumData.second || podiumData.third) && (
+      {(podiumData.first || podiumData.second || podiumData.third) && (
         <div className="sm:hidden flex flex-col gap-3 mb-6 select-none w-full max-w-full overflow-hidden px-1">
           {/* 1st Place (Hero Card Total Width) */}
           {podiumData.first && (() => {
