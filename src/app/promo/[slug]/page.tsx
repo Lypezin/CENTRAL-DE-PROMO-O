@@ -52,7 +52,7 @@ export default async function PromoPage({ params }: { params: Promise<{ slug: st
   }
 
   return (
-    <div className={`max-w-7xl mx-auto px-4 md:px-8 py-8 animate-slide-up ${promo.destaque_copa ? 'promo-page-copa' : ''}`}>
+    <div className={`max-w-5xl mx-auto px-4 md:px-8 py-8 animate-slide-up ${promo.destaque_copa ? 'promo-page-copa' : ''}`}>
       {promo.destaque_copa && <CopaThemeForcer />}
       {/* Back button link */}
       <div className="mb-6">
@@ -96,17 +96,15 @@ export default async function PromoPage({ params }: { params: Promise<{ slug: st
       )}
 
       {/* Header Info Panel */}
-      <div className="mb-10 flex flex-col lg:flex-row gap-8 lg:items-start justify-between">
-        <div className="flex-1 min-w-0">
-          <div className="flex flex-wrap items-center gap-3 mb-4">
+      <div className={`mb-10 flex flex-col ${promo.destaque_copa ? 'items-center text-center gap-6' : 'lg:flex-row gap-8 lg:items-start justify-between'}`}>
+        <div className={`flex-1 min-w-0 ${promo.destaque_copa ? 'flex flex-col items-center' : ''}`}>
+          <div className={`flex flex-wrap items-center gap-3 mb-4 ${promo.destaque_copa ? 'justify-center' : ''}`}>
             <StatusBadge status={promo.status} />
-            <span className={`text-[9px] font-extrabold tracking-wider uppercase px-2.5 py-1 rounded-md border font-mono ${
-              promo.destaque_copa
-                ? 'bg-amber-950/20 border-amber-800/30 text-amber-400 copa-shimmer shadow-sm shadow-amber-950/30'
-                : 'bg-zinc-900/30 border border-zinc-800/80 text-zinc-500'
-            }`}>
-              {promo.tipo === 'ranking_turno' ? 'RANKING POR TURNO' : 'DESAFIO'}
-            </span>
+            {!promo.destaque_copa && (
+              <span className="text-[9px] font-extrabold tracking-wider uppercase px-2.5 py-1 rounded-md border font-mono bg-zinc-900/30 border border-zinc-800/80 text-zinc-500">
+                {promo.tipo === 'ranking_turno' ? 'RANKING POR TURNO' : 'DESAFIO'}
+              </span>
+            )}
           </div>
 
           {promo.cidade && (
@@ -121,16 +119,16 @@ export default async function PromoPage({ params }: { params: Promise<{ slug: st
             </div>
           )}
 
-          <h1 className={`text-2xl xs:text-3xl md:text-5xl font-black text-white mb-2 md:mb-4 leading-tight tracking-tight break-words ${promo.destaque_copa ? 'text-gradient-neon gold-text-glow' : ''}`}>
+          <h1 className={`text-2xl xs:text-3xl md:text-5xl font-black text-white mb-2 md:mb-4 leading-tight tracking-tight break-words ${promo.destaque_copa ? 'text-gradient-neon gold-text-glow text-center' : ''}`}>
             {promo.nome}
           </h1>
-          <p className="text-zinc-400 max-w-3xl text-xs md:text-base leading-relaxed">
+          <p className={`text-zinc-400 max-w-3xl text-xs md:text-base leading-relaxed ${promo.destaque_copa ? 'text-center' : ''}`}>
             {promo.descricao || 'Sem descrição.'}
           </p>
         </div>
         
         {/* Date Widgets Panel (Flex col no mobile, grid ou row no desktop) */}
-        <div className="flex flex-col sm:flex-row lg:flex-col gap-3.5 shrink-0 w-full lg:w-auto lg:min-w-[280px]">
+        <div className={`flex flex-col sm:flex-row ${promo.destaque_copa ? 'lg:flex-row justify-center w-full max-w-2xl' : 'lg:flex-col lg:w-auto lg:min-w-[280px]'} gap-3.5 shrink-0 w-full`}>
           {/* Campaign Validity Duration Card */}
           <div className={`${promo.destaque_copa ? 'copa-date-card' : 'obsidian-card'} p-4 md:p-5 shadow-lg flex-1`}>
             <div className={`text-[9px] font-bold uppercase tracking-wider font-mono mb-2 ${promo.destaque_copa ? 'copa-date-label' : 'text-zinc-500'}`}>Período de Validade</div>

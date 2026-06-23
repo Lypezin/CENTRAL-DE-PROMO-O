@@ -333,7 +333,7 @@ function RankingLeaderboardComponent({
       )}
 
       {/* 📋 UNIFIED DATAGRID TABLE LIST (Obsidian Ledger responsiva, sem transbordar horizontalmente) */}
-      <div className="border border-white/[0.04] rounded-2xl overflow-hidden bg-zinc-950/20 shadow-2xl shadow-black/80 animate-slide-up w-full max-w-full">
+      <div className="border border-white/[0.04] rounded-2xl overflow-hidden bg-zinc-950/20 shadow-2xl shadow-black/80 animate-slide-up w-full max-w-full copa-leaderboard-table">
         {/* Table Header */}
         <div className="flex items-center px-3 sm:px-5 py-3 bg-zinc-950/50 border-b border-white/[0.04] text-[9px] sm:text-[9px] font-bold text-zinc-500 uppercase tracking-wider font-mono select-none w-full">
           <div className="w-8 sm:w-12 shrink-0 text-center">Pos</div>
