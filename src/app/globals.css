@@ -1145,4 +1145,258 @@ body.tema-copa .copa-prize-badge:hover {
 }
 
 
+/* ═══════════════════════════════════════════════════════════════
+   COPA DO MUNDO — REDESIGN PREMIUM (Banner Hero + Cards + Pódio)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Hero Banner Épico ── */
+.copa-hero-banner {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 120% 80% at 50% 0%, rgba(22, 101, 52, 0.25), transparent 55%),
+    radial-gradient(ellipse 80% 60% at 80% 100%, rgba(245, 158, 11, 0.08), transparent 50%),
+    linear-gradient(135deg, rgba(2, 12, 6, 0.95) 0%, rgba(4, 25, 12, 0.9) 40%, rgba(8, 8, 10, 0.95) 100%);
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  border-radius: 20px;
+  padding: 2rem 2.5rem;
+  box-shadow:
+    0 25px 60px -15px rgba(0, 0, 0, 0.95),
+    0 0 40px -10px rgba(16, 185, 129, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  isolation: isolate;
+}
+
+.copa-hero-banner::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, 
+    transparent 0%,
+    #166534 15%, 
+    #fbbf24 35%,
+    #166534 50%,
+    #1e3a8a 65%,
+    #fbbf24 85%,
+    transparent 100%
+  );
+  opacity: 0.9;
+  z-index: 2;
+}
+
+.copa-hero-banner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+  transform: translateX(-120%) skewX(-15deg);
+  animation: copaHeroSheen 6s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes copaHeroSheen {
+  0% { transform: translateX(-120%) skewX(-15deg); opacity: 0; }
+  15% { opacity: 0.6; }
+  40%, 100% { transform: translateX(220%) skewX(-15deg); opacity: 0; }
+}
+
+/* ── Troféu Épico ── */
+.copa-hero-trophy {
+  font-size: 3.5rem;
+  filter: drop-shadow(0 0 20px rgba(251, 191, 36, 0.5)) drop-shadow(0 0 40px rgba(251, 191, 36, 0.2));
+  animation: copaGoldPulse 3s ease-in-out infinite, float 4s ease-in-out infinite;
+  z-index: 2;
+}
+
+@keyframes copaGoldPulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 15px rgba(251, 191, 36, 0.4)) drop-shadow(0 0 30px rgba(251, 191, 36, 0.15));
+  }
+  50% {
+    filter: drop-shadow(0 0 25px rgba(251, 191, 36, 0.7)) drop-shadow(0 0 50px rgba(251, 191, 36, 0.3));
+  }
+}
+
+/* ── Título "Edição Especial" ── */
+.copa-hero-title {
+  background: linear-gradient(135deg, #ffffff 0%, #f4d66a 40%, #d4a425 60%, #f4d66a 80%, #ffffff 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: copaTextShimmer 4s linear infinite;
+  text-shadow: none;
+}
+
+@keyframes copaTextShimmer {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+/* ── Sub-badge da Copa ── */
+.copa-hero-subtitle {
+  background: linear-gradient(135deg, rgba(22, 101, 52, 0.3), rgba(16, 185, 129, 0.12));
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 999px;
+  padding: 0.25rem 1rem;
+  color: #6ee7b7;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-family: ui-monospace, monospace;
+}
+
+/* ── Bola ⚽ decorativa flutuante ── */
+.copa-hero-ball {
+  position: absolute;
+  font-size: 1.5rem;
+  opacity: 0.12;
+  pointer-events: none;
+  z-index: 0;
+  animation: copaBallFloat 8s ease-in-out infinite;
+}
+
+.copa-hero-ball:nth-child(2) {
+  animation-delay: -3s;
+  animation-duration: 10s;
+}
+
+.copa-hero-ball:nth-child(3) {
+  animation-delay: -6s;
+  animation-duration: 12s;
+}
+
+@keyframes copaBallFloat {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); opacity: 0.08; }
+  25% { transform: translate(6px, -8px) rotate(45deg); opacity: 0.15; }
+  50% { transform: translate(-4px, -14px) rotate(90deg); opacity: 0.12; }
+  75% { transform: translate(8px, -6px) rotate(135deg); opacity: 0.10; }
+}
+
+/* ── Stars decorativas ── */
+.copa-hero-star {
+  position: absolute;
+  color: #fbbf24;
+  pointer-events: none;
+  z-index: 0;
+  animation: copaStarTwinkle 3s ease-in-out infinite;
+}
+
+.copa-hero-star:nth-child(2) { animation-delay: -1s; }
+.copa-hero-star:nth-child(3) { animation-delay: -2s; }
+
+@keyframes copaStarTwinkle {
+  0%, 100% { opacity: 0.15; transform: scale(0.8); }
+  50% { opacity: 0.45; transform: scale(1.2); }
+}
+
+/* ── Cards de Data Temáticos Copa ── */
+.copa-date-card {
+  background:
+    radial-gradient(circle at 20% 0%, rgba(251, 191, 36, 0.07), transparent 50%),
+    linear-gradient(135deg, rgba(4, 20, 10, 0.9), rgba(2, 10, 6, 0.95)) !important;
+  border: 1px solid rgba(251, 191, 36, 0.2) !important;
+  box-shadow:
+    0 15px 40px -12px rgba(0, 0, 0, 0.9),
+    0 0 20px -8px rgba(16, 185, 129, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.copa-date-card::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(251, 191, 36, 0.3), transparent);
+  pointer-events: none;
+}
+
+.copa-date-card:hover {
+  border-color: rgba(251, 191, 36, 0.4) !important;
+  transform: translateY(-2px);
+  box-shadow:
+    0 20px 50px -12px rgba(0, 0, 0, 0.95),
+    0 0 30px -5px rgba(251, 191, 36, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+.copa-date-icon {
+  color: #f59e0b !important;
+  filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.4));
+}
+
+.copa-date-label {
+  color: #d4a425 !important;
+}
+
+/* ── Busca Temática Copa ── */
+.promo-page-copa input[type="text"] {
+  background: rgba(3, 18, 9, 0.85) !important;
+  border-color: rgba(251, 191, 36, 0.15) !important;
+  color: #f3f4f6 !important;
+}
+
+.promo-page-copa input[type="text"]:focus {
+  border-color: rgba(16, 185, 129, 0.5) !important;
+  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.2), 0 0 20px rgba(16, 185, 129, 0.08) !important;
+}
+
+.promo-page-copa input[type="text"]::placeholder {
+  color: rgba(251, 191, 36, 0.25) !important;
+}
+
+/* ── Pódio — Efeitos mais Dramáticos ── */
+body.tema-copa .copa-podium-1 {
+  background: 
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(251, 191, 36, 0.18), transparent 55%),
+    linear-gradient(135deg, rgba(8, 38, 18, 0.85), rgba(4, 20, 11, 0.9)) !important;
+  border: 1.5px solid rgba(245, 158, 11, 0.5) !important;
+  box-shadow: 
+    0 25px 60px -12px rgba(0, 0, 0, 0.95),
+    0 0 45px -8px rgba(245, 158, 11, 0.3),
+    inset 0 1px 1px rgba(255, 255, 255, 0.1) !important;
+  animation: copaPodiumGold 4s ease-in-out infinite;
+}
+
+@keyframes copaPodiumGold {
+  0%, 100% {
+    border-color: rgba(245, 158, 11, 0.45);
+    box-shadow:
+      0 25px 60px -12px rgba(0, 0, 0, 0.95),
+      0 0 35px -8px rgba(245, 158, 11, 0.25),
+      inset 0 1px 1px rgba(255, 255, 255, 0.08);
+  }
+  50% {
+    border-color: rgba(16, 185, 129, 0.55);
+    box-shadow:
+      0 25px 60px -12px rgba(0, 0, 0, 0.95),
+      0 0 45px -5px rgba(16, 185, 129, 0.3),
+      inset 0 1px 1px rgba(255, 255, 255, 0.12);
+  }
+}
+
+/* ── Ranking Header Copa ── */
+.promo-page-copa .obsidian-card h3 {
+  color: #f4d66a !important;
+}
+
+/* ── Responsive adjustments ── */
+@media (max-width: 640px) {
+  .copa-hero-banner {
+    padding: 1.5rem 1.25rem;
+  }
+  .copa-hero-trophy {
+    font-size: 2.5rem;
+  }
+}
 

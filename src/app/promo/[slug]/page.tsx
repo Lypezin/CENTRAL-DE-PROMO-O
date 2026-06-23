@@ -64,6 +64,37 @@ export default async function PromoPage({ params }: { params: Promise<{ slug: st
         </a>
       </div>
 
+      {/* 🏆 COPA HERO BANNER — Exclusivo para destaque_copa */}
+      {promo.destaque_copa && (
+        <div className="copa-hero-banner mb-8">
+          {/* Bolas ⚽ decorativas */}
+          <span className="copa-hero-ball" style={{ top: '12%', left: '5%' }}>⚽</span>
+          <span className="copa-hero-ball" style={{ bottom: '15%', right: '8%' }}>⚽</span>
+          <span className="copa-hero-ball" style={{ top: '60%', left: '85%' }}>⚽</span>
+          
+          {/* Estrelas ★ decorativas */}
+          <span className="copa-hero-star text-[10px]" style={{ top: '18%', right: '15%' }}>★</span>
+          <span className="copa-hero-star text-[8px]" style={{ top: '70%', left: '12%' }}>★</span>
+          <span className="copa-hero-star text-[6px]" style={{ bottom: '20%', right: '25%' }}>★</span>
+          
+          <div className="flex flex-col sm:flex-row items-center gap-5 relative z-10">
+            {/* Troféu */}
+            <div className="copa-hero-trophy">🏆</div>
+            
+            {/* Texto */}
+            <div className="text-center sm:text-left flex-1">
+              <div className="copa-hero-title text-lg sm:text-xl md:text-2xl font-black tracking-tight mb-2">
+                EDIÇÃO ESPECIAL COPA DO MUNDO
+              </div>
+              <div className="flex flex-wrap items-center gap-2 justify-center sm:justify-start">
+                <span className="copa-hero-subtitle">⚽ Competição Oficial</span>
+                <span className="copa-hero-subtitle">🏅 Prêmios Exclusivos</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header Info Panel */}
       <div className="mb-10 flex flex-col lg:flex-row gap-8 lg:items-start justify-between">
         <div className="flex-1 min-w-0">
@@ -92,7 +123,6 @@ export default async function PromoPage({ params }: { params: Promise<{ slug: st
 
           <h1 className={`text-2xl xs:text-3xl md:text-5xl font-black text-white mb-2 md:mb-4 leading-tight tracking-tight break-words ${promo.destaque_copa ? 'text-gradient-neon gold-text-glow' : ''}`}>
             {promo.nome}
-            {promo.destaque_copa && <span className="text-lg md:text-2xl font-bold text-amber-400 ml-3 inline-block animate-float">🏆</span>}
           </h1>
           <p className="text-zinc-400 max-w-3xl text-xs md:text-base leading-relaxed">
             {promo.descricao || 'Sem descrição.'}
@@ -102,10 +132,10 @@ export default async function PromoPage({ params }: { params: Promise<{ slug: st
         {/* Date Widgets Panel (Flex col no mobile, grid ou row no desktop) */}
         <div className="flex flex-col sm:flex-row lg:flex-col gap-3.5 shrink-0 w-full lg:w-auto lg:min-w-[280px]">
           {/* Campaign Validity Duration Card */}
-          <div className="obsidian-card p-4 md:p-5 shadow-lg flex-1">
-            <div className="text-zinc-500 text-[9px] font-bold uppercase tracking-wider font-mono mb-2">Período de Validade</div>
+          <div className={`${promo.destaque_copa ? 'copa-date-card' : 'obsidian-card'} p-4 md:p-5 shadow-lg flex-1`}>
+            <div className={`text-[9px] font-bold uppercase tracking-wider font-mono mb-2 ${promo.destaque_copa ? 'copa-date-label' : 'text-zinc-500'}`}>Período de Validade</div>
             <div className="text-zinc-300 flex items-center gap-2">
-              <svg className="w-4 h-4 text-sky-400 val-icon shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className={`w-4 h-4 shrink-0 ${promo.destaque_copa ? 'copa-date-icon' : 'text-sky-400 val-icon'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
               <span className="font-mono text-[11px] sm:text-xs md:text-sm font-bold tracking-tight whitespace-nowrap">{formatData(promo.data_inicio)} — {formatData(promo.data_fim)}</span>
@@ -113,10 +143,10 @@ export default async function PromoPage({ params }: { params: Promise<{ slug: st
           </div>
 
           {/* Actual Real-Time Data Duration Card */}
-          <div className="obsidian-card p-4 md:p-5 shadow-lg flex-1">
-            <div className="text-zinc-500 text-[9px] font-bold uppercase tracking-wider font-mono mb-2">Período dos Dados</div>
-            <div className="text-emerald-400 flex items-center gap-2">
-              <svg className="w-4 h-4 text-emerald-400 animate-pulse shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className={`${promo.destaque_copa ? 'copa-date-card' : 'obsidian-card'} p-4 md:p-5 shadow-lg flex-1`}>
+            <div className={`text-[9px] font-bold uppercase tracking-wider font-mono mb-2 ${promo.destaque_copa ? 'copa-date-label' : 'text-zinc-500'}`}>Período dos Dados</div>
+            <div className={`flex items-center gap-2 ${promo.destaque_copa ? 'text-emerald-300' : 'text-emerald-400'}`}>
+              <svg className={`w-4 h-4 animate-pulse shrink-0 ${promo.destaque_copa ? 'copa-date-icon' : 'text-emerald-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <span className="font-mono text-[11px] sm:text-xs md:text-sm font-bold tracking-tight whitespace-nowrap">
@@ -132,6 +162,7 @@ export default async function PromoPage({ params }: { params: Promise<{ slug: st
           </div>
         </div>
       </div>
+
 
       {/* Main Campaign Data Grid */}
       <div className="mb-12">
