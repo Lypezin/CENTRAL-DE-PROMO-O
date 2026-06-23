@@ -143,12 +143,12 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
           {/* Location / Praça Tag */}
           {promo.cidade && (
             <div className="mb-2.5">
-              <span className={`inline-flex items-center text-[9px] md:text-[10px] font-bold tracking-wider uppercase px-2.5 py-0.5 rounded font-mono ${
+              <span className={`inline-flex items-center text-[9px] md:text-[10px] font-bold tracking-wider uppercase px-2.5 py-0.5 rounded font-mono backdrop-blur-sm ${
                 isCopa
-                  ? 'text-emerald-300 bg-zinc-950/80 border border-emerald-500/40 shadow-[0_0_10px_rgba(16,185,129,0.15)]'
+                  ? 'text-emerald-100 bg-emerald-950/60 border border-emerald-500/60 shadow-[0_0_12px_rgba(16,185,129,0.4)]'
                   : isNinja
-                    ? 'text-zinc-300 bg-zinc-800/30 border border-zinc-600/40 shadow-[0_0_10px_rgba(255,255,255,0.05)]'
-                    : 'text-sky-400 bg-sky-950/20 border border-sky-900/30'
+                    ? 'text-zinc-100 bg-zinc-700/60 border border-zinc-500/60 shadow-[0_0_12px_rgba(255,255,255,0.1)]'
+                    : 'text-sky-100 bg-sky-900/60 border border-sky-500/50'
               }`}>
                 📍 {promo.cidade}
               </span>

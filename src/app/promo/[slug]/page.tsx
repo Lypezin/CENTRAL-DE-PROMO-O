@@ -143,7 +143,7 @@ export default async function PromoPage({ params }: { params: Promise<{ slug: st
             <div className="copa-hero-subtitle text-xs sm:text-sm md:text-base mb-2">🏆 Edição Especial Copa do Mundo</div>
             
             {promo.cidade && (
-              <span className="inline-flex items-center text-[10px] sm:text-xs font-bold tracking-wider uppercase border px-3 py-1.5 rounded-md font-mono bg-zinc-950/80 border-emerald-500/40 text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+              <span className="inline-flex items-center text-[10px] sm:text-xs font-bold tracking-wider uppercase border px-3 py-1.5 rounded-md font-mono backdrop-blur-sm bg-emerald-950/60 border-emerald-500/60 text-emerald-100 shadow-[0_0_15px_rgba(16,185,129,0.4)]">
                 Praça: {promo.cidade}
               </span>
             )}
@@ -202,7 +202,7 @@ export default async function PromoPage({ params }: { params: Promise<{ slug: st
 
             {promo.cidade && (
               <div className="mb-4">
-                <span className="inline-flex items-center text-[9px] md:text-[10px] font-bold tracking-wider uppercase border px-2.5 py-1 rounded-md font-mono bg-sky-950/20 border-sky-900/30 text-sky-400">
+                <span className="inline-flex items-center text-[9px] md:text-[10px] font-bold tracking-wider uppercase border px-2.5 py-1 rounded-md font-mono backdrop-blur-sm bg-sky-900/60 border-sky-500/50 text-sky-100">
                   Praça: {promo.cidade}
                 </span>
               </div>
