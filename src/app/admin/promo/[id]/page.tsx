@@ -67,20 +67,23 @@ export default function EditPromoPage() {
         setLocalPremios(data.promocao.config_premios || [])
         const loadedTurnos = data.promocao.config_turnos || ['CAFE_DA_MANHA', 'ALMOCO', 'TARDE', 'JANTAR', 'MADRUGADA']
         setActiveTurnos(loadedTurnos)
-        if (loadedTurnos.length > 0 && !loadedTurnos.includes(turnoEditorAtivo)) {
-          setTurnoEditorAtivo(loadedTurnos[0])
-        }
       }
     } catch (e) {
       console.error(e)
     } finally {
       setLoading(false)
     }
-  }, [id, turnoEditorAtivo])
+  }, [id])
 
   useEffect(() => {
     carregarPromo()
   }, [carregarPromo])
+
+  useEffect(() => {
+    if (activeTurnos.length > 0 && !activeTurnos.includes(turnoEditorAtivo)) {
+      setTurnoEditorAtivo(activeTurnos[0])
+    }
+  }, [activeTurnos, turnoEditorAtivo])
 
 
   const handleUpdate = async (fields: Partial<Promocao>) => {

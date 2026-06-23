@@ -31,7 +31,8 @@ export default function GeneralSettingsForm({
       data_fim: promo.data_fim,
       status: promo.status,
       destaque_copa: promo.destaque_copa,
-      config_regras: promo.config_regras
+      config_regras: promo.config_regras,
+      config_turnos: promo.config_turnos
     }).then(() => toast.success('Alterações gerais salvas com sucesso!'))
   }
 
@@ -75,14 +76,17 @@ export default function GeneralSettingsForm({
               onChange={e => {
                 const val = e.target.value
                 const updates: any = { metrica: val }
+                let novosTurnos = promo.config_turnos
                 
                 if (val === 'pontos') {
                   updates.agrupamento = 'geral'
+                  novosTurnos = ['GERAL']
                   if (setTurnoEditorAtivo) {
                     setTurnoEditorAtivo('GERAL')
                   }
                 } else {
                   updates.agrupamento = 'turno'
+                  novosTurnos = ['CAFE_DA_MANHA', 'ALMOCO', 'TARDE', 'JANTAR', 'MADRUGADA']
                   if (setTurnoEditorAtivo) {
                     setTurnoEditorAtivo('CAFE_DA_MANHA')
                   }
@@ -90,6 +94,7 @@ export default function GeneralSettingsForm({
                 
                 setPromo({
                   ...promo,
+                  config_turnos: novosTurnos,
                   config_regras: {
                     ...(promo.config_regras || {}),
                     mecanica: {

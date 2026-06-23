@@ -122,6 +122,8 @@ export default function TurnoPrizesConfigurator({
     premios: []
   }
 
+  const isGeral = promo.config_regras?.mecanica?.agrupamento === 'geral'
+
   return (
     <div className="glass p-6 rounded-2xl border border-white/10 shadow-xl space-y-6">
       <div>
@@ -134,75 +136,85 @@ export default function TurnoPrizesConfigurator({
       </div>
 
       {/* Turnos Habilitados Toggle Checkboxes */}
-      <div className="bg-black/35 border border-white/5 p-4 rounded-xl space-y-3">
-        <h3 className="text-xs font-bold text-white flex items-center gap-1.5 uppercase tracking-wider text-sky-400 font-mono select-none">
-          <span>⏰</span> Turnos Habilitados nesta Campanha
-        </h3>
-        <p className="text-[11px] text-zinc-500 leading-relaxed">
-          Somente os turnos marcados aparecerão na listagem e na barra de abas pública da Central de Promoções.
-        </p>
-        
-        <div className="flex flex-wrap gap-2.5 pt-1">
+      {!isGeral && (
+        <div className="bg-black/35 border border-white/5 p-4 rounded-xl space-y-3">
+          <h3 className="text-xs font-bold text-white flex items-center gap-1.5 uppercase tracking-wider text-sky-400 font-mono select-none">
+            <span>⏰</span> Turnos Habilitados nesta Campanha
+          </h3>
+          <p className="text-[11px] text-zinc-500 leading-relaxed">
+            Somente os turnos marcados aparecerão na listagem e na barra de abas pública da Central de Promoções.
+          </p>
+          
+          <div className="flex flex-wrap gap-2.5 pt-1">
+            {[
+              { key: 'CAFE_DA_MANHA', label: 'Café da Manhã', emoji: '☀️' },
+              { key: 'ALMOCO', label: 'Almoço', emoji: '🌤️' },
+              { key: 'TARDE', label: 'Tarde', emoji: '🌅' },
+              { key: 'JANTAR', label: 'Jantar', emoji: '🌙' },
+              { key: 'MADRUGADA', label: 'Madrugada', emoji: '⭐' }
+            ].map(t => {
+              const isChecked = activeTurnos.includes(t.key)
+              return (
+                <button
+                  key={t.key}
+                  type="button"
+                  onClick={() => handleToggleTurno(t.key)}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-xs font-bold transition-all duration-300 active:scale-95 select-none ${
+                    isChecked 
+                      ? 'bg-sky-500/10 border-sky-500/30 text-white shadow-sm' 
+                      : 'bg-black/35 border-white/5 text-zinc-500 hover:text-zinc-300 hover:bg-white/2'
+                  }`}
+                >
+                  <div className={`w-3.5 h-3.5 rounded border flex items-center justify-center transition-all ${
+                    isChecked 
+                      ? 'bg-sky-600 border-sky-500 text-white' 
+                      : 'border-white/20 text-transparent'
+                  }`}>
+                    <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3.5} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span>{t.emoji}</span>
+                  <span>{t.label}</span>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Segmented active Tab controller for visual editor shifts */}
+      {!isGeral ? (
+        <div className="flex bg-black/45 p-1 rounded-xl border border-white/5 overflow-x-auto scrollbar-none gap-1 select-none">
           {[
             { key: 'CAFE_DA_MANHA', label: 'Café da Manhã', emoji: '☀️' },
             { key: 'ALMOCO', label: 'Almoço', emoji: '🌤️' },
             { key: 'TARDE', label: 'Tarde', emoji: '🌅' },
             { key: 'JANTAR', label: 'Jantar', emoji: '🌙' },
             { key: 'MADRUGADA', label: 'Madrugada', emoji: '⭐' }
-          ].map(t => {
-            const isChecked = activeTurnos.includes(t.key)
-            return (
-              <button
-                key={t.key}
-                type="button"
-                onClick={() => handleToggleTurno(t.key)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-xs font-bold transition-all duration-300 active:scale-95 select-none ${
-                  isChecked 
-                    ? 'bg-sky-500/10 border-sky-500/30 text-white shadow-sm' 
-                    : 'bg-black/35 border-white/5 text-zinc-500 hover:text-zinc-300 hover:bg-white/2'
-                }`}
-              >
-                <div className={`w-3.5 h-3.5 rounded border flex items-center justify-center transition-all ${
-                  isChecked 
-                    ? 'bg-sky-600 border-sky-500 text-white' 
-                    : 'border-white/20 text-transparent'
-                }`}>
-                  <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3.5} d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <span>{t.emoji}</span>
-                <span>{t.label}</span>
-              </button>
-            )
-          })}
+          ].filter(t => activeTurnos.includes(t.key)).map(t => (
+            <button
+              key={t.key}
+              type="button"
+              onClick={() => setTurnoEditorAtivo(t.key)}
+              className={`flex-grow md:flex-initial min-w-[120px] px-3.5 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 active:scale-95 ${
+                turnoEditorAtivo === t.key 
+                  ? 'bg-sky-600 text-white shadow-lg shadow-sky-500/10' 
+                  : 'text-zinc-500 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <span>{t.emoji}</span>
+              {t.label}
+            </button>
+          ))}
         </div>
-      </div>
-
-      {/* Segmented active Tab controller for visual editor shifts */}
-      <div className="flex bg-black/45 p-1 rounded-xl border border-white/5 overflow-x-auto scrollbar-none gap-1 select-none">
-        {[
-          { key: 'CAFE_DA_MANHA', label: 'Café da Manhã', emoji: '☀️' },
-          { key: 'ALMOCO', label: 'Almoço', emoji: '🌤️' },
-          { key: 'TARDE', label: 'Tarde', emoji: '🌅' },
-          { key: 'JANTAR', label: 'Jantar', emoji: '🌙' },
-          { key: 'MADRUGADA', label: 'Madrugada', emoji: '⭐' }
-        ].filter(t => activeTurnos.includes(t.key)).map(t => (
-          <button
-            key={t.key}
-            type="button"
-            onClick={() => setTurnoEditorAtivo(t.key)}
-            className={`flex-grow md:flex-initial min-w-[120px] px-3.5 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 active:scale-95 ${
-              turnoEditorAtivo === t.key 
-                ? 'bg-sky-600 text-white shadow-lg shadow-sky-500/10' 
-                : 'text-zinc-500 hover:text-white hover:bg-white/5'
-            }`}
-          >
-            <span>{t.emoji}</span>
-            {t.label}
-          </button>
-        ))}
-      </div>
+      ) : (
+        <div className="flex bg-black/45 p-1 rounded-xl border border-white/5 gap-1 select-none w-max">
+          <div className="px-5 py-2 bg-sky-600 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-lg shadow-sky-500/10">
+            <span>🏆</span> Geral Consolidado (Sem Turnos)
+          </div>
+        </div>
+      )}
 
       {/* Editor visual detail inputs for dynamic selected active Turno */}
       <div className="space-y-6 animate-fade-in">
