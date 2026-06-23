@@ -9,9 +9,16 @@ interface GeneralSettingsFormProps {
   setPromo: React.Dispatch<React.SetStateAction<Promocao | null>>
   onSave: (fields: Partial<Promocao>) => Promise<void>
   saving: boolean
+  setTurnoEditorAtivo?: React.Dispatch<React.SetStateAction<string>>
 }
 
-export default function GeneralSettingsForm({ promo, setPromo, onSave, saving }: GeneralSettingsFormProps) {
+export default function GeneralSettingsForm({ 
+  promo, 
+  setPromo, 
+  onSave, 
+  saving,
+  setTurnoEditorAtivo
+}: GeneralSettingsFormProps) {
   const toast = useToast()
   
   const handleSubmit = (e: React.FormEvent) => {
@@ -67,13 +74,27 @@ export default function GeneralSettingsForm({ promo, setPromo, onSave, saving }:
               value={promo.config_regras?.mecanica?.metrica ?? 'corridas_completadas'}
               onChange={e => {
                 const val = e.target.value
+                const updates: any = { metrica: val }
+                
+                if (val === 'pontos') {
+                  updates.agrupamento = 'geral'
+                  if (setTurnoEditorAtivo) {
+                    setTurnoEditorAtivo('GERAL')
+                  }
+                } else {
+                  updates.agrupamento = 'turno'
+                  if (setTurnoEditorAtivo) {
+                    setTurnoEditorAtivo('CAFE_DA_MANHA')
+                  }
+                }
+                
                 setPromo({
                   ...promo,
                   config_regras: {
                     ...(promo.config_regras || {}),
                     mecanica: {
                       ...(promo.config_regras?.mecanica || {}),
-                      metrica: val
+                      ...updates
                     }
                   }
                 })

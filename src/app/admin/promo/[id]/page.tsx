@@ -324,6 +324,7 @@ export default function EditPromoPage() {
               setPromo={setPromo} 
               onSave={handleUpdate} 
               saving={saving} 
+              setTurnoEditorAtivo={setTurnoEditorAtivo}
             />
 
 
