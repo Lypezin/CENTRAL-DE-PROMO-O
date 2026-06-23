@@ -22,6 +22,7 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
 
   const isRanking = promo.tipo === 'ranking_turno'
   const isCopa = promo.destaque_copa
+  const isNinja = /faixa preta|ninja/i.test(promo.nome)
 
   return (
     <Link href={`/promo/${promo.slug}`} className="block w-full h-full">
@@ -29,12 +30,17 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
         className={`obsidian-card h-full flex flex-col relative group overflow-hidden ${
           isCopa 
             ? 'card-tema-copa !bg-gradient-to-br !from-[#061c0d] !via-[#040f08] !to-[#020502] !border-amber-500/20 shadow-[0_0_20px_rgba(16,185,129,0.05)]' 
-            : ''
+            : isNinja
+              ? 'card-tema-ninja !bg-gradient-to-br !from-[#1a0505] !via-[#0a0202] !to-[#000000] !border-red-600/30 shadow-[0_0_20px_rgba(220,38,38,0.1)]'
+              : ''
         }`}
       >
         {/* Shimmer light flash on hover */}
         {isCopa && (
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-400/10 to-transparent -translate-x-[150%] group-hover:translate-x-[150%] transition-transform duration-[1200ms] ease-in-out pointer-events-none z-20" />
+        )}
+        {isNinja && (
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-red-600/10 to-transparent -translate-x-[150%] group-hover:translate-x-[150%] transition-transform duration-[1000ms] ease-in-out pointer-events-none z-20" />
         )}
 
         {/* Ambient background glow orbs inside the card */}
@@ -47,6 +53,16 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
             <span className="absolute top-12 right-12 text-amber-400/60 text-[10px] animate-pulse pointer-events-none select-none z-10 filter drop-shadow-[0_0_3px_rgba(251,191,36,1)]">★</span>
             <span className="absolute bottom-24 right-8 text-amber-300/40 text-[13px] animate-pulse duration-1000 pointer-events-none select-none z-10 filter drop-shadow-[0_0_4px_rgba(251,191,36,0.8)]">★</span>
             <span className="absolute top-1/2 left-4 text-emerald-400/30 text-[11px] animate-pulse duration-700 pointer-events-none select-none z-10">★</span>
+          </>
+        )}
+        {isNinja && (
+          <>
+            <div className="absolute -right-[15%] -top-[15%] w-[180px] h-[180px] rounded-full bg-red-600/[0.08] blur-[45px] pointer-events-none group-hover:bg-red-600/[0.15] transition-colors duration-500 z-0" />
+            <div className="absolute -left-[15%] -bottom-[15%] w-[180px] h-[180px] rounded-full bg-rose-900/[0.08] blur-[45px] pointer-events-none group-hover:bg-rose-900/[0.15] transition-colors duration-500 z-0" />
+            
+            {/* Shurikens / Crosses */}
+            <span className="absolute top-14 right-10 text-red-500/50 text-[12px] animate-[spin_4s_linear_infinite] pointer-events-none select-none z-10 filter drop-shadow-[0_0_5px_rgba(220,38,38,0.8)]">✦</span>
+            <span className="absolute bottom-20 left-6 text-red-600/40 text-[14px] animate-[spin_6s_linear_infinite_reverse] pointer-events-none select-none z-10 filter drop-shadow-[0_0_5px_rgba(220,38,38,0.6)]">✦</span>
           </>
         )}
 
@@ -77,9 +93,11 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
         <div className={`w-full shrink-0 transition-all duration-300 promo-card-top-bar ${
           isCopa
             ? 'h-[5px] md:h-[6px] group-hover:h-[8px] bg-gradient-to-r from-emerald-500 via-amber-400 to-emerald-500 shadow-[0_2px_15px_rgba(251,191,36,0.4)]'
-            : isRanking 
-              ? 'h-[3px] group-hover:h-[4px] bg-gradient-to-r from-sky-500 to-indigo-600' 
-              : 'h-[3px] group-hover:h-[4px] bg-gradient-to-r from-emerald-400 to-teal-500'
+            : isNinja
+              ? 'h-[5px] md:h-[6px] group-hover:h-[8px] bg-gradient-to-r from-red-700 via-rose-500 to-red-800 shadow-[0_2px_15px_rgba(225,29,72,0.5)]'
+              : isRanking 
+                ? 'h-[3px] group-hover:h-[4px] bg-gradient-to-r from-sky-500 to-indigo-600' 
+                : 'h-[3px] group-hover:h-[4px] bg-gradient-to-r from-emerald-400 to-teal-500'
         }`}></div>
 
         {/* Floating background World Cup Trophy watermark */}
@@ -105,11 +123,18 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
                   🏆 COPA
                 </span>
               )}
+              {isNinja && (
+                <span className="text-[9px] font-black tracking-wider text-rose-300 bg-rose-950/40 border border-red-500/35 px-2 py-0.5 rounded uppercase font-mono flex items-center gap-0.5 shadow-[0_0_8px_rgba(225,29,72,0.3)]">
+                  🥋 FAIXA PRETA
+                </span>
+              )}
             </div>
             <span className={`text-[9px] font-extrabold tracking-wider uppercase px-2.5 py-1 rounded-md font-mono ${
               isCopa
                 ? 'text-amber-300 bg-amber-950/20 border border-amber-900/40'
-                : 'text-zinc-500 bg-zinc-900/30 border border-zinc-800/80'
+                : isNinja
+                  ? 'text-rose-300 bg-rose-950/20 border border-rose-900/40'
+                  : 'text-zinc-500 bg-zinc-900/30 border border-zinc-800/80'
             }`}>
               {isRanking ? 'RANKING' : 'DESAFIO'}
             </span>
@@ -121,7 +146,9 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
               <span className={`inline-flex items-center text-[9px] md:text-[10px] font-bold tracking-wider uppercase px-2.5 py-0.5 rounded font-mono ${
                 isCopa
                   ? 'text-emerald-400 bg-emerald-950/30 border border-emerald-800/40 shadow-[0_0_10px_rgba(16,185,129,0.15)]'
-                  : 'text-sky-400 bg-sky-950/20 border border-sky-900/30'
+                  : isNinja
+                    ? 'text-rose-400 bg-rose-950/30 border border-rose-800/40 shadow-[0_0_10px_rgba(225,29,72,0.15)]'
+                    : 'text-sky-400 bg-sky-950/20 border border-sky-900/30'
               }`}>
                 📍 {promo.cidade}
               </span>
@@ -132,7 +159,9 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
           <h3 className={`text-lg sm:text-xl font-bold mb-2 transition-all duration-300 tracking-tight promo-card-title flex flex-wrap items-center ${
             isCopa 
               ? 'text-amber-50 group-hover:brightness-125 group-hover:scale-[1.02] transform-origin-left drop-shadow-md'
-              : 'text-white group-hover:text-sky-400'
+              : isNinja
+                ? 'text-red-50 group-hover:brightness-125 group-hover:scale-[1.02] transform-origin-left drop-shadow-[0_0_8px_rgba(225,29,72,0.4)]'
+                : 'text-white group-hover:text-sky-400'
           }`}>
             {isCopa && /hexa/i.test(promo.nome) ? (
               promo.nome.split(/(hexa)/i).map((part, index) => 
@@ -151,7 +180,11 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
           
           {/* Description */}
           <p className={`text-sm mb-6 flex-grow truncate-2 line-clamp-2 leading-relaxed font-sans ${
-            isCopa ? 'text-emerald-100/70 font-medium' : 'text-zinc-400'
+            isCopa 
+              ? 'text-emerald-100/70 font-medium' 
+              : isNinja
+                ? 'text-rose-100/70 font-medium'
+                : 'text-zinc-400'
           }`}>
             {promo.descricao || 'Sem descrição cadastrada.'}
           </p>
@@ -181,11 +214,11 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
 
           {/* Card Footer */}
           <div className="pt-4 border-t border-white/[0.04] flex items-center justify-between text-[11px] text-zinc-500">
-            <div className={`flex items-center gap-1.5 font-bold tracking-wide ${isCopa ? 'text-amber-400/80' : 'text-zinc-500'}`}>
+            <div className={`flex items-center gap-1.5 font-bold tracking-wide ${isCopa ? 'text-amber-400/80' : isNinja ? 'text-rose-400/80' : 'text-zinc-500'}`}>
               <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              <span className={`font-mono font-medium ${isCopa ? 'text-amber-300/80' : 'text-zinc-400'}`}>
+              <span className={`font-mono font-medium ${isCopa ? 'text-amber-300/80' : isNinja ? 'text-rose-300/80' : 'text-zinc-400'}`}>
                 {formatData(promo.data_inicio)} — {formatData(promo.data_fim)}
               </span>
             </div>
@@ -193,7 +226,9 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
             <div className={`flex items-center gap-1 font-extrabold tracking-wider uppercase text-[10px] transition-all duration-300 promo-card-action ${
               isCopa 
                 ? 'text-amber-400 group-hover:text-amber-300 group-hover:scale-105 bg-amber-500/10 px-3 py-1.5 rounded-lg border border-amber-500/20 shadow-inner' 
-                : 'text-sky-400 group-hover:text-white'
+                : isNinja
+                  ? 'text-rose-400 group-hover:text-rose-300 group-hover:scale-105 bg-rose-500/10 px-3 py-1.5 rounded-lg border border-rose-500/20 shadow-[0_0_8px_rgba(225,29,72,0.15)]'
+                  : 'text-sky-400 group-hover:text-white'
             }`}>
               <span>{isRanking ? 'VER RANKING' : 'ACESSAR'}</span>
               <svg className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">

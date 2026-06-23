@@ -3,17 +3,18 @@
 import { useEffect, useState } from 'react'
 import LightningBackground from './LightningBackground'
 import WorldCupBackground from './WorldCupBackground'
+import NinjaBackground from './NinjaBackground'
 
 interface DynamicBackgroundProps {
-  temaAtivo: 'raios' | 'copa'
+  temaAtivo: 'raios' | 'copa' | 'ninja'
 }
 
 export default function DynamicBackground({ temaAtivo }: DynamicBackgroundProps) {
-  const [forcedTheme, setForcedTheme] = useState<'raios' | 'copa' | null>(null)
+  const [forcedTheme, setForcedTheme] = useState<'raios' | 'copa' | 'ninja' | null>(null)
 
   useEffect(() => {
     const handleForceTheme = (e: Event) => {
-      const customEvent = e as CustomEvent<'raios' | 'copa' | null>
+      const customEvent = e as CustomEvent<'raios' | 'copa' | 'ninja' | null>
       setForcedTheme(customEvent.detail)
     }
 
@@ -29,16 +30,20 @@ export default function DynamicBackground({ temaAtivo }: DynamicBackgroundProps)
   useEffect(() => {
     if (currentTheme === 'copa') {
       document.body.classList.add('tema-copa')
-      document.body.classList.remove('tema-raios')
+      document.body.classList.remove('tema-raios', 'tema-ninja')
+    } else if (currentTheme === 'ninja') {
+      document.body.classList.add('tema-ninja')
+      document.body.classList.remove('tema-raios', 'tema-copa')
     } else {
       document.body.classList.add('tema-raios')
-      document.body.classList.remove('tema-copa')
+      document.body.classList.remove('tema-copa', 'tema-ninja')
     }
     return () => {
-      document.body.classList.remove('tema-copa', 'tema-raios')
+      document.body.classList.remove('tema-copa', 'tema-raios', 'tema-ninja')
     }
   }, [currentTheme])
 
-  return currentTheme === 'copa' ? <WorldCupBackground /> : <LightningBackground />
+  if (currentTheme === 'ninja') return <NinjaBackground />
+  if (currentTheme === 'copa') return <WorldCupBackground />
+  return <LightningBackground />
 }
-
