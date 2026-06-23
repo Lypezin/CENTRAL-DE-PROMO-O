@@ -117,7 +117,7 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
             <div className="mb-2.5">
               <span className={`inline-flex items-center text-[9px] md:text-[10px] font-bold tracking-wider uppercase px-2.5 py-0.5 rounded font-mono ${
                 isCopa
-                  ? 'text-emerald-400 bg-emerald-950/30 border border-emerald-800/40'
+                  ? 'text-emerald-400 bg-emerald-950/30 border border-emerald-800/40 shadow-[0_0_10px_rgba(16,185,129,0.15)]'
                   : 'text-sky-400 bg-sky-950/20 border border-sky-900/30'
               }`}>
                 📍 {promo.cidade}
@@ -125,13 +125,25 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
             </div>
           )}
 
-          {/* Title */}
-          <h3 className={`text-lg font-bold mb-2 transition-colors duration-200 tracking-tight promo-card-title ${
+          {/* Title with HEXA highlight */}
+          <h3 className={`text-lg font-bold mb-2 transition-all duration-300 tracking-tight promo-card-title ${
             isCopa 
-              ? 'text-gradient-copa group-hover:brightness-110'
+              ? 'text-amber-100 group-hover:brightness-125 group-hover:scale-[1.01] transform-origin-left'
               : 'text-white group-hover:text-sky-400'
           }`}>
-            {promo.nome}
+            {isCopa && /hexa/i.test(promo.nome) ? (
+              promo.nome.split(/(hexa)/i).map((part, index) => 
+                /hexa/i.test(part) ? (
+                  <span key={index} className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 via-amber-400 to-yellow-200 animate-pulse drop-shadow-[0_0_12px_rgba(251,191,36,0.8)] font-black text-[22px] mx-1 inline-block transform -skew-x-6">
+                    {part.toUpperCase()}
+                  </span>
+                ) : (
+                  <span key={index}>{part}</span>
+                )
+              )
+            ) : (
+              promo.nome
+            )}
           </h3>
           
           {/* Description */}
