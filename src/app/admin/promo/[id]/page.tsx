@@ -12,7 +12,7 @@ import { getPremioFromConfig } from '@/lib/config'
 import StatsOverview from '@/components/admin/StatsOverview'
 import ExcelImportZone from '@/components/admin/ExcelImportZone'
 import GeneralSettingsForm from '@/components/admin/GeneralSettingsForm'
-import CampaignMechanicsForm from '@/components/admin/CampaignMechanicsForm'
+
 import TurnoPrizesConfigurator from '@/components/admin/TurnoPrizesConfigurator'
 const TURNO_LABELS: Record<string, string> = {
   'CAFE_DA_MANHA': 'Café da Manhã',
@@ -326,15 +326,7 @@ export default function EditPromoPage() {
               saving={saving} 
             />
 
-            {/* Form 2: Mechanics metrics definitions */}
-            <CampaignMechanicsForm 
-              promo={promo}
-              setPromo={setPromo}
-              onSave={handleUpdate}
-              saving={saving}
-              activeTurnos={activeTurnos}
-              setTurnoEditorAtivo={setTurnoEditorAtivo}
-            />
+
 
             {/* Form 3: Shift prizes visual matrix */}
             <TurnoPrizesConfigurator 
