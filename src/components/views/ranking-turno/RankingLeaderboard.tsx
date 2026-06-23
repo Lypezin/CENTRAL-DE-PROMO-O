@@ -80,4 +80,4 @@ function RankingLeaderboardComponent({
   )
 }
 
-export default memo(RankingLeaderboardComponent)
+export const RankingLeaderboard = memo(RankingLeaderboardComponent)

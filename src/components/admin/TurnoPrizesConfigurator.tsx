@@ -1,5 +1,5 @@
-import TurnoPrizeRow from './TurnoPrizeRow'
 'use client'
+import TurnoPrizeRow from './TurnoPrizeRow'
 
 import React from 'react'
 import { Promocao } from '@/lib/supabase'

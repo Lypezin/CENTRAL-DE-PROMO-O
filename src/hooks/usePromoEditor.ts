@@ -224,7 +224,7 @@ export function usePromoEditor(id: string | string[]) {
         return
       }
       
-      XLSX.writeFile(wb, \`ranking_\${promo.slug}_\${new Date().toISOString().slice(0, 10)}.xlsx\`)
+      XLSX.writeFile(wb, `ranking_${promo.slug}_${new Date().toISOString().slice(0, 10)}.xlsx`)
       toast.success('Ranking exportado para Excel com sucesso!')
     } catch (e) {
       console.error(e)
