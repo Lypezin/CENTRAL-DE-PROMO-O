@@ -16,7 +16,7 @@ function getIp(request: NextRequest): string {
 async function logAction(
   acao: string,
   detalhe: string,
-  status: 'success' | 'error',
+  status: 'success' | 'error' | 'warning',
   metadata: Record<string, unknown> = {},
   ip = 'server'
 ) {
