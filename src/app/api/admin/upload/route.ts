@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabaseServer'
-import * as XLSX from 'xlsx'
-import { normalizarPeriodo } from '@/lib/config'
 import { verifySessionToken } from '@/lib/auth'
+import { processExcelBuffer } from '@/lib/admin/excelParser'
 
 function isAuthenticated(request: NextRequest): boolean {
   const token = request.cookies.get('admin_auth_session')?.value
@@ -24,58 +23,6 @@ async function logAction(
   await supabaseAdmin.from('admin_logs').insert({ acao, detalhe, status, metadata, ip })
 }
 
-const MAPA_COLUNAS: Record<string, string> = {
-  'data_do_periodo': 'data_do_periodo',
-  'data do periodo': 'data_do_periodo',
-  'data do período': 'data_do_periodo',
-  'periodo': 'periodo',
-  'período': 'periodo',
-  'duracao_do_periodo': 'duracao_do_periodo',
-  'duração do período': 'duracao_do_periodo',
-  'numero_minimo_de_entregadores_regulares_na_escala': 'numero_minimo_de_entregadores_regulares_na_escala',
-  'tag': 'tag',
-  'id_da_pessoa_entregadora': 'id_da_pessoa_entregadora',
-  'pessoa_entregadora': 'pessoa_entregadora',
-  'pessoa entregadora': 'pessoa_entregadora',
-  'praca': 'praca',
-  'praça': 'praca',
-  'sub_praca': 'sub_praca',
-  'sub praça': 'sub_praca',
-  'origem': 'origem',
-  'tempo_disponivel_escalado': 'tempo_disponivel_escalado',
-  'tempo_disponivel_absoluto': 'tempo_disponivel_absoluto',
-  'numero_de_corridas_ofertadas': 'numero_de_corridas_ofertadas',
-  'numero_de_corridas_aceitas': 'numero_de_corridas_aceitas',
-  'numero_de_corridas_rejeitadas': 'numero_de_corridas_rejeitadas',
-  'numero_de_corridas_completadas': 'numero_de_corridas_completadas',
-  'numero_de_corridas_canceladas_pela_pessoa_entregadora': 'numero_de_corridas_canceladas_pela_pessoa_entregadora',
-  'numero_de_pedidos_aceitos_e_concluidos': 'numero_de_pedidos_aceitos_e_concluidos',
-  'soma_das_taxas_das_corridas_aceitas': 'soma_das_taxas_das_corridas_aceitas',
-  'pontos': 'pontos',
-}
-
-function normalizarColuna(col: string): string {
-  return String(col ?? '').toLowerCase().trim().replace(/\s+/g, ' ')
-}
-
-function parseExcelDate(value: unknown): string {
-  if (value === null || value === undefined || value === '') return ''
-  if (typeof value === 'number') {
-    const data = XLSX.SSF.parse_date_code(value)
-    const d = new Date(Date.UTC(data.y, data.m - 1, data.d))
-    return d.toISOString().split('T')[0]
-  }
-  if (typeof value === 'string') {
-    const matchBR = value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/)
-    if (matchBR) return `${matchBR[3]}-${matchBR[2]}-${matchBR[1]}`
-    const d = new Date(value)
-    if (!isNaN(d.getTime())) return d.toISOString().split('T')[0]
-    return value
-  }
-  return String(value)
-}
-
-// POST: Recebe arquivo Excel via FormData, processa no servidor
 export async function POST(request: NextRequest) {
   const ip = getIp(request)
 
@@ -102,114 +49,37 @@ export async function POST(request: NextRequest) {
     const nomeArquivo = file.name
     const extensao = nomeArquivo.split('.').pop()?.toLowerCase()
     const mimeAceitos = [
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
-      'application/vnd.ms-excel', // .xls
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-excel',
     ]
 
-    // Validação de segurança: bloquear uploads de arquivos maliciosos ou extensões incompatíveis
     if (!['xlsx', 'xls'].includes(extensao || '') && !mimeAceitos.includes(file.type)) {
       await logAction('upload_erro', `Tentativa de upload de arquivo inválido: ${nomeArquivo} (Type: ${file.type})`, 'error', { ip }, ip)
       return NextResponse.json({ error: 'Tipo de arquivo inválido. Apenas planilhas Excel (.xlsx ou .xls) são permitidas.' }, { status: 400 })
     }
 
     const tamanhoMB = (file.size / 1024 / 1024).toFixed(2)
-
     await logAction('upload_inicio', `Arquivo: ${nomeArquivo} (${tamanhoMB}MB)`, 'success', { nome: nomeArquivo, tamanho_bytes: file.size }, ip)
 
-    // Parse Excel no servidor (evita enviar JSON grande pelo cliente)
     const buffer = Buffer.from(await file.arrayBuffer())
-    const wb = XLSX.read(buffer, { type: 'buffer', cellDates: false })
-    const ws = wb.Sheets[wb.SheetNames[0]]
-    const rawData = XLSX.utils.sheet_to_json(ws, { header: 1 }) as unknown[][]
-
-    if (rawData.length < 2) {
-      await logAction('upload_erro', 'Planilha vazia', 'error', { nome: nomeArquivo }, ip)
-      return NextResponse.json({ error: 'Planilha vazia ou sem dados' }, { status: 400 })
+    
+    let parseResult;
+    try {
+      parseResult = processExcelBuffer(buffer, promocaoId);
+    } catch (err: any) {
+      await logAction('upload_erro', err.message, 'error', { nome: nomeArquivo }, ip)
+      return NextResponse.json({ error: err.message }, { status: 400 })
     }
 
-    const headers = (rawData[0] as string[]).map(h => normalizarColuna(h))
-    const rows = rawData.slice(1)
-
-    // Mapeia colunas
-    const colMap: Record<number, string> = {}
-    const colunasNaoMapeadas: string[] = []
-    headers.forEach((h, i) => {
-      const mapped = MAPA_COLUNAS[h] || MAPA_COLUNAS[h.replace(/_/g, ' ')]
-      if (mapped) colMap[i] = mapped
-      else if (h) colunasNaoMapeadas.push(h)
-    })
+    const { registrosUnicos, linhasIgnoradas, registrosMesclados, colMap, colunasNaoMapeadas } = parseResult;
 
     await logAction(
       'upload_parse',
-      `${rows.length} linhas lidas, ${Object.keys(colMap).length} colunas mapeadas`,
+      `${registrosUnicos.length + registrosMesclados + linhasIgnoradas} linhas lidas, ${Object.keys(colMap).length} colunas mapeadas`,
       'success',
       { colunas_mapeadas: Object.values(colMap), colunas_ignoradas: colunasNaoMapeadas },
       ip
     )
-
-    // Converte linhas
-    const registros = rows
-      .filter(row => Array.isArray(row) && row.some(c => c !== null && c !== ''))
-      .map(row => {
-        const obj: Record<string, string | number | null> = {}
-        Object.entries(colMap).forEach(([idx, campo]) => {
-          const val = (row as unknown[])[Number(idx)]
-          if (campo === 'data_do_periodo') {
-            obj[campo] = parseExcelDate(val)
-          } else if (campo === 'periodo') {
-            // Normaliza periodos: 'CAFÉ DA MANHÃ' → 'CAFE_DA_MANHA'
-            const periodoStr = val !== null && val !== undefined ? String(val).trim() : ''
-            obj[campo] = normalizarPeriodo(periodoStr) ?? periodoStr
-          } else if (campo === 'soma_das_taxas_das_corridas_aceitas') {
-            // Valores vêm em centavos no Excel → dividir por 100
-            const num = val !== null && val !== undefined ? Number(val) : NaN
-            obj[campo] = isNaN(num) ? null : String(Math.round(num) / 100)
-          } else {
-            obj[campo] = val !== null && val !== undefined ? String(val).trim() : null
-          }
-        })
-        obj.promocao_id = promocaoId
-        // Fallback: se periodo não veio no Excel, usar GERAL
-        if (!obj.periodo || obj.periodo === '') {
-          obj.periodo = 'GERAL'
-        }
-        return obj
-      })
-      .filter(r => r.data_do_periodo && r.id_da_pessoa_entregadora)
-
-    const linhasIgnoradas = rows.length - registros.length
-
-    // Agregar: planilha pode ter linhas quebradas (ex: por sub-praça) com mesma chave (data+periodo+id)
-    // Soma os valores numéricos em vez de descartar
-    const mapaDedup = new Map<string, Record<string, string | number | null>>()
-    const camposNumericosParaSomar = [
-      'tempo_disponivel_escalado',
-      'tempo_disponivel_absoluto',
-      'numero_de_corridas_ofertadas',
-      'numero_de_corridas_aceitas',
-      'numero_de_corridas_rejeitadas',
-      'numero_de_corridas_completadas',
-      'numero_de_corridas_canceladas_pela_pessoa_entregadora',
-      'numero_de_pedidos_aceitos_e_concluidos',
-      'soma_das_taxas_das_corridas_aceitas',
-      'pontos'
-    ]
-
-    for (const r of registros) {
-      const chave = `${r.data_do_periodo}|${r.periodo}|${r.id_da_pessoa_entregadora}`
-      if (mapaDedup.has(chave)) {
-        const existente = mapaDedup.get(chave)!
-        for (const campo of camposNumericosParaSomar) {
-          const valExistente = Number(existente[campo]) || 0
-          const valNovo = Number(r[campo]) || 0
-          existente[campo] = valExistente + valNovo
-        }
-      } else {
-        mapaDedup.set(chave, { ...r })
-      }
-    }
-    const registrosUnicos = Array.from(mapaDedup.values())
-    const registrosMesclados = registros.length - registrosUnicos.length
 
     await logAction(
       'upload_filtro',
@@ -224,7 +94,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Nenhum registro válido encontrado. Verifique os cabeçalhos da planilha.' }, { status: 400 })
     }
 
-    // Upsert em lotes de 500
     const TAMANHO_LOTE = 500
     let totalInseridos = 0
     let totalAtualizados = 0
@@ -250,106 +119,38 @@ export async function POST(request: NextRequest) {
       } else if (data && data.length > 0) {
         totalInseridos += data[0].inseridos || 0
         totalAtualizados += data[0].atualizados || 0
-        await logAction(
-          'upload_lote_ok',
-          `Lote ${numeroLote}: +${data[0].inseridos} inseridos, ~${data[0].atualizados} atualizados`,
-          'success',
-          { lote: numeroLote, inseridos: data[0].inseridos, atualizados: data[0].atualizados },
-          ip
-        )
       }
     }
 
-    const duracaoMs = Date.now() - inicio
-
-    // Registra no histórico de uploads
-    await supabaseAdmin.from('uploads').insert({
-      nome_arquivo: nomeArquivo,
-      total_linhas: registrosUnicos.length,
-      status: loteErros > 0 ? 'parcial' : 'success',
-      mensagem: `${totalInseridos} inseridos, ${totalAtualizados} atualizados${registrosMesclados > 0 ? `, ${registrosMesclados} registros mesclados` : ''}${loteErros > 0 ? `, ${loteErros} lotes com erro` : ''}`,
-    })
-
-    await logAction(
-      'upload_concluido',
-      `${nomeArquivo}: ${totalInseridos} inseridos, ${totalAtualizados} atualizados em ${(duracaoMs / 1000).toFixed(1)}s`,
-      loteErros > 0 ? 'error' : 'success',
-      { inseridos: totalInseridos, atualizados: totalAtualizados, duracao_ms: duracaoMs, lote_erros: loteErros, mesclados: registrosMesclados },
-      ip
-    )
-
-    return NextResponse.json({
-      success: true,
+    const tempoMs = Date.now() - inicio
+    const finalStatus = loteErros === 0 ? 'success' : 'warning'
+    const finalDetail = `Processado em ${tempoMs}ms. Inseridos: ${totalInseridos}, Atualizados: ${totalAtualizados}, Erros de lote: ${loteErros}`
+    
+    await logAction('upload_concluido', finalDetail, finalStatus, { 
+      tempo_ms: tempoMs,
       inseridos: totalInseridos,
       atualizados: totalAtualizados,
-      total: registrosUnicos.length,
-      ignorados: linhasIgnoradas,
-      duracao_ms: duracaoMs,
-    })
-  } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Erro interno'
-    await logAction('upload_exception', msg, 'error', {}, ip)
-    console.error('Erro no upload:', error)
-    return NextResponse.json({ error: msg }, { status: 500 })
-  }
-}
+      lotes_com_erro: loteErros
+    }, ip)
 
-// DELETE: Limpar dados
-export async function DELETE(request: NextRequest) {
-  const ip = getIp(request)
-
-  if (!isAuthenticated(request)) {
-    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
-  }
-
-  try {
-    const { searchParams } = new URL(request.url)
-    const dataInicio = searchParams.get('data_inicio')
-    const dataFim = searchParams.get('data_fim')
-
-    let error: any;
-
-    if (dataInicio && dataFim) {
-      const res = await supabaseAdmin.rpc('limpar_entregas', { p_data_inicio: dataInicio, p_data_fim: dataFim })
-      error = res.error
-      await logAction('delete_periodo', `Deletando de ${dataInicio} a ${dataFim}`, 'success', { dataInicio, dataFim }, ip)
-    } else {
-      const res = await supabaseAdmin.rpc('limpar_entregas', { p_data_inicio: null, p_data_fim: null })
-      error = res.error
-      await logAction('delete_tudo', 'Deletando TODOS os dados de entregas', 'success', {}, ip)
+    if (loteErros > 0) {
+      return NextResponse.json({ 
+        success: true, 
+        message: `Processamento concluído com alguns erros. ${totalInseridos} inseridos, ${totalAtualizados} atualizados.`,
+        warning: true
+      })
     }
 
-    if (error) throw error
+    return NextResponse.json({ 
+      success: true, 
+      message: `Sucesso! ${totalInseridos} inseridos, ${totalAtualizados} atualizados em ${(tempoMs/1000).toFixed(1)}s.` 
+    })
 
-    return NextResponse.json({ success: true })
   } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Erro interno'
-    await logAction('delete_erro', msg, 'error', {}, ip)
-    return NextResponse.json({ error: msg }, { status: 500 })
+    const tempoMs = Date.now() - inicio
+    const msg = error instanceof Error ? error.message : 'Erro interno desconhecido'
+    await logAction('upload_falha_geral', msg, 'error', { tempo_ms: tempoMs }, ip)
+    console.error('Upload Error:', error)
+    return NextResponse.json({ error: 'Falha ao processar o arquivo no servidor. Tente novamente.' }, { status: 500 })
   }
-}
-
-// GET: Histórico de uploads
-export async function GET(request: NextRequest) {
-  if (!isAuthenticated(request)) {
-    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
-  }
-
-  const { data: historico, error: err1 } = await supabaseAdmin
-    .from('uploads')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(30)
-
-  const { data: logs, error: err2 } = await supabaseAdmin
-    .from('admin_logs')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(100)
-
-  if (err1 || err2) {
-    return NextResponse.json({ error: err1?.message || err2?.message }, { status: 500 })
-  }
-
-  return NextResponse.json({ historico, logs })
 }

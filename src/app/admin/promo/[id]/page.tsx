@@ -1,262 +1,44 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import StatusBadge from '@/components/ui/StatusBadge'
-import { Promocao, PromocaoStats, supabase } from '@/lib/supabase'
-import { useToast } from '@/components/ui/Toast'
-import { getPremioFromConfig } from '@/lib/config'
+import { usePromoEditor } from '@/hooks/usePromoEditor'
 
 // Admin Subcomponents
 import StatsOverview from '@/components/admin/StatsOverview'
 import ExcelImportZone from '@/components/admin/ExcelImportZone'
 import GeneralSettingsForm from '@/components/admin/GeneralSettingsForm'
-
 import TurnoPrizesConfigurator from '@/components/admin/TurnoPrizesConfigurator'
-const TURNO_LABELS: Record<string, string> = {
-  'CAFE_DA_MANHA': 'Café da Manhã',
-  'ALMOCO': 'Almoço',
-  'TARDE': 'Tarde',
-  'JANTAR': 'Jantar',
-  'MADRUGADA': 'Madrugada',
-  'GERAL': 'Geral'
-}
 
 export default function EditPromoPage() {
   const { id } = useParams()
-  const router = useRouter()
-  const toast = useToast()
-  const [promo, setPromo] = useState<Promocao | null>(null)
-  const [stats, setStats] = useState<PromocaoStats | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
-  const [deleting, setDeleting] = useState(false)
-  const [confirmDelete, setConfirmDelete] = useState(false)
-  const [clearingData, setClearingData] = useState(false)
-  const [confirmClearData, setConfirmClearData] = useState(false)
-  const [exporting, setExporting] = useState(false)
-
-  // Subcomponents Visual Editor States
-  const [localPremios, setLocalPremios] = useState<any[]>([])
-  const [turnoEditorAtivo, setTurnoEditorAtivo] = useState<string>('CAFE_DA_MANHA')
-  const [activeTurnos, setActiveTurnos] = useState<string[]>(['CAFE_DA_MANHA', 'ALMOCO', 'TARDE', 'JANTAR', 'MADRUGADA'])
-
-  const carregarPromo = useCallback(async () => {
-    try {
-      const res = await fetch(`/api/promocoes/${id}`)
-      if (res.ok) {
-        const data = await res.json()
-        const initializedPromo = {
-          ...data.promocao,
-          config_regras: {
-            limite_ranking: data.promocao.config_regras?.limite_ranking ?? 15,
-            regras_texto: data.promocao.config_regras?.regras_texto ?? [],
-            mecanica: data.promocao.config_regras?.mecanica || {
-              metrica: 'corridas_completadas',
-              tipo_calculo: 'ranking',
-              agrupamento: 'turno',
-              filtros: [],
-              metas_predefinidas: [],
-              niveis: []
-            }
-          }
-        }
-        setPromo(initializedPromo)
-        setStats(data.stats)
-        setLocalPremios(data.promocao.config_premios || [])
-        const loadedTurnos = data.promocao.config_turnos || ['CAFE_DA_MANHA', 'ALMOCO', 'TARDE', 'JANTAR', 'MADRUGADA']
-        setActiveTurnos(loadedTurnos)
-      }
-    } catch (e) {
-      console.error(e)
-    } finally {
-      setLoading(false)
-    }
-  }, [id])
-
-  useEffect(() => {
-    carregarPromo()
-  }, [carregarPromo])
-
-  // Sincroniza a lista de turnos ativos com o objeto da promoção atual
-  useEffect(() => {
-    if (promo?.config_turnos) {
-      setActiveTurnos(promo.config_turnos)
-    }
-  }, [promo?.config_turnos])
-
-  // Gerencia a aba ativa do editor de turnos de forma condicional ao agrupamento da métrica
-  useEffect(() => {
-    const isGeral = promo?.config_regras?.mecanica?.agrupamento === 'geral'
-    if (isGeral) {
-      if (turnoEditorAtivo !== 'GERAL') {
-        setTurnoEditorAtivo('GERAL')
-      }
-    } else {
-      if (activeTurnos.length > 0 && !activeTurnos.includes(turnoEditorAtivo) && turnoEditorAtivo !== 'GERAL') {
-        setTurnoEditorAtivo(activeTurnos[0])
-      }
-    }
-  }, [activeTurnos, turnoEditorAtivo, promo])
-
-
-  const handleUpdate = async (fields: Partial<Promocao>) => {
-    setSaving(true)
-    try {
-      const res = await fetch(`/api/promocoes/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(fields)
-      })
-      if (res.ok) {
-        const data = await res.json()
-        const initializedData = {
-          ...data,
-          config_regras: {
-            limite_ranking: data.config_regras?.limite_ranking ?? 15,
-            regras_texto: data.config_regras?.regras_texto ?? [],
-            mecanica: data.config_regras?.mecanica || {
-              metrica: 'corridas_completadas',
-              tipo_calculo: 'ranking',
-              agrupamento: 'turno',
-              filtros: [],
-              metas_predefinidas: [],
-              niveis: []
-            }
-          }
-        }
-        setPromo(initializedData)
-        setLocalPremios(data.config_premios || [])
-        setActiveTurnos(data.config_turnos || ['CAFE_DA_MANHA', 'ALMOCO', 'TARDE', 'JANTAR', 'MADRUGADA'])
-        toast.success('Promoção atualizada com sucesso!')
-      }
-    } catch (e) {
-      console.error(e)
-      toast.error('Erro ao atualizar promoção.')
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  const handleDelete = async () => {
-    if (!confirmDelete) {
-      setConfirmDelete(true)
-      return
-    }
-    setDeleting(true)
-    try {
-      const res = await fetch(`/api/promocoes/${id}`, { method: 'DELETE' })
-      if (res.ok) {
-        toast.success('Promoção excluída com sucesso!')
-        router.push('/admin')
-      } else {
-        toast.error('Erro ao excluir promoção.')
-      }
-    } catch (e) {
-      console.error(e)
-      toast.error('Erro ao excluir promoção.')
-    } finally {
-      setDeleting(false)
-      setConfirmDelete(false)
-    }
-  }
-
-  const handleClearData = async () => {
-    if (!confirmClearData) {
-      setConfirmClearData(true)
-      return
-    }
-    setClearingData(true)
-    try {
-      const res = await fetch(`/api/promocoes/${id}?apenas_dados=true`, { method: 'DELETE' })
-      if (res.ok) {
-        toast.success('Dados da planilha excluídos com sucesso!')
-        carregarPromo() // Recarrega estatísticas zeradas
-      } else {
-        toast.error('Erro ao excluir dados da planilha.')
-      }
-    } catch (e) {
-      console.error(e)
-      toast.error('Erro ao excluir dados da planilha.')
-    } finally {
-      setClearingData(false)
-      setConfirmClearData(false)
-    }
-  }
-
-  const handleExportRanking = async () => {
-    if (!promo) return
-    setExporting(true)
-    try {
-      const XLSX = await import('xlsx')
-      const agrupamento = promo.config_regras?.mecanica?.agrupamento || 'turno'
-      const turnos = agrupamento === 'geral' 
-        ? ['GERAL'] 
-        : (activeTurnos && activeTurnos.length > 0 ? activeTurnos : ['CAFE_DA_MANHA', 'ALMOCO', 'TARDE', 'JANTAR', 'MADRUGADA'])
-      
-      // Limite do ranking visível
-      const limiteRanking = promo.config_regras?.limite_ranking ?? 15
-      
-      // Criar novo Workbook do Excel
-      const wb = XLSX.utils.book_new()
-      let hasData = false
-      
-      for (const turno of turnos) {
-        const { data, error } = await supabase.rpc('get_ranking_por_promocao', {
-          p_promocao_id: promo.id,
-          p_periodo: turno,
-          p_limite: limiteRanking
-        })
-        
-        if (!error && data && data.length > 0) {
-          hasData = true
-          // Dupla garantia de que apenas o ranking visível será exportado
-          const visibleData = data.slice(0, limiteRanking)
-          
-          // Formata as linhas para o Excel
-          const sheetRows = visibleData.map((row: any) => {
-            const premio = getPremioFromConfig(localPremios || [], turno, row.posicao)
-            return {
-              'Posição': row.posicao,
-              'Entregador': row.pessoa_entregadora,
-              'ID Entregador': row.id_da_pessoa_entregadora,
-              'Praça/Cidade': row.praca,
-              'Corridas Completadas': row.total_corridas_completadas,
-              'Total Taxas (BRL)': row.total_soma_taxas,
-              'Prêmio Estimado (BRL)': premio
-            }
-          })
-          
-          // Cria a planilha a partir dos dados JSON
-          const ws = XLSX.utils.json_to_sheet(sheetRows)
-          
-          // Nome da aba limitado a 31 caracteres (limite máximo suportado pelo Excel)
-          const rawSheetName = TURNO_LABELS[turno] || turno
-          const sheetName = rawSheetName.slice(0, 31)
-          
-          // Adiciona a planilha ao workbook
-          XLSX.utils.book_append_sheet(wb, ws, sheetName)
-        }
-      }
-      
-      if (!hasData) {
-        toast.error('Nenhum dado encontrado para exportar.')
-        setExporting(false)
-        return
-      }
-      
-      // Escrever arquivo Excel (.xlsx) e disparar o download
-      XLSX.writeFile(wb, `ranking_${promo.slug}_${new Date().toISOString().slice(0, 10)}.xlsx`)
-      
-      toast.success('Ranking exportado para Excel com sucesso!')
-    } catch (e) {
-      console.error(e)
-      toast.error('Erro ao exportar ranking.')
-    } finally {
-      setExporting(false)
-    }
-  }
+  
+  const {
+    promo,
+    setPromo,
+    stats,
+    loading,
+    saving,
+    deleting,
+    confirmDelete,
+    setConfirmDelete,
+    clearingData,
+    confirmClearData,
+    setConfirmClearData,
+    exporting,
+    localPremios,
+    setLocalPremios,
+    turnoEditorAtivo,
+    setTurnoEditorAtivo,
+    activeTurnos,
+    setActiveTurnos,
+    carregarPromo,
+    handleUpdate,
+    handleDelete,
+    handleClearData,
+    handleExportRanking
+  } = usePromoEditor(id)
 
   if (loading) return <div className="p-8 text-center text-white font-mono">Carregando portal...</div>
   if (!promo) return <div className="p-8 text-center text-red-500 font-mono">Promoção não encontrada.</div>
@@ -345,8 +127,6 @@ export default function EditPromoPage() {
               setTurnoEditorAtivo={setTurnoEditorAtivo}
             />
 
-
-
             {/* Form 3: Shift prizes visual matrix */}
             <TurnoPrizesConfigurator 
               promo={promo}
@@ -399,25 +179,25 @@ export default function EditPromoPage() {
                 </button>
               </div>
 
-              <div className="pt-5 border-t border-white/[0.04]">
-                <h3 className="font-bold text-zinc-400 mb-2 flex items-center gap-1.5 text-xs uppercase tracking-wider font-mono">
-                  <span>⚠️</span> Excluir Campanha Permanentemente
+              <div className="pt-6 border-t border-red-500/10">
+                <h3 className="font-bold text-red-400 mb-2 flex items-center gap-1.5 text-xs uppercase tracking-wider font-mono">
+                  <span>⚠️</span> Zona de Perigo
                 </h3>
                 <p className="text-[11px] text-zinc-500 mb-4 leading-relaxed">
-                  Deleta a página pública da promoção, configurações de prêmios e histórico associado permanentemente.
+                  A exclusão da promoção apagará todas as configurações de regras e links associados a ela.
                 </p>
                 {confirmDelete && (
                   <div className="text-[10px] text-red-400 mb-2 font-extrabold uppercase tracking-wide font-mono animate-pulse">
-                    ⚠️ Atenção: Esta ação não pode ser desfeita! Clique novamente para confirmar a exclusão.
+                    ⚠️ Atenção: Clique novamente para confirmar a EXCLUSÃO PERMANENTE desta promoção.
                   </div>
                 )}
                 <button 
                   onClick={handleDelete}
                   onBlur={() => setConfirmDelete(false)}
                   disabled={deleting}
-                  className="text-xs text-red-500/50 hover:text-red-400 font-extrabold transition-all w-full text-left bg-transparent border-none p-0 cursor-pointer uppercase tracking-wider font-mono select-none"
+                  className="admin-btn-danger w-full text-xs !py-2.5"
                 >
-                  {deleting ? 'Excluindo página...' : confirmDelete ? 'Confirmar Deleção da Página' : 'Excluir promoção permanentemente'}
+                  {deleting ? 'Excluindo...' : confirmDelete ? 'Confirmar Exclusão' : 'Excluir Promoção'}
                 </button>
               </div>
             </div>
