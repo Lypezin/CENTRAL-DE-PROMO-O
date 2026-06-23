@@ -12,26 +12,26 @@ export default function NinjaBackground() {
   if (!mounted) return null
 
   return (
-    <div className="fixed inset-0 pointer-events-none z-[-1] overflow-hidden bg-black">
-      {/* Grade de fundo escurecida avermelhada */}
-      <div className="absolute inset-0 opacity-[0.15]" 
+    <div className="fixed inset-0 pointer-events-none z-[-1] overflow-hidden bg-[#030303]">
+      {/* Grade de fundo escurecida prateada/chumbo */}
+      <div className="absolute inset-0 opacity-[0.25]" 
            style={{ 
-             backgroundImage: 'linear-gradient(rgba(153, 27, 27, 0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(153, 27, 27, 0.3) 1px, transparent 1px)', 
+             backgroundImage: 'linear-gradient(rgba(113, 113, 122, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(113, 113, 122, 0.15) 1px, transparent 1px)', 
              backgroundSize: '40px 40px' 
            }}>
       </div>
       
       {/* Sombras radiais profundas */}
-      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-red-900/10 blur-[120px] rounded-full mix-blend-screen" />
-      <div className="absolute bottom-[-10%] right-[-5%] w-[600px] h-[600px] bg-rose-950/20 blur-[150px] rounded-full mix-blend-screen" />
-      <div className="absolute top-[40%] left-[30%] w-[300px] h-[300px] bg-red-800/5 blur-[100px] rounded-full mix-blend-screen animate-pulse duration-1000" />
+      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-zinc-600/5 blur-[120px] rounded-full mix-blend-screen" />
+      <div className="absolute bottom-[-10%] right-[-5%] w-[600px] h-[600px] bg-zinc-800/20 blur-[150px] rounded-full mix-blend-screen" />
+      <div className="absolute top-[40%] left-[30%] w-[300px] h-[300px] bg-zinc-400/5 blur-[100px] rounded-full mix-blend-screen animate-pulse duration-1000" />
 
-      {/* Névoa Carmesim Dinâmica Inferior */}
-      <div className="absolute bottom-0 left-0 w-full h-[40vh] bg-gradient-to-t from-red-950/30 to-transparent"></div>
+      {/* Névoa Platinada Dinâmica Inferior */}
+      <div className="absolute bottom-0 left-0 w-full h-[40vh] bg-gradient-to-t from-zinc-900/40 to-transparent"></div>
 
-      {/* Partículas flutuantes estilo Faíscas/Cinzas Vermelhas */}
+      {/* Partículas flutuantes estilo Faíscas/Cinzas Prateadas */}
       <div className="absolute inset-0 perspective-[1000px]">
-        {/* Usaremos um efeito de CSS simples para simular faíscas flutuando na tela */}
+        {/* Usaremos um efeito de CSS simples para simular cinzas flutuando na tela */}
         {Array.from({ length: 15 }).map((_, i) => {
           const size = Math.random() * 4 + 2; // de 2px a 6px
           const dur = Math.random() * 15 + 10; // de 10s a 25s
@@ -42,7 +42,7 @@ export default function NinjaBackground() {
           return (
             <div
               key={i}
-              className="absolute bottom-[-20px] rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)] opacity-0 animate-float-ash"
+              className="absolute bottom-[-20px] rounded-full bg-zinc-300 shadow-[0_0_8px_rgba(228,228,231,0.6)] opacity-0 animate-float-ash"
               style={{
                 width: `${size}px`,
                 height: `${size}px`,
@@ -56,9 +56,9 @@ export default function NinjaBackground() {
         })}
       </div>
       
-      {/* Silhueta Katana Diagonal (efeito de lâmina) */}
-      <div className="absolute top-[-10%] right-[-10%] w-[150%] h-[2px] bg-gradient-to-r from-transparent via-red-500/10 to-transparent transform -rotate-45 blur-[1px]"></div>
-      <div className="absolute top-[15%] right-[-10%] w-[150%] h-[1px] bg-gradient-to-r from-transparent via-red-600/20 to-transparent transform -rotate-45 blur-[2px]"></div>
+      {/* Silhueta Katana Diagonal (efeito de lâmina) - Prata */}
+      <div className="absolute top-[-10%] right-[-10%] w-[150%] h-[2px] bg-gradient-to-r from-transparent via-zinc-400/10 to-transparent transform -rotate-45 blur-[1px]"></div>
+      <div className="absolute top-[15%] right-[-10%] w-[150%] h-[1px] bg-gradient-to-r from-transparent via-zinc-500/20 to-transparent transform -rotate-45 blur-[2px]"></div>
 
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes float-ash {
@@ -67,14 +67,14 @@ export default function NinjaBackground() {
             opacity: 0;
           }
           10% {
-            opacity: 0.8;
+            opacity: 0.6;
           }
           50% {
             transform: translateY(-50vh) translateX(calc(var(--end-left) - 50%)) scale(0.8);
-            opacity: 0.6;
+            opacity: 0.4;
           }
           90% {
-            opacity: 0.2;
+            opacity: 0.1;
           }
           100% {
             transform: translateY(-110vh) translateX(calc(var(--end-left) - 50%)) scale(0.5);

@@ -163,18 +163,39 @@ export default function GeneralSettingsForm({
 
         <div className="pt-4 border-t border-white/[0.04] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
-            <label className="relative inline-flex items-center cursor-pointer select-none">
-              <input 
-                type="checkbox" 
-                checked={promo.destaque_copa || false}
-                onChange={e => setPromo({ ...promo, destaque_copa: e.target.checked })}
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-zinc-800 rounded-full peer peer-focus:ring-2 peer-focus:ring-amber-500/50 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-zinc-400 after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-600 peer-checked:after:bg-white"></div>
-              <span className="ml-3 text-xs font-bold text-zinc-300 font-mono flex items-center gap-1">
-                🏆 Destaque Tema Copa do Mundo
-              </span>
-            </label>
+            <div className="flex items-center gap-4">
+              <label className="relative inline-flex items-center cursor-pointer select-none">
+                <input 
+                  type="checkbox" 
+                  checked={promo.destaque_copa || false}
+                  onChange={e => setPromo({ ...promo, destaque_copa: e.target.checked })}
+                  className="sr-only peer"
+                />
+                <div className="w-9 h-5 bg-zinc-800 rounded-full peer peer-focus:ring-2 peer-focus:ring-amber-500/50 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-zinc-400 after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-600 peer-checked:after:bg-white"></div>
+                <span className="ml-2 text-[10px] font-bold text-zinc-300 font-mono flex items-center gap-1">
+                  🏆 Copa
+                </span>
+              </label>
+
+              <label className="relative inline-flex items-center cursor-pointer select-none pl-2 border-l border-white/10">
+                <input 
+                  type="checkbox" 
+                  checked={promo.config_regras?.tema_ninja || false}
+                  onChange={e => setPromo({ 
+                    ...promo, 
+                    config_regras: { 
+                      ...(promo.config_regras || {}), 
+                      tema_ninja: e.target.checked 
+                    } 
+                  })}
+                  className="sr-only peer"
+                />
+                <div className="w-9 h-5 bg-zinc-800 rounded-full peer peer-focus:ring-2 peer-focus:ring-zinc-400/50 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-zinc-400 after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-600 peer-checked:after:bg-white"></div>
+                <span className="ml-2 text-[10px] font-bold text-zinc-300 font-mono flex items-center gap-1">
+                  🥋 Faixa Preta
+                </span>
+              </label>
+            </div>
 
             {/* Novo Campo: Limite de Ranking */}
             <div className="flex items-center gap-2 pl-0 sm:pl-4 sm:border-l border-white/10">
