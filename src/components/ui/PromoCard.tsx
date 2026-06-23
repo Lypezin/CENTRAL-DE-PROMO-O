@@ -27,7 +27,9 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
     <Link href={`/promo/${promo.slug}`} className="block w-full h-full">
       <div 
         className={`obsidian-card h-full flex flex-col relative group overflow-hidden ${
-          isCopa ? 'card-tema-copa' : ''
+          isCopa 
+            ? 'card-tema-copa !bg-gradient-to-br !from-[#061c0d] !via-[#040f08] !to-[#020502] !border-amber-500/20 shadow-[0_0_20px_rgba(16,185,129,0.05)]' 
+            : ''
         }`}
       >
         {/* Shimmer light flash on hover */}
@@ -42,8 +44,9 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
             <div className="absolute -left-[15%] -bottom-[15%] w-[180px] h-[180px] rounded-full bg-emerald-500/[0.08] blur-[45px] pointer-events-none group-hover:bg-emerald-500/[0.12] transition-colors duration-500 z-0" />
             
             {/* Sparkles */}
-            <span className="absolute top-12 right-10 text-amber-400/40 text-[9px] animate-pulse pointer-events-none select-none z-10">★</span>
-            <span className="absolute bottom-16 left-8 text-emerald-400/30 text-[11px] animate-pulse duration-1000 pointer-events-none select-none z-10">★</span>
+            <span className="absolute top-12 right-12 text-amber-400/60 text-[10px] animate-pulse pointer-events-none select-none z-10 filter drop-shadow-[0_0_3px_rgba(251,191,36,1)]">★</span>
+            <span className="absolute bottom-24 right-8 text-amber-300/40 text-[13px] animate-pulse duration-1000 pointer-events-none select-none z-10 filter drop-shadow-[0_0_4px_rgba(251,191,36,0.8)]">★</span>
+            <span className="absolute top-1/2 left-4 text-emerald-400/30 text-[11px] animate-pulse duration-700 pointer-events-none select-none z-10">★</span>
           </>
         )}
 
@@ -70,13 +73,13 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
           </>
         )}
 
-        {/* Accent thin top bar */}
-        <div className={`h-[3px] w-full shrink-0 transition-all duration-300 group-hover:h-[4px] promo-card-top-bar ${
+        {/* Accent top bar */}
+        <div className={`w-full shrink-0 transition-all duration-300 promo-card-top-bar ${
           isCopa
-            ? 'bg-gradient-to-r from-emerald-500 via-amber-400 to-emerald-500'
+            ? 'h-[5px] md:h-[6px] group-hover:h-[8px] bg-gradient-to-r from-emerald-500 via-amber-400 to-emerald-500 shadow-[0_2px_15px_rgba(251,191,36,0.4)]'
             : isRanking 
-              ? 'bg-gradient-to-r from-sky-500 to-indigo-600' 
-              : 'bg-gradient-to-r from-emerald-400 to-teal-500'
+              ? 'h-[3px] group-hover:h-[4px] bg-gradient-to-r from-sky-500 to-indigo-600' 
+              : 'h-[3px] group-hover:h-[4px] bg-gradient-to-r from-emerald-400 to-teal-500'
         }`}></div>
 
         {/* Floating background World Cup Trophy watermark */}
@@ -126,9 +129,9 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
           )}
 
           {/* Title with HEXA highlight */}
-          <h3 className={`text-lg sm:text-xl font-bold mb-2 transition-all duration-300 tracking-tight promo-card-title ${
+          <h3 className={`text-lg sm:text-xl font-bold mb-2 transition-all duration-300 tracking-tight promo-card-title flex flex-wrap items-center ${
             isCopa 
-              ? 'text-amber-100 group-hover:brightness-125 group-hover:scale-[1.02] transform-origin-left'
+              ? 'text-amber-50 group-hover:brightness-125 group-hover:scale-[1.02] transform-origin-left drop-shadow-md'
               : 'text-white group-hover:text-sky-400'
           }`}>
             {isCopa && /hexa/i.test(promo.nome) ? (
@@ -148,7 +151,7 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
           
           {/* Description */}
           <p className={`text-sm mb-6 flex-grow truncate-2 line-clamp-2 leading-relaxed font-sans ${
-            isCopa ? 'text-emerald-100/60' : 'text-zinc-400'
+            isCopa ? 'text-emerald-100/70 font-medium' : 'text-zinc-400'
           }`}>
             {promo.descricao || 'Sem descrição cadastrada.'}
           </p>
