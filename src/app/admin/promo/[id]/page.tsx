@@ -79,11 +79,26 @@ export default function EditPromoPage() {
     carregarPromo()
   }, [carregarPromo])
 
+  // Sincroniza a lista de turnos ativos com o objeto da promoção atual
   useEffect(() => {
-    if (activeTurnos.length > 0 && !activeTurnos.includes(turnoEditorAtivo)) {
-      setTurnoEditorAtivo(activeTurnos[0])
+    if (promo?.config_turnos) {
+      setActiveTurnos(promo.config_turnos)
     }
-  }, [activeTurnos, turnoEditorAtivo])
+  }, [promo?.config_turnos])
+
+  // Gerencia a aba ativa do editor de turnos de forma condicional ao agrupamento da métrica
+  useEffect(() => {
+    const isGeral = promo?.config_regras?.mecanica?.agrupamento === 'geral'
+    if (isGeral) {
+      if (turnoEditorAtivo !== 'GERAL') {
+        setTurnoEditorAtivo('GERAL')
+      }
+    } else {
+      if (activeTurnos.length > 0 && !activeTurnos.includes(turnoEditorAtivo) && turnoEditorAtivo !== 'GERAL') {
+        setTurnoEditorAtivo(activeTurnos[0])
+      }
+    }
+  }, [activeTurnos, turnoEditorAtivo, promo])
 
 
   const handleUpdate = async (fields: Partial<Promocao>) => {
