@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface LightningProps {
   hue?: number;
@@ -256,18 +256,43 @@ const Lightning: React.FC<LightningProps> = ({
 };
 
 export default function LightningBackground() {
+  const [isEcoMode, setIsEcoMode] = useState(false);
+
+  useEffect(() => {
+    // Inicializa o estado do Modo Eco
+    const stored = localStorage.getItem('performance_mode');
+    if (stored === 'eco') {
+      setIsEcoMode(true);
+    }
+
+    const handlePerfChange = (e: Event) => {
+      const customEvent = e as CustomEvent<{ isEco: boolean }>;
+      setIsEcoMode(customEvent.detail.isEco);
+    };
+
+    window.addEventListener('performance_mode_change', handlePerfChange);
+    return () => {
+      window.removeEventListener('performance_mode_change', handlePerfChange);
+    };
+  }, []);
+
   return (
     <div className="fixed inset-0 z-[-2] pointer-events-none overflow-hidden bg-[#030303]">
       {/* WebGL Canvas - Centered lightning beam with subtle opacity */}
-      <div className="absolute inset-0 opacity-[0.22] mix-blend-screen">
-        <Lightning 
-          hue={222} 
-          xOffset={0.0} 
-          speed={0.8} 
-          intensity={0.45} 
-          size={1.5} 
-        />
-      </div>
+      {!isEcoMode ? (
+        <div className="absolute inset-0 opacity-[0.22] mix-blend-screen">
+          <Lightning 
+            hue={222} 
+            xOffset={0.0} 
+            speed={0.8} 
+            intensity={0.45} 
+            size={1.5} 
+          />
+        </div>
+      ) : (
+        /* Fallback estático premium para modo eco: um brilho central suave que se assemelha ao raio mas sem animação */
+        <div className="absolute inset-0 opacity-[0.15] bg-[radial-gradient(ellipse_at_center,rgba(56,189,248,0.20),transparent_70%)]" />
+      )}
       
       {/* Elegant Radial Dark Gradient Mask to blend WebGL lightning smoothly into Obsidian Black */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,transparent_10%,#030303_85%)]"></div>

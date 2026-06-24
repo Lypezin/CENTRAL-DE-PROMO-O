@@ -31,7 +31,7 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
           isCopa 
             ? 'card-tema-copa !bg-gradient-to-br !from-[#061c0d] !via-[#040f08] !to-[#020502] !border-amber-500/20 shadow-[0_0_20px_rgba(16,185,129,0.05)]' 
             : isNinja
-              ? 'card-tema-ninja !bg-gradient-to-br !from-[#18181b] !via-[#0a0a0a] !to-[#000000] !border-zinc-500/30 shadow-[0_0_20px_rgba(255,255,255,0.05)]'
+              ? 'card-tema-ninja !bg-gradient-to-br !from-[#141414] !via-[#09090b] !to-[#020202] !border-zinc-800/80 hover:!border-rose-900/40 shadow-[0_4px_30px_rgba(0,0,0,0.5)] shadow-black/80'
               : ''
         }`}
       >
@@ -57,8 +57,8 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
         )}
         {isNinja && (
           <>
-            <div className="absolute -right-[15%] -top-[15%] w-[180px] h-[180px] rounded-full bg-zinc-600/[0.05] blur-[45px] pointer-events-none group-hover:bg-zinc-600/[0.1] transition-colors duration-500 z-0" />
-            <div className="absolute -left-[15%] -bottom-[15%] w-[180px] h-[180px] rounded-full bg-zinc-400/[0.03] blur-[45px] pointer-events-none group-hover:bg-zinc-400/[0.08] transition-colors duration-500 z-0" />
+            <div className="absolute -right-[15%] -top-[15%] w-[180px] h-[180px] rounded-full bg-rose-900/[0.04] blur-[45px] pointer-events-none group-hover:bg-rose-900/[0.08] transition-colors duration-500 z-0" />
+            <div className="absolute -left-[15%] -bottom-[15%] w-[180px] h-[180px] rounded-full bg-zinc-700/[0.02] blur-[45px] pointer-events-none group-hover:bg-zinc-700/[0.06] transition-colors duration-500 z-0" />
             
             {/* Shurikens / Crosses */}
             <span className="absolute top-14 right-10 text-zinc-500/50 text-[12px] animate-[spin_4s_linear_infinite] pointer-events-none select-none z-10 filter drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]">✦</span>
@@ -82,10 +82,10 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
             <div className={`absolute left-1/2 -bottom-[0.5px] w-[1px] h-[5px] -translate-x-1/2 pointer-events-none z-20 ${isCopa ? 'bg-amber-400/80' : 'bg-zinc-400/80'}`} />
 
             {/* 3. Decorative Corner Brackets */}
-            <div className={`absolute top-0 left-0 w-3.5 h-3.5 border-t-2 border-l-2 rounded-tl-[12px] pointer-events-none z-20 ${isCopa ? 'border-amber-400' : 'border-zinc-500'}`} />
-            <div className={`absolute top-0 right-0 w-3.5 h-3.5 border-t-2 border-r-2 rounded-tr-[12px] pointer-events-none z-20 ${isCopa ? 'border-amber-400' : 'border-zinc-500'}`} />
-            <div className={`absolute bottom-0 left-0 w-3.5 h-3.5 border-b-2 border-l-2 rounded-bl-[12px] pointer-events-none z-20 ${isCopa ? 'border-amber-400' : 'border-zinc-500'}`} />
-            <div className={`absolute bottom-0 right-0 w-3.5 h-3.5 border-b-2 border-r-2 rounded-br-[12px] pointer-events-none z-20 ${isCopa ? 'border-amber-400' : 'border-zinc-500'}`} />
+            <div className={`absolute top-0 left-0 w-3.5 h-3.5 border-t-2 border-l-2 rounded-tl-[12px] pointer-events-none z-20 ${isCopa ? 'border-amber-400' : 'border-rose-600/80'}`} />
+            <div className={`absolute top-0 right-0 w-3.5 h-3.5 border-t-2 border-r-2 rounded-tr-[12px] pointer-events-none z-20 ${isCopa ? 'border-amber-400' : 'border-rose-600/80'}`} />
+            <div className={`absolute bottom-0 left-0 w-3.5 h-3.5 border-b-2 border-l-2 rounded-bl-[12px] pointer-events-none z-20 ${isCopa ? 'border-amber-400' : 'border-rose-600/80'}`} />
+            <div className={`absolute bottom-0 right-0 w-3.5 h-3.5 border-b-2 border-r-2 rounded-br-[12px] pointer-events-none z-20 ${isCopa ? 'border-amber-400' : 'border-rose-600/80'}`} />
           </>
         )}
 
@@ -94,7 +94,7 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
           isCopa
             ? 'h-[5px] md:h-[6px] group-hover:h-[8px] bg-gradient-to-r from-emerald-500 via-amber-400 to-emerald-500 shadow-[0_2px_15px_rgba(251,191,36,0.4)]'
             : isNinja
-              ? 'h-[5px] md:h-[6px] group-hover:h-[8px] bg-gradient-to-r from-zinc-700 via-zinc-300 to-zinc-700 shadow-[0_2px_15px_rgba(255,255,255,0.4)]'
+              ? 'h-[5px] md:h-[6px] group-hover:h-[8px] bg-gradient-to-r from-zinc-950 via-rose-600 to-zinc-950 shadow-[0_2px_15px_rgba(225,29,72,0.4)]'
               : isRanking 
                 ? 'h-[3px] group-hover:h-[4px] bg-gradient-to-r from-sky-500 to-indigo-600' 
                 : 'h-[3px] group-hover:h-[4px] bg-gradient-to-r from-emerald-400 to-teal-500'
@@ -124,7 +124,7 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
                 </span>
               )}
               {isNinja && (
-                <span className="text-[9px] font-black tracking-wider text-zinc-300 bg-zinc-900/40 border border-zinc-500/35 px-2 py-0.5 rounded uppercase font-mono flex items-center gap-0.5 shadow-[0_0_8px_rgba(255,255,255,0.1)]">
+                <span className="text-[9px] font-black tracking-wider text-rose-400 bg-zinc-950 border border-rose-950/60 px-2 py-0.5 rounded uppercase font-mono flex items-center gap-0.5 shadow-[0_0_8px_rgba(225,29,72,0.2)]">
                   🥋 FAIXA PRETA
                 </span>
               )}
@@ -147,7 +147,7 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
                 isCopa
                   ? 'text-emerald-100 bg-emerald-950/60 border border-emerald-500/60 shadow-[0_0_12px_rgba(16,185,129,0.4)]'
                   : isNinja
-                    ? 'text-zinc-100 bg-zinc-700/60 border border-zinc-500/60 shadow-[0_0_12px_rgba(255,255,255,0.1)]'
+                    ? 'text-zinc-300 bg-zinc-900/80 border border-zinc-800 shadow-[0_0_12px_rgba(0,0,0,0.4)]'
                     : 'text-sky-100 bg-sky-900/60 border border-sky-500/50'
               }`}>
                 📍 {promo.cidade}
@@ -203,7 +203,7 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
                       key={t} 
                       className={`inline-flex items-center gap-1 text-[8.5px] font-bold px-2 py-0.5 rounded-md font-mono ${
                         isNinja 
-                          ? 'text-zinc-300 bg-zinc-800/50 border border-zinc-600/30' 
+                          ? 'text-zinc-300 bg-zinc-900/60 border border-zinc-800/60' 
                           : 'text-amber-200/90 bg-amber-950/35 border border-amber-500/25'
                       }`}
                     >
@@ -231,7 +231,7 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
               isCopa 
                 ? 'text-amber-400 group-hover:text-amber-300 group-hover:scale-105 bg-amber-500/10 px-3 py-1.5 rounded-lg border border-amber-500/20 shadow-inner' 
                 : isNinja
-                  ? 'text-zinc-300 group-hover:text-white group-hover:scale-105 bg-zinc-800/50 px-3 py-1.5 rounded-lg border border-zinc-500/30 shadow-[0_0_8px_rgba(255,255,255,0.05)]'
+                  ? 'text-rose-400 group-hover:text-white group-hover:scale-105 bg-rose-950/10 px-3 py-1.5 rounded-lg border border-rose-950/30 shadow-[0_0_8px_rgba(225,29,72,0.05)] hover:bg-rose-950/20'
                   : 'text-sky-400 group-hover:text-white'
             }`}>
               <span>{isRanking ? 'VER RANKING' : 'ACESSAR'}</span>

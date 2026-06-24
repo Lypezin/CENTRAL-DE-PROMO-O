@@ -4,9 +4,24 @@ import { useEffect, useState } from 'react'
 
 export default function NinjaBackground() {
   const [mounted, setMounted] = useState(false)
+  const [isEcoMode, setIsEcoMode] = useState(false)
 
   useEffect(() => {
     setMounted(true)
+    const stored = localStorage.getItem('performance_mode')
+    if (stored === 'eco') {
+      setIsEcoMode(true)
+    }
+
+    const handlePerfChange = (e: Event) => {
+      const customEvent = e as CustomEvent<{ isEco: boolean }>
+      setIsEcoMode(customEvent.detail.isEco)
+    }
+
+    window.addEventListener('performance_mode_change', handlePerfChange)
+    return () => {
+      window.removeEventListener('performance_mode_change', handlePerfChange)
+    }
   }, [])
 
   if (!mounted) return null
@@ -30,31 +45,33 @@ export default function NinjaBackground() {
       <div className="absolute bottom-0 left-0 w-full h-[40vh] bg-gradient-to-t from-zinc-900/40 to-transparent"></div>
 
       {/* Partículas flutuantes estilo Faíscas/Cinzas Prateadas */}
-      <div className="absolute inset-0 perspective-[1000px]">
-        {/* Usaremos um efeito de CSS simples para simular cinzas flutuando na tela */}
-        {Array.from({ length: 15 }).map((_, i) => {
-          const size = Math.random() * 4 + 2; // de 2px a 6px
-          const dur = Math.random() * 15 + 10; // de 10s a 25s
-          const delay = Math.random() * -20;
-          const left = Math.random() * 100;
-          const endLeft = left + (Math.random() * 20 - 10);
-          
-          return (
-            <div
-              key={i}
-              className="absolute bottom-[-20px] rounded-full bg-zinc-300 shadow-[0_0_8px_rgba(228,228,231,0.6)] opacity-0 animate-float-ash"
-              style={{
-                width: `${size}px`,
-                height: `${size}px`,
-                left: `${left}%`,
-                animationDuration: `${dur}s`,
-                animationDelay: `${delay}s`,
-                '--end-left': `${endLeft}%`
-              } as React.CSSProperties}
-            ></div>
-          )
-        })}
-      </div>
+      {!isEcoMode && (
+        <div className="absolute inset-0 perspective-[1000px]">
+          {/* Usaremos um efeito de CSS simples para simular cinzas flutuando na tela */}
+          {Array.from({ length: 15 }).map((_, i) => {
+            const size = Math.random() * 4 + 2; // de 2px a 6px
+            const dur = Math.random() * 15 + 10; // de 10s a 25s
+            const delay = Math.random() * -20;
+            const left = Math.random() * 100;
+            const endLeft = left + (Math.random() * 20 - 10);
+            
+            return (
+              <div
+                key={i}
+                className="absolute bottom-[-20px] rounded-full bg-zinc-300 shadow-[0_0_8px_rgba(228,228,231,0.6)] opacity-0 animate-float-ash"
+                style={{
+                  width: `${size}px`,
+                  height: `${size}px`,
+                  left: `${left}%`,
+                  animationDuration: `${dur}s`,
+                  animationDelay: `${delay}s`,
+                  '--end-left': `${endLeft}%`
+                } as React.CSSProperties}
+              ></div>
+            )
+          })}
+        </div>
+      )}
       
       {/* Silhueta Katana Diagonal (efeito de lâmina) - Prata */}
       <div className="absolute top-[-10%] right-[-10%] w-[150%] h-[2px] bg-gradient-to-r from-transparent via-zinc-400/10 to-transparent transform -rotate-45 blur-[1px]"></div>

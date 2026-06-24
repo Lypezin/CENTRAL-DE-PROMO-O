@@ -70,22 +70,22 @@ export default async function PromoPage({ params }: { params: Promise<{ slug: st
 
       {/* HEADER UNIFICADO */}
       {isNinja ? (
-        <div className="ninja-hero-banner mb-10 flex flex-col items-center text-center">
+        <div className="ninja-hero-banner mb-10 flex flex-col items-center text-center relative overflow-hidden">
           {/* Shurikens e Espadas decorativas (Cinza/Platina/Branco) */}
-          <span className="absolute text-zinc-500/30 text-2xl animate-[spin_6s_linear_infinite]" style={{ top: '15%', left: '8%' }}>✦</span>
-          <span className="absolute text-zinc-400/20 text-3xl animate-[spin_4s_linear_infinite_reverse]" style={{ bottom: '20%', right: '10%' }}>✦</span>
-          <span className="absolute text-zinc-300/20 text-xl filter drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]" style={{ top: '55%', left: '85%' }}>🗡️</span>
+          <span className="absolute text-zinc-600/20 text-2xl animate-[spin_8s_linear_infinite] select-none pointer-events-none" style={{ top: '15%', left: '8%' }}>✦</span>
+          <span className="absolute text-zinc-500/15 text-3xl animate-[spin_5s_linear_infinite_reverse] select-none pointer-events-none" style={{ bottom: '20%', right: '10%' }}>✦</span>
+          <span className="absolute text-zinc-400/10 text-xl filter drop-shadow-[0_0_8px_rgba(255,255,255,0.2)] select-none pointer-events-none" style={{ top: '55%', left: '85%' }}>🗡️</span>
           
           <div className="flex flex-col items-center gap-4 relative z-10 w-full">
-            <div className="text-xs sm:text-sm md:text-base mb-2 text-zinc-300 font-extrabold tracking-widest uppercase drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">🥋 Edição Especial Faixa Preta</div>
+            <div className="text-xs sm:text-sm md:text-base mb-2 text-rose-500 font-extrabold tracking-widest uppercase drop-shadow-[0_0_12px_rgba(225,29,72,0.3)]">🥋 Edição Especial Faixa Preta</div>
             
             {promo.cidade && (
-              <span className="inline-flex items-center text-[10px] sm:text-xs font-bold tracking-wider uppercase border px-3 py-1.5 rounded-md font-mono bg-zinc-900/60 border-zinc-500/50 text-zinc-300 shadow-[0_0_15px_rgba(255,255,255,0.05)]">
+              <span className="inline-flex items-center text-[10px] sm:text-xs font-bold tracking-wider uppercase border px-3 py-1.5 rounded-md font-mono bg-zinc-950/80 border-rose-950/40 text-zinc-300 shadow-[0_0_15px_rgba(225,29,72,0.08)]">
                 Praça: {promo.cidade}
               </span>
             )}
             
-            <h1 className="text-[28px] leading-8 sm:text-4xl md:text-6xl font-black text-white sm:leading-tight tracking-tight mt-1 mb-1 drop-shadow-[0_0_15px_rgba(255,255,255,0.2)] text-gradient-copa">
+            <h1 className="text-[28px] leading-8 sm:text-4xl md:text-6xl font-black text-white sm:leading-tight tracking-tight mt-1 mb-1 text-gradient-ninja">
               {promo.nome}
             </h1>
             

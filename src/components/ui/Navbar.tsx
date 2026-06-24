@@ -2,11 +2,28 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export default function Navbar() {
   const pathname = usePathname()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isEco, setIsEco] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+    const stored = localStorage.getItem('performance_mode')
+    if (stored === 'eco') {
+      setIsEco(true)
+    }
+  }, [])
+
+  const toggleEcoMode = () => {
+    const nextVal = !isEco
+    setIsEco(nextVal)
+    localStorage.setItem('performance_mode', nextVal ? 'eco' : 'normal')
+    window.dispatchEvent(new CustomEvent('performance_mode_change', { detail: { isEco: nextVal } }))
+  }
 
   const links = [
     { href: '/', label: 'Promoções' },
@@ -41,6 +58,22 @@ export default function Navbar() {
               </Link>
             )
           })}
+
+          {mounted && (
+            <>
+              <span className="w-[1px] h-4 bg-white/10" />
+              <button
+                onClick={toggleEcoMode}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-extrabold uppercase tracking-wider transition-all duration-200 border cursor-pointer ${
+                  isEco 
+                    ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.12)] hover:bg-emerald-500/20' 
+                    : 'bg-zinc-900/60 border-zinc-800/80 text-zinc-400 hover:text-white hover:border-zinc-700 hover:bg-zinc-800/40'
+                }`}
+              >
+                <span>{isEco ? '🍃 Modo Eco: On' : '⚡ Desempenho'}</span>
+              </button>
+            </>
+          )}
         </div>
 
         {/* Mobile Toggle */}
@@ -78,6 +111,25 @@ export default function Navbar() {
                 </Link>
               )
             })}
+
+            {mounted && (
+              <div className="border-t border-white/[0.04] pt-2 mt-1">
+                <button
+                  onClick={() => {
+                    toggleEcoMode()
+                    setIsMobileMenuOpen(false)
+                  }}
+                  className={`w-full flex items-center justify-between px-3 py-3 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                    isEco 
+                      ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400' 
+                      : 'bg-zinc-900/40 border border-zinc-800/40 text-zinc-400'
+                  }`}
+                >
+                  <span>Modo Econômico</span>
+                  <span>{isEco ? '🍃 LIGADO' : '⚡ DESLIGADO'}</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
