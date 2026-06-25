@@ -25,7 +25,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   // Fetch active theme from Supabase (server-side)
-  let temaAtivo: 'raios' | 'copa' = 'raios'
+  let temaAtivo: 'raios' | 'copa' | 'ninja' = 'raios'
   try {
     const { data } = await supabaseAdmin
       .from('configuracoes')

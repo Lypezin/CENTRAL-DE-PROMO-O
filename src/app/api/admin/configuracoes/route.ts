@@ -3,7 +3,7 @@ import { supabaseAdmin } from '@/lib/supabaseServer'
 import { getAuthenticatedUser } from '@/lib/auth'
 
 interface TemaConfig {
-  tema_ativo: 'raios' | 'copa'
+  tema_ativo: 'raios' | 'copa' | 'ninja'
 }
 
 const DEFAULT_CONFIG: TemaConfig = { tema_ativo: 'raios' }
@@ -41,9 +41,9 @@ export async function PUT(request: NextRequest) {
     const body = await request.json() as { config: TemaConfig }
     const { config } = body
 
-    if (!config || !config.tema_ativo || !['raios', 'copa'].includes(config.tema_ativo)) {
+    if (!config || !config.tema_ativo || !['raios', 'copa', 'ninja'].includes(config.tema_ativo)) {
       return NextResponse.json(
-        { success: false, error: 'Configuração inválida. tema_ativo deve ser "raios" ou "copa".' },
+        { success: false, error: 'Configuração inválida. tema_ativo deve ser "raios", "copa" ou "ninja".' },
         { status: 400 }
       )
     }

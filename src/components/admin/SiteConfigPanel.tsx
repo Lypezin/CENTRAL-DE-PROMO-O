@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useToast } from '@/components/ui/Toast'
 
-type Tema = 'raios' | 'copa'
+type Tema = 'raios' | 'copa' | 'ninja'
 
 interface ConfigResponse {
   success: boolean
@@ -30,8 +30,8 @@ export default function SiteConfigPanel() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const handleToggle = useCallback(async () => {
-    const novoTema: Tema = tema === 'raios' ? 'copa' : 'raios'
+  const handleSelectTema = useCallback(async (novoTema: Tema) => {
+    if (novoTema === tema) return
     setSaving(true)
     try {
       const res = await fetch('/api/admin/configuracoes', {
@@ -42,7 +42,12 @@ export default function SiteConfigPanel() {
       const data = (await res.json()) as ConfigResponse
       if (data.success) {
         setTema(novoTema)
-        toast.success(`Tema alterado para "${novoTema === 'copa' ? 'Copa do Mundo' : 'Raios'}"`)
+        const labels: Record<Tema, string> = {
+          raios: 'Raios Elétricos',
+          copa: 'Copa do Mundo',
+          ninja: 'Ninja (Faixa Preta)'
+        }
+        toast.success(`Tema alterado para "${labels[novoTema]}"`)
       } else {
         toast.error(data.error || 'Erro ao salvar')
       }
@@ -52,8 +57,6 @@ export default function SiteConfigPanel() {
       setSaving(false)
     }
   }, [tema, toast])
-
-  const isCopa = tema === 'copa'
 
   return (
     <div className="rounded-2xl border border-white/[0.06] bg-zinc-950/60 backdrop-blur-md p-6">
@@ -65,43 +68,39 @@ export default function SiteConfigPanel() {
         </h3>
       </div>
 
-      {/* Theme Toggle */}
-      <div className="flex items-center justify-between">
-        <div className="flex flex-col gap-1">
-          <span className="text-sm font-medium text-zinc-300">Tema Visual</span>
+      {/* Theme Toggle (Segmented control) */}
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-1 mb-2">
+          <span className="text-sm font-semibold text-zinc-300">Tema Visual do Hub</span>
           <span className="text-xs text-zinc-500">
-            {isCopa ? '⚽ Copa do Mundo' : '⚡ Raios Elétricos'}
+            Define o tema padrão da página inicial pública (Hub) para todas as pessoas que acessam.
           </span>
         </div>
 
-        <button
-          onClick={handleToggle}
-          disabled={loading || saving}
-          aria-label={`Alternar para tema ${isCopa ? 'Raios' : 'Copa'}`}
-          className="relative inline-flex h-8 w-16 shrink-0 cursor-pointer items-center rounded-full 
-                     transition-all duration-500 ease-in-out focus-visible:outline-none 
-                     focus-visible:ring-2 focus-visible:ring-white/20 disabled:opacity-50 disabled:cursor-wait"
-          style={{
-            background: isCopa
-              ? 'linear-gradient(135deg, #166534, #22c55e)'
-              : 'linear-gradient(135deg, #0c4a6e, #0ea5e9)',
-            boxShadow: isCopa
-              ? '0 0 20px rgba(34, 197, 94, 0.25), inset 0 1px 1px rgba(255,255,255,0.1)'
-              : '0 0 20px rgba(14, 165, 233, 0.25), inset 0 1px 1px rgba(255,255,255,0.1)',
-          }}
-        >
-          <span
-            className="pointer-events-none flex h-6 w-6 items-center justify-center rounded-full 
-                       bg-white shadow-lg transition-all duration-500 ease-in-out text-xs"
-            style={{
-              transform: isCopa ? 'translateX(34px)' : 'translateX(4px)',
-            }}
-          >
-            {loading || saving ? (
-              <span className="animate-spin text-[10px]">⏳</span>
-            ) : isCopa ? '⚽' : '⚡'}
-          </span>
-        </button>
+        <div className="grid grid-cols-3 gap-2 bg-black/45 p-1 rounded-xl border border-white/5 select-none">
+          {[
+            { key: 'raios', label: 'Raios', emoji: '⚡', color: 'hover:text-sky-400', activeBg: 'bg-sky-500/10 border-sky-500/30 text-sky-400 shadow-[0_0_12px_rgba(14,165,233,0.12)]' },
+            { key: 'copa', label: 'Copa', emoji: '🏆', color: 'hover:text-amber-400', activeBg: 'bg-amber-500/10 border-amber-500/30 text-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.12)]' },
+            { key: 'ninja', label: 'Ninja', emoji: '🥋', color: 'hover:text-rose-500', activeBg: 'bg-rose-500/10 border-rose-500/30 text-rose-400 shadow-[0_0_12px_rgba(225,29,72,0.12)]' }
+          ].map(opt => {
+            const isActive = tema === opt.key
+            return (
+              <button
+                key={opt.key}
+                disabled={loading || saving}
+                onClick={() => handleSelectTema(opt.key as Tema)}
+                className={`flex flex-col items-center justify-center py-2.5 px-2 rounded-lg border text-[11px] font-extrabold uppercase tracking-wider transition-all duration-200 cursor-pointer active:scale-[0.97] ${
+                  isActive 
+                    ? opt.activeBg
+                    : 'bg-transparent border-transparent text-zinc-500 ' + opt.color
+                }`}
+              >
+                <span className="text-base mb-1">{opt.emoji}</span>
+                <span>{opt.label}</span>
+              </button>
+            )
+          })}
+        </div>
       </div>
     </div>
   )

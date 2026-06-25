@@ -93,7 +93,17 @@ export function processExcelBuffer(buffer: Buffer, promocaoId: string): ParseRes
           obj[campo] = normalizarPeriodo(periodoStr) ?? periodoStr
         } else if (campo === 'soma_das_taxas_das_corridas_aceitas') {
           const num = val !== null && val !== undefined ? Number(val) : NaN
-          obj[campo] = isNaN(num) ? null : String(Math.round(num) / 100)
+          if (isNaN(num)) {
+            obj[campo] = null
+          } else {
+            // Se o número for maior que 300 e for um inteiro, assume que está em centavos e divide por 100.
+            // Se contiver decimal ou for menor ou igual a 300, assume que já está em reais.
+            if (num > 300 && Number.isInteger(num)) {
+              obj[campo] = String(num / 100)
+            } else {
+              obj[campo] = String(num)
+            }
+          }
         } else {
           obj[campo] = val !== null && val !== undefined ? String(val).trim() : null
         }
