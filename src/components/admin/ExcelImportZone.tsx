@@ -40,7 +40,7 @@ export default function ExcelImportZone({ promocaoId, onUploadSuccess }: ExcelIm
       if (result.success) {
         setArquivo(null)
         if (fileInputRef.current) fileInputRef.current.value = ''
-        onUploadSuccess() // Reload stats
+        onUploadSuccess()
       }
     } catch (err: any) {
       setUploadResult({ success: false, error: err.message || 'Erro no upload' })
@@ -51,16 +51,18 @@ export default function ExcelImportZone({ promocaoId, onUploadSuccess }: ExcelIm
   }
 
   return (
-    <div className="glass p-6 rounded-2xl border border-white/10 shadow-xl relative overflow-hidden">
-      <h3 className="font-bold text-white mb-2 flex items-center gap-2 text-sm uppercase tracking-wider font-mono select-none">
-        <span className="text-sky-400">📥</span> Importar Planilha
+    <div className="rounded-xl border border-white/[0.04] bg-[#08080a] p-4 space-y-3">
+      <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono flex items-center gap-1.5">
+        <svg className="w-3 h-3 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+        Importar Planilha
       </h3>
-      <p className="text-xs text-zinc-500 mb-4 leading-relaxed">
-        Faça o upload do arquivo Excel com o consolidado de corridas. Os dados de entregas serão vinculados a esta campanha automaticamente.
-      </p>
       
       <div
-        className={`upload-zone relative p-8 transition-all duration-300 ${dragOver ? 'active' : ''}`}
+        className={`border border-dashed rounded-lg p-4 text-center cursor-pointer transition-all ${
+          dragOver 
+            ? 'border-sky-500 bg-sky-500/5' 
+            : 'border-white/[0.06] hover:border-white/10 bg-[#0a0a0c]'
+        }`}
         onDragOver={e => { e.preventDefault(); setDragOver(true) }}
         onDragLeave={() => setDragOver(false)}
         onDrop={e => { e.preventDefault(); setDragOver(false); setArquivo(e.dataTransfer.files[0]) }}
@@ -74,88 +76,55 @@ export default function ExcelImportZone({ promocaoId, onUploadSuccess }: ExcelIm
           className="hidden" 
         />
         
-        <div className="flex flex-col items-center justify-center gap-2">
-          {arquivo ? (
-            <>
-              <span className="text-2xl animate-bounce">📊</span>
-              <div className="text-sky-400 font-bold text-xs break-all px-2 max-w-full text-center">
-                {arquivo.name}
-              </div>
-              <div className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider font-mono">
-                {new Intl.NumberFormat('pt-BR', { style: 'decimal' }).format(Number((arquivo.size / 1024).toFixed(1)))} KB &bull; Pronto para processar
-              </div>
-            </>
-          ) : (
-            <>
-              <span className="text-2xl text-zinc-600 group-hover:text-sky-400 transition-colors">📂</span>
-              <div className="text-zinc-400 text-xs font-semibold">
-                Arraste ou clique para selecionar (.xlsx)
-              </div>
-              <div className="text-[9px] text-zinc-600 font-mono uppercase tracking-wider">
-                Formato Excel padrão
-              </div>
-            </>
-          )}
-        </div>
+        {arquivo ? (
+          <div className="space-y-1">
+            <p className="text-sky-400 text-[11px] font-bold break-all">{arquivo.name}</p>
+            <p className="text-[9px] text-zinc-500 font-mono">
+              {(arquivo.size / 1024).toFixed(1)} KB
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-1">
+            <p className="text-zinc-400 text-[11px] font-medium">Arraste ou clique para selecionar</p>
+            <p className="text-[9px] text-zinc-600 font-mono">.xlsx</p>
+          </div>
+        )}
       </div>
 
       {uploadLoading && (
-        <div className="mt-4 space-y-2">
-          <div className="flex justify-between items-center text-[10px] font-mono text-zinc-500">
-            <span>Processando planilha...</span>
-            <span className="font-extrabold text-sky-400">{progresso}%</span>
+        <div className="space-y-1.5">
+          <div className="flex justify-between text-[9px] font-mono text-zinc-500">
+            <span>Processando...</span>
+            <span className="text-sky-400">{progresso}%</span>
           </div>
-          <div className="h-1.5 w-full bg-white/[0.04] rounded-full overflow-hidden border border-white/[0.02]">
+          <div className="h-1 w-full bg-white/[0.04] rounded-full overflow-hidden">
             <div 
-              className="h-full bg-gradient-to-r from-sky-500 to-indigo-600 transition-all duration-300 rounded-full shadow-[0_0_8px_rgba(56,189,248,0.5)]" 
+              className="h-full bg-sky-500 transition-all duration-300 rounded-full" 
               style={{ width: `${progresso}%` }}
-            ></div>
+            />
           </div>
         </div>
       )}
 
       {uploadResult && (
-        <div className={`mt-4 p-3 rounded-xl border text-xs leading-relaxed animate-fade-in ${
+        <div className={`text-[11px] font-bold p-2 rounded-lg border ${
           uploadResult.success 
-            ? 'bg-emerald-500/5 border-emerald-500/20 text-emerald-400 font-bold' 
-            : 'bg-red-500/5 border-red-500/20 text-red-400 font-bold'
+            ? 'bg-emerald-500/5 border-emerald-500/20 text-emerald-400' 
+            : 'bg-red-500/5 border-red-500/20 text-red-400'
         }`}>
-          {uploadResult.success ? (
-            <div className="flex items-start gap-2">
-              <span className="text-base leading-none">✅</span>
-              <div>
-                <p className="font-extrabold uppercase text-[10px] tracking-wider mb-0.5 font-mono">Planilha Processada!</p>
-                <p className="text-zinc-400 font-medium">
-                  Inseridos: <span className="text-emerald-400 font-mono font-bold">{uploadResult.inseridos}</span> &bull; 
-                  Atualizados: <span className="text-emerald-400 font-mono font-bold">{uploadResult.atualizados}</span>
-                </p>
-              </div>
-            </div>
-          ) : (
-            <div className="flex items-start gap-2">
-              <span className="text-base leading-none">⚠️</span>
-              <div>
-                <p className="font-extrabold uppercase text-[10px] tracking-wider mb-0.5 font-mono">Erro de Importação</p>
-                <p className="text-zinc-400 font-medium">{uploadResult.error}</p>
-              </div>
-            </div>
-          )}
+          {uploadResult.success 
+            ? `✓ ${uploadResult.inseridos} inseridos, ${uploadResult.atualizados} atualizados`
+            : `✗ ${uploadResult.error}`
+          }
         </div>
       )}
 
       <button 
         onClick={handleUpload}
         disabled={!arquivo || uploadLoading}
-        className="admin-btn-primary w-full mt-4 flex items-center justify-center gap-2 !py-2.5"
+        className="admin-btn-primary w-full !py-2 text-[11px]"
       >
-        {uploadLoading ? (
-          <>
-            <span className="animate-spin text-sm">🔄</span>
-            <span>Processando...</span>
-          </>
-        ) : (
-          <span>Processar Planilha</span>
-        )}
+        {uploadLoading ? 'Processando...' : 'Processar'}
       </button>
     </div>
   )

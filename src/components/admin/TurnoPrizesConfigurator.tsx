@@ -4,7 +4,6 @@ import TurnoPrizeRow from './TurnoPrizeRow'
 import React from 'react'
 import { Promocao } from '@/lib/supabase'
 import { useToast } from '@/components/ui/Toast'
-import Tooltip from '@/components/ui/Tooltip'
 
 interface TurnoPrizesConfiguratorProps {
   promo: Promocao
@@ -18,6 +17,14 @@ interface TurnoPrizesConfiguratorProps {
   saving: boolean
   handleUpdate: (fields: Partial<Promocao>) => Promise<void>
 }
+
+const TURNOS = [
+  { key: 'CAFE_DA_MANHA', label: 'Café', emoji: '☀️' },
+  { key: 'ALMOCO', label: 'Almoço', emoji: '🌤️' },
+  { key: 'TARDE', label: 'Tarde', emoji: '🌅' },
+  { key: 'JANTAR', label: 'Jantar', emoji: '🌙' },
+  { key: 'MADRUGADA', label: 'Madrugada', emoji: '⭐' }
+]
 
 export default function TurnoPrizesConfigurator({
   promo,
@@ -39,7 +46,7 @@ export default function TurnoPrizesConfigurator({
       : [...activeTurnos, turno]
       
     if (novosTurnos.length === 0) {
-      toast.warning('A promoção precisa de pelo menos um turno ativo!')
+      toast.warning('Pelo menos um turno deve estar ativo!')
       return
     }
     
@@ -138,7 +145,7 @@ export default function TurnoPrizesConfigurator({
   const handleSavePrizes = () => {
     onSave({
       config_premios: localPremios
-    }).then(() => toast.success('Regras de prêmios salvas com sucesso!'))
+    }).then(() => toast.success('Prêmios salvos!'))
   }
 
   const turnoConfigObj = localPremios.find(t => t.turno === turnoEditorAtivo) || {
@@ -150,54 +157,39 @@ export default function TurnoPrizesConfigurator({
   const isGeral = promo.config_regras?.mecanica?.agrupamento === 'geral'
 
   return (
-    <div className="glass p-6 rounded-2xl border border-white/10 shadow-xl space-y-6">
-      <div>
-        <h2 className="text-lg font-bold text-white mb-1 flex items-center gap-2 uppercase tracking-wider font-mono select-none">
-          <span className="text-sky-400">🏆</span> Prêmios & Elegibilidade por Turno
+    <div className="rounded-xl border border-white/[0.04] bg-[#08080a] p-5 space-y-4">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-xs font-bold text-zinc-400 uppercase tracking-wider font-mono flex items-center gap-2">
+          <svg className="w-3.5 h-3.5 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
+          Prêmios & Turnos
         </h2>
-        <p className="text-[10px] text-zinc-500 font-medium">
-          Configure a ativação de cada período, mínimo de elegibilidade de corridas e o editor visual de prêmios.
-        </p>
       </div>
 
-      {/* Turnos Habilitados Toggle Checkboxes */}
+      {/* Turno toggles */}
       {!isGeral && (
-        <div className="bg-black/35 border border-white/5 p-4 rounded-xl space-y-3">
-          <h3 className="text-xs font-bold text-white flex items-center gap-1.5 uppercase tracking-wider text-sky-400 font-mono select-none">
-            <span>⏰</span> Turnos Habilitados nesta Campanha
-          </h3>
-          <p className="text-[11px] text-zinc-500 leading-relaxed">
-            Somente os turnos marcados aparecerão na listagem e na barra de abas pública da Central de Promoções.
-          </p>
-          
-          <div className="flex flex-wrap gap-2.5 pt-1">
-            {[
-              { key: 'CAFE_DA_MANHA', label: 'Café da Manhã', emoji: '☀️' },
-              { key: 'ALMOCO', label: 'Almoço', emoji: '🌤️' },
-              { key: 'TARDE', label: 'Tarde', emoji: '🌅' },
-              { key: 'JANTAR', label: 'Jantar', emoji: '🌙' },
-              { key: 'MADRUGADA', label: 'Madrugada', emoji: '⭐' }
-            ].map(t => {
+        <div className="space-y-2">
+          <p className="text-[10px] text-zinc-500 font-mono uppercase tracking-wider">Turnos ativos</p>
+          <div className="flex flex-wrap gap-1.5">
+            {TURNOS.map(t => {
               const isChecked = activeTurnos.includes(t.key)
               return (
                 <button
                   key={t.key}
                   type="button"
                   onClick={() => handleToggleTurno(t.key)}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-xs font-bold transition-all duration-300 active:scale-95 select-none ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[11px] font-bold transition-all ${
                     isChecked 
-                      ? 'bg-sky-500/10 border-sky-500/30 text-white shadow-sm' 
-                      : 'bg-black/35 border-white/5 text-zinc-500 hover:text-zinc-300 hover:bg-white/2'
+                      ? 'bg-sky-500/10 border-sky-500/30 text-white' 
+                      : 'border-white/[0.04] text-zinc-500 hover:text-zinc-300 hover:border-white/10'
                   }`}
                 >
-                  <div className={`w-3.5 h-3.5 rounded border flex items-center justify-center transition-all ${
-                    isChecked 
-                      ? 'bg-sky-600 border-sky-500 text-white' 
-                      : 'border-white/20 text-transparent'
+                  <div className={`w-2.5 h-2.5 rounded-sm border flex items-center justify-center transition-all ${
+                    isChecked ? 'bg-sky-500 border-sky-400' : 'border-zinc-600'
                   }`}>
-                    <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3.5} d="M5 13l4 4L19 7" />
-                    </svg>
+                    {isChecked && (
+                      <svg className="w-1.5 h-1.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M5 13l4 4L19 7" /></svg>
+                    )}
                   </div>
                   <span>{t.emoji}</span>
                   <span>{t.label}</span>
@@ -208,87 +200,65 @@ export default function TurnoPrizesConfigurator({
         </div>
       )}
 
-      {/* Segmented active Tab controller for visual editor shifts */}
-      {!isGeral ? (
-        <div className="flex bg-black/45 p-1 rounded-xl border border-white/5 overflow-x-auto scrollbar-none gap-1 select-none">
-          {[
-            { key: 'CAFE_DA_MANHA', label: 'Café da Manhã', emoji: '☀️' },
-            { key: 'ALMOCO', label: 'Almoço', emoji: '🌤️' },
-            { key: 'TARDE', label: 'Tarde', emoji: '🌅' },
-            { key: 'JANTAR', label: 'Jantar', emoji: '🌙' },
-            { key: 'MADRUGADA', label: 'Madrugada', emoji: '⭐' }
-          ].filter(t => activeTurnos.includes(t.key)).map(t => (
+      {/* Tab selector */}
+      <div className="flex bg-[#0a0a0c] p-0.5 rounded-lg border border-white/[0.04] gap-0.5 overflow-x-auto scrollbar-none">
+        {isGeral ? (
+          <div className="px-3 py-1.5 bg-sky-600 text-white rounded-md text-[11px] font-bold flex items-center gap-1.5">
+            <span>🏆</span> Geral
+          </div>
+        ) : (
+          TURNOS.filter(t => activeTurnos.includes(t.key)).map(t => (
             <button
               key={t.key}
               type="button"
               onClick={() => setTurnoEditorAtivo(t.key)}
-              className={`flex-grow md:flex-initial min-w-[120px] px-3.5 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 active:scale-95 ${
+              className={`flex-1 min-w-[80px] px-2.5 py-1.5 rounded-md text-[11px] font-bold transition-all ${
                 turnoEditorAtivo === t.key 
-                  ? 'bg-sky-600 text-white shadow-lg shadow-sky-500/10' 
+                  ? 'bg-sky-600 text-white' 
                   : 'text-zinc-500 hover:text-white hover:bg-white/5'
               }`}
             >
-              <span>{t.emoji}</span>
-              {t.label}
+              <span className="hidden sm:inline">{t.emoji}</span> {t.label}
             </button>
-          ))}
-        </div>
-      ) : (
-        <div className="flex bg-black/45 p-1 rounded-xl border border-white/5 gap-1 select-none w-max">
-          <div className="px-5 py-2 bg-sky-600 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-lg shadow-sky-500/10">
-            <span>🏆</span> Geral Consolidado (Sem Turnos)
-          </div>
-        </div>
-      )}
+          ))
+        )}
+      </div>
 
-      {/* Editor visual detail inputs for dynamic selected active Turno */}
-      <div className="space-y-6 animate-fade-in">
-        
-        {/* Meta / Regra de Elegibilidade */}
-        <div className="bg-black/35 border border-white/5 p-4 rounded-xl space-y-3">
-          <h3 className="text-xs font-bold text-white flex items-center gap-1.5 font-mono select-none uppercase tracking-wider text-sky-400">
-            <span>🎯</span> Regra de Elegibilidade
-          </h3>
-          <div className="flex flex-col md:flex-row md:items-center gap-4">
-            <div className="flex-1 w-full">
-              <Tooltip content="Número mínimo de corridas que o entregador precisa completar neste turno para receber o prêmio">
-                <label htmlFor="turno-minimo" className="block text-[9px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1">Mínimo de Corridas no Turno</label>
-              </Tooltip>
-              <input
-                id="turno-minimo"
-                type="number"
-                value={turnoConfigObj.minimo_corridas ?? 0}
-                onChange={e => handleUpdateMinimo(Number(e.target.value))}
-                placeholder="Ex: 10"
-                className="admin-input !bg-[#0b0b0d] !py-2 !px-3"
-                min="0"
-              />
-            </div>
-            <div className="flex-[2] text-[11px] text-zinc-500 leading-relaxed md:pt-4">
-              Mínimo de corridas finalizadas necessárias neste turno específico para poder receber a bonificação. Defina como 0 para liberar sem meta de corridas.
-            </div>
-          </div>
+      {/* Eligibility rule */}
+      <div className="bg-[#0a0a0c] border border-white/[0.04] rounded-lg p-3 space-y-2">
+        <label htmlFor="turno-minimo" className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono">
+          Mínimo de corridas no turno
+        </label>
+        <div className="flex items-center gap-3">
+          <input
+            id="turno-minimo"
+            type="number"
+            value={turnoConfigObj.minimo_corridas ?? 0}
+            onChange={e => handleUpdateMinimo(Number(e.target.value))}
+            className="admin-input !py-2 !px-3 w-24 bg-[#08080a]"
+            min="0"
+          />
+          <span className="text-[10px] text-zinc-500">corridas para ser elegível. Defina 0 para sem meta.</span>
+        </div>
+      </div>
+
+      {/* Prizes */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono">Prêmios por posição</h3>
+          <button
+            type="button"
+            onClick={handleAddPremioRow}
+            className="text-[11px] font-bold text-sky-400 hover:text-sky-300 transition-colors"
+          >
+            + Adicionar
+          </button>
         </div>
 
-        {/* Classifications & Prizes Builder Grid */}
-        <div className="space-y-4">
-          <div className="flex justify-between items-center select-none">
-            <h3 className="text-xs font-bold text-white flex items-center gap-1.5 font-mono uppercase tracking-wider text-sky-400">
-              <span>💰</span> Configuração dos Prêmios por Posição
-            </h3>
-            <button
-              type="button"
-              onClick={handleAddPremioRow}
-              className="text-xs text-sky-400 hover:text-sky-300 font-extrabold flex items-center gap-1 active:scale-95 transition-all"
-            >
-              + Adicionar Linha
-            </button>
-          </div>
-
-          <div className="space-y-2.5">
-            {turnoConfigObj.premios?.map((p: any, idx: number) => {
-              const premios = turnoConfigObj.premios || []
-              return (
+        <div className="space-y-1.5">
+          {turnoConfigObj.premios?.map((p: any, idx: number) => {
+            const premios = turnoConfigObj.premios || []
+            return (
               <TurnoPrizeRow
                 key={p.id || `${turnoEditorAtivo}_${p.posicao || idx}`}
                 premio={p}
@@ -300,38 +270,35 @@ export default function TurnoPrizesConfigurator({
                 onMoveUp={handleMoveUp}
                 onMoveDown={handleMoveDown}
               />
-              )
-            })}
+            )
+          })}
 
-            {(!turnoConfigObj.premios || turnoConfigObj.premios.length === 0) && (
-              <div className="text-center p-6 bg-black/45 border border-white/[0.04] rounded-xl text-xs text-zinc-500 select-none">
-                Nenhum prêmio cadastrado para este turno. Clique em "+ Adicionar Linha" para começar.
-              </div>
-            )}
-          </div>
+          {(!turnoConfigObj.premios || turnoConfigObj.premios.length === 0) && (
+            <div className="text-center py-4 text-[11px] text-zinc-500">
+              Nenhum prêmio cadastrado. Clique em "+ Adicionar".
+            </div>
+          )}
         </div>
-
-        {/* Global Save action */}
-        <div className="pt-4 border-t border-white/[0.04] flex justify-end">
-          <button
-            type="button"
-            onClick={handleSavePrizes}
-            disabled={saving}
-            className="admin-btn-primary flex items-center gap-2 !px-6 !py-2.5"
-          >
-            {saving ? (
-              <>
-                <span className="animate-spin text-xs">🔄</span>
-                <span>Salvando...</span>
-              </>
-            ) : (
-              <span>Salvar Regras & Prêmios</span>
-            )}
-          </button>
-        </div>
-
       </div>
 
+      {/* Save */}
+      <div className="flex justify-end pt-2 border-t border-white/[0.04]">
+        <button
+          type="button"
+          onClick={handleSavePrizes}
+          disabled={saving}
+          className="admin-btn-primary !py-2 !px-5 text-[11px] flex items-center gap-2"
+        >
+          {saving ? (
+            <>
+              <span className="w-3 h-3 border-[1.5px] border-current border-t-transparent rounded-full animate-spin" />
+              Salvando...
+            </>
+          ) : (
+            'Salvar Prêmios'
+          )}
+        </button>
+      </div>
     </div>
   )
 }

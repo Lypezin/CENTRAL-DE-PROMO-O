@@ -43,123 +43,121 @@ export default function EditPromoPage() {
   } = usePromoEditor(id as string)
 
   if (loading) return (
-    <div className="p-8 text-center text-white font-mono">
-      Carregando portal...
+    <div className="flex items-center justify-center min-h-[60vh]">
+      <div className="text-center space-y-3">
+        <div className="w-5 h-5 border-2 border-sky-400 border-t-transparent rounded-full animate-spin mx-auto" />
+        <p className="text-xs text-zinc-500 font-mono uppercase tracking-wider">Carregando portal...</p>
+      </div>
     </div>
   )
   if (!promo) return (
-    <div className="p-8 text-center text-red-500 font-mono">
-      Promoção não encontrada.
+    <div className="flex items-center justify-center min-h-[60vh]">
+      <div className="text-center space-y-2">
+        <p className="text-red-400 font-bold text-sm">Promoção não encontrada.</p>
+        <Link href="/admin" className="text-sky-400 text-xs font-mono hover:underline">← Voltar ao painel</Link>
+      </div>
     </div>
   )
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="min-h-screen pb-16 relative overflow-hidden"
-    >
-      <div className="tech-grid"></div>
-
-      <div className="max-w-6xl mx-auto p-4 md:p-8 relative z-10">
-        <div className="mb-8">
+    <div className="min-h-screen pb-12">
+      <div className="max-w-5xl mx-auto px-4 md:px-6 pt-6">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="mb-8"
+        >
           <Link
             href="/admin"
-            className="text-sky-400 hover:text-sky-300 text-xs font-bold uppercase tracking-wider font-mono flex items-center gap-2 mb-4 transition-all hover:gap-3"
+            className="inline-flex items-center gap-1.5 text-zinc-500 hover:text-sky-400 text-[11px] font-mono uppercase tracking-wider mb-5 transition-colors"
           >
-            ← Voltar para listagem
+            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" /></svg>
+            Voltar ao painel
           </Link>
 
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <motion.div
-              initial={{ x: -20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.1 }}
-            >
-              <div className="flex flex-wrap items-center gap-3 mb-2">
-                <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight leading-none">{promo.nome}</h1>
-                {promo.cidade && (
-                  <span className="text-[10px] font-extrabold text-sky-400 px-2 py-0.5 rounded bg-sky-500/10 border border-sky-500/20 uppercase tracking-wider">
-                    📍 {promo.cidade}
-                  </span>
-                )}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2.5">
+                <h1 className="text-xl md:text-2xl font-black text-white tracking-tight">{promo.nome}</h1>
                 <StatusBadge status={promo.status} />
               </div>
-              <p className="text-[10px] text-zinc-500 font-mono">ID: {promo.id} &bull; SLUG: {promo.slug}</p>
-            </motion.div>
-            
-            <motion.div
-              initial={{ x: 20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.15 }}
-              className="flex flex-wrap gap-2.5"
-            >
-              <Tooltip content="Exportar ranking dos entregadores em formato Excel">
+              <div className="flex items-center gap-3 text-[10px] text-zinc-500 font-mono">
+                {promo.cidade && (
+                  <span className="flex items-center gap-1 text-sky-400/80">
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                    {promo.cidade}
+                  </span>
+                )}
+                <span className="text-zinc-700">·</span>
+                <span>{promo.id.slice(0, 8)}</span>
+                <span className="text-zinc-700">·</span>
+                <span>/{promo.slug}</span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Tooltip content="Exportar ranking em Excel">
                 <button
                   onClick={handleExportRanking}
                   disabled={exporting}
-                  className="admin-btn-secondary hover:!text-sky-400 !py-2 !px-4 text-xs flex items-center gap-1.5"
-                  aria-label="Exportar ranking em Excel"
+                  className="admin-btn-secondary !py-2 !px-3.5 text-[11px] flex items-center gap-1.5"
                 >
                   {exporting ? (
-                    <>
-                      <span className="animate-spin inline-block w-2.5 h-2.5 border border-current border-t-transparent rounded-full mr-1"></span>
-                      Exportando...
-                    </>
+                    <span className="w-3 h-3 border-[1.5px] border-current border-t-transparent rounded-full animate-spin" />
                   ) : (
-                    <>
-                      <span>📥</span> Exportar Ranking (Excel)
-                    </>
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
                   )}
+                  <span className="hidden sm:inline">{exporting ? 'Exportando...' : 'Exportar'}</span>
                 </button>
               </Tooltip>
-              <Link 
+              <Link
                 href={`/promo/${promo.slug}`}
                 target="_blank"
-                className="admin-btn-secondary !py-2 !px-4 text-xs"
+                className="admin-btn-secondary !py-2 !px-3.5 text-[11px] flex items-center gap-1.5"
               >
-                Ver página pública
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                <span className="hidden sm:inline">Página pública</span>
               </Link>
-              {promo.status !== 'ativa' && (
-                <button 
+              {promo.status !== 'ativa' ? (
+                <button
                   onClick={() => handleUpdate({ status: 'ativa' })}
                   disabled={saving}
-                  className="admin-btn-primary !from-emerald-500 !to-teal-500 shadow-emerald-500/20 !py-2 !px-4 text-xs"
-                  aria-label="Ativar promoção"
+                  className="admin-btn-primary !bg-emerald-600 hover:!bg-emerald-500 !text-white !py-2 !px-3.5 text-[11px]"
                 >
-                  Ativar Promoção
+                  Ativar
                 </button>
-              )}
-              {promo.status === 'ativa' && (
-                <button 
+              ) : (
+                <button
                   onClick={() => handleUpdate({ status: 'encerrada' })}
                   disabled={saving}
-                  className="admin-btn-danger !py-2 !px-4 text-xs"
-                  aria-label="Encerrar promoção"
+                  className="admin-btn-danger !py-2 !px-3.5 text-[11px]"
                 >
                   Encerrar
                 </button>
               )}
-            </motion.div>
+            </div>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          {/* Left Column */}
           <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="lg:col-span-2 space-y-6"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
+            className="lg:col-span-2 space-y-5"
           >
-            <GeneralSettingsForm 
-              promo={promo} 
-              setPromo={setPromo} 
-              onSave={handleUpdate} 
-              saving={saving} 
+            <GeneralSettingsForm
+              promo={promo}
+              setPromo={setPromo}
+              onSave={handleUpdate}
+              saving={saving}
               setTurnoEditorAtivo={setTurnoEditorAtivo}
             />
-
-            <TurnoPrizesConfigurator 
+            <TurnoPrizesConfigurator
               promo={promo}
               localPremios={localPremios}
               setLocalPremios={setLocalPremios}
@@ -173,11 +171,12 @@ export default function EditPromoPage() {
             />
           </motion.div>
 
+          {/* Right Column */}
           <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.25 }}
-            className="space-y-6"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.15 }}
+            className="space-y-5"
           >
             <PromoPreviewCard
               nome={promo.nome}
@@ -193,64 +192,36 @@ export default function EditPromoPage() {
 
             <StatsOverview stats={stats} />
 
-            <ExcelImportZone 
-              promocaoId={promo.id} 
-              onUploadSuccess={carregarPromo} 
+            <ExcelImportZone
+              promocaoId={promo.id}
+              onUploadSuccess={carregarPromo}
             />
 
-            <motion.div
-              whileHover={{ scale: 1.01 }}
-              className="glass p-6 rounded-2xl border border-red-500/20 bg-red-500/5 space-y-6 shadow-xl"
-            >
-              <div>
-                <h3 className="font-bold text-red-400 mb-2 flex items-center gap-1.5 text-xs uppercase tracking-wider font-mono">
-                  <span>🧹</span> Limpar Dados da Planilha
-                </h3>
-                <p className="text-[11px] text-zinc-500 mb-4 leading-relaxed">
-                  Isso removerá permanentemente TODOS os dados de entregadores importados para esta campanha, zerando os leaderboards.
-                </p>
-                {confirmClearData && (
-                  <div className="text-[10px] text-red-400 mb-2 font-extrabold uppercase tracking-wide font-mono animate-pulse">
-                    ⚠️ Atenção: Clique novamente para confirmar a limpeza total dos dados de entregas!
-                  </div>
-                )}
-                <button 
+            {/* Danger Zone */}
+            <div className="rounded-xl border border-white/[0.04] bg-[#08080a] p-4 space-y-3">
+              <h3 className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider font-mono">Zona de Perigo</h3>
+              <div className="space-y-2">
+                <button
                   onClick={handleClearData}
                   onBlur={() => setConfirmClearData(false)}
                   disabled={clearingData}
-                  className="admin-btn-danger w-full !bg-red-950/40 !border-red-500/30 hover:!bg-red-900/60 !py-2.5 text-xs"
-                  aria-label="Limpar dados da planilha"
+                  className="w-full text-[11px] font-bold py-2 px-3 rounded-lg border border-red-500/20 text-red-400/80 hover:bg-red-500/10 hover:text-red-400 transition-all"
                 >
-                  {clearingData ? 'Limpando...' : confirmClearData ? 'Confirmar Exclusão dos Dados' : 'Limpar Planilha (Excluir Dados)'}
+                  {clearingData ? 'Limpando...' : confirmClearData ? 'Clique novamente para confirmar' : 'Limpar dados da planilha'}
                 </button>
-              </div>
-
-              <div className="pt-6 border-t border-red-500/10">
-                <h3 className="font-bold text-red-400 mb-2 flex items-center gap-1.5 text-xs uppercase tracking-wider font-mono">
-                  <span>⚠️</span> Zona de Perigo
-                </h3>
-                <p className="text-[11px] text-zinc-500 mb-4 leading-relaxed">
-                  A exclusão da promoção apagará todas as configurações de regras e links associados a ela.
-                </p>
-                {confirmDelete && (
-                  <div className="text-[10px] text-red-400 mb-2 font-extrabold uppercase tracking-wide font-mono animate-pulse">
-                    ⚠️ Atenção: Clique novamente para confirmar a EXCLUSÃO PERMANENTE desta promoção.
-                  </div>
-                )}
-                <button 
+                <button
                   onClick={handleDelete}
                   onBlur={() => setConfirmDelete(false)}
                   disabled={deleting}
-                  className="admin-btn-danger w-full text-xs !py-2.5"
-                  aria-label="Excluir promoção"
+                  className="w-full text-[11px] font-bold py-2 px-3 rounded-lg border border-red-500/10 text-red-500/50 hover:bg-red-500/10 hover:text-red-400 transition-all"
                 >
-                  {deleting ? 'Excluindo...' : confirmDelete ? 'Confirmar Exclusão' : 'Excluir Promoção'}
+                  {deleting ? 'Excluindo...' : confirmDelete ? 'Clique novamente para confirmar' : 'Excluir promoção'}
                 </button>
               </div>
-            </motion.div>
+            </div>
           </motion.div>
         </div>
       </div>
-    </motion.div>
+    </div>
   )
 }
