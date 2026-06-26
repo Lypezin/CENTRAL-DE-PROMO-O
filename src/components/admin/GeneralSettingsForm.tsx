@@ -223,39 +223,60 @@ export default function GeneralSettingsForm({
 
         <div className="pt-5 border-t border-white/[0.04] flex flex-col sm:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-6 w-full sm:w-auto p-4 sm:p-0 bg-white/[0.01] sm:bg-transparent rounded-xl border border-white/5 sm:border-transparent">
-            {/* Toggles Destaques Visuais */}
             <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 w-full justify-around">
-              <label className="relative inline-flex items-center cursor-pointer select-none group">
-                <input 
-                  type="checkbox" 
-                  checked={promo.destaque_copa || false}
-                  onChange={e => setPromo({ ...promo, destaque_copa: e.target.checked })}
-                  className="sr-only peer"
-                />
-                <div className="w-10 h-5 bg-zinc-800 rounded-full peer peer-focus:ring-2 peer-focus:ring-amber-500/50 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-zinc-400 after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-600 peer-checked:after:bg-white"></div>
-                <span className="ml-3 text-[11px] font-bold text-zinc-400 group-hover:text-zinc-200 transition-colors font-mono flex items-center gap-1.5 uppercase">
-                  🏆 Destaque Copa
-                </span>
-              </label>
+              <button
+                type="button"
+                onClick={() => setPromo({ ...promo, destaque_copa: !promo.destaque_copa })}
+                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl border text-[11px] font-bold font-mono uppercase tracking-wider transition-all active:scale-95 ${
+                  promo.destaque_copa
+                    ? 'bg-amber-500/15 border-amber-500/30 text-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.15)]'
+                    : 'bg-black/30 border-white/5 text-zinc-500 hover:text-zinc-300'
+                }`}
+                aria-label="Alternar destaque Copa"
+              >
+                <div className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all ${
+                  promo.destaque_copa
+                    ? 'bg-amber-500 border-amber-400'
+                    : 'border-zinc-600 bg-transparent'
+                }`}>
+                  {promo.destaque_copa && (
+                    <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                </div>
+                🏆 Destaque Copa
+              </button>
 
-              <label className="relative inline-flex items-center cursor-pointer select-none group sm:pl-6 sm:border-l border-white/10">
-                <input 
-                  type="checkbox" 
-                  checked={promo.config_regras?.tema_ninja || false}
-                  onChange={e => setPromo({ 
-                    ...promo, 
-                    config_regras: { 
-                      ...(promo.config_regras || {}), 
-                      tema_ninja: e.target.checked 
-                    } 
-                  })}
-                  className="sr-only peer"
-                />
-                <div className="w-10 h-5 bg-zinc-800 rounded-full peer peer-focus:ring-2 peer-focus:ring-zinc-400/50 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-zinc-400 after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-500 peer-checked:after:bg-white shadow-[0_0_10px_rgba(255,255,255,0.0)] peer-checked:shadow-[0_0_10px_rgba(255,255,255,0.1)]"></div>
-                <span className="ml-3 text-[11px] font-bold text-zinc-400 group-hover:text-zinc-200 transition-colors font-mono flex items-center gap-1.5 uppercase">
-                  🥋 Tema Faixa Preta
-                </span>
-              </label>
+              <button
+                type="button"
+                onClick={() => setPromo({
+                  ...promo,
+                  config_regras: {
+                    ...(promo.config_regras || {}),
+                    tema_ninja: !promo.config_regras?.tema_ninja
+                  }
+                })}
+                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl border text-[11px] font-bold font-mono uppercase tracking-wider transition-all active:scale-95 ${
+                  promo.config_regras?.tema_ninja
+                    ? 'bg-zinc-500/15 border-zinc-500/30 text-zinc-300 shadow-[0_0_12px_rgba(255,255,255,0.05)]'
+                    : 'bg-black/30 border-white/5 text-zinc-500 hover:text-zinc-300'
+                }`}
+                aria-label="Alternar tema faixa preta"
+              >
+                <div className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all ${
+                  promo.config_regras?.tema_ninja
+                    ? 'bg-zinc-500 border-zinc-400'
+                    : 'border-zinc-600 bg-transparent'
+                }`}>
+                  {promo.config_regras?.tema_ninja && (
+                    <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                </div>
+                🥋 Tema Faixa Preta
+              </button>
             </div>
           </div>
 

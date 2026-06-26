@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
-import Link from 'next/link'
+import { useState, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import StatusBadge from '@/components/ui/StatusBadge'
+import Tooltip from '@/components/ui/Tooltip'
 import { Promocao } from '@/lib/supabase'
 
 interface AdminPromoListProps {
@@ -12,9 +13,12 @@ interface AdminPromoListProps {
 }
 
 export default function AdminPromoList({ promocoes, loading, onReorder }: AdminPromoListProps) {
+  const router = useRouter()
   const [draggedItemIndex, setDraggedItemIndex] = useState<number | null>(null)
   const [dragOverItemIndex, setDragOverItemIndex] = useState<number | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const dragStartPos = useRef({ x: 0, y: 0 })
+  const isDragging = useRef(false)
 
   const filteredPromocoes = promocoes.filter(p =>
     p.nome.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -22,7 +26,13 @@ export default function AdminPromoList({ promocoes, loading, onReorder }: AdminP
     p.slug.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
+  const handleMouseDown = (e: React.MouseEvent, index: number) => {
+    dragStartPos.current = { x: e.clientX, y: e.clientY }
+    isDragging.current = false
+  }
+
   const handleDragStart = (index: number) => {
+    isDragging.current = true
     setDraggedItemIndex(index)
   }
 
@@ -37,7 +47,6 @@ export default function AdminPromoList({ promocoes, loading, onReorder }: AdminP
       newOrder.splice(draggedItemIndex, 1)
       newOrder.splice(dragOverItemIndex, 0, draggedItem)
       
-      // Update the 'ordem' field locally for the new order array
       const updatedPromos = newOrder.map((promo, idx) => ({
         ...promo,
         config_regras: {
@@ -52,6 +61,12 @@ export default function AdminPromoList({ promocoes, loading, onReorder }: AdminP
     }
     setDraggedItemIndex(null)
     setDragOverItemIndex(null)
+  }
+
+  const handleCardClick = (promoId: string) => {
+    if (!isDragging.current) {
+      router.push(`/admin/promo/${promoId}`)
+    }
   }
 
   if (loading) {
@@ -122,10 +137,12 @@ export default function AdminPromoList({ promocoes, loading, onReorder }: AdminP
         <div 
           key={promo.id} 
           draggable
+          onMouseDown={(e) => handleMouseDown(e, index)}
           onDragStart={() => handleDragStart(index)}
           onDragEnter={() => handleDragEnter(index)}
           onDragEnd={handleDragEnd}
           onDragOver={(e) => e.preventDefault()}
+          onClick={() => handleCardClick(promo.id)}
           className={`obsidian-card group rounded-2xl border ${
             dragOverItemIndex === index 
               ? 'border-dashed border-sky-500 bg-sky-900/20 scale-105' 
@@ -133,16 +150,14 @@ export default function AdminPromoList({ promocoes, loading, onReorder }: AdminP
           } overflow-hidden flex flex-col transition-all duration-300 relative shadow-xl shadow-black/40 cursor-grab active:cursor-grabbing`}
         >
           
-          {/* Drag Handle Icon (Visual indicator) */}
           <div className="absolute top-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-40 transition-opacity">
             <div className="w-8 h-1.5 rounded-full bg-white/20"></div>
           </div>
 
-          {/* Card Accent Top */}
           <div className="h-1 w-full bg-gradient-to-r from-zinc-800 to-zinc-700 group-hover:from-sky-500 group-hover:to-indigo-500 transition-all duration-500"></div>
 
-          <div className="p-5 flex-grow flex flex-col pointer-events-none">
-            <div className="flex justify-between items-start mb-4 pointer-events-auto">
+          <div className="p-5 flex-grow flex flex-col">
+            <div className="flex justify-between items-start mb-4">
               <StatusBadge status={promo.status} />
               {promo.cidade && (
                 <span className="text-[9px] font-black tracking-wider text-sky-400 bg-sky-950/20 border border-sky-900/40 px-2 py-1 rounded uppercase font-mono shadow-inner">
@@ -151,14 +166,14 @@ export default function AdminPromoList({ promocoes, loading, onReorder }: AdminP
               )}
             </div>
 
-            <h3 className="text-lg font-black text-white leading-tight mb-1 group-hover:text-sky-300 transition-colors pointer-events-auto">
+            <h3 className="text-lg font-black text-white leading-tight mb-1 group-hover:text-sky-300 transition-colors">
               {promo.nome}
             </h3>
-            <p className="text-xs text-zinc-500 font-mono mb-4 break-all opacity-70 pointer-events-auto">
+            <p className="text-xs text-zinc-500 font-mono mb-4 break-all opacity-70">
               /{promo.slug}
             </p>
 
-            <div className="mt-auto pt-4 border-t border-white/[0.04] flex items-center justify-between pointer-events-auto">
+            <div className="mt-auto pt-4 border-t border-white/[0.04] flex items-center justify-between">
               <div className="flex flex-col">
                 <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-wider mb-1">Período</span>
                 <span className="text-xs font-mono text-zinc-400">
@@ -166,15 +181,14 @@ export default function AdminPromoList({ promocoes, loading, onReorder }: AdminP
                 </span>
               </div>
               
-              <Link 
-                href={`/admin/promo/${promo.id}`}
-                className="bg-zinc-900 hover:bg-sky-600 text-zinc-300 hover:text-white border border-white/5 hover:border-sky-500/50 px-4 py-2 rounded-lg text-xs font-bold transition-all active:scale-95 flex items-center gap-1.5"
-              >
-                Gerenciar
-                <svg className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
+              <Tooltip content="Gerenciar promoção">
+                <span className="bg-zinc-900 hover:bg-sky-600 text-zinc-300 hover:text-white border border-white/5 hover:border-sky-500/50 px-4 py-2 rounded-lg text-xs font-bold transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer">
+                  Gerenciar
+                  <svg className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                  </svg>
+                </span>
+              </Tooltip>
             </div>
           </div>
         </div>

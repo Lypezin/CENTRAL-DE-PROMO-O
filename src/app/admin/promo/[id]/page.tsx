@@ -222,6 +222,9 @@ export default function EditPromoPage() {
               descricao={promo.descricao}
               data_inicio={promo.data_inicio}
               data_fim={promo.data_fim}
+              destaque_copa={promo.destaque_copa}
+              tema_ninja={promo.config_regras?.tema_ninja}
+              config_turnos={promo.config_turnos}
             />
 
             <StatsOverview stats={stats} />
