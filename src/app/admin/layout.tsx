@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -8,13 +8,18 @@ import { motion, AnimatePresence } from 'framer-motion'
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [hasSession, setHasSession] = useState(true)
+
+  useEffect(() => {
+    setHasSession(!!document?.cookie?.includes('admin_session'))
+  }, [])
 
   const navItems = [
     { href: '/admin', label: 'Dashboard', icon: '📊' },
     { href: '/admin/promo', label: 'Promoções', icon: '🏆' },
   ]
 
-  const isLoginPage = pathname === '/admin' && !document?.cookie?.includes('admin_session')
+  const isLoginPage = pathname === '/admin' && !hasSession
 
   return (
     <div className="min-h-screen bg-[#030303] flex">
