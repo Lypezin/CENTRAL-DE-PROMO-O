@@ -38,10 +38,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       )}
 
       {!isLoginPage && (
-        <motion.aside
-          initial={{ x: -280 }}
-          animate={{ x: sidebarOpen ? 0 : -280 }}
-          className="fixed lg:static lg:translate-x-0 top-0 left-0 w-64 h-screen bg-[#0a0a0c] border-r border-white/[0.04] z-30 flex flex-col shadow-2xl shadow-black/50 transition-transform duration-300"
+        <aside
+          className={`fixed lg:static top-0 left-0 w-64 h-screen bg-[#0a0a0c] border-r border-white/[0.04] z-30 flex flex-col shadow-2xl shadow-black/50 transition-transform duration-300 ${
+            sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+          }`}
         >
           <div className="p-5 border-b border-white/[0.04]">
             <Link href="/admin" className="flex items-center gap-2">
@@ -90,7 +90,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               Ver Site
             </Link>
           </div>
-        </motion.aside>
+        </aside>
       )}
 
       {!isLoginPage && (
