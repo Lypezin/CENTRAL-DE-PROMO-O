@@ -5,7 +5,7 @@ import StatusBadge from '@/components/ui/StatusBadge'
 import CopaThemeForcer from '@/components/promo/CopaThemeForcer'
 import NinjaThemeForcer from '@/components/promo/NinjaThemeForcer'
 
-export const revalidate = 0 // Disable cache for real-time data accuracy
+export const revalidate = 60 // Disable cache for real-time data accuracy
 
 export default async function PromoPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
@@ -26,23 +26,17 @@ export default async function PromoPage({ params }: { params: Promise<{ slug: st
     return `${day}/${month}/${year}`
   }
 
-  // Fetch real dates of imported deliverer rides data
-  const { data: minDataRes } = await supabase
+  // Fetch earliest date
+  const { data: dataRes } = await supabase
     .from('entregas')
     .select('data_do_periodo')
     .eq('promocao_id', promo.id)
     .order('data_do_periodo', { ascending: true })
     .limit(1)
 
-  const { data: maxDataRes } = await supabase
-    .from('entregas')
-    .select('data_do_periodo')
-    .eq('promocao_id', promo.id)
-    .order('data_do_periodo', { ascending: false })
-    .limit(1)
 
-  const minData = minDataRes?.[0]?.data_do_periodo || null
-  const maxData = maxDataRes?.[0]?.data_do_periodo || null
+  const minData = dataRes?.[0]?.data_do_periodo || null
+  const maxData = minData
 
   const formatDataShort = (dataStr: string | null) => {
     if (!dataStr) return ''

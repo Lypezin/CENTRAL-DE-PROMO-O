@@ -2,13 +2,26 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import { motion } from 'framer-motion'
 import { Promocao } from '@/lib/supabase'
 import { useToast } from '@/components/ui/Toast'
 
-// Custom Admin Components
 import AdminLoginScreen from '@/components/admin/AdminLoginScreen'
 import AdminPromoList from '@/components/admin/AdminPromoList'
 import SiteConfigPanel from '@/components/admin/SiteConfigPanel'
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.08 }
+  }
+}
+
+const itemVariants = {
+  hidden: { y: 16, opacity: 0 },
+  visible: { y: 0, opacity: 1 }
+}
 
 export default function AdminPage() {
   const router = useRouter()
@@ -18,12 +31,10 @@ export default function AdminPage() {
   const [pageState, setPageState] = useState<'login' | 'admin'>('login')
   const [nomeAdmin, setNomeAdmin] = useState('')
   
-  // Dashboard states
   const [promocoes, setPromocoes] = useState<Promocao[]>([])
   const [loading, setLoading] = useState(true)
   const [creating, setCreating] = useState(false)
 
-  // Analytics states
   const [onlineCount, setOnlineCount] = useState<number>(1)
   const [totalVisits, setTotalVisits] = useState<number>(0)
 
@@ -31,7 +42,6 @@ export default function AdminPage() {
     setIsMounted(true)
   }, [])
 
-  // WebSockets para presença online
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const count = (window as any).__onlineCount
@@ -95,7 +105,7 @@ export default function AdminPage() {
   }
 
   const handleReorder = async (newOrder: Promocao[]) => {
-    setPromocoes(newOrder) // Optimistic update
+    setPromocoes(newOrder)
     
     try {
       const updates = newOrder.map((promo, index) => ({
@@ -157,7 +167,6 @@ export default function AdminPage() {
     }
   }
 
-  // Pre-render loading shell during hydration
   if (!isMounted) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-[#030303]">
@@ -170,7 +179,6 @@ export default function AdminPage() {
     )
   }
 
-  // Tela de Login e Registro Modularizada
   if (pageState === 'login') {
     return (
       <AdminLoginScreen 
@@ -182,17 +190,22 @@ export default function AdminPage() {
     )
   }
 
-  // Dashboard do Painel de Admin
   return (
-    <div className="min-h-screen pb-16 relative overflow-hidden bg-[#030303]">
-      {/* Ambient Background */}
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="min-h-screen pb-16 relative overflow-hidden bg-[#030303]"
+    >
       <div className="tech-grid opacity-30 pointer-events-none"></div>
       <div className="absolute top-0 inset-x-0 h-[300px] bg-gradient-to-b from-sky-500/5 to-transparent pointer-events-none"></div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 py-8 relative z-10 animate-slide-up">
-        
-        {/* Painel Header Centralizado */}
-        <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-10 gap-6 border-b border-white/[0.04] pb-6">
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 py-8 relative z-10"
+      >
+        <motion.div variants={itemVariants} className="flex flex-col md:flex-row justify-between items-center md:items-end mb-10 gap-6 border-b border-white/[0.04] pb-6">
           <div className="text-center md:text-left flex-1">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-sky-500/10 border border-sky-500/20 rounded-full text-[10px] font-bold text-sky-400 uppercase tracking-widest font-mono mb-3">
               <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse"></span>
@@ -203,16 +216,22 @@ export default function AdminPage() {
           </div>
           
           <div className="flex flex-wrap justify-center md:justify-end gap-3 w-full md:w-auto">
-            <button 
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
               onClick={handleLogout} 
-              className="bg-zinc-900 hover:bg-red-950/40 text-zinc-400 hover:text-red-400 border border-white/[0.04] hover:border-red-500/30 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all active:scale-95"
+              className="bg-zinc-900 hover:bg-red-950/40 text-zinc-400 hover:text-red-400 border border-white/[0.04] hover:border-red-500/30 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all"
+              aria-label="Encerrar sessão"
             >
               Encerrar Sessão
-            </button>
-            <button 
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
               onClick={handleCriarPromocao} 
               disabled={creating}
-              className="bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white border border-sky-400/50 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider shadow-lg shadow-sky-500/20 transition-all active:scale-95 flex items-center gap-2"
+              className="bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white border border-sky-400/50 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider shadow-lg shadow-sky-500/20 transition-all flex items-center gap-2"
+              aria-label="Criar nova promoção"
             >
               {creating ? (
                 <>
@@ -225,19 +244,19 @@ export default function AdminPage() {
                   Nova Promoção
                 </>
               )}
-            </button>
+            </motion.button>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Site Configuration (Global) */}
-        <div className="mb-8">
+        <motion.div variants={itemVariants} className="mb-8">
           <SiteConfigPanel />
-        </div>
+        </motion.div>
 
-        {/* Analytics Cards Dashboard */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-          {/* Active Online Users Card */}
-          <div className="obsidian-card p-6 rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-[#050806] to-emerald-950/20 relative overflow-hidden group flex items-center justify-between transition-all hover:border-emerald-500/40">
+        <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            className="obsidian-card p-6 rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-[#050806] to-emerald-950/20 relative overflow-hidden group flex items-center justify-between transition-all hover:border-emerald-500/40"
+          >
             <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-emerald-500/10 blur-[30px] rounded-full group-hover:bg-emerald-500/20 transition-colors"></div>
             <div className="relative z-10">
               <div className="text-[10px] font-bold text-emerald-500/80 uppercase tracking-wider font-mono mb-2 flex items-center gap-2">
@@ -251,10 +270,12 @@ export default function AdminPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
               </svg>
             </div>
-          </div>
+          </motion.div>
 
-          {/* Total Hits/Visits Card */}
-          <div className="obsidian-card p-6 rounded-2xl border border-sky-500/20 bg-gradient-to-br from-[#050608] to-sky-950/20 relative overflow-hidden group flex items-center justify-between transition-all hover:border-sky-500/40">
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            className="obsidian-card p-6 rounded-2xl border border-sky-500/20 bg-gradient-to-br from-[#050608] to-sky-950/20 relative overflow-hidden group flex items-center justify-between transition-all hover:border-sky-500/40"
+          >
             <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-sky-500/10 blur-[30px] rounded-full group-hover:bg-sky-500/20 transition-colors"></div>
             <div className="relative z-10">
               <div className="text-[10px] font-bold text-sky-500/80 uppercase tracking-wider font-mono mb-2 flex items-center gap-2">
@@ -268,20 +289,18 @@ export default function AdminPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
               </svg>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
-        {/* Gerenciamento de Promoções (Lista Substituída) */}
-        <div>
+        <motion.div variants={itemVariants}>
           <div className="mb-4">
             <h2 className="text-xl font-bold text-white">Gestão de Promoções</h2>
             <p className="text-xs text-zinc-500 mt-1">Selecione uma promoção ativa ou arquivada para editar regras e painéis.</p>
           </div>
           
           <AdminPromoList promocoes={promocoes} loading={loading} onReorder={handleReorder} />
-        </div>
-
-      </div>
-    </div>
+        </motion.div>
+      </motion.div>
+    </motion.div>
   )
 }

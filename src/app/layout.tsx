@@ -35,7 +35,8 @@ export default async function RootLayout({
     if (data?.valor?.tema_ativo) {
       temaAtivo = data.valor.tema_ativo
     }
-  } catch {
+  } catch (e) {
+    console.error('Failed to fetch theme:', e);
     // Default to 'raios' if table doesn't exist yet
   }
 

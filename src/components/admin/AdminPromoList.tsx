@@ -14,6 +14,13 @@ interface AdminPromoListProps {
 export default function AdminPromoList({ promocoes, loading, onReorder }: AdminPromoListProps) {
   const [draggedItemIndex, setDraggedItemIndex] = useState<number | null>(null)
   const [dragOverItemIndex, setDragOverItemIndex] = useState<number | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+
+  const filteredPromocoes = promocoes.filter(p =>
+    p.nome.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (p.cidade && p.cidade.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    p.slug.toLowerCase().includes(searchQuery.toLowerCase())
+  )
 
   const handleDragStart = (index: number) => {
     setDraggedItemIndex(index)
@@ -78,8 +85,40 @@ export default function AdminPromoList({ promocoes, loading, onReorder }: AdminP
   }
 
   return (
+    <>
+      <div className="relative mb-5">
+        <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+          placeholder="Buscar promoção por nome, cidade ou slug..."
+          className="w-full bg-[#0a0a0c] border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-sky-500/50 transition-all"
+          aria-label="Buscar promoções"
+        />
+        {searchQuery && (
+          <button
+            onClick={() => setSearchQuery('')}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors"
+            aria-label="Limpar busca"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        )}
+      </div>
+
+      {filteredPromocoes.length === 0 && searchQuery && (
+        <div className="glass p-8 rounded-2xl border border-white/10 text-center">
+          <p className="text-zinc-500 text-sm">Nenhuma promoção encontrada para <span className="text-zinc-300 font-medium">"{searchQuery}"</span></p>
+        </div>
+      )}
+
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-      {promocoes.map((promo, index) => (
+      {filteredPromocoes.map((promo, index) => (
         <div 
           key={promo.id} 
           draggable
@@ -141,5 +180,6 @@ export default function AdminPromoList({ promocoes, loading, onReorder }: AdminP
         </div>
       ))}
     </div>
+    </>
   )
 }

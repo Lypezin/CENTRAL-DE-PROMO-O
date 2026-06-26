@@ -1,7 +1,7 @@
 import { supabase, Promocao } from '@/lib/supabase'
 import HubContent from '@/components/promo/HubContent'
 
-export const revalidate = 0 // Disable cache for real-time accuracy
+export const revalidate = 60 // Disable cache for real-time accuracy
 
 export default async function HubPage() {
   // Fetch active, draft and past promotions ordered properly

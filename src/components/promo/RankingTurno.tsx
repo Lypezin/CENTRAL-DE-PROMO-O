@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { supabase, EntregaRanking } from '@/lib/supabase'
-import { formatCurrency, getMedalha } from '@/lib/config'
+import { formatCurrency } from '@/lib/config'
 
 // Subcomponents import
 import { RankingFilters } from '../views/ranking-turno/RankingFilters'
@@ -53,6 +53,7 @@ export default function RankingTurno({
   const [rankingData, setRankingData] = useState<EntregaRanking[]>([])
   const [loading, setLoading] = useState(true)
   const [painelAberto, setPainelAberto] = useState(false)
+  const rankingCache = useRef(new Map())
 
   // Otimização de Performance: Debouncing nativo e leve para evitar recalcular filtros pesados em tempo de digitação
   useEffect(() => {
@@ -75,14 +76,20 @@ export default function RankingTurno({
   }, [isGeral, turnosDisponiveis, filtroAtivo])
 
   useEffect(() => {
-    async function fetchRanking() {
+    async function fetchRanking() {  const cacheKey = promocaoId + ':' + filtroAtivo
+      if (rankingCache.current.has(cacheKey)) {
+        setRankingData(rankingCache.current.get(cacheKey))
+        setLoading(false)
+        return
+      }
       setLoading(true)
       const { data, error } = await supabase.rpc('get_ranking_por_promocao', {
         p_promocao_id: promocaoId,
         p_periodo: filtroAtivo,
-        p_limite: 1000
+        p_limite: 200
       })
       if (!error && data) {
+        rankingCache.current.set(cacheKey, data)
         setRankingData(data)
       }
       setLoading(false)

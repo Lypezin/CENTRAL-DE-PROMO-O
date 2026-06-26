@@ -1,9 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import LightningBackground from './LightningBackground'
-import WorldCupBackground from './WorldCupBackground'
-import NinjaBackground from './NinjaBackground'
+import dynamic from 'next/dynamic'
+
+const LightningBackground = dynamic(() => import('./LightningBackground'), { ssr: false })
+const WorldCupBackground = dynamic(() => import('./WorldCupBackground'), { ssr: false })
+const NinjaBackground = dynamic(() => import('./NinjaBackground'), { ssr: false })
 
 interface DynamicBackgroundProps {
   temaAtivo: 'raios' | 'copa' | 'ninja'
@@ -26,7 +28,6 @@ export default function DynamicBackground({ temaAtivo }: DynamicBackgroundProps)
 
   const currentTheme = forcedTheme || temaAtivo
 
-  // Add/remove theme class on body element based on active theme
   useEffect(() => {
     if (currentTheme === 'copa') {
       document.body.classList.add('tema-copa')

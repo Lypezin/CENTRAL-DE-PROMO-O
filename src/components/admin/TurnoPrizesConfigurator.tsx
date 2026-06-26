@@ -4,6 +4,7 @@ import TurnoPrizeRow from './TurnoPrizeRow'
 import React from 'react'
 import { Promocao } from '@/lib/supabase'
 import { useToast } from '@/components/ui/Toast'
+import Tooltip from '@/components/ui/Tooltip'
 
 interface TurnoPrizesConfiguratorProps {
   promo: Promocao
@@ -98,7 +99,7 @@ export default function TurnoPrizesConfigurator({
       novosPremios.push(turnoConfig)
     }
     if (!turnoConfig.premios) turnoConfig.premios = []
-    turnoConfig.premios.push({ posicao: turnoConfig.premios.length + 1, valor: 100 })
+    turnoConfig.premios.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), posicao: turnoConfig.premios.length + 1, valor: 100 })
     setLocalPremios(novosPremios)
   }
 
@@ -107,6 +108,29 @@ export default function TurnoPrizesConfigurator({
     const turnoConfig = novosPremios.find(t => t.turno === turnoEditorAtivo)
     if (turnoConfig && turnoConfig.premios) {
       turnoConfig.premios.splice(idx, 1)
+      setLocalPremios(novosPremios)
+    }
+  }
+
+  const handleMoveUp = (idx: number) => {
+    if (idx <= 0) return
+    const novosPremios = [...localPremios]
+    const turnoConfig = novosPremios.find(t => t.turno === turnoEditorAtivo)
+    if (turnoConfig && turnoConfig.premios) {
+      const tmp = turnoConfig.premios[idx]
+      turnoConfig.premios[idx] = turnoConfig.premios[idx - 1]
+      turnoConfig.premios[idx - 1] = tmp
+      setLocalPremios(novosPremios)
+    }
+  }
+
+  const handleMoveDown = (idx: number) => {
+    const novosPremios = [...localPremios]
+    const turnoConfig = novosPremios.find(t => t.turno === turnoEditorAtivo)
+    if (turnoConfig && turnoConfig.premios && idx < turnoConfig.premios.length - 1) {
+      const tmp = turnoConfig.premios[idx]
+      turnoConfig.premios[idx] = turnoConfig.premios[idx + 1]
+      turnoConfig.premios[idx + 1] = tmp
       setLocalPremios(novosPremios)
     }
   }
@@ -227,7 +251,9 @@ export default function TurnoPrizesConfigurator({
           </h3>
           <div className="flex flex-col md:flex-row md:items-center gap-4">
             <div className="flex-1 w-full">
-              <label htmlFor="turno-minimo" className="block text-[9px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1">Mínimo de Corridas no Turno</label>
+              <Tooltip content="Número mínimo de corridas que o entregador precisa completar neste turno para receber o prêmio">
+                <label htmlFor="turno-minimo" className="block text-[9px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1">Mínimo de Corridas no Turno</label>
+              </Tooltip>
               <input
                 id="turno-minimo"
                 type="number"
@@ -260,15 +286,22 @@ export default function TurnoPrizesConfigurator({
           </div>
 
           <div className="space-y-2.5">
-            {turnoConfigObj.premios?.map((p: any, idx: number) => (
+            {turnoConfigObj.premios?.map((p: any, idx: number) => {
+              const premios = turnoConfigObj.premios || []
+              return (
               <TurnoPrizeRow
-                key={idx}
+                key={p.id || `${turnoEditorAtivo}_${p.posicao || idx}`}
                 premio={p}
                 idx={idx}
+                isFirst={idx === 0}
+                isLast={idx === premios.length - 1}
                 onUpdate={handleUpdatePremioRow}
                 onRemove={handleRemovePremioRow}
+                onMoveUp={handleMoveUp}
+                onMoveDown={handleMoveDown}
               />
-            ))}
+              )
+            })}
 
             {(!turnoConfigObj.premios || turnoConfigObj.premios.length === 0) && (
               <div className="text-center p-6 bg-black/45 border border-white/[0.04] rounded-xl text-xs text-zinc-500 select-none">

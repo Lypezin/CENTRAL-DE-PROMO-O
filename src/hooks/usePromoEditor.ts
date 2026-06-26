@@ -27,7 +27,7 @@ export function usePromoEditor(id: string | string[]) {
   const [confirmClearData, setConfirmClearData] = useState(false)
   const [exporting, setExporting] = useState(false)
 
-  const [localPremios, setLocalPremios] = useState<any[]>([])
+  const [localPremios, setLocalPremios] = useState<Promocao['config_premios']>([])
   const [turnoEditorAtivo, setTurnoEditorAtivo] = useState<string>('CAFE_DA_MANHA')
   const [activeTurnos, setActiveTurnos] = useState<string[]>(['CAFE_DA_MANHA', 'ALMOCO', 'TARDE', 'JANTAR', 'MADRUGADA'])
 
@@ -85,7 +85,7 @@ export function usePromoEditor(id: string | string[]) {
         setTurnoEditorAtivo(activeTurnos[0])
       }
     }
-  }, [activeTurnos, turnoEditorAtivo, promo])
+  }, [activeTurnos, turnoEditorAtivo, promo?.config_regras?.mecanica?.agrupamento])
 
   const handleUpdate = async (fields: Partial<Promocao>) => {
     setSaving(true)

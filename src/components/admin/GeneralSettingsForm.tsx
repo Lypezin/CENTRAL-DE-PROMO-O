@@ -1,8 +1,9 @@
 'use client'
 
-import React from 'react'
+import React, { useRef, useCallback } from 'react'
 import { Promocao } from '@/lib/supabase'
 import { useToast } from '@/components/ui/Toast'
+import Tooltip from '@/components/ui/Tooltip'
 
 interface GeneralSettingsFormProps {
   promo: Promocao
@@ -20,6 +21,7 @@ export default function GeneralSettingsForm({
   setTurnoEditorAtivo
 }: GeneralSettingsFormProps) {
   const toast = useToast()
+  const descRef = useRef<HTMLDivElement>(null)
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -36,6 +38,19 @@ export default function GeneralSettingsForm({
     }).then(() => toast.success('Alterações gerais salvas com sucesso!'))
   }
 
+  const execFormat = useCallback((cmd: string, val?: string) => {
+    document.execCommand(cmd, false, val)
+    if (descRef.current) {
+      setPromo({ ...promo, descricao: descRef.current.innerHTML })
+    }
+  }, [promo, setPromo])
+
+  const handleDescChange = useCallback(() => {
+    if (descRef.current) {
+      setPromo({ ...promo, descricao: descRef.current.innerHTML })
+    }
+  }, [promo, setPromo])
+
   return (
     <form onSubmit={handleSubmit} className="glass p-6 rounded-2xl border border-white/10 shadow-xl space-y-6">
       <h2 className="text-lg font-bold text-white flex items-center gap-2 uppercase tracking-wider font-mono select-none">
@@ -45,7 +60,9 @@ export default function GeneralSettingsForm({
       <div className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label htmlFor="geral-nome" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Nome da Promoção</label>
+            <Tooltip content="Nome público da campanha exibido nos cards e página da promoção">
+              <label htmlFor="geral-nome" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Nome da Promoção</label>
+            </Tooltip>
             <input 
               id="geral-nome"
               type="text" 
@@ -75,7 +92,7 @@ export default function GeneralSettingsForm({
               value={promo.config_regras?.mecanica?.metrica ?? 'corridas_completadas'}
               onChange={e => {
                 const val = e.target.value
-                const updates: any = { metrica: val }
+                const updates: Record<string, string> = { metrica: val }
                 let novosTurnos = promo.config_turnos
                 
                 if (val === 'pontos') {
@@ -114,14 +131,35 @@ export default function GeneralSettingsForm({
         </div>
         
         <div>
-          <label htmlFor="geral-descricao" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Descrição</label>
-          <textarea 
-            id="geral-descricao"
-            value={promo.descricao || ''}
-            onChange={e => setPromo({ ...promo, descricao: e.target.value })}
-            rows={3}
-            className="admin-input"
-            placeholder="Descreva a praça ou as regras de premiação rápida da promoção..."
+          <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Descrição</label>
+          <Tooltip content="Use os botões para formatar o texto em negrito ou itálico">
+            <div className="flex gap-1 mb-1.5 border border-white/10 rounded-lg p-1 bg-[#0a0a0c] w-max">
+              <button
+                type="button"
+                onClick={() => execFormat('bold')}
+                className="px-2.5 py-1 text-xs font-bold text-zinc-400 hover:text-white hover:bg-white/5 rounded transition-all"
+                aria-label="Negrito"
+              ><strong>B</strong></button>
+              <button
+                type="button"
+                onClick={() => execFormat('italic')}
+                className="px-2.5 py-1 text-xs italic text-zinc-400 hover:text-white hover:bg-white/5 rounded transition-all"
+                aria-label="Itálico"
+              ><em>I</em></button>
+            </div>
+          </Tooltip>
+          <div
+            ref={descRef}
+            contentEditable
+            role="textbox"
+            aria-multiline="true"
+            aria-label="Descrição da promoção"
+            suppressContentEditableWarning
+            onInput={handleDescChange}
+            onBlur={handleDescChange}
+            className="admin-input min-h-[72px] cursor-text [&:empty:before]:content-[attr(data-placeholder)] [&:empty:before]:text-zinc-600"
+            data-placeholder="Descreva a praça ou as regras de premiação rápida da promoção..."
+            dangerouslySetInnerHTML={{ __html: promo.descricao || '' }}
           />
         </div>
 

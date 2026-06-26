@@ -93,16 +93,6 @@ export function normalizarPeriodo(periodo: string): TurnoKey | null {
   return MAPEAMENTO_PERIODOS[periodo.toUpperCase().trim()] ?? null
 }
 
-export function getPremio(turnoKey: TurnoKey, posicao: number): number {
-  const config = TURNOS_CONFIG[turnoKey]
-  if (!config) return 0
-  for (const p of config.premios) {
-    if ('posicao' in p && p.posicao === posicao) return p.valor
-    if ('posicao_inicio' in p && posicao >= p.posicao_inicio! && posicao <= p.posicao_fim!) return p.valor
-  }
-  return 0
-}
-
 export function formatCurrency(value: number): string {
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
