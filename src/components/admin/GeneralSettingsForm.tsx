@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef, useCallback } from 'react'
+import React from 'react'
 import { Promocao } from '@/lib/supabase'
 import { useToast } from '@/components/ui/Toast'
 import Tooltip from '@/components/ui/Tooltip'
@@ -21,8 +21,7 @@ export default function GeneralSettingsForm({
   setTurnoEditorAtivo
 }: GeneralSettingsFormProps) {
   const toast = useToast()
-  const descRef = useRef<HTMLDivElement>(null)
-  
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     onSave({
@@ -38,18 +37,21 @@ export default function GeneralSettingsForm({
     }).then(() => toast.success('Alterações gerais salvas com sucesso!'))
   }
 
-  const execFormat = useCallback((cmd: string, val?: string) => {
-    document.execCommand(cmd, false, val)
-    if (descRef.current) {
-      setPromo({ ...promo, descricao: descRef.current.innerHTML })
-    }
-  }, [promo, setPromo])
-
-  const handleDescChange = useCallback(() => {
-    if (descRef.current) {
-      setPromo({ ...promo, descricao: descRef.current.innerHTML })
-    }
-  }, [promo, setPromo])
+  const wrapFormat = (tag: string, char: string) => {
+    const ta = document.getElementById('geral-descricao') as HTMLTextAreaElement
+    if (!ta) return
+    const start = ta.selectionStart
+    const end = ta.selectionEnd
+    const text = promo.descricao || ''
+    const before = text.substring(0, start)
+    const selected = text.substring(start, end)
+    const after = text.substring(end)
+    setPromo({ ...promo, descricao: before + char + selected + char + after })
+    requestAnimationFrame(() => {
+      ta.focus()
+      ta.setSelectionRange(start + char.length, end + char.length)
+    })
+  }
 
   return (
     <form onSubmit={handleSubmit} className="glass p-6 rounded-2xl border border-white/10 shadow-xl space-y-6">
@@ -131,35 +133,30 @@ export default function GeneralSettingsForm({
         </div>
         
         <div>
-          <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Descrição</label>
-          <Tooltip content="Use os botões para formatar o texto em negrito ou itálico">
+          <label htmlFor="geral-descricao" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Descrição</label>
+          <Tooltip content="Selecione o texto e clique nos botões para formatar">
             <div className="flex gap-1 mb-1.5 border border-white/10 rounded-lg p-1 bg-[#0a0a0c] w-max">
               <button
                 type="button"
-                onClick={() => execFormat('bold')}
+                onClick={() => wrapFormat('strong', '**')}
                 className="px-2.5 py-1 text-xs font-bold text-zinc-400 hover:text-white hover:bg-white/5 rounded transition-all"
                 aria-label="Negrito"
               ><strong>B</strong></button>
               <button
                 type="button"
-                onClick={() => execFormat('italic')}
+                onClick={() => wrapFormat('em', '_')}
                 className="px-2.5 py-1 text-xs italic text-zinc-400 hover:text-white hover:bg-white/5 rounded transition-all"
                 aria-label="Itálico"
               ><em>I</em></button>
             </div>
           </Tooltip>
-          <div
-            ref={descRef}
-            contentEditable
-            role="textbox"
-            aria-multiline="true"
-            aria-label="Descrição da promoção"
-            suppressContentEditableWarning
-            onInput={handleDescChange}
-            onBlur={handleDescChange}
-            className="admin-input min-h-[72px] cursor-text [&:empty:before]:content-[attr(data-placeholder)] [&:empty:before]:text-zinc-600"
-            data-placeholder="Descreva a praça ou as regras de premiação rápida da promoção..."
-            dangerouslySetInnerHTML={{ __html: promo.descricao || '' }}
+          <textarea
+            id="geral-descricao"
+            value={promo.descricao || ''}
+            onChange={e => setPromo({ ...promo, descricao: e.target.value })}
+            rows={3}
+            className="admin-input"
+            placeholder="Descreva a praça ou as regras de premiação rápida da promoção..."
           />
         </div>
 

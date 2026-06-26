@@ -6,7 +6,6 @@ import { motion } from 'framer-motion'
 import StatusBadge from '@/components/ui/StatusBadge'
 import Tooltip from '@/components/ui/Tooltip'
 import { usePromoEditor } from '@/hooks/usePromoEditor'
-import { useAutoSave } from '@/hooks/useAutoSave'
 
 import StatsOverview from '@/components/admin/StatsOverview'
 import ExcelImportZone from '@/components/admin/ExcelImportZone'
@@ -43,21 +42,6 @@ export default function EditPromoPage() {
     handleExportRanking
   } = usePromoEditor(id as string)
 
-  const { status: autoSaveStatus, triggerNow: triggerSave } = useAutoSave(
-    {
-      nome: promo?.nome ?? '',
-      cidade: promo?.cidade ?? '',
-      descricao: promo?.descricao ?? '',
-      data_inicio: promo?.data_inicio ?? '',
-      data_fim: promo?.data_fim ?? '',
-      status: promo?.status ?? 'rascunho',
-    },
-    async (fields) => {
-      await handleUpdate(fields as Record<string, unknown>)
-    },
-    2000
-  )
-
   if (loading) return (
     <div className="p-8 text-center text-white font-mono">
       Carregando portal...
@@ -85,26 +69,6 @@ export default function EditPromoPage() {
           >
             ← Voltar para listagem
           </Link>
-
-          <div className="flex items-center gap-3 mb-4">
-            <div className={`px-2.5 py-1 rounded-full text-[10px] font-bold font-mono uppercase tracking-wider flex items-center gap-1.5 ${
-              autoSaveStatus === 'saving' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' :
-              autoSaveStatus === 'saved' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
-              autoSaveStatus === 'error' ? 'bg-red-500/10 text-red-400 border border-red-500/20' :
-              'bg-zinc-500/10 text-zinc-400 border border-zinc-500/20'
-            }`}>
-              <span className={`w-1.5 h-1.5 rounded-full ${
-                autoSaveStatus === 'saving' ? 'bg-amber-400 animate-pulse' :
-                autoSaveStatus === 'saved' ? 'bg-emerald-400' :
-                autoSaveStatus === 'error' ? 'bg-red-400' :
-                'bg-zinc-400'
-              }`} />
-              {autoSaveStatus === 'saving' ? 'Salvando...' :
-               autoSaveStatus === 'saved' ? 'Salvo ✓' :
-               autoSaveStatus === 'error' ? 'Erro ao salvar' :
-               'Auto-save'}
-            </div>
-          </div>
 
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <motion.div
@@ -190,7 +154,7 @@ export default function EditPromoPage() {
             <GeneralSettingsForm 
               promo={promo} 
               setPromo={setPromo} 
-              onSave={async (fields) => { await handleUpdate(fields); triggerSave() }} 
+              onSave={handleUpdate} 
               saving={saving} 
               setTurnoEditorAtivo={setTurnoEditorAtivo}
             />
