@@ -26,25 +26,24 @@ export default async function PromoPage({ params }: { params: Promise<{ slug: st
     return `${day}/${month}/${year}`
   }
 
-  // Fetch earliest date
-  const { data: dataRes } = await supabase
-    .from('entregas')
-    .select('data_do_periodo')
-    .eq('promocao_id', promo.id)
-    .order('data_do_periodo', { ascending: true })
-    .limit(1)
+  // Fetch earliest and latest dates
+  const [minDataRes, maxDataRes] = await Promise.all([
+    supabase
+      .from('entregas')
+      .select('data_do_periodo')
+      .eq('promocao_id', promo.id)
+      .order('data_do_periodo', { ascending: true })
+      .limit(1),
+    supabase
+      .from('entregas')
+      .select('data_do_periodo')
+      .eq('promocao_id', promo.id)
+      .order('data_do_periodo', { ascending: false })
+      .limit(1)
+  ])
 
-
-  const minData = dataRes?.[0]?.data_do_periodo || null
-  const maxData = minData
-
-  const formatDataShort = (dataStr: string | null) => {
-    if (!dataStr) return ''
-    const parts = dataStr.split('-')
-    if (parts.length < 3) return dataStr
-    const [, month, day] = parts
-    return `${day}/${month}`
-  }
+  const minData = minDataRes.data?.[0]?.data_do_periodo || null
+  const maxData = maxDataRes.data?.[0]?.data_do_periodo || null
 
   const isNinja = promo.config_regras?.tema_ninja === true
 
@@ -110,8 +109,8 @@ export default async function PromoPage({ params }: { params: Promise<{ slug: st
                   <span className="font-mono text-[11px] sm:text-xs md:text-sm font-black tracking-tight whitespace-nowrap drop-shadow-md">
                     {minData && maxData ? (
                       minData === maxData 
-                        ? `Dia ${formatDataShort(minData)}`
-                        : `${formatDataShort(minData)} — ${formatDataShort(maxData)}`
+                        ? `Dia ${formatData(minData)}`
+                        : `${formatData(minData)} — ${formatData(maxData)}`
                     ) : (
                       'Aguardando dados...'
                     )}
@@ -173,8 +172,8 @@ export default async function PromoPage({ params }: { params: Promise<{ slug: st
                   <span className="font-mono text-[11px] sm:text-xs md:text-sm font-black tracking-tight whitespace-nowrap drop-shadow-md">
                     {minData && maxData ? (
                       minData === maxData 
-                        ? `Dia ${formatDataShort(minData)}`
-                        : `${formatDataShort(minData)} — ${formatDataShort(maxData)}`
+                        ? `Dia ${formatData(minData)}`
+                        : `${formatData(minData)} — ${formatData(maxData)}`
                     ) : (
                       'Aguardando dados...'
                     )}
@@ -230,8 +229,8 @@ export default async function PromoPage({ params }: { params: Promise<{ slug: st
                 <span className="font-mono text-[11px] sm:text-xs md:text-sm font-bold tracking-tight whitespace-nowrap">
                   {minData && maxData ? (
                     minData === maxData 
-                      ? `Dia ${formatDataShort(minData)}`
-                      : `${formatDataShort(minData)} — ${formatDataShort(maxData)}`
+                      ? `Dia ${formatData(minData)}`
+                      : `${formatData(minData)} — ${formatData(maxData)}`
                   ) : (
                     'Aguardando dados...'
                   )}
