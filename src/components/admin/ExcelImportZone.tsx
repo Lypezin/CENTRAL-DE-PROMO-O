@@ -36,14 +36,14 @@ export default function ExcelImportZone({ promocaoId, onUploadSuccess }: ExcelIm
       
       if (!res.ok) {
         let errorMsg = `Erro ${res.status}`;
-        try {
-          const errData = await res.json();
-          errorMsg = errData.error || errorMsg;
-        } catch {
-          const text = await res.text();
-          if (res.status === 413) {
-            errorMsg = 'Arquivo muito grande (Payload Too Large).';
-          } else {
+        const text = await res.text();
+        if (res.status === 413) {
+          errorMsg = 'O arquivo é muito grande (Payload Too Large). O servidor recusou a requisição.';
+        } else {
+          try {
+            const errData = JSON.parse(text);
+            errorMsg = errData.error || text || errorMsg;
+          } catch {
             errorMsg = text || errorMsg;
           }
         }
