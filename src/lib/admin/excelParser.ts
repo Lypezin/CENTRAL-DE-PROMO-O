@@ -60,8 +60,8 @@ export interface ParseResult {
   colunasNaoMapeadas: string[]
 }
 
-export function processExcelBuffer(buffer: Buffer, promocaoId: string): ParseResult {
-  const wb = XLSX.read(buffer, { type: 'buffer', cellDates: false })
+export function processExcelBuffer(buffer: Buffer | ArrayBuffer | Uint8Array, promocaoId: string): ParseResult {
+  const wb = XLSX.read(buffer, { type: 'array', cellDates: false })
   const ws = wb.Sheets[wb.SheetNames[0]]
   const rawData = XLSX.utils.sheet_to_json(ws, { header: 1 }) as unknown[][]
 

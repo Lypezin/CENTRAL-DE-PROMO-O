@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useRef } from 'react'
+import { processExcelBuffer } from '@/lib/admin/excelParser'
 
 interface ExcelImportZoneProps {
   promocaoId: string
@@ -19,42 +19,80 @@ export default function ExcelImportZone({ promocaoId, onUploadSuccess }: ExcelIm
     if (!arquivo) return
     setUploadLoading(true)
     setUploadResult(null)
-    setProgresso(15)
+    setProgresso(5)
 
     try {
-      const formData = new FormData()
-      formData.append('file', arquivo)
-      formData.append('promocao_id', promocaoId)
+      // 1. Ler o arquivo localmente
+      const arrayBuffer = await arquivo.arrayBuffer()
+      setProgresso(15)
 
-      setProgresso(40)
-      const res = await fetch('/api/admin/upload', {
-        method: 'POST',
-        body: formData,
-      })
+      // 2. Processar a planilha no navegador
+      let parseResult;
+      try {
+        parseResult = processExcelBuffer(arrayBuffer, promocaoId);
+      } catch (err: any) {
+        throw new Error(err.message || 'Erro ao ler a planilha no navegador');
+      }
+      const { registrosUnicos } = parseResult;
       
-      setProgresso(85)
-      
-      if (!res.ok) {
-        let errorMsg = `Erro ${res.status}`;
-        const text = await res.text();
-        if (res.status === 413) {
-          errorMsg = 'O arquivo é muito grande (Payload Too Large). O servidor recusou a requisição.';
-        } else {
-          try {
-            const errData = JSON.parse(text);
-            errorMsg = errData.error || text || errorMsg;
-          } catch {
-            errorMsg = text || errorMsg;
-          }
-        }
-        throw new Error(errorMsg);
+      if (registrosUnicos.length === 0) {
+        throw new Error('Nenhum registro válido encontrado. Verifique a planilha.');
       }
 
-      const result = await res.json()
-      setProgresso(100)
-      setUploadResult(result)
+      setProgresso(25)
 
-      if (result.success) {
+      // 3. Enviar em lotes
+      const TAMANHO_LOTE = 500
+      let totalInseridos = 0
+      let totalAtualizados = 0
+      let totalErros = 0
+      const numLotes = Math.ceil(registrosUnicos.length / TAMANHO_LOTE)
+
+      for (let i = 0; i < registrosUnicos.length; i += TAMANHO_LOTE) {
+        const lote = registrosUnicos.slice(i, i + TAMANHO_LOTE)
+        
+        const res = await fetch('/api/admin/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            promocao_id: promocaoId, 
+            registros: lote,
+            arquivoNome: arquivo.name,
+            totalLinhas: registrosUnicos.length,
+            loteAtual: Math.floor(i / TAMANHO_LOTE) + 1,
+            totalLotes: numLotes
+          }),
+        })
+        
+        if (!res.ok) {
+          const text = await res.text();
+          let errorMsg = `Erro ${res.status}`;
+          if (res.status === 413) errorMsg = 'Lote muito grande.';
+          else {
+            try { errorMsg = JSON.parse(text).error || text || errorMsg } catch { errorMsg = text || errorMsg }
+          }
+          throw new Error(`Falha no lote ${Math.floor(i/TAMANHO_LOTE)+1}: ${errorMsg}`);
+        }
+
+        const result = await res.json()
+        if (result.success) {
+          totalInseridos += result.inseridos || 0
+          totalAtualizados += result.atualizados || 0
+        } else {
+          totalErros++
+        }
+
+        // Atualizar progresso visual (25% a 100%)
+        const pct = 25 + Math.floor(((i + TAMANHO_LOTE) / registrosUnicos.length) * 75)
+        setProgresso(Math.min(pct, 100))
+      }
+
+      setProgresso(100)
+      
+      if (totalErros > 0) {
+        setUploadResult({ success: true, message: `Concluído com avisos. ${totalInseridos} inseridos, ${totalAtualizados} atualizados. Alguns lotes falharam.` })
+      } else {
+        setUploadResult({ success: true, inseridos: totalInseridos, atualizados: totalAtualizados })
         setArquivo(null)
         if (fileInputRef.current) fileInputRef.current.value = ''
         onUploadSuccess()
