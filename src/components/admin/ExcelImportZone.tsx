@@ -33,6 +33,23 @@ export default function ExcelImportZone({ promocaoId, onUploadSuccess }: ExcelIm
       })
       
       setProgresso(85)
+      
+      if (!res.ok) {
+        let errorMsg = `Erro ${res.status}`;
+        try {
+          const errData = await res.json();
+          errorMsg = errData.error || errorMsg;
+        } catch {
+          const text = await res.text();
+          if (res.status === 413) {
+            errorMsg = 'Arquivo muito grande (Payload Too Large).';
+          } else {
+            errorMsg = text || errorMsg;
+          }
+        }
+        throw new Error(errorMsg);
+      }
+
       const result = await res.json()
       setProgresso(100)
       setUploadResult(result)
