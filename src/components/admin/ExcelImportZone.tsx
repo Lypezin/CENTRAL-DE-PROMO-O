@@ -1,5 +1,6 @@
 'use client'
 
+import React, { useState, useRef } from 'react'
 import { processExcelBuffer } from '@/lib/admin/excelParser'
 
 interface ExcelImportZoneProps {
