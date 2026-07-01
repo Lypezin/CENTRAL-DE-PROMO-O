@@ -26,6 +26,7 @@ export function usePromoEditor(id: string | string[]) {
   const [clearingData, setClearingData] = useState(false)
   const [confirmClearData, setConfirmClearData] = useState(false)
   const [exporting, setExporting] = useState(false)
+  const [exportingBD, setExportingBD] = useState(false)
 
   const [localPremios, setLocalPremios] = useState<Promocao['config_premios']>([])
   const [turnoEditorAtivo, setTurnoEditorAtivo] = useState<string>('CAFE_DA_MANHA')
@@ -234,6 +235,86 @@ export function usePromoEditor(id: string | string[]) {
     }
   }
 
+  const handleExportBaseDados = async () => {
+    if (!promo) return
+    setExportingBD(true)
+    try {
+      const XLSX = await import('xlsx')
+      
+      let allRows: any[] = []
+      let page = 0
+      const pageSize = 1000
+      let hasMore = true
+      
+      while (hasMore) {
+        const { data, error } = await supabase
+          .from('entregas')
+          .select('*')
+          .eq('promocao_id', promo.id)
+          .range(page * pageSize, (page + 1) * pageSize - 1)
+          
+        if (error) {
+          throw error
+        }
+        
+        if (data && data.length > 0) {
+          allRows = [...allRows, ...data]
+          if (data.length < pageSize) {
+            hasMore = false
+          } else {
+            page++
+          }
+        } else {
+          hasMore = false
+        }
+      }
+      
+      if (allRows.length === 0) {
+        toast.error('Nenhum dado encontrado para exportar.')
+        setExportingBD(false)
+        return
+      }
+      
+      const sheetRows = allRows.map((row: any) => ({
+        'data_do_periodo': row.data_do_periodo,
+        'periodo': row.periodo,
+        'duracao_do_periodo': row.duracao_do_periodo,
+        'numero_minimo_de_entregadores_regulares_na_escala': row.numero_minimo_de_entregadores_regulares_na_escala,
+        'tag': row.tag,
+        'id_da_pessoa_entregadora': row.id_da_pessoa_entregadora,
+        'pessoa_entregadora': row.pessoa_entregadora,
+        'praca': row.praca,
+        'sub_praca': row.sub_praca,
+        'origem': row.origem,
+        'tempo_disponivel_escalado': row.tempo_disponivel_escalado,
+        'tempo_disponivel_absoluto': row.tempo_disponivel_absoluto,
+        'numero_de_corridas_ofertadas': row.numero_de_corridas_ofertadas,
+        'numero_de_corridas_aceitas': row.numero_de_corridas_aceitas,
+        'numero_de_corridas_rejeitadas': row.numero_de_corridas_rejeitadas,
+        'numero_de_corridas_completadas': row.numero_de_corridas_completadas,
+        'numero_de_corridas_canceladas_pela_pessoa_entregadora': row.numero_de_corridas_canceladas_pela_pessoa_entregadora,
+        'numero_de_pedidos_aceitos_e_concluidos': row.numero_de_pedidos_aceitos_e_concluidos,
+        'soma_das_taxas_das_corridas_aceitas': row.soma_das_taxas_das_corridas_aceitas,
+        'pontos': row.pontos,
+        'promocao_id': row.promocao_id,
+        'created_at': row.created_at,
+        'updated_at': row.updated_at
+      }))
+      
+      const wb = XLSX.utils.book_new()
+      const ws = XLSX.utils.json_to_sheet(sheetRows)
+      XLSX.utils.book_append_sheet(wb, ws, 'Entregas Banco de Dados')
+      
+      XLSX.writeFile(wb, `db_entregas_${promo.slug}_${new Date().toISOString().slice(0, 10)}.xlsx`)
+      toast.success('Banco de dados de entregas exportado com sucesso!')
+    } catch (e) {
+      console.error(e)
+      toast.error('Erro ao exportar banco de dados.')
+    } finally {
+      setExportingBD(false)
+    }
+  }
+
   return {
     promo,
     setPromo,
@@ -247,6 +328,7 @@ export function usePromoEditor(id: string | string[]) {
     confirmClearData,
     setConfirmClearData,
     exporting,
+    exportingBD,
     localPremios,
     setLocalPremios,
     turnoEditorAtivo,
@@ -257,6 +339,7 @@ export function usePromoEditor(id: string | string[]) {
     handleUpdate,
     handleDelete,
     handleClearData,
-    handleExportRanking
+    handleExportRanking,
+    handleExportBaseDados
   }
 }
