@@ -60,86 +60,123 @@ export default function TurnoPrizesConfigurator({
   }
 
   const handleUpdateMinimo = (minimo: number) => {
-    const novosPremios = [...localPremios]
-    let turnoConfig = novosPremios.find(t => t.turno === turnoEditorAtivo)
-    if (!turnoConfig) {
-      turnoConfig = { turno: turnoEditorAtivo, minimo_corridas: 0, premios: [] }
-      novosPremios.push(turnoConfig)
-    }
-    turnoConfig.minimo_corridas = Number(minimo)
-    setLocalPremios(novosPremios)
+    setLocalPremios(prev => {
+      const exists = prev.some(t => t.turno === turnoEditorAtivo)
+      if (!exists) {
+        return [...prev, { turno: turnoEditorAtivo, minimo_corridas: Number(minimo), premios: [] }]
+      }
+      return prev.map(t => {
+        if (t.turno === turnoEditorAtivo) {
+          return { ...t, minimo_corridas: Number(minimo) }
+        }
+        return t
+      })
+    })
   }
 
   const handleUpdatePremioRow = (idx: number, campo: string, valor: any) => {
-    const novosPremios = [...localPremios]
-    let turnoConfig = novosPremios.find(t => t.turno === turnoEditorAtivo)
-    if (!turnoConfig) {
-      turnoConfig = { turno: turnoEditorAtivo, minimo_corridas: 0, premios: [] }
-      novosPremios.push(turnoConfig)
-    }
-    if (turnoConfig && turnoConfig.premios && turnoConfig.premios[idx]) {
-      const premio = turnoConfig.premios[idx]
-      if (campo === 'tipo') {
-        if (valor === 'single') {
-          delete premio.posicao_inicio
-          delete premio.posicao_fim
-          premio.posicao = 1
-        } else {
-          delete premio.posicao
-          premio.posicao_inicio = 3
-          premio.posicao_fim = 5
+    setLocalPremios(prev => {
+      return prev.map(t => {
+        if (t.turno === turnoEditorAtivo) {
+          const novosPremios = (t.premios || []).map((premio: any, pIdx: number) => {
+            if (pIdx === idx) {
+              const novoPremio = { ...premio }
+              if (campo === 'tipo') {
+                if (valor === 'single') {
+                  delete novoPremio.posicao_inicio
+                  delete novoPremio.posicao_fim
+                  novoPremio.posicao = 1
+                } else {
+                  delete novoPremio.posicao
+                  novoPremio.posicao_inicio = 3
+                  novoPremio.posicao_fim = 5
+                }
+              } else if (campo === 'descricao') {
+                novoPremio[campo] = valor
+              } else {
+                novoPremio[campo] = valor === '' ? 0 : Number(valor)
+              }
+              return novoPremio
+            }
+            return premio
+          })
+          return { ...t, premios: novosPremios }
         }
-      } else if (campo === 'descricao') {
-        premio[campo] = valor
-      } else {
-        premio[campo] = Number(valor)
-      }
-      setLocalPremios(novosPremios)
-    }
+        return t
+      })
+    })
   }
 
   const handleAddPremioRow = () => {
-    const novosPremios = [...localPremios]
-    let turnoConfig = novosPremios.find(t => t.turno === turnoEditorAtivo)
-    if (!turnoConfig) {
-      turnoConfig = { turno: turnoEditorAtivo, minimo_corridas: 0, premios: [] }
-      novosPremios.push(turnoConfig)
-    }
-    if (!turnoConfig.premios) turnoConfig.premios = []
-    turnoConfig.premios.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), posicao: turnoConfig.premios.length + 1, valor: 100 })
-    setLocalPremios(novosPremios)
+    setLocalPremios(prev => {
+      const exists = prev.some(t => t.turno === turnoEditorAtivo)
+      const novoId = Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
+      
+      if (!exists) {
+        return [...prev, {
+          turno: turnoEditorAtivo,
+          minimo_corridas: 0,
+          premios: [{ id: novoId, posicao: 1, valor: 100 }]
+        }]
+      }
+      
+      return prev.map(t => {
+        if (t.turno === turnoEditorAtivo) {
+          const premiosAtuais = t.premios || []
+          return {
+            ...t,
+            premios: [
+              ...premiosAtuais,
+              { id: novoId, posicao: premiosAtuais.length + 1, valor: 100 }
+            ]
+          }
+        }
+        return t
+      })
+    })
   }
 
   const handleRemovePremioRow = (idx: number) => {
-    const novosPremios = [...localPremios]
-    const turnoConfig = novosPremios.find(t => t.turno === turnoEditorAtivo)
-    if (turnoConfig && turnoConfig.premios) {
-      turnoConfig.premios.splice(idx, 1)
-      setLocalPremios(novosPremios)
-    }
+    setLocalPremios(prev => {
+      return prev.map(t => {
+        if (t.turno === turnoEditorAtivo) {
+          const novosPremios = (t.premios || []).filter((_: any, pIdx: number) => pIdx !== idx)
+          return { ...t, premios: novosPremios }
+        }
+        return t
+      })
+    })
   }
 
   const handleMoveUp = (idx: number) => {
     if (idx <= 0) return
-    const novosPremios = [...localPremios]
-    const turnoConfig = novosPremios.find(t => t.turno === turnoEditorAtivo)
-    if (turnoConfig && turnoConfig.premios) {
-      const tmp = turnoConfig.premios[idx]
-      turnoConfig.premios[idx] = turnoConfig.premios[idx - 1]
-      turnoConfig.premios[idx - 1] = tmp
-      setLocalPremios(novosPremios)
-    }
+    setLocalPremios(prev => {
+      return prev.map(t => {
+        if (t.turno === turnoEditorAtivo && t.premios) {
+          const novosPremios = [...t.premios]
+          const tmp = novosPremios[idx]
+          novosPremios[idx] = novosPremios[idx - 1]
+          novosPremios[idx - 1] = tmp
+          return { ...t, premios: novosPremios }
+        }
+        return t
+      })
+    })
   }
 
   const handleMoveDown = (idx: number) => {
-    const novosPremios = [...localPremios]
-    const turnoConfig = novosPremios.find(t => t.turno === turnoEditorAtivo)
-    if (turnoConfig && turnoConfig.premios && idx < turnoConfig.premios.length - 1) {
-      const tmp = turnoConfig.premios[idx]
-      turnoConfig.premios[idx] = turnoConfig.premios[idx + 1]
-      turnoConfig.premios[idx + 1] = tmp
-      setLocalPremios(novosPremios)
-    }
+    setLocalPremios(prev => {
+      return prev.map(t => {
+        if (t.turno === turnoEditorAtivo && t.premios && idx < t.premios.length - 1) {
+          const novosPremios = [...t.premios]
+          const tmp = novosPremios[idx]
+          novosPremios[idx] = novosPremios[idx + 1]
+          novosPremios[idx + 1] = tmp
+          return { ...t, premios: novosPremios }
+        }
+        return t
+      })
+    })
   }
 
   const handleSavePrizes = () => {
@@ -260,7 +297,7 @@ export default function TurnoPrizesConfigurator({
             const premios = turnoConfigObj.premios || []
             return (
               <TurnoPrizeRow
-                key={p.id || `${turnoEditorAtivo}_${p.posicao || idx}`}
+                key={p.id || `${turnoEditorAtivo}_${idx}`}
                 premio={p}
                 idx={idx}
                 isFirst={idx === 0}

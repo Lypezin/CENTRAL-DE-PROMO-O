@@ -54,7 +54,22 @@ export function usePromoEditor(id: string | string[]) {
         }
         setPromo(initializedPromo)
         setStats(data.stats)
-        setLocalPremios(data.promocao.config_premios || [])
+        
+        const rawPremios = data.promocao.config_premios || []
+        const initializedPremios = rawPremios.map((t: any) => {
+          if (t.premios && Array.isArray(t.premios)) {
+            return {
+              ...t,
+              premios: t.premios.map((p: any, pIdx: number) => ({
+                id: p.id || `init_${pIdx}_${Math.random().toString(36).slice(2, 6)}`,
+                ...p
+              }))
+            }
+          }
+          return t
+        })
+        setLocalPremios(initializedPremios)
+        
         const loadedTurnos = data.promocao.config_turnos || ['CAFE_DA_MANHA', 'ALMOCO', 'TARDE', 'JANTAR', 'MADRUGADA']
         setActiveTurnos(loadedTurnos)
       }
@@ -114,7 +129,22 @@ export function usePromoEditor(id: string | string[]) {
           }
         }
         setPromo(initializedData)
-        setLocalPremios(data.config_premios || [])
+        
+        const rawPremios = data.config_premios || []
+        const initializedPremios = rawPremios.map((t: any) => {
+          if (t.premios && Array.isArray(t.premios)) {
+            return {
+              ...t,
+              premios: t.premios.map((p: any, pIdx: number) => ({
+                id: p.id || `init_${pIdx}_${Math.random().toString(36).slice(2, 6)}`,
+                ...p
+              }))
+            }
+          }
+          return t
+        })
+        setLocalPremios(initializedPremios)
+        
         setActiveTurnos(data.config_turnos || ['CAFE_DA_MANHA', 'ALMOCO', 'TARDE', 'JANTAR', 'MADRUGADA'])
         toast.success('Promoção atualizada com sucesso!')
       }
