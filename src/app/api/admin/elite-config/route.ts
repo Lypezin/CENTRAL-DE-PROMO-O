@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabaseServer'
 import { getAuthenticatedUser } from '@/lib/auth'
-import { normalizeEliteConfig } from '@/lib/eliteConfig'
+import { DEFAULT_ELITE_CONFIG, normalizeEliteConfig } from '@/lib/eliteConfig'
 
 const ELITE_DATA_SLUG = 'elite-dados-internos'
 
@@ -31,6 +31,8 @@ async function ensureEliteDataPromotion(existingPromotionId?: string) {
       descricao: 'Base interna usada pela consulta fixa do ELITE.',
       tipo: 'ranking_turno',
       status: 'rascunho',
+      data_inicio: null,
+      data_fim: null,
       config_premios: null,
       config_turnos: ['GERAL'],
       config_regras: {
@@ -42,25 +44,52 @@ async function ensureEliteDataPromotion(existingPromotionId?: string) {
     .select('id')
     .single()
 
-  if (error || !createdPromo?.id) {
-    throw new Error(error?.message || 'Erro ao preparar base interna do ELITE')
+  if (createdPromo?.id) {
+    return createdPromo.id
   }
 
-  return createdPromo.id
+  if (error) {
+    const { data: retryBySlug } = await supabaseAdmin
+      .from('promocoes')
+      .select('id')
+      .eq('slug', ELITE_DATA_SLUG)
+      .maybeSingle()
+
+    if (retryBySlug?.id) {
+      return retryBySlug.id
+    }
+
+    throw new Error(error.message || 'Erro ao preparar base interna do ELITE')
+  }
+
+  return ''
 }
 
 async function loadEliteConfigWithDataPromo() {
-  const { data } = await supabaseAdmin.from('configuracoes').select('valor').eq('chave', 'elite_config').single()
-  const normalizedConfig = normalizeEliteConfig(data?.valor)
-  const dataPromoId = await ensureEliteDataPromotion(normalizedConfig.data_promocao_id)
+  const { data } = await supabaseAdmin.from('configuracoes').select('valor').eq('chave', 'elite_config').maybeSingle()
+  const normalizedConfig = normalizeEliteConfig(data?.valor || DEFAULT_ELITE_CONFIG)
 
-  if (normalizedConfig.data_promocao_id !== dataPromoId) {
-    const persistedConfig = { ...normalizedConfig, data_promocao_id: dataPromoId }
-    await supabaseAdmin.from('configuracoes').upsert({ chave: 'elite_config', valor: persistedConfig }, { onConflict: 'chave' })
-    return persistedConfig
+  try {
+    const dataPromoId = await ensureEliteDataPromotion(normalizedConfig.data_promocao_id)
+
+    if (dataPromoId && normalizedConfig.data_promocao_id !== dataPromoId) {
+      const persistedConfig = { ...normalizedConfig, data_promocao_id: dataPromoId }
+      const { error } = await supabaseAdmin
+        .from('configuracoes')
+        .upsert({ chave: 'elite_config', valor: persistedConfig }, { onConflict: 'chave' })
+
+      if (!error) {
+        return persistedConfig
+      }
+    }
+
+    return {
+      ...normalizedConfig,
+      data_promocao_id: dataPromoId || normalizedConfig.data_promocao_id,
+    }
+  } catch {
+    return normalizedConfig
   }
-
-  return normalizedConfig
 }
 
 export async function GET() {
@@ -74,7 +103,7 @@ export async function GET() {
     return NextResponse.json({ success: true, config })
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Erro interno'
-    return NextResponse.json({ success: false, error: msg }, { status: 500 })
+    return NextResponse.json({ success: true, config: DEFAULT_ELITE_CONFIG, warning: msg })
   }
 }
 
@@ -98,7 +127,7 @@ export async function PUT(request: NextRequest) {
       .upsert({ chave: 'elite_config', valor: config }, { onConflict: 'chave' })
 
     if (error) {
-      return NextResponse.json({ success: false, error: 'Erro ao salvar configuracao' }, { status: 500 })
+      return NextResponse.json({ success: false, error: error.message || 'Erro ao salvar configuracao' }, { status: 500 })
     }
 
     await supabaseAdmin.from('admin_logs').insert({
