@@ -25,26 +25,6 @@ function formatMonthLabel(monthKey: string): string {
   }).format(date)
 }
 
-function buildMonthSequence(minDate: string, maxDate: string): EliteMonth[] {
-  const [minYear, minMonth] = minDate.split('-').map(Number)
-  const [maxYear, maxMonth] = maxDate.split('-').map(Number)
-
-  const cursor = new Date(Date.UTC(maxYear, maxMonth - 1, 1))
-  const minCursor = new Date(Date.UTC(minYear, minMonth - 1, 1))
-  const months: EliteMonth[] = []
-
-  while (cursor >= minCursor) {
-    const value = `${cursor.getUTCFullYear()}-${String(cursor.getUTCMonth() + 1).padStart(2, '0')}`
-    months.push({
-      value,
-      label: formatMonthLabel(value),
-    })
-    cursor.setUTCMonth(cursor.getUTCMonth() - 1)
-  }
-
-  return months
-}
-
 function getMonthRange(monthKey: string) {
   const [year, month] = monthKey.split('-').map(Number)
   const start = new Date(Date.UTC(year, month - 1, 1))
@@ -60,48 +40,57 @@ function isValidMonthKey(value: string): boolean {
   return /^\d{4}-\d{2}$/.test(value)
 }
 
+function buildDistinctMonths(dates: Array<string | null | undefined>) {
+  const uniqueMonths = Array.from(
+    new Set(
+      dates
+        .filter((date): date is string => typeof date === 'string' && date.length >= 7)
+        .map((date) => date.slice(0, 7))
+    )
+  ).sort((a, b) => b.localeCompare(a))
+
+  return uniqueMonths.map((value) => ({
+    value,
+    label: formatMonthLabel(value),
+  })) satisfies EliteMonth[]
+}
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const scope = searchParams.get('scope') || 'lookup'
-  let eliteTarget = DEFAULT_ELITE_CONFIG.target
+  let eliteConfig = DEFAULT_ELITE_CONFIG
 
   try {
-    const { data } = await supabaseAdmin
-      .from('configuracoes')
-      .select('valor')
-      .eq('chave', 'elite_config')
-      .single()
+    const { data } = await supabaseAdmin.from('configuracoes').select('valor').eq('chave', 'elite_config').single()
 
     if (data?.valor) {
-      eliteTarget = normalizeEliteConfig(data.valor).target
+      eliteConfig = normalizeEliteConfig(data.valor)
     }
   } catch {}
 
+  const eliteTarget = eliteConfig.target
+  const eliteDataPromoId = eliteConfig.data_promocao_id
+
   if (scope === 'months') {
-    const [minDataRes, maxDataRes] = await Promise.all([
-      supabaseAdmin
-        .from('entregas')
-        .select('data_do_periodo')
-        .order('data_do_periodo', { ascending: true })
-        .limit(1),
-      supabaseAdmin
-        .from('entregas')
-        .select('data_do_periodo')
-        .order('data_do_periodo', { ascending: false })
-        .limit(1),
-    ])
-
-    const minDate = minDataRes.data?.[0]?.data_do_periodo || null
-    const maxDate = maxDataRes.data?.[0]?.data_do_periodo || null
-
-    if (minDataRes.error || maxDataRes.error) {
-      return NextResponse.json(
-        { error: minDataRes.error?.message || maxDataRes.error?.message || 'Erro ao carregar meses' },
-        { status: 500 }
-      )
+    if (!eliteDataPromoId) {
+      return NextResponse.json({
+        months: [],
+        defaultMonth: '',
+      })
     }
 
-    const months = minDate && maxDate ? buildMonthSequence(minDate, maxDate) : []
+    const { data, error } = await supabaseAdmin
+      .from('entregas')
+      .select('data_do_periodo')
+      .eq('promocao_id', eliteDataPromoId)
+      .order('data_do_periodo', { ascending: false })
+      .limit(50000)
+
+    if (error) {
+      return NextResponse.json({ error: error.message || 'Erro ao carregar meses' }, { status: 500 })
+    }
+
+    const months = buildDistinctMonths((data || []).map((row) => row.data_do_periodo))
 
     return NextResponse.json({
       months,
@@ -112,8 +101,12 @@ export async function GET(request: Request) {
   const month = searchParams.get('month')?.trim() || ''
   const search = searchParams.get('search')?.trim() || ''
 
+  if (!eliteDataPromoId) {
+    return NextResponse.json({ month, target: eliteTarget, results: [] })
+  }
+
   if (!isValidMonthKey(month)) {
-    return NextResponse.json({ error: 'Mês inválido.' }, { status: 400 })
+    return NextResponse.json({ error: 'Mes invalido.' }, { status: 400 })
   }
 
   if (search.length < 2) {
@@ -125,6 +118,7 @@ export async function GET(request: Request) {
   const { data, error } = await supabaseAdmin
     .from('entregas')
     .select('id_da_pessoa_entregadora,pessoa_entregadora,praca,numero_de_pedidos_aceitos_e_concluidos')
+    .eq('promocao_id', eliteDataPromoId)
     .gte('data_do_periodo', start)
     .lte('data_do_periodo', end)
     .ilike('pessoa_entregadora', `%${search}%`)
@@ -138,7 +132,7 @@ export async function GET(request: Request) {
 
   for (const row of data || []) {
     const nome = row.pessoa_entregadora || 'Entregador'
-    const praca = row.praca || 'Praça não informada'
+    const praca = row.praca || 'Praca nao informada'
     const entregadorId = row.id_da_pessoa_entregadora || `${nome}:${praca}`
     const key = `${entregadorId}:${nome}:${praca}`
     const totalPedidos = Number(row.numero_de_pedidos_aceitos_e_concluidos) || 0

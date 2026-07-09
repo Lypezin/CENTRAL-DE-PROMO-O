@@ -5,15 +5,17 @@ export interface EliteConfig {
   page_description: string
   tag_label: string
   target: number
+  data_promocao_id: string
 }
 
 export const DEFAULT_ELITE_CONFIG: EliteConfig = {
   card_title: 'ELITE',
-  card_description: 'Consulte quantos pedidos aceitos e concluídos o entregador acumulou no mês. Ao bater 300, ele vira ELITE.',
+  card_description: 'Consulte quantos pedidos aceitos e concluidos o entregador acumulou no mes. Ao bater 300, ele vira ELITE.',
   page_title: 'Consulta mensal de pedidos',
-  page_description: 'Pesquisa individual por entregador, com apuração mensal de pedidos aceitos e concluídos. Bateu 300 no mês, virou ELITE.',
+  page_description: 'Pesquisa individual por entregador, com apuracao mensal de pedidos aceitos e concluidos. Bateu 300 no mes, virou ELITE.',
   tag_label: 'Lista fixa mensal',
   target: 300,
+  data_promocao_id: '',
 }
 
 export function normalizeEliteConfig(value: unknown): EliteConfig {
@@ -35,5 +37,9 @@ export function normalizeEliteConfig(value: unknown): EliteConfig {
       typeof raw.target === 'number' && Number.isFinite(raw.target) && raw.target > 0
         ? Math.round(raw.target)
         : DEFAULT_ELITE_CONFIG.target,
+    data_promocao_id:
+      typeof raw.data_promocao_id === 'string' && raw.data_promocao_id.trim()
+        ? raw.data_promocao_id.trim()
+        : DEFAULT_ELITE_CONFIG.data_promocao_id,
   }
 }

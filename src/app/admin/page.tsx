@@ -75,7 +75,8 @@ export default function AdminPage() {
       const res = await fetch('/api/promocoes')
       if (res.ok) {
         const data: Promocao[] = await res.json()
-        const sortedData = data.sort((a, b) => {
+        const visiblePromos = data.filter((promo) => promo.config_regras?.elite_internal !== true)
+        const sortedData = visiblePromos.sort((a, b) => {
           const aOrdem = a.config_regras?.ordem ?? 999
           const bOrdem = b.config_regras?.ordem ?? 999
           return aOrdem - bOrdem
