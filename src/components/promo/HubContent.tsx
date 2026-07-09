@@ -3,6 +3,7 @@
 import { useState, useRef, useMemo, useEffect } from 'react'
 import PromoCard from '@/components/ui/PromoCard'
 import { Promocao } from '@/lib/supabase'
+import EliteCard from '@/components/promo/EliteCard'
 
 type PrizeItem = {
   valor?: number
@@ -165,6 +166,8 @@ export default function HubContent({ initialPromocoes }: { initialPromocoes: Pro
           </div>
         </div>
       </section>
+
+      <EliteCard />
 
       {/* Filter and Search Bar */}
       <section className="mb-8 flex flex-col md:flex-row gap-4 items-center justify-between animate-slide-up">
