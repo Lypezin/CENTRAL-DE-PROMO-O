@@ -9,6 +9,7 @@ import { useToast } from '@/components/ui/Toast'
 import AdminLoginScreen from '@/components/admin/AdminLoginScreen'
 import AdminPromoList from '@/components/admin/AdminPromoList'
 import SiteConfigPanel from '@/components/admin/SiteConfigPanel'
+import { EliteConfig } from '@/lib/eliteConfig'
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -34,6 +35,7 @@ export default function AdminPage() {
   const [promocoes, setPromocoes] = useState<Promocao[]>([])
   const [loading, setLoading] = useState(true)
   const [creating, setCreating] = useState(false)
+  const [elitePromoId, setElitePromoId] = useState('')
 
   const [onlineCount, setOnlineCount] = useState<number>(1)
   const [totalVisits, setTotalVisits] = useState<number>(0)
@@ -90,15 +92,29 @@ export default function AdminPage() {
     }
   }, [])
 
+  const carregarEliteConfig = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/elite-config')
+      if (!res.ok) return
+      const data = (await res.json()) as { success?: boolean; config?: EliteConfig }
+      if (data.success && data.config?.data_promocao_id) {
+        setElitePromoId(data.config.data_promocao_id)
+      }
+    } catch (e) {
+      console.error('Erro ao carregar configuracao do ELITE:', e)
+    }
+  }, [])
+
   useEffect(() => {
     if (pageState === 'admin') {
       carregarPromocoes()
       carregarAnalytics()
+      carregarEliteConfig()
 
       const interval = setInterval(carregarAnalytics, 10000)
       return () => clearInterval(interval)
     }
-  }, [pageState, carregarPromocoes, carregarAnalytics])
+  }, [pageState, carregarPromocoes, carregarAnalytics, carregarEliteConfig])
 
   const handleLogout = async () => {
     await fetch('/api/admin/logout', { method: 'POST' })
@@ -299,7 +315,7 @@ export default function AdminPage() {
             <p className="text-xs text-zinc-500 mt-1">Selecione uma promoção ativa ou arquivada para editar regras e painéis.</p>
           </div>
           
-          <AdminPromoList promocoes={promocoes} loading={loading} onReorder={handleReorder} />
+          <AdminPromoList promocoes={promocoes} loading={loading} onReorder={handleReorder} elitePromoId={elitePromoId} />
         </motion.div>
       </motion.div>
     </motion.div>

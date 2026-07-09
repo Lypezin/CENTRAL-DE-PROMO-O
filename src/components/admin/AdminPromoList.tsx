@@ -10,9 +10,10 @@ interface AdminPromoListProps {
   promocoes: Promocao[]
   loading: boolean
   onReorder?: (newOrder: Promocao[]) => void
+  elitePromoId?: string
 }
 
-export default function AdminPromoList({ promocoes, loading, onReorder }: AdminPromoListProps) {
+export default function AdminPromoList({ promocoes, loading, onReorder, elitePromoId }: AdminPromoListProps) {
   const router = useRouter()
   const [draggedItemIndex, setDraggedItemIndex] = useState<number | null>(null)
   const [dragOverItemIndex, setDragOverItemIndex] = useState<number | null>(null)
@@ -128,7 +129,7 @@ export default function AdminPromoList({ promocoes, loading, onReorder }: AdminP
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
         <div
-          onClick={() => router.push('/admin/elite')}
+          onClick={() => router.push(elitePromoId ? `/admin/promo/${elitePromoId}` : '/admin/elite')}
           className="obsidian-card group relative flex cursor-pointer flex-col overflow-hidden rounded-2xl border border-amber-500/20 bg-[linear-gradient(135deg,rgba(23,18,10,0.96),rgba(8,8,8,0.98))] shadow-xl shadow-black/40 transition-all duration-300 hover:border-amber-400/35"
         >
           <div className="h-1 w-full bg-gradient-to-r from-amber-500 via-yellow-300 to-amber-500 shadow-[0_2px_15px_rgba(251,191,36,0.25)]"></div>
@@ -141,26 +142,38 @@ export default function AdminPromoList({ promocoes, loading, onReorder }: AdminP
             </div>
 
             <h3 className="mb-1 text-lg font-black leading-tight text-white transition-colors group-hover:text-amber-200">Consulta ELITE</h3>
-            <p className="mb-4 font-mono text-xs text-zinc-500 opacity-70">/elite</p>
+            <p className="mb-4 font-mono text-xs text-zinc-500 opacity-70">{elitePromoId ? `/admin/promo/${elitePromoId}` : '/admin/elite'}</p>
 
             <p className="mb-5 text-sm leading-relaxed text-zinc-400">
-              Editar o card fixo da central, a pagina interna de consulta e a meta mensal de pedidos.
+              Abrir a base do ELITE para importar planilha e consultar dados. O layout e os textos ficam em uma tela separada.
             </p>
 
             <div className="mt-auto flex items-center justify-between border-t border-white/[0.04] pt-4">
               <div className="flex flex-col">
                 <span className="mb-1 text-[9px] font-bold uppercase tracking-wider text-zinc-600">Tipo</span>
-                <span className="font-mono text-xs text-zinc-400">Configuracao fixa</span>
+                <span className="font-mono text-xs text-zinc-400">{elitePromoId ? 'Base com planilha' : 'Configuracao fixa'}</span>
               </div>
 
-              <Tooltip content="Gerenciar ELITE">
-                <span className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-amber-500/20 bg-amber-950/25 px-4 py-2 text-xs font-bold text-amber-200 transition-all hover:border-amber-400 hover:bg-amber-500 hover:text-black active:scale-95">
-                  Gerenciar
-                  <svg className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-                  </svg>
-                </span>
-              </Tooltip>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    router.push('/admin/elite')
+                  }}
+                  className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-[11px] font-bold text-zinc-200 transition-all hover:border-amber-400/40 hover:text-white"
+                >
+                  Layout
+                </button>
+                <Tooltip content="Abrir base do ELITE">
+                  <span className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-amber-500/20 bg-amber-950/25 px-4 py-2 text-xs font-bold text-amber-200 transition-all hover:border-amber-400 hover:bg-amber-500 hover:text-black active:scale-95">
+                    Planilha
+                    <svg className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </span>
+                </Tooltip>
+              </div>
             </div>
           </div>
         </div>

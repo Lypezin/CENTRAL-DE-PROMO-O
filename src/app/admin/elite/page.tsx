@@ -151,6 +151,19 @@ export default function AdminElitePage() {
               <p className="text-zinc-400 text-sm md:text-base mt-2 max-w-3xl">
                 Aqui voce consegue subir a planilha do ELITE, limpar a base mensal e editar o conteudo exibido no card e na pagina publica.
               </p>
+              {config.data_promocao_id && (
+                <div className="mt-4">
+                  <Link
+                    href={`/admin/promo/${config.data_promocao_id}`}
+                    className="inline-flex items-center gap-2 rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-2 text-[11px] font-bold uppercase tracking-wider text-amber-200 transition-all hover:border-amber-400/40 hover:bg-amber-500/15"
+                  >
+                    Abrir tela da planilha
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </Link>
+                </div>
+              )}
             </div>
 
             <button
