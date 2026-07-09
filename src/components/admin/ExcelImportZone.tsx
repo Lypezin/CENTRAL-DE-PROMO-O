@@ -71,7 +71,7 @@ export default function ExcelImportZone({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            promocao_id: promocaoId,
+            promocao_id: resolvedPromocaoId,
             registros: lote,
             arquivoNome: arquivo.name,
             totalLinhas: registrosUnicos.length,

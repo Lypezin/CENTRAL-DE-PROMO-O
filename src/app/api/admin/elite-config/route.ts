@@ -1,10 +1,56 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabaseServer'
 import { getAuthenticatedUser } from '@/lib/auth'
-import { DEFAULT_ELITE_CONFIG, normalizeEliteConfig } from '@/lib/eliteConfig'
+import { DEFAULT_ELITE_CONFIG, EliteConfig, normalizeEliteConfig } from '@/lib/eliteConfig'
 
 const ELITE_DATA_SLUG = 'elite-dados-internos'
 const EMPTY_PRIZE_CONFIG: never[] = []
+
+async function readEliteConfigValue() {
+  const { data, error } = await supabaseAdmin
+    .from('configuracoes')
+    .select('valor')
+    .eq('chave', 'elite_config')
+    .limit(1)
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return data?.[0]?.valor
+}
+
+async function saveEliteConfigValue(config: EliteConfig) {
+  const { data: existingRows, error: readError } = await supabaseAdmin
+    .from('configuracoes')
+    .select('chave')
+    .eq('chave', 'elite_config')
+    .limit(1)
+
+  if (readError) {
+    throw new Error(readError.message)
+  }
+
+  if (existingRows && existingRows.length > 0) {
+    const { error } = await supabaseAdmin
+      .from('configuracoes')
+      .update({ valor: config })
+      .eq('chave', 'elite_config')
+
+    if (error) {
+      throw new Error(error.message)
+    }
+    return
+  }
+
+  const { error } = await supabaseAdmin
+    .from('configuracoes')
+    .insert({ chave: 'elite_config', valor: config })
+
+  if (error) {
+    throw new Error(error.message)
+  }
+}
 
 async function ensureEliteDataPromotion(existingPromotionId?: string) {
   if (existingPromotionId) {
@@ -77,21 +123,15 @@ async function ensureEliteDataPromotion(existingPromotionId?: string) {
 }
 
 async function loadEliteConfigWithDataPromo() {
-  const { data } = await supabaseAdmin.from('configuracoes').select('valor').eq('chave', 'elite_config').maybeSingle()
-  const normalizedConfig = normalizeEliteConfig(data?.valor || DEFAULT_ELITE_CONFIG)
+  const normalizedConfig = normalizeEliteConfig((await readEliteConfigValue()) || DEFAULT_ELITE_CONFIG)
 
   try {
     const dataPromoId = await ensureEliteDataPromotion(normalizedConfig.data_promocao_id)
 
     if (dataPromoId && normalizedConfig.data_promocao_id !== dataPromoId) {
       const persistedConfig = { ...normalizedConfig, data_promocao_id: dataPromoId }
-      const { error } = await supabaseAdmin
-        .from('configuracoes')
-        .upsert({ chave: 'elite_config', valor: persistedConfig }, { onConflict: 'chave' })
-
-      if (!error) {
-        return persistedConfig
-      }
+      await saveEliteConfigValue(persistedConfig)
+      return persistedConfig
     }
 
     return {
@@ -145,13 +185,7 @@ export async function PUT(request: NextRequest) {
       data_promocao_id: dataPromoId,
     }
 
-    const { error } = await supabaseAdmin
-      .from('configuracoes')
-      .upsert({ chave: 'elite_config', valor: config }, { onConflict: 'chave' })
-
-    if (error) {
-      return NextResponse.json({ success: false, error: error.message || 'Erro ao salvar configuracao' }, { status: 500 })
-    }
+    await saveEliteConfigValue(config)
 
     await supabaseAdmin.from('admin_logs').insert({
       acao: 'elite_config_atualizada',
