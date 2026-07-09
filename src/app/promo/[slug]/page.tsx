@@ -251,6 +251,7 @@ export default async function PromoPage({ params }: { params: Promise<{ slug: st
             configTurnos={configTurnos} 
             configRegras={promo.config_regras || {}}
             isCopa={promo.destaque_copa}
+            isNinja={isNinja}
           />
         ) : (
           <div className="text-center p-12 bg-[#08080a] border border-white/[0.04] rounded-2xl text-zinc-500 text-xs font-mono">

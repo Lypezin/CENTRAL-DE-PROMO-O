@@ -1,6 +1,7 @@
 import { memo } from 'react'
 import { EntregaRanking } from '@/lib/supabase'
 import { getPremioInfoFromConfig } from '@/lib/config'
+import { getRankingMetricHeader, getRankingMetricShortfallLabel, resolveRankingMetric } from '@/lib/rankingMetric'
 
 export interface LeaderboardPodiumProps {
   podiumData: { first: EntregaRanking | null, second: EntregaRanking | null, third: EntregaRanking | null }
@@ -12,13 +13,17 @@ export interface LeaderboardPodiumProps {
   formatCurrency: (val: number) => string
   mecanica: any
   isCopa?: boolean
+  isNinja?: boolean
   minimoCorridas: number
+  getRequirementValue: (item: EntregaRanking) => number
 }
 
 export const LeaderboardPodium = memo(function LeaderboardPodium({
   podiumData, configPremios, filtroAtivo, getScore, formatScoreValue, 
-  maxScore, formatCurrency, mecanica, isCopa, minimoCorridas
+  maxScore, formatCurrency, mecanica, isCopa, isNinja, minimoCorridas, getRequirementValue
 }: LeaderboardPodiumProps) {
+  const resolvedMetric = resolveRankingMetric(mecanica, isNinja)
+
   return (
     <>
 {/* 🏆 DESKTOP PODIUM SECTION (Cards tridimensionais grandes para PC) */}
@@ -28,7 +33,8 @@ export const LeaderboardPodium = memo(function LeaderboardPodium({
           {/* 2nd Place (Silver Card) */}
           {podiumData.second && (() => {
             const item = podiumData.second
-            const atingiuMinimo = item.total_corridas_completadas >= minimoCorridas
+            const requirementValue = getRequirementValue(item)
+            const atingiuMinimo = requirementValue >= minimoCorridas
             const premioInfo = getPremioInfoFromConfig(configPremios, filtroAtivo, 2)
             const premioTeoricoValor = premioInfo.valor || 0
             const premioTeoricoDesc = premioInfo.descricao || ''
@@ -53,7 +59,7 @@ export const LeaderboardPodium = memo(function LeaderboardPodium({
                 </div>
                 <div className="space-y-3 mt-auto relative z-10">
                   <div className="flex justify-between items-center text-[10px] font-mono border-t border-white/[0.02] pt-2">
-                    <span className="text-zinc-500 uppercase">{mecanica.metrica === 'pontos' ? 'PONTOS:' : mecanica.metrica === 'corridas_completadas' ? 'CORRIDAS:' : 'VALOR:'}</span>
+                    <span className="text-zinc-500 uppercase">{getRankingMetricHeader(resolvedMetric)}:</span>
                     <span className="text-white font-bold">{scoreFormatted}</span>
                   </div>
                   {temPremio && (
@@ -66,7 +72,7 @@ export const LeaderboardPodium = memo(function LeaderboardPodium({
                   )}
                   {!atingiuMinimo && temPremio && (
                     <div className="text-[8px] bg-amber-500/10 text-amber-400 border border-amber-500/20 p-1.5 rounded-lg font-bold uppercase font-mono tracking-wider text-center">
-                      Falta {minimoCorridas - item.total_corridas_completadas} corr.
+                      {getRankingMetricShortfallLabel(resolvedMetric, minimoCorridas - requirementValue)}
                     </div>
                   )}
                   <div className="h-[3px] w-full bg-white/[0.02] rounded-full overflow-hidden">
@@ -80,7 +86,8 @@ export const LeaderboardPodium = memo(function LeaderboardPodium({
           {/* 1st Place (Gold Card) */}
           {podiumData.first && (() => {
             const item = podiumData.first
-            const atingiuMinimo = item.total_corridas_completadas >= minimoCorridas
+            const requirementValue = getRequirementValue(item)
+            const atingiuMinimo = requirementValue >= minimoCorridas
             const premioInfo = getPremioInfoFromConfig(configPremios, filtroAtivo, 1)
             const premioTeoricoValor = premioInfo.valor || 0
             const premioTeoricoDesc = premioInfo.descricao || ''
@@ -106,7 +113,7 @@ export const LeaderboardPodium = memo(function LeaderboardPodium({
                 </div>
                 <div className="space-y-3 mt-auto relative z-10">
                   <div className="flex justify-between items-center text-[10px] font-mono border-t border-yellow-600/10 pt-2.5">
-                    <span className="text-zinc-500 uppercase">{mecanica.metrica === 'pontos' ? 'PONTOS:' : mecanica.metrica === 'corridas_completadas' ? 'CORRIDAS:' : 'VALOR:'}</span>
+                    <span className="text-zinc-500 uppercase">{getRankingMetricHeader(resolvedMetric)}:</span>
                     <span className="text-white font-extrabold text-xs">{scoreFormatted}</span>
                   </div>
                   {temPremio && (
@@ -119,7 +126,7 @@ export const LeaderboardPodium = memo(function LeaderboardPodium({
                   )}
                   {!atingiuMinimo && temPremio && (
                     <div className="text-[8px] bg-amber-500/10 text-amber-400 border border-amber-500/20 p-1.5 rounded-lg font-bold uppercase font-mono tracking-wider text-center">
-                      Falta {minimoCorridas - item.total_corridas_completadas} corr.
+                      {getRankingMetricShortfallLabel(resolvedMetric, minimoCorridas - requirementValue)}
                     </div>
                   )}
                   <div className="h-[3px] w-full bg-white/[0.02] rounded-full overflow-hidden">
@@ -133,7 +140,8 @@ export const LeaderboardPodium = memo(function LeaderboardPodium({
           {/* 3rd Place (Bronze Card) */}
           {podiumData.third && (() => {
             const item = podiumData.third
-            const atingiuMinimo = item.total_corridas_completadas >= minimoCorridas
+            const requirementValue = getRequirementValue(item)
+            const atingiuMinimo = requirementValue >= minimoCorridas
             const premioInfo = getPremioInfoFromConfig(configPremios, filtroAtivo, 3)
             const premioTeoricoValor = premioInfo.valor || 0
             const premioTeoricoDesc = premioInfo.descricao || ''
@@ -158,7 +166,7 @@ export const LeaderboardPodium = memo(function LeaderboardPodium({
                 </div>
                 <div className="space-y-3 mt-auto relative z-10">
                   <div className="flex justify-between items-center text-[10px] font-mono border-t border-white/[0.02] pt-2">
-                    <span className="text-zinc-500 uppercase">{mecanica.metrica === 'pontos' ? 'PONTOS:' : mecanica.metrica === 'corridas_completadas' ? 'CORRIDAS:' : 'VALOR:'}</span>
+                    <span className="text-zinc-500 uppercase">{getRankingMetricHeader(resolvedMetric)}:</span>
                     <span className="text-white font-bold">{scoreFormatted}</span>
                   </div>
                   {temPremio && (
@@ -171,7 +179,7 @@ export const LeaderboardPodium = memo(function LeaderboardPodium({
                   )}
                   {!atingiuMinimo && temPremio && (
                     <div className="text-[8px] bg-amber-500/10 text-amber-400 border border-amber-500/20 p-1.5 rounded-lg font-bold uppercase font-mono tracking-wider text-center">
-                      Falta {minimoCorridas - item.total_corridas_completadas} corr.
+                      {getRankingMetricShortfallLabel(resolvedMetric, minimoCorridas - requirementValue)}
                     </div>
                   )}
                   <div className="h-[3px] w-full bg-white/[0.02] rounded-full overflow-hidden">
@@ -190,7 +198,7 @@ export const LeaderboardPodium = memo(function LeaderboardPodium({
           {/* 1st Place (Hero Card Total Width) */}
           {podiumData.first && (() => {
             const item = podiumData.first
-            const atingiuMinimo = item.total_corridas_completadas >= minimoCorridas
+            const atingiuMinimo = getRequirementValue(item) >= minimoCorridas
             const premioInfo = getPremioInfoFromConfig(configPremios, filtroAtivo, 1)
             const premioTeoricoValor = premioInfo.valor || 0
             const premioTeoricoDesc = premioInfo.descricao || ''
@@ -221,7 +229,7 @@ export const LeaderboardPodium = memo(function LeaderboardPodium({
 
                 <div className="flex justify-between items-end mt-4 pt-3 border-t border-yellow-600/10 relative z-10">
                   <div>
-                    <div className="text-[10px] text-zinc-500 font-mono uppercase mb-0.5">{mecanica.metrica === 'pontos' ? 'PONTOS:' : mecanica.metrica === 'corridas_completadas' ? 'CORRIDAS:' : 'VALOR:'}</div>
+                    <div className="text-[10px] text-zinc-500 font-mono uppercase mb-0.5">{getRankingMetricHeader(resolvedMetric)}:</div>
                     <div className="text-2xl font-mono text-yellow-400 font-black leading-none">{scoreFormatted}</div>
                   </div>
                   
@@ -242,7 +250,7 @@ export const LeaderboardPodium = memo(function LeaderboardPodium({
             {/* 2nd Place (Esquerda) */}
             {podiumData.second && (() => {
               const item = podiumData.second
-              const atingiuMinimo = item.total_corridas_completadas >= minimoCorridas
+              const atingiuMinimo = getRequirementValue(item) >= minimoCorridas
               const premioInfo = getPremioInfoFromConfig(configPremios, filtroAtivo, 2)
               const premioTeoricoValor = premioInfo.valor || 0
               const premioTeoricoDesc = premioInfo.descricao || ''
@@ -278,7 +286,7 @@ export const LeaderboardPodium = memo(function LeaderboardPodium({
             {/* 3rd Place (Direita) */}
             {podiumData.third && (() => {
               const item = podiumData.third
-              const atingiuMinimo = item.total_corridas_completadas >= minimoCorridas
+              const atingiuMinimo = getRequirementValue(item) >= minimoCorridas
               const premioInfo = getPremioInfoFromConfig(configPremios, filtroAtivo, 3)
               const premioTeoricoValor = premioInfo.valor || 0
               const premioTeoricoDesc = premioInfo.descricao || ''

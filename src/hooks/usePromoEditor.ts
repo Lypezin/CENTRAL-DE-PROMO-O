@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation'
 import { Promocao, PromocaoStats, supabase } from '@/lib/supabase'
 import { useToast } from '@/components/ui/Toast'
 import { getPremioFromConfig } from '@/lib/config'
+import { getRankingMetricValue, resolveRankingMetric } from '@/lib/rankingMetric'
 
 const TURNO_LABELS: Record<string, string> = {
   'CAFE_DA_MANHA': 'Café da Manhã',
@@ -11,6 +12,35 @@ const TURNO_LABELS: Record<string, string> = {
   'JANTAR': 'Jantar',
   'MADRUGADA': 'Madrugada',
   'GERAL': 'Geral'
+}
+
+const createDefaultMecanica = (isNinja = false) => ({
+  metrica: isNinja ? 'pedidos_aceitos_e_concluidos' : 'corridas_completadas',
+  tipo_calculo: 'ranking',
+  agrupamento: 'turno',
+  filtros: [],
+  metas_predefinidas: [],
+  niveis: []
+})
+
+const normalizePromoConfig = (promoData: any) => {
+  const isNinja = promoData?.config_regras?.tema_ninja === true
+  const mecanica = promoData?.config_regras?.mecanica
+  const resolvedMetric = resolveRankingMetric(mecanica, isNinja)
+
+  return {
+    ...promoData,
+    config_regras: {
+      limite_ranking: promoData?.config_regras?.limite_ranking ?? 15,
+      regras_texto: promoData?.config_regras?.regras_texto ?? [],
+      ...promoData?.config_regras,
+      mecanica: {
+        ...createDefaultMecanica(isNinja),
+        ...(mecanica || {}),
+        metrica: resolvedMetric
+      }
+    }
+  }
 }
 
 export function usePromoEditor(id: string | string[]) {
@@ -37,21 +67,7 @@ export function usePromoEditor(id: string | string[]) {
       const res = await fetch(`/api/promocoes/${id}`)
       if (res.ok) {
         const data = await res.json()
-        const initializedPromo = {
-          ...data.promocao,
-          config_regras: {
-            limite_ranking: data.promocao.config_regras?.limite_ranking ?? 15,
-            regras_texto: data.promocao.config_regras?.regras_texto ?? [],
-            mecanica: data.promocao.config_regras?.mecanica || {
-              metrica: 'corridas_completadas',
-              tipo_calculo: 'ranking',
-              agrupamento: 'turno',
-              filtros: [],
-              metas_predefinidas: [],
-              niveis: []
-            }
-          }
-        }
+        const initializedPromo = normalizePromoConfig(data.promocao)
         setPromo(initializedPromo)
         setStats(data.stats)
         
@@ -113,21 +129,7 @@ export function usePromoEditor(id: string | string[]) {
       })
       if (res.ok) {
         const data = await res.json()
-        const initializedData = {
-          ...data,
-          config_regras: {
-            limite_ranking: data.config_regras?.limite_ranking ?? 15,
-            regras_texto: data.config_regras?.regras_texto ?? [],
-            mecanica: data.config_regras?.mecanica || {
-              metrica: 'corridas_completadas',
-              tipo_calculo: 'ranking',
-              agrupamento: 'turno',
-              filtros: [],
-              metas_predefinidas: [],
-              niveis: []
-            }
-          }
-        }
+        const initializedData = normalizePromoConfig(data)
         setPromo(initializedData)
         
         const rawPremios = data.config_premios || []
@@ -213,6 +215,16 @@ export function usePromoEditor(id: string | string[]) {
         : (activeTurnos && activeTurnos.length > 0 ? activeTurnos : ['CAFE_DA_MANHA', 'ALMOCO', 'TARDE', 'JANTAR', 'MADRUGADA'])
       
       const limiteRanking = promo.config_regras?.limite_ranking ?? 15
+      const resolvedMetric = resolveRankingMetric(
+        promo.config_regras?.mecanica,
+        promo.config_regras?.tema_ninja === true
+      )
+      const metricLabelMap = {
+        corridas_completadas: 'Corridas Completadas',
+        pedidos_aceitos_e_concluidos: 'Pedidos Aceitos e Concluídos',
+        faturamento_taxas: 'Faturamento Acumulado (R$)',
+        pontos: 'Pontuação Acumulada'
+      } as const
       
       const wb = XLSX.utils.book_new()
       let hasData = false
@@ -235,7 +247,7 @@ export function usePromoEditor(id: string | string[]) {
               'Entregador': row.pessoa_entregadora,
               'ID Entregador': row.id_da_pessoa_entregadora,
               'Praça/Cidade': row.praca,
-              'Corridas Completadas': row.total_corridas_completadas,
+              [metricLabelMap[resolvedMetric]]: getRankingMetricValue(row, resolvedMetric),
               'Total Taxas (BRL)': row.total_soma_taxas,
               'Prêmio Estimado (BRL)': premio
             }

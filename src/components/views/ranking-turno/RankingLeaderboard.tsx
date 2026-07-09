@@ -4,6 +4,7 @@ import { memo, useMemo } from 'react'
 import { EntregaRanking } from '@/lib/supabase'
 import { LeaderboardPodium } from './LeaderboardPodium'
 import { LeaderboardTable } from './LeaderboardTable'
+import { getRankingMetricValue, resolveRankingMetric } from '@/lib/rankingMetric'
 
 interface RankingLeaderboardProps {
   searchQuery: string
@@ -17,6 +18,7 @@ interface RankingLeaderboardProps {
   formatCurrency: (val: number) => string
   mecanica: any
   isCopa?: boolean
+  isNinja?: boolean
 }
 
 function RankingLeaderboardComponent({
@@ -30,12 +32,17 @@ function RankingLeaderboardComponent({
   maxScore,
   formatCurrency,
   mecanica,
-  isCopa
+  isCopa,
+  isNinja
 }: RankingLeaderboardProps) {
-  
+  const resolvedMetric = useMemo(() => resolveRankingMetric(mecanica, isNinja), [mecanica, isNinja])
   const minimoCorridas = useMemo(() => {
     return activeTurnoConfig?.minimo_corridas || 0
   }, [activeTurnoConfig])
+
+  const getRequirementValue = useMemo(() => {
+    return (item: EntregaRanking) => getRankingMetricValue(item, resolvedMetric)
+  }, [resolvedMetric])
 
   // Extract Podium members (if not searching)
   const podiumData = useMemo(() => {
@@ -60,7 +67,9 @@ function RankingLeaderboardComponent({
           formatCurrency={formatCurrency}
           mecanica={mecanica}
           isCopa={isCopa}
+          isNinja={isNinja}
           minimoCorridas={minimoCorridas}
+          getRequirementValue={getRequirementValue}
         />
       )}
 
@@ -75,7 +84,9 @@ function RankingLeaderboardComponent({
         formatCurrency={formatCurrency}
         mecanica={mecanica}
         isCopa={isCopa}
+        isNinja={isNinja}
         minimoCorridas={minimoCorridas}
+        getRequirementValue={getRequirementValue}
       />
     </div>
   )

@@ -1,6 +1,7 @@
 import { memo } from 'react'
 import { EntregaRanking } from '@/lib/supabase'
 import { getPremioFromConfig, getPremioInfoFromConfig } from '@/lib/config'
+import { getRankingMetricHeader, getRankingMetricShortfallLabel, resolveRankingMetric } from '@/lib/rankingMetric'
 
 export interface LeaderboardTableProps {
   searchQuery: string
@@ -14,12 +15,16 @@ export interface LeaderboardTableProps {
   mecanica: any
   isCopa?: boolean
   minimoCorridas: number
+  isNinja?: boolean
+  getRequirementValue: (item: EntregaRanking) => number
 }
 
 export const LeaderboardTable = memo(function LeaderboardTable({
   searchQuery, rankingToDisplay, configPremios, filtroAtivo, getScore, formatScoreValue, 
-  maxScore, formatCurrency, mecanica, isCopa, minimoCorridas
+  maxScore, formatCurrency, mecanica, isCopa, minimoCorridas, isNinja, getRequirementValue
 }: LeaderboardTableProps) {
+  const resolvedMetric = resolveRankingMetric(mecanica, isNinja)
+
   return (
     <div className="border-y sm:border sm:rounded-2xl overflow-hidden border-white/[0.04] bg-[#050508]/80 sm:bg-zinc-950/20 shadow-none sm:shadow-2xl sm:shadow-black/80 animate-slide-up w-[calc(100%+16px)] sm:w-full -mx-2 sm:mx-0 max-w-none sm:max-w-full copa-leaderboard-table">
       {/* Table Header (Desktop and Mobile) */}
@@ -28,7 +33,7 @@ export const LeaderboardTable = memo(function LeaderboardTable({
         <div className="flex-1 min-w-0 pl-2 sm:pl-5">Entregador</div>
         <div className="w-24 hidden sm:block shrink-0">Praça</div>
         <div className="w-18 sm:w-28 shrink-0 text-right pr-2 sm:pr-5">
-          {mecanica.metrica === 'pontos' ? 'PONTOS' : mecanica.metrica === 'corridas_completadas' ? 'CORRIDAS' : 'VALOR'}
+          {getRankingMetricHeader(resolvedMetric)}
         </div>
         <div className="w-24 sm:w-36 shrink-0 text-right">Prêmio</div>
       </div>
@@ -39,7 +44,8 @@ export const LeaderboardTable = memo(function LeaderboardTable({
           const isPodium = !searchQuery && idx < 3
           if (isPodium) return null
 
-          const atingiuMinimo = item.total_corridas_completadas >= minimoCorridas
+          const requirementValue = getRequirementValue(item)
+          const atingiuMinimo = requirementValue >= minimoCorridas
           const premioTeorico = getPremioFromConfig(configPremios, filtroAtivo, item.posicao)
           const premioInfo = getPremioInfoFromConfig(configPremios, filtroAtivo, item.posicao)
           const premio = atingiuMinimo ? premioTeorico : 0
@@ -116,7 +122,7 @@ export const LeaderboardTable = memo(function LeaderboardTable({
                         🎁 {premioInfo.descricao}
                       </span>
                       <span className="text-[8px] sm:text-[9px] text-amber-500 bg-amber-500/10 border border-amber-500/20 px-1 py-0.5 rounded font-black uppercase mt-1 tracking-tighter">
-                        Falta {minimoCorridas - item.total_corridas_completadas}
+                        {getRankingMetricShortfallLabel(resolvedMetric, minimoCorridas - requirementValue)}
                       </span>
                     </div>
                   )
@@ -131,7 +137,7 @@ export const LeaderboardTable = memo(function LeaderboardTable({
                         +{formatCurrency(premioTeorico)}
                       </span>
                       <span className="text-[8px] sm:text-[9px] text-amber-500 bg-amber-500/10 border border-amber-500/20 px-1 py-0.5 rounded font-black uppercase mt-1 tracking-tighter">
-                        Falta {minimoCorridas - item.total_corridas_completadas}
+                        {getRankingMetricShortfallLabel(resolvedMetric, minimoCorridas - requirementValue)}
                       </span>
                     </div>
                   )

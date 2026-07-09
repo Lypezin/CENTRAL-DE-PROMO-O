@@ -3,6 +3,7 @@
 import React from 'react'
 import { Promocao } from '@/lib/supabase'
 import { useToast } from '@/components/ui/Toast'
+import { resolveRankingMetric } from '@/lib/rankingMetric'
 
 interface GeneralSettingsFormProps {
   promo: Promocao
@@ -52,6 +53,11 @@ export default function GeneralSettingsForm({
     })
   }
 
+  const metricValue = resolveRankingMetric(
+    promo.config_regras?.mecanica,
+    promo.config_regras?.tema_ninja === true
+  )
+
   return (
     <form onSubmit={handleSubmit} className="rounded-xl border border-white/[0.04] bg-[#08080a] p-5 space-y-5">
       <div className="flex items-center justify-between">
@@ -89,7 +95,7 @@ export default function GeneralSettingsForm({
           <label htmlFor="geral-metrica" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Métrica</label>
           <select
             id="geral-metrica"
-            value={promo.config_regras?.mecanica?.metrica ?? 'corridas_completadas'}
+            value={metricValue}
             onChange={e => {
               const val = e.target.value
               const updates: Record<string, string> = { metrica: val }
@@ -120,6 +126,7 @@ export default function GeneralSettingsForm({
             className="admin-input !py-2.5 bg-[#0a0a0c]"
           >
             <option value="corridas_completadas">Quantidade de Corridas</option>
+            <option value="pedidos_aceitos_e_concluidos">Pedidos Aceitos e Concluídos</option>
             <option value="faturamento_taxas">Faturamento Acumulado (R$)</option>
             <option value="pontos">Pontuação Acumulada</option>
           </select>
@@ -221,13 +228,23 @@ export default function GeneralSettingsForm({
           </button>
           <button
             type="button"
-            onClick={() => setPromo({
-              ...promo,
-              config_regras: {
-                ...(promo.config_regras || {}),
-                tema_ninja: !promo.config_regras?.tema_ninja
-              }
-            })}
+            onClick={() => {
+              const nextTemaNinja = !promo.config_regras?.tema_ninja
+              const currentMetric = promo.config_regras?.mecanica?.metrica
+              const shouldSwitchMetric = nextTemaNinja && (!currentMetric || currentMetric === 'corridas_completadas')
+
+              setPromo({
+                ...promo,
+                config_regras: {
+                  ...(promo.config_regras || {}),
+                  tema_ninja: nextTemaNinja,
+                  mecanica: {
+                    ...(promo.config_regras?.mecanica || {}),
+                    ...(shouldSwitchMetric ? { metrica: 'pedidos_aceitos_e_concluidos' } : {})
+                  }
+                }
+              })
+            }}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[11px] font-bold transition-all ${
               promo.config_regras?.tema_ninja
                 ? 'bg-zinc-500/10 border-zinc-500/30 text-zinc-300'

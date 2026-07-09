@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { supabase, EntregaRanking } from '@/lib/supabase'
 import { formatCurrency } from '@/lib/config'
+import { formatRankingMetricValue, getRankingMetricValue, resolveRankingMetric } from '@/lib/rankingMetric'
 
 // Subcomponents import
 import { RankingFilters } from '../views/ranking-turno/RankingFilters'
@@ -20,18 +21,20 @@ const TURNO_DISPLAY: Record<string, { label: string; emoji: string; cor: string;
   'GERAL': { label: 'Geral', emoji: '🏆', cor: '#e4e4e7', corGradiente: 'linear-gradient(135deg, #71717a, #e4e4e7)' }
 }
 
-export default function RankingTurno({ 
+export default function RankingTurno({
   promocaoId,
-  configPremios, 
+  configPremios,
   configTurnos,
   configRegras = {},
-  isCopa = false
-}: { 
+  isCopa = false,
+  isNinja = false
+}: {
   promocaoId: string
   configPremios: any[]
   configTurnos: string[]
   configRegras?: any
   isCopa?: boolean
+  isNinja?: boolean
 }) {
   const mecanica = useMemo(() => configRegras?.mecanica || {
     metrica: 'corridas_completadas',
@@ -42,6 +45,7 @@ export default function RankingTurno({
   const isGeral = mecanica.agrupamento === 'geral'
   const isMetas = mecanica.tipo_calculo === 'metas'
   const isNiveis = mecanica.tipo_calculo === 'niveis'
+  const resolvedMetric = useMemo(() => resolveRankingMetric(mecanica, isNinja), [mecanica, isNinja])
   
   const turnosDisponiveis = useMemo(() => {
     return isGeral ? ['GERAL'] : configTurnos
@@ -118,16 +122,12 @@ export default function RankingTurno({
   }, [filteredRanking, displayLimit])
   
   const getScore = useCallback((item: EntregaRanking) => {
-    if (mecanica.metrica === 'faturamento_taxas') return item.total_soma_taxas
-    if (mecanica.metrica === 'pontos') return item.total_pontos
-    return item.total_corridas_completadas
-  }, [mecanica.metrica])
+    return getRankingMetricValue(item, resolvedMetric)
+  }, [resolvedMetric])
 
   const formatScoreValue = useCallback((val: number) => {
-    if (mecanica.metrica === 'faturamento_taxas') return formatCurrency(val)
-    if (mecanica.metrica === 'pontos') return `${val} pts`
-    return `${val} corr.`
-  }, [mecanica.metrica])
+    return formatRankingMetricValue(resolvedMetric, val, formatCurrency)
+  }, [resolvedMetric])
 
   const maxScore = useMemo(() => {
     return rankingToDisplay.length > 0 ? getScore(rankingToDisplay[0]) : 1
@@ -208,6 +208,7 @@ export default function RankingTurno({
                 formatCurrency={formatCurrency}
                 mecanica={mecanica}
                 isCopa={isCopa}
+                isNinja={isNinja}
               />
             )}
 
