@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabaseServer'
+import { DEFAULT_ELITE_CONFIG, normalizeEliteConfig } from '@/lib/eliteConfig'
 
 type EliteMonth = {
   value: string
@@ -62,6 +63,19 @@ function isValidMonthKey(value: string): boolean {
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const scope = searchParams.get('scope') || 'lookup'
+  let eliteTarget = DEFAULT_ELITE_CONFIG.target
+
+  try {
+    const { data } = await supabaseAdmin
+      .from('configuracoes')
+      .select('valor')
+      .eq('chave', 'elite_config')
+      .single()
+
+    if (data?.valor) {
+      eliteTarget = normalizeEliteConfig(data.valor).target
+    }
+  } catch {}
 
   if (scope === 'months') {
     const [minDataRes, maxDataRes] = await Promise.all([
@@ -141,7 +155,7 @@ export async function GET(request: Request) {
 
     const current = grouped.get(key)!
     current.totalPedidos += totalPedidos
-    current.isElite = current.totalPedidos >= 300
+    current.isElite = current.totalPedidos >= eliteTarget
   }
 
   const results = Array.from(grouped.values())
@@ -150,6 +164,7 @@ export async function GET(request: Request) {
 
   return NextResponse.json({
     month,
+    target: eliteTarget,
     results,
   })
 }

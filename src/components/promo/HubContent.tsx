@@ -4,6 +4,7 @@ import { useState, useRef, useMemo, useEffect } from 'react'
 import PromoCard from '@/components/ui/PromoCard'
 import { Promocao } from '@/lib/supabase'
 import ElitePromoCard from '@/components/promo/ElitePromoCard'
+import { EliteConfig } from '@/lib/eliteConfig'
 
 type PrizeItem = {
   valor?: number
@@ -19,7 +20,13 @@ declare global {
   }
 }
 
-export default function HubContent({ initialPromocoes }: { initialPromocoes: Promocao[] }) {
+export default function HubContent({
+  initialPromocoes,
+  eliteConfig,
+}: {
+  initialPromocoes: Promocao[]
+  eliteConfig: EliteConfig
+}) {
   const [searchQuery, setSearchQuery] = useState('')
   const [activeTab, setActiveTab] = useState<'todas' | 'ativas' | 'encerradas'>('ativas')
   const [isTermsOpen, setIsTermsOpen] = useState(false)
@@ -216,7 +223,7 @@ export default function HubContent({ initialPromocoes }: { initialPromocoes: Pro
       <section className="animate-slide-up">
         <div className="grid-promos gap-6">
           <div className="animate-fade-in">
-            <ElitePromoCard />
+            <ElitePromoCard config={eliteConfig} />
           </div>
           {filteredPromocoes.map((promo) => (
             <div key={promo.id} className="animate-fade-in">

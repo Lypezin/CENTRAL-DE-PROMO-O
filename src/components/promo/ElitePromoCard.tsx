@@ -1,9 +1,10 @@
 import Link from 'next/link'
 import StatusBadge from '@/components/ui/StatusBadge'
+import { EliteConfig } from '@/lib/eliteConfig'
 
 const ELITE_MONTHS = ['Meta 300', 'Reset mensal', 'Histórico por mês']
 
-export default function ElitePromoCard() {
+export default function ElitePromoCard({ config }: { config: EliteConfig }) {
   return (
     <Link href="/elite" className="block w-full h-full">
       <div className="obsidian-card h-full flex flex-col relative group overflow-hidden !bg-gradient-to-br !from-[#17120a] !via-[#0a0907] !to-[#030303] !border-amber-500/20 shadow-[0_0_20px_rgba(245,158,11,0.08)]">
@@ -42,14 +43,14 @@ export default function ElitePromoCard() {
           </div>
           <div className="mb-2.5">
             <span className="inline-flex items-center text-[9px] md:text-[10px] font-bold tracking-wider uppercase px-2.5 py-0.5 rounded font-mono backdrop-blur-sm text-amber-100 bg-amber-950/50 border border-amber-500/35 shadow-[0_0_12px_rgba(245,158,11,0.22)]">
-              📍 Lista fixa mensal
+              📍 {config.tag_label}
             </span>
           </div>
           <h3 className="text-lg sm:text-xl font-bold mb-2 transition-all duration-300 tracking-tight text-amber-50 group-hover:brightness-125 group-hover:scale-[1.02] transform-origin-left drop-shadow-md">
-            ELITE
+            {config.card_title}
           </h3>
           <p className="text-sm mb-6 flex-grow line-clamp-3 leading-relaxed font-sans text-amber-50/75 font-medium">
-            Consulte quantos pedidos aceitos e concluídos o entregador acumulou no mês. Ao bater 300, ele vira ELITE.
+            {config.card_description}
           </p>
           <div className="mt-auto pt-3 border-t mb-3.5 border-amber-950/40">
             <div className="text-[8px] font-extrabold uppercase tracking-wider mb-1.5 font-mono text-amber-300/80">
@@ -61,7 +62,7 @@ export default function ElitePromoCard() {
                   key={item}
                   className="inline-flex items-center gap-1 text-[8.5px] font-bold px-2 py-0.5 rounded-md font-mono text-amber-100/90 bg-amber-950/35 border border-amber-500/25"
                 >
-                  <span>{item}</span>
+                  <span>{item === 'Meta 300' ? `Meta ${config.target}` : item}</span>
                 </span>
               ))}
             </div>

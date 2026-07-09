@@ -1,11 +1,26 @@
 import { supabase, Promocao } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabaseServer'
 import HubContent from '@/components/promo/HubContent'
+import { DEFAULT_ELITE_CONFIG, normalizeEliteConfig } from '@/lib/eliteConfig'
 
 export const revalidate = 60 // Disable cache for real-time accuracy
 
 export default async function HubPage() {
   // Fetch active, draft and past promotions ordered properly
   const { data: promocoes, error } = await supabase.rpc('get_promocoes')
+  let eliteConfig = DEFAULT_ELITE_CONFIG
+
+  try {
+    const { data } = await supabaseAdmin
+      .from('configuracoes')
+      .select('valor')
+      .eq('chave', 'elite_config')
+      .single()
+
+    if (data?.valor) {
+      eliteConfig = normalizeEliteConfig(data.valor)
+    }
+  } catch {}
   
   if (error) {
     console.error('Error fetching promocoes:', error)
@@ -35,7 +50,7 @@ export default async function HubPage() {
 
   return (
     <div className="min-h-screen pb-16">
-      <HubContent initialPromocoes={publicPromocoes} />
+      <HubContent initialPromocoes={publicPromocoes} eliteConfig={eliteConfig} />
     </div>
   )
 }
