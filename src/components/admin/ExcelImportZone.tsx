@@ -4,11 +4,12 @@ import React, { useRef, useState } from 'react'
 import { processExcelBuffer } from '@/lib/admin/excelParser'
 
 interface ExcelImportZoneProps {
-  promocaoId: string
+  promocaoId?: string
   onUploadSuccess: () => void
   title?: string
   description?: string
   compact?: boolean
+  resolvePromocaoId?: () => Promise<string>
 }
 
 export default function ExcelImportZone({
@@ -17,6 +18,7 @@ export default function ExcelImportZone({
   title = 'Importar Planilha',
   description = 'Selecione uma planilha .xlsx para enviar os dados.',
   compact = false,
+  resolvePromocaoId,
 }: ExcelImportZoneProps) {
   const [arquivo, setArquivo] = useState<File | null>(null)
   const [uploadLoading, setUploadLoading] = useState(false)
@@ -32,12 +34,18 @@ export default function ExcelImportZone({
     setProgresso(5)
 
     try {
+      const resolvedPromocaoId = promocaoId || (resolvePromocaoId ? await resolvePromocaoId() : '')
+
+      if (!resolvedPromocaoId) {
+        throw new Error('Nao foi possivel preparar a base de dados para importar a planilha.')
+      }
+
       const arrayBuffer = await arquivo.arrayBuffer()
       setProgresso(15)
 
       let parseResult
       try {
-        parseResult = processExcelBuffer(arrayBuffer, promocaoId)
+        parseResult = processExcelBuffer(arrayBuffer, resolvedPromocaoId)
       } catch (err: any) {
         throw new Error(err.message || 'Erro ao ler a planilha no navegador')
       }
@@ -141,7 +149,7 @@ export default function ExcelImportZone({
         type="file"
         accept=".xlsx,.xls"
         onChange={(e) => setArquivo(e.target.files?.[0] || null)}
-        className="hidden"
+        className="block w-full rounded-xl border border-white/10 bg-[#0a0a0c] px-3 py-2.5 text-sm text-zinc-300 file:mr-4 file:rounded-lg file:border-0 file:bg-sky-500 file:px-3 file:py-1.5 file:text-[11px] file:font-bold file:uppercase file:tracking-wider file:text-white hover:border-white/15 focus:border-sky-500/50 focus:outline-none"
       />
 
       <div

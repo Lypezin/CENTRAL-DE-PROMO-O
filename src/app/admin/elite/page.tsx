@@ -77,6 +77,32 @@ export default function AdminElitePage() {
     }
   }
 
+  const ensureEliteDataPromoId = async () => {
+    if (config.data_promocao_id) {
+      return config.data_promocao_id
+    }
+
+    const res = await fetch('/api/admin/elite-config', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ config }),
+    })
+
+    const data = (await res.json()) as EliteConfigResponse
+
+    if (res.status === 401) {
+      router.push('/admin')
+      return ''
+    }
+
+    if (!res.ok || !data.success || !data.config?.data_promocao_id) {
+      throw new Error(data.error || 'Nao foi possivel preparar a base interna do ELITE')
+    }
+
+    setConfig(data.config)
+    return data.config.data_promocao_id
+  }
+
   const handleClearEliteData = async () => {
     if (!config.data_promocao_id) {
       toast.error('Base interna do ELITE ainda nao foi preparada')
@@ -197,21 +223,16 @@ export default function AdminElitePage() {
                   </p>
                 </div>
 
-                {config.data_promocao_id ? (
-                  <ExcelImportZone
-                    promocaoId={config.data_promocao_id}
-                    title="Planilha do ELITE"
-                    description="Escolha o arquivo de Excel para atualizar a base mensal do ELITE."
-                    onUploadSuccess={() => {
-                      toast.success('Base do ELITE atualizada com sucesso')
-                      setConfirmClearData(false)
-                    }}
-                  />
-                ) : (
-                  <div className="rounded-xl border border-white/[0.06] bg-[#08080a] p-4 text-sm text-zinc-500">
-                    Preparando base interna do ELITE...
-                  </div>
-                )}
+                <ExcelImportZone
+                  promocaoId={config.data_promocao_id || undefined}
+                  resolvePromocaoId={ensureEliteDataPromoId}
+                  title="Planilha do ELITE"
+                  description="Escolha o arquivo de Excel para atualizar a base mensal do ELITE."
+                  onUploadSuccess={() => {
+                    toast.success('Base do ELITE atualizada com sucesso')
+                    setConfirmClearData(false)
+                  }}
+                />
               </div>
 
               <div className="space-y-4">
