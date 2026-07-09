@@ -116,7 +116,7 @@ export default function AdminElitePage() {
 
   if (loading) {
     return (
-      <div className="max-w-5xl mx-auto px-4 md:px-6 pt-6">
+      <div className="max-w-6xl mx-auto px-4 md:px-6 pt-6">
         <div className="flex items-center justify-center min-h-[50vh]">
           <div className="text-center space-y-3">
             <div className="w-5 h-5 border-2 border-amber-400 border-t-transparent rounded-full animate-spin mx-auto" />
@@ -129,7 +129,7 @@ export default function AdminElitePage() {
 
   return (
     <div className="min-h-screen pb-12">
-      <div className="max-w-5xl mx-auto px-4 md:px-6 pt-6">
+      <div className="max-w-6xl mx-auto px-4 md:px-6 pt-6">
         <div className="mb-8">
           <Link
             href="/admin"
@@ -147,9 +147,9 @@ export default function AdminElitePage() {
                 <span className="h-1.5 w-1.5 rounded-full bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.9)]" />
                 ELITE
               </div>
-              <h1 className="text-3xl md:text-4xl font-black text-white tracking-tight">Configuracao do ELITE</h1>
-              <p className="text-zinc-400 text-sm md:text-base mt-2 max-w-2xl">
-                Edite o card fixo, a pagina interna e suba a planilha da base mensal do ELITE direto por aqui.
+              <h1 className="text-3xl md:text-4xl font-black text-white tracking-tight">Gestao do ELITE</h1>
+              <p className="text-zinc-400 text-sm md:text-base mt-2 max-w-3xl">
+                Aqui voce consegue subir a planilha do ELITE, limpar a base mensal e editar o conteudo exibido no card e na pagina publica.
               </p>
             </div>
 
@@ -171,82 +171,46 @@ export default function AdminElitePage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_380px] gap-5">
-          <div className="space-y-5">
-            <div className="rounded-2xl border border-white/[0.06] bg-zinc-950/60 backdrop-blur-md p-6">
-              <h2 className="text-sm font-semibold text-zinc-200 tracking-wide uppercase mb-5">Card da Central</h2>
-              <div className="grid grid-cols-1 gap-4">
+        <div className="space-y-5">
+          <section className="rounded-2xl border border-amber-500/15 bg-[linear-gradient(180deg,rgba(10,10,12,0.98),rgba(7,7,8,0.98))] overflow-hidden">
+            <div className="h-[5px] bg-gradient-to-r from-amber-500 via-yellow-300 to-amber-500" />
+            <div className="grid grid-cols-1 gap-5 p-5 lg:grid-cols-[minmax(0,1.3fr)_360px]">
+              <div className="space-y-4">
                 <div>
-                  <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Titulo do card</label>
-                  <input
-                    type="text"
-                    value={config.card_title}
-                    onChange={(e) => setConfig({ ...config, card_title: e.target.value })}
-                    className="admin-input !py-2.5"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Descricao do card</label>
-                  <textarea
-                    rows={3}
-                    value={config.card_description}
-                    onChange={(e) => setConfig({ ...config, card_description: e.target.value })}
-                    className="admin-input !py-2.5 resize-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Etiqueta</label>
-                  <input
-                    type="text"
-                    value={config.tag_label}
-                    onChange={(e) => setConfig({ ...config, tag_label: e.target.value })}
-                    className="admin-input !py-2.5"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-white/[0.06] bg-zinc-950/60 backdrop-blur-md p-6">
-              <h2 className="text-sm font-semibold text-zinc-200 tracking-wide uppercase mb-5">Pagina Interna</h2>
-              <div className="grid grid-cols-1 gap-4">
-                <div>
-                  <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Titulo da pagina</label>
-                  <input
-                    type="text"
-                    value={config.page_title}
-                    onChange={(e) => setConfig({ ...config, page_title: e.target.value })}
-                    className="admin-input !py-2.5"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Descricao da pagina</label>
-                  <textarea
-                    rows={4}
-                    value={config.page_description}
-                    onChange={(e) => setConfig({ ...config, page_description: e.target.value })}
-                    className="admin-input !py-2.5 resize-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Meta mensal</label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={config.target}
-                    onChange={(e) => setConfig({ ...config, target: Math.max(1, Number(e.target.value) || 1) })}
-                    className="admin-input !py-2.5 bg-[#0a0a0c]"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-white/[0.06] bg-zinc-950/60 backdrop-blur-md p-6 space-y-4">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <h2 className="text-sm font-semibold text-zinc-200 tracking-wide uppercase">Base de Dados ELITE</h2>
-                  <p className="mt-2 text-sm text-zinc-500">
-                    Use a mesma planilha de entregas para alimentar o ranking mensal do ELITE. Os meses do card publico saem apenas dessa base.
+                  <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-300">Base de dados ELITE</div>
+                  <h2 className="mt-2 text-2xl font-black tracking-tight text-white">Adicionar planilha do ELITE</h2>
+                  <p className="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-400">
+                    Esse campo usa a base interna do ELITE. Os meses da consulta publica passam a aparecer somente quando existirem dados reais nessa planilha.
                   </p>
+                </div>
+
+                {config.data_promocao_id ? (
+                  <ExcelImportZone
+                    promocaoId={config.data_promocao_id}
+                    title="Planilha do ELITE"
+                    description="Escolha o arquivo de Excel para atualizar a base mensal do ELITE."
+                    onUploadSuccess={() => {
+                      toast.success('Base do ELITE atualizada com sucesso')
+                      setConfirmClearData(false)
+                    }}
+                  />
+                ) : (
+                  <div className="rounded-xl border border-white/[0.06] bg-[#08080a] p-4 text-sm text-zinc-500">
+                    Preparando base interna do ELITE...
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-4">
+                <div className="rounded-2xl border border-white/[0.05] bg-black/20 p-4">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Base vinculada</div>
+                  <div className="mt-2 text-[11px] font-mono break-all text-zinc-300">{config.data_promocao_id || 'aguardando criacao'}</div>
+                </div>
+
+                <div className="rounded-2xl border border-white/[0.05] bg-black/20 p-4">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Regra ativa</div>
+                  <div className="mt-2 text-lg font-black text-white">{config.target} pedidos no mes</div>
+                  <div className="mt-1 text-[11px] text-zinc-500">Ao atingir a meta, o entregador recebe status ELITE na consulta.</div>
                 </div>
 
                 <button
@@ -254,56 +218,109 @@ export default function AdminElitePage() {
                   onClick={handleClearEliteData}
                   onBlur={() => setConfirmClearData(false)}
                   disabled={clearingData || !config.data_promocao_id}
-                  className="shrink-0 rounded-xl border border-red-500/20 px-4 py-2 text-[11px] font-bold uppercase tracking-wider text-red-300 transition-all hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="w-full rounded-xl border border-red-500/20 px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-red-300 transition-all hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  {clearingData ? 'Limpando...' : confirmClearData ? 'Confirmar limpeza' : 'Limpar base'}
+                  {clearingData ? 'Limpando...' : confirmClearData ? 'Confirmar limpeza da base' : 'Limpar base do ELITE'}
                 </button>
               </div>
-
-              {config.data_promocao_id ? (
-                <ExcelImportZone
-                  promocaoId={config.data_promocao_id}
-                  onUploadSuccess={() => {
-                    toast.success('Base do ELITE atualizada com sucesso')
-                    setConfirmClearData(false)
-                  }}
-                />
-              ) : (
-                <div className="rounded-xl border border-white/[0.06] bg-[#08080a] p-4 text-sm text-zinc-500">
-                  Preparando base interna do ELITE...
-                </div>
-              )}
             </div>
-          </div>
+          </section>
 
-          <div className="rounded-2xl border border-amber-500/15 bg-[linear-gradient(180deg,rgba(10,10,12,0.98),rgba(7,7,8,0.98))] overflow-hidden h-fit">
-            <div className="h-[5px] bg-gradient-to-r from-amber-500 via-yellow-300 to-amber-500" />
-            <div className="p-5">
-              <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-amber-300">
-                <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
-                Previa
-              </div>
-              <h3 className="mt-4 text-xl font-black text-white tracking-tight">{config.card_title}</h3>
-              <p className="mt-2 text-sm text-zinc-400 leading-relaxed">{config.card_description}</p>
-
-              <div className="mt-4 inline-flex items-center text-[10px] font-bold tracking-wider uppercase px-2.5 py-0.5 rounded font-mono text-amber-100 bg-amber-950/50 border border-amber-500/35">
-                {config.tag_label}
-              </div>
-
-              <div className="mt-6 grid grid-cols-1 gap-3">
-                <div className="rounded-2xl border border-white/[0.05] bg-black/20 p-4">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Meta</div>
-                  <div className="mt-2 text-2xl font-black text-white">{config.target}</div>
-                  <div className="text-[11px] text-zinc-500">pedidos no mes</div>
+          <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_380px]">
+            <div className="space-y-5">
+              <div className="rounded-2xl border border-white/[0.06] bg-zinc-950/60 backdrop-blur-md p-6">
+                <h2 className="text-sm font-semibold text-zinc-200 tracking-wide uppercase mb-5">Card da Central</h2>
+                <div className="grid grid-cols-1 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Titulo do card</label>
+                    <input
+                      type="text"
+                      value={config.card_title}
+                      onChange={(e) => setConfig({ ...config, card_title: e.target.value })}
+                      className="admin-input !py-2.5"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Descricao do card</label>
+                    <textarea
+                      rows={3}
+                      value={config.card_description}
+                      onChange={(e) => setConfig({ ...config, card_description: e.target.value })}
+                      className="admin-input !py-2.5 resize-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Etiqueta</label>
+                    <input
+                      type="text"
+                      value={config.tag_label}
+                      onChange={(e) => setConfig({ ...config, tag_label: e.target.value })}
+                      className="admin-input !py-2.5"
+                    />
+                  </div>
                 </div>
-                <div className="rounded-2xl border border-white/[0.05] bg-black/20 p-4">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Pagina</div>
-                  <div className="mt-2 text-lg font-black text-white">{config.page_title}</div>
-                  <div className="mt-1 text-[11px] text-zinc-500 line-clamp-3">{config.page_description}</div>
+              </div>
+
+              <div className="rounded-2xl border border-white/[0.06] bg-zinc-950/60 backdrop-blur-md p-6">
+                <h2 className="text-sm font-semibold text-zinc-200 tracking-wide uppercase mb-5">Pagina Interna</h2>
+                <div className="grid grid-cols-1 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Titulo da pagina</label>
+                    <input
+                      type="text"
+                      value={config.page_title}
+                      onChange={(e) => setConfig({ ...config, page_title: e.target.value })}
+                      className="admin-input !py-2.5"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Descricao da pagina</label>
+                    <textarea
+                      rows={4}
+                      value={config.page_description}
+                      onChange={(e) => setConfig({ ...config, page_description: e.target.value })}
+                      className="admin-input !py-2.5 resize-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Meta mensal</label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={config.target}
+                      onChange={(e) => setConfig({ ...config, target: Math.max(1, Number(e.target.value) || 1) })}
+                      className="admin-input !py-2.5 bg-[#0a0a0c]"
+                    />
+                  </div>
                 </div>
-                <div className="rounded-2xl border border-white/[0.05] bg-black/20 p-4">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Base interna</div>
-                  <div className="mt-2 text-[11px] font-mono break-all text-zinc-400">{config.data_promocao_id || 'aguardando'}</div>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-amber-500/15 bg-[linear-gradient(180deg,rgba(10,10,12,0.98),rgba(7,7,8,0.98))] overflow-hidden h-fit">
+              <div className="h-[5px] bg-gradient-to-r from-amber-500 via-yellow-300 to-amber-500" />
+              <div className="p-5">
+                <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-amber-300">
+                  <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+                  Previa
+                </div>
+                <h3 className="mt-4 text-xl font-black text-white tracking-tight">{config.card_title}</h3>
+                <p className="mt-2 text-sm text-zinc-400 leading-relaxed">{config.card_description}</p>
+
+                <div className="mt-4 inline-flex items-center text-[10px] font-bold tracking-wider uppercase px-2.5 py-0.5 rounded font-mono text-amber-100 bg-amber-950/50 border border-amber-500/35">
+                  {config.tag_label}
+                </div>
+
+                <div className="mt-6 grid grid-cols-1 gap-3">
+                  <div className="rounded-2xl border border-white/[0.05] bg-black/20 p-4">
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Meta</div>
+                    <div className="mt-2 text-2xl font-black text-white">{config.target}</div>
+                    <div className="text-[11px] text-zinc-500">pedidos no mes</div>
+                  </div>
+                  <div className="rounded-2xl border border-white/[0.05] bg-black/20 p-4">
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Pagina</div>
+                    <div className="mt-2 text-lg font-black text-white">{config.page_title}</div>
+                    <div className="mt-1 text-[11px] text-zinc-500 line-clamp-3">{config.page_description}</div>
+                  </div>
                 </div>
               </div>
             </div>
