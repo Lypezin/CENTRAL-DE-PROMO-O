@@ -4,6 +4,7 @@ import { getAuthenticatedUser } from '@/lib/auth'
 import { DEFAULT_ELITE_CONFIG, normalizeEliteConfig } from '@/lib/eliteConfig'
 
 const ELITE_DATA_SLUG = 'elite-dados-internos'
+const EMPTY_PRIZE_CONFIG: never[] = []
 
 async function ensureEliteDataPromotion(existingPromotionId?: string) {
   if (existingPromotionId) {
@@ -33,10 +34,20 @@ async function ensureEliteDataPromotion(existingPromotionId?: string) {
       status: 'rascunho',
       data_inicio: null,
       data_fim: null,
-      config_premios: null,
+      config_premios: EMPTY_PRIZE_CONFIG,
       config_turnos: ['GERAL'],
       config_regras: {
+        limite_ranking: 15,
+        regras_texto: [],
         elite_internal: true,
+        mecanica: {
+          metrica: 'pedidos_aceitos_e_concluidos',
+          tipo_calculo: 'ranking',
+          agrupamento: 'geral',
+          filtros: [],
+          metas_predefinidas: [],
+          niveis: [],
+        },
       },
       cidade: null,
       destaque_copa: false,
@@ -116,7 +127,19 @@ export async function PUT(request: NextRequest) {
   try {
     const body = (await request.json()) as { config?: unknown }
     const incomingConfig = normalizeEliteConfig(body.config)
-    const dataPromoId = await ensureEliteDataPromotion(incomingConfig.data_promocao_id)
+    let dataPromoId = ''
+
+    try {
+      dataPromoId = await ensureEliteDataPromotion(incomingConfig.data_promocao_id)
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : 'Erro ao preparar base interna do ELITE'
+      return NextResponse.json({ success: false, error: msg }, { status: 500 })
+    }
+
+    if (!dataPromoId) {
+      return NextResponse.json({ success: false, error: 'Base interna do ELITE nao foi criada.' }, { status: 500 })
+    }
+
     const config = {
       ...incomingConfig,
       data_promocao_id: dataPromoId,
