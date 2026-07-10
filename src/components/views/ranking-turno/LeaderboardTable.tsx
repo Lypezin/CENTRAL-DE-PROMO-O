@@ -24,7 +24,7 @@ export const LeaderboardTable = memo(function LeaderboardTable({
   maxScore, formatCurrency, mecanica, isCopa, minimoCorridas, isNinja, getRequirementValue
 }: LeaderboardTableProps) {
   const resolvedMetric = resolveRankingMetric(mecanica, isNinja)
-  const showMetricColumn = !(isNinja && resolvedMetric === 'pedidos_aceitos_e_concluidos')
+  const showMetricColumn = !isNinja
 
   return (
     <div className="border-y sm:border sm:rounded-2xl overflow-hidden border-white/[0.04] bg-[#050508]/80 sm:bg-zinc-950/20 shadow-none sm:shadow-2xl sm:shadow-black/80 animate-slide-up w-[calc(100%+16px)] sm:w-full -mx-2 sm:mx-0 max-w-none sm:max-w-full copa-leaderboard-table">
