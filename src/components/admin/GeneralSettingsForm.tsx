@@ -231,7 +231,7 @@ export default function GeneralSettingsForm({
             onClick={() => {
               const nextTemaNinja = !promo.config_regras?.tema_ninja
               const currentMetric = promo.config_regras?.mecanica?.metrica
-              const shouldSwitchMetric = nextTemaNinja && (!currentMetric || currentMetric === 'corridas_completadas')
+              const shouldSwitchMetric = nextTemaNinja && currentMetric !== 'faturamento_taxas'
 
               setPromo({
                 ...promo,
@@ -240,7 +240,7 @@ export default function GeneralSettingsForm({
                   tema_ninja: nextTemaNinja,
                   mecanica: {
                     ...(promo.config_regras?.mecanica || {}),
-                    ...(shouldSwitchMetric ? { metrica: 'pedidos_aceitos_e_concluidos' } : {})
+                    ...(shouldSwitchMetric ? { metrica: 'faturamento_taxas' } : {})
                   }
                 }
               })

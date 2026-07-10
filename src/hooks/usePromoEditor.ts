@@ -15,7 +15,7 @@ const TURNO_LABELS: Record<string, string> = {
 }
 
 const createDefaultMecanica = (isNinja = false) => ({
-  metrica: isNinja ? 'pedidos_aceitos_e_concluidos' : 'corridas_completadas',
+  metrica: isNinja ? 'faturamento_taxas' : 'corridas_completadas',
   tipo_calculo: 'ranking',
   agrupamento: 'turno',
   filtros: [],

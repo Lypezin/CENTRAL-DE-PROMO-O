@@ -9,12 +9,12 @@ export type RankingMetric =
 export function resolveRankingMetric(mecanica: { metrica?: string } | null | undefined, isNinja = false): RankingMetric {
   const metrica = mecanica?.metrica
 
-  if (metrica === 'pedidos_aceitos_e_concluidos' || metrica === 'faturamento_taxas' || metrica === 'pontos') {
-    return metrica
+  if (isNinja) {
+    return 'faturamento_taxas'
   }
 
-  if (isNinja) {
-    return 'pedidos_aceitos_e_concluidos'
+  if (metrica === 'pedidos_aceitos_e_concluidos' || metrica === 'faturamento_taxas' || metrica === 'pontos') {
+    return metrica
   }
 
   return 'corridas_completadas'
