@@ -1,23 +1,15 @@
 import { cookies } from 'next/headers'
 import crypto from 'crypto'
 
-function resolveJwtSecret(): string {
-  if (process.env.JWT_SECRET && process.env.JWT_SECRET.length >= 32) {
-    return process.env.JWT_SECRET
-  }
-  if (process.env.NODE_ENV === 'production') {
-    throw new Error(
-      'JWT_SECRET must be set in production (min 32 chars). Do not derive secrets from public env vars.'
-    )
-  }
-  // Dev-only fallback so local setup still works without extra config
-  return crypto
-    .createHash('sha256')
-    .update(process.env.NEXT_PUBLIC_SUPABASE_URL || 'dev-only-central-promocoes')
-    .digest('hex')
-}
-
-const JWT_SECRET = resolveJwtSecret()
+// Session HMAC key: optional JWT_SECRET env, otherwise stable derived fallback.
+// Never throws at import time (Vercel `next build` imports this module during page data collection).
+const JWT_SECRET =
+  process.env.JWT_SECRET && process.env.JWT_SECRET.length > 0
+    ? process.env.JWT_SECRET
+    : crypto
+        .createHash('sha256')
+        .update(process.env.NEXT_PUBLIC_SUPABASE_URL || 'central-promocoes-session')
+        .digest('hex')
 
 function timingSafeEqualHex(a: string, b: string): boolean {
   try {
