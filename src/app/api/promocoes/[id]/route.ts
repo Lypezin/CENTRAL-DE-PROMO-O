@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { supabaseAdmin } from '@/lib/supabaseServer'
 import { getAuthenticatedUser } from '@/lib/auth'
 
@@ -7,12 +8,14 @@ async function isAuthenticated(): Promise<boolean> {
   return user !== null
 }
 
-// GET: Buscar promoção por ID + estatísticas (público)
+// GET: Buscar promoção por ID + estatísticas
+// Público: só ativas/encerradas e sem elite_internal. Admin: tudo.
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params
+  const isAdmin = (await getAuthenticatedUser()) !== null
 
   const { data: promocao, error } = await supabaseAdmin
     .from('promocoes')
@@ -25,6 +28,15 @@ export async function GET(
       { error: 'Promoção não encontrada' },
       { status: 404 }
     )
+  }
+
+  if (!isAdmin) {
+    if (promocao.status === 'rascunho' || promocao.config_regras?.elite_internal) {
+      return NextResponse.json(
+        { error: 'Promoção não encontrada' },
+        { status: 404 }
+      )
+    }
   }
 
   // Buscar estatísticas via RPC
@@ -103,6 +115,12 @@ export async function PUT(
       )
     }
 
+    revalidatePath('/')
+    revalidatePath('/admin')
+    if (data.slug) {
+      revalidatePath(`/promo/${data.slug}`)
+    }
+
     return NextResponse.json(data)
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Erro interno'
@@ -135,6 +153,8 @@ export async function DELETE(
         )
       }
 
+      revalidatePath('/')
+      revalidatePath('/admin')
       return NextResponse.json({ success: true, apenas_dados: true })
     } else {
       // Executa a deleção completa da promoção via RPC
@@ -147,6 +167,8 @@ export async function DELETE(
         )
       }
 
+      revalidatePath('/')
+      revalidatePath('/admin')
       return NextResponse.json({ success: true })
     }
   } catch (error) {

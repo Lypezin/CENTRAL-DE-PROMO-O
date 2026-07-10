@@ -80,18 +80,25 @@ export default function RankingTurno({
   }, [isGeral, turnosDisponiveis, filtroAtivo])
 
   useEffect(() => {
-    async function fetchRanking() {  const cacheKey = promocaoId + ':' + filtroAtivo
+    let cancelled = false
+
+    async function fetchRanking() {
+      const cacheKey = promocaoId + ':' + filtroAtivo
       if (rankingCache.current.has(cacheKey)) {
-        setRankingData(rankingCache.current.get(cacheKey))
-        setLoading(false)
+        if (!cancelled) {
+          setRankingData(rankingCache.current.get(cacheKey))
+          setLoading(false)
+        }
         return
       }
-      setLoading(true)
+      if (!cancelled) setLoading(true)
       const { data, error } = await supabase.rpc('get_ranking_por_promocao', {
         p_promocao_id: promocaoId,
         p_periodo: filtroAtivo,
         p_limite: 200
       })
+      // Ignore stale responses when turno/promo changed mid-flight
+      if (cancelled) return
       if (!error && data) {
         rankingCache.current.set(cacheKey, data)
         setRankingData(data)
@@ -99,6 +106,9 @@ export default function RankingTurno({
       setLoading(false)
     }
     fetchRanking()
+    return () => {
+      cancelled = true
+    }
   }, [promocaoId, filtroAtivo])
 
   // Otimização: filtrar ranking memoizado com base na query debouncada

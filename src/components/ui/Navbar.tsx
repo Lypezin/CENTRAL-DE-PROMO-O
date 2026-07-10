@@ -12,9 +12,26 @@ export default function Navbar() {
 
   useEffect(() => {
     setMounted(true)
+
     const stored = localStorage.getItem('performance_mode')
-    if (stored === 'eco') {
+    if (stored === 'eco' || stored === 'normal') {
+      const eco = stored === 'eco'
+      setIsEco(eco)
+      // Sync listeners (backgrounds may mount after this)
+      window.dispatchEvent(new CustomEvent('performance_mode_change', { detail: { isEco: eco } }))
+      return
+    }
+
+    // Auto eco when user prefers reduced motion or is on a small mobile viewport
+    // Does not persist until the user toggles manually — keeps beauty as default on desktop
+    const prefersReduced =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const isSmallMobile = window.innerWidth < 768 && (navigator.hardwareConcurrency || 4) <= 4
+
+    if (prefersReduced || isSmallMobile) {
       setIsEco(true)
+      window.dispatchEvent(new CustomEvent('performance_mode_change', { detail: { isEco: true } }))
     }
   }, [])
 

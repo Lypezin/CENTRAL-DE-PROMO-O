@@ -159,6 +159,8 @@ const CopaWebGLShader: React.FC<CopaShaderProps> = ({
       window.removeEventListener("focus", handleFocus)
       clearTimeout(resizeTimeout)
       cancelAnimationFrame(animationFrameId)
+      const loseContext = gl.getExtension("WEBGL_lose_context")
+      loseContext?.loseContext()
     }
   }, [speed, intensity])
 

@@ -1,10 +1,33 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+
+type AshParticle = {
+  size: number
+  dur: number
+  delay: number
+  left: number
+  endLeft: number
+}
 
 export default function NinjaBackground() {
   const [mounted, setMounted] = useState(false)
   const [isEcoMode, setIsEcoMode] = useState(false)
+
+  // Stable particle layout — generated once after mount (not on every render)
+  const ashParticles = useMemo<AshParticle[]>(() => {
+    if (!mounted) return []
+    return Array.from({ length: 15 }, () => {
+      const left = Math.random() * 100
+      return {
+        size: Math.random() * 4 + 2,
+        dur: Math.random() * 15 + 10,
+        delay: Math.random() * -20,
+        left,
+        endLeft: left + (Math.random() * 20 - 10),
+      }
+    })
+  }, [mounted])
 
   useEffect(() => {
     setMounted(true)
@@ -47,29 +70,20 @@ export default function NinjaBackground() {
       {/* Partículas flutuantes estilo Faíscas/Cinzas Prateadas */}
       {!isEcoMode && (
         <div className="absolute inset-0 perspective-[1000px]">
-          {/* Usaremos um efeito de CSS simples para simular cinzas flutuando na tela */}
-          {Array.from({ length: 15 }).map((_, i) => {
-            const size = Math.random() * 4 + 2; // de 2px a 6px
-            const dur = Math.random() * 15 + 10; // de 10s a 25s
-            const delay = Math.random() * -20;
-            const left = Math.random() * 100;
-            const endLeft = left + (Math.random() * 20 - 10);
-            
-            return (
-              <div
-                key={i}
-                className="absolute bottom-[-20px] rounded-full bg-zinc-300 shadow-[0_0_8px_rgba(228,228,231,0.6)] opacity-0 animate-float-ash"
-                style={{
-                  width: `${size}px`,
-                  height: `${size}px`,
-                  left: `${left}%`,
-                  animationDuration: `${dur}s`,
-                  animationDelay: `${delay}s`,
-                  '--end-left': `${endLeft}%`
-                } as React.CSSProperties}
-              ></div>
-            )
-          })}
+          {ashParticles.map((p, i) => (
+            <div
+              key={i}
+              className="absolute bottom-[-20px] rounded-full bg-zinc-300 shadow-[0_0_8px_rgba(228,228,231,0.6)] opacity-0 animate-float-ash"
+              style={{
+                width: `${p.size}px`,
+                height: `${p.size}px`,
+                left: `${p.left}%`,
+                animationDuration: `${p.dur}s`,
+                animationDelay: `${p.delay}s`,
+                '--end-left': `${p.endLeft}%`
+              } as React.CSSProperties}
+            ></div>
+          ))}
         </div>
       )}
       

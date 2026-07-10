@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { supabaseAdmin } from '@/lib/supabaseServer'
 import { gerarSlug } from '@/lib/config'
 import { getAuthenticatedUser } from '@/lib/auth'
@@ -8,18 +9,30 @@ async function isAuthenticated(): Promise<boolean> {
   return user !== null
 }
 
-// GET: Listar promoções (público, com filtro opcional por status)
+// GET: Listar promoções
+// - Sem auth: só ativas/encerradas (nunca rascunho nem elite_internal)
+// - Com auth admin: lista completa (inclui rascunhos); status opcional
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const status = searchParams.get('status')
+  const isAdmin = (await getAuthenticatedUser()) !== null
 
   let query = supabaseAdmin
     .from('promocoes')
     .select('id, slug, nome, descricao, tipo, status, data_inicio, data_fim, cidade, created_at, updated_at, destaque_copa, config_regras')
     .order('created_at', { ascending: false })
 
-  if (status) {
-    query = query.eq('status', status)
+  if (isAdmin) {
+    if (status) {
+      query = query.eq('status', status)
+    }
+  } else {
+    // Public: force safe statuses only
+    if (status === 'ativa' || status === 'encerrada') {
+      query = query.eq('status', status)
+    } else {
+      query = query.in('status', ['ativa', 'encerrada'])
+    }
   }
 
   const { data, error } = await query
@@ -28,7 +41,27 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  return NextResponse.json(data)
+  const rows = data || []
+  if (isAdmin) {
+    return NextResponse.json(rows)
+  }
+
+  // Strip internal elite promos and avoid leaking sensitive rule internals
+  const publicRows = rows
+    .filter((p) => !p.config_regras?.elite_internal)
+    .map((p) => ({
+      ...p,
+      config_regras: p.config_regras
+        ? {
+            ordem: p.config_regras.ordem,
+            limite_ranking: p.config_regras.limite_ranking,
+            tema_ninja: p.config_regras.tema_ninja,
+            mecanica: p.config_regras.mecanica,
+          }
+        : null,
+    }))
+
+  return NextResponse.json(publicRows)
 }
 
 // POST: Criar nova promoção (requer autenticação admin)
@@ -80,6 +113,9 @@ export async function POST(request: Request) {
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
+
+    revalidatePath('/')
+    revalidatePath('/admin')
 
     return NextResponse.json(data, { status: 201 })
   } catch (error) {

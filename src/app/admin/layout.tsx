@@ -7,17 +7,35 @@ import { motion, AnimatePresence } from 'framer-motion'
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const [hasSession, setHasSession] = useState(true)
+  // null = still checking; only show chrome when authenticated
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
 
   useEffect(() => {
-    setHasSession(!!document?.cookie?.includes('admin_session'))
-  }, [])
+    let cancelled = false
+    async function verifySession() {
+      try {
+        const res = await fetch('/api/admin/verify')
+        if (!res.ok) {
+          if (!cancelled) setIsAuthenticated(false)
+          return
+        }
+        const data = await res.json()
+        if (!cancelled) setIsAuthenticated(!!data.authenticated)
+      } catch {
+        if (!cancelled) setIsAuthenticated(false)
+      }
+    }
+    verifySession()
+    return () => {
+      cancelled = true
+    }
+  }, [pathname])
 
-  const isLoginPage = pathname === '/admin' && !hasSession
+  const showNav = isAuthenticated === true
 
   return (
     <div className="min-h-screen bg-[#030303]">
-      {!isLoginPage && (
+      {showNav && (
         <nav className="sticky top-0 z-30 border-b border-white/[0.04] bg-[#030303]/80 backdrop-blur-xl">
           <div className="max-w-5xl mx-auto px-4 md:px-6 flex items-center justify-between h-12">
             <div className="flex items-center gap-4">
@@ -39,8 +57,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 >
                   Dashboard
                 </Link>
-                <Link
-                  href="/admin"
+                <a
+                  href="/admin#promocoes"
                   className={`px-2.5 py-1 rounded-md text-[11px] font-bold transition-all ${
                     pathname.startsWith('/admin/promo')
                       ? 'text-sky-400 bg-sky-500/10'
@@ -48,7 +66,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   }`}
                 >
                   Promoções
-                </Link>
+                </a>
               </div>
             </div>
             <Link

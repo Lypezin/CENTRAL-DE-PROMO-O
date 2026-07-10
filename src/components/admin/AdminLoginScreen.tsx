@@ -51,7 +51,7 @@ export default function AdminLoginScreen({ onSuccess }: AdminLoginScreenProps) {
       })
       const data = await res.json()
       if (data.success) {
-        onSuccess(data.name || 'Admin')
+        onSuccess(data.nome || data.name || 'Admin')
       } else {
         setErro(data.error || 'Usuário ou senha incorretos.')
       }

@@ -5,7 +5,7 @@ import StatusBadge from '@/components/ui/StatusBadge'
 import CopaThemeForcer from '@/components/promo/CopaThemeForcer'
 import NinjaThemeForcer from '@/components/promo/NinjaThemeForcer'
 
-export const revalidate = 60 // Disable cache for real-time data accuracy
+export const revalidate = 60 // ISR: revalidate promo page every 60s
 
 export default async function PromoPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params

@@ -309,7 +309,7 @@ export default function AdminPage() {
           </motion.div>
         </motion.div>
 
-        <motion.div variants={itemVariants}>
+        <motion.div variants={itemVariants} id="promocoes">
           <div className="mb-4">
             <h2 className="text-xl font-bold text-white">Gestão de Promoções</h2>
             <p className="text-xs text-zinc-500 mt-1">Selecione uma promoção ativa ou arquivada para editar regras e painéis.</p>

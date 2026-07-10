@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabaseServer'
 import { verifySessionToken } from '@/lib/auth'
-import { processExcelBuffer } from '@/lib/admin/excelParser'
+
+const MAX_BATCH_SIZE = 500
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
 function isAuthenticated(request: NextRequest): boolean {
   const token = request.cookies.get('admin_auth_session')?.value
@@ -37,9 +39,30 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { promocao_id, registros, arquivoNome, totalLinhas, loteAtual, totalLotes } = body
 
-    if (!promocao_id || !registros || !Array.isArray(registros)) {
+    if (!promocao_id || typeof promocao_id !== 'string' || !UUID_RE.test(promocao_id)) {
+      return NextResponse.json({ error: 'promocao_id inválido.' }, { status: 400 })
+    }
+
+    if (!registros || !Array.isArray(registros)) {
       return NextResponse.json({ error: 'Dados inválidos na requisição.' }, { status: 400 })
     }
+
+    if (registros.length === 0) {
+      return NextResponse.json({ error: 'Lote vazio.' }, { status: 400 })
+    }
+
+    if (registros.length > MAX_BATCH_SIZE) {
+      return NextResponse.json(
+        { error: `Lote excede o máximo de ${MAX_BATCH_SIZE} registros.` },
+        { status: 400 }
+      )
+    }
+
+    // Force promocao_id server-side — never trust client-embedded values
+    const sanitizedRegistros = registros.map((row: Record<string, unknown>) => ({
+      ...row,
+      promocao_id,
+    }))
 
     if (loteAtual === 1) {
       await logAction('upload_inicio', `Iniciando upload: ${arquivoNome}`, 'success', { 
@@ -50,7 +73,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { data, error } = await supabaseAdmin.rpc('upsert_entregas_batch', {
-      p_registros: registros,
+      p_registros: sanitizedRegistros,
     })
 
     if (error) {

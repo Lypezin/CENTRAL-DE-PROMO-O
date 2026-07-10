@@ -198,11 +198,21 @@ const Lightning: React.FC<LightningProps> = ({
     const startTime = performance.now();
     let animationFrameId: number;
     let isPaused = false;
+    let lastRenderTime = performance.now();
+    // Match Copa budget: cap FPS so visual stays smooth without uncapped GPU cost
+    const targetFPS = 42;
+    const frameInterval = 1000 / targetFPS;
 
     const render = () => {
       if (isPaused) return;
-      gl.uniform2f(iResolutionLocation, canvas.width, canvas.height);
+      animationFrameId = requestAnimationFrame(render);
+
       const currentTime = performance.now();
+      const elapsed = currentTime - lastRenderTime;
+      if (elapsed < frameInterval) return;
+      lastRenderTime = currentTime - (elapsed % frameInterval);
+
+      gl.uniform2f(iResolutionLocation, canvas.width, canvas.height);
       gl.uniform1f(iTimeLocation, (currentTime - startTime) / 1000.0);
       gl.uniform1f(uHueLocation, hue);
       gl.uniform1f(uXOffsetLocation, xOffset);
@@ -210,7 +220,6 @@ const Lightning: React.FC<LightningProps> = ({
       gl.uniform1f(uIntensityLocation, intensity);
       gl.uniform1f(uSizeLocation, size);
       gl.drawArrays(gl.TRIANGLES, 0, 6);
-      animationFrameId = requestAnimationFrame(render);
     };
     render();
 
@@ -249,6 +258,9 @@ const Lightning: React.FC<LightningProps> = ({
       window.removeEventListener("focus", handleFocus);
       clearTimeout(resizeTimeout);
       cancelAnimationFrame(animationFrameId);
+      // Release GPU resources when theme unmounts
+      const loseContext = gl.getExtension("WEBGL_lose_context");
+      loseContext?.loseContext();
     };
   }, [hue, xOffset, speed, intensity, size]);
 

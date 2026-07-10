@@ -3,7 +3,7 @@ import { supabaseAdmin } from '@/lib/supabaseServer'
 import HubContent from '@/components/promo/HubContent'
 import { DEFAULT_ELITE_CONFIG, normalizeEliteConfig } from '@/lib/eliteConfig'
 
-export const revalidate = 60 // Disable cache for real-time accuracy
+export const revalidate = 60 // ISR: revalidate hub every 60s
 
 export default async function HubPage() {
   // Fetch active, draft and past promotions ordered properly

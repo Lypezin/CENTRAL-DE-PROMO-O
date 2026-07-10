@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { supabaseAdmin } from '@/lib/supabaseServer'
 import { getAuthenticatedUser } from '@/lib/auth'
 
@@ -70,6 +71,9 @@ export async function PUT(request: NextRequest) {
       status: 'success',
       metadata: { tema_ativo: config.tema_ativo, admin: user.username },
     })
+
+    revalidatePath('/')
+    revalidatePath('/admin')
 
     return NextResponse.json({ success: true, config })
   } catch (error) {

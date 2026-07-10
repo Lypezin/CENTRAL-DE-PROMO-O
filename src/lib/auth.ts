@@ -1,8 +1,34 @@
 import { cookies } from 'next/headers'
 import crypto from 'crypto'
 
-// Use a secure JWT_SECRET from environment or fallback to a persistent hash of NEXT_PUBLIC_SUPABASE_URL
-const JWT_SECRET = process.env.JWT_SECRET || crypto.createHash('sha256').update(process.env.NEXT_PUBLIC_SUPABASE_URL || 'fallback-secret-central-promocoes').digest('hex')
+function resolveJwtSecret(): string {
+  if (process.env.JWT_SECRET && process.env.JWT_SECRET.length >= 32) {
+    return process.env.JWT_SECRET
+  }
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error(
+      'JWT_SECRET must be set in production (min 32 chars). Do not derive secrets from public env vars.'
+    )
+  }
+  // Dev-only fallback so local setup still works without extra config
+  return crypto
+    .createHash('sha256')
+    .update(process.env.NEXT_PUBLIC_SUPABASE_URL || 'dev-only-central-promocoes')
+    .digest('hex')
+}
+
+const JWT_SECRET = resolveJwtSecret()
+
+function timingSafeEqualHex(a: string, b: string): boolean {
+  try {
+    const bufA = Buffer.from(a, 'utf8')
+    const bufB = Buffer.from(b, 'utf8')
+    if (bufA.length !== bufB.length) return false
+    return crypto.timingSafeEqual(bufA, bufB)
+  } catch {
+    return false
+  }
+}
 
 export interface SessionPayload {
   username: string
@@ -30,7 +56,7 @@ export function verifyPassword(password: string, storedValue: string): boolean {
   // Backwards compatibility check: old SHA-256 hash was a 64-char hex string
   if (!storedValue.startsWith('pbkdf2:')) {
     const oldHash = crypto.createHash('sha256').update(password).digest('hex')
-    return oldHash === storedValue
+    return timingSafeEqualHex(oldHash, storedValue)
   }
 
   const parts = storedValue.split(':')
@@ -38,7 +64,7 @@ export function verifyPassword(password: string, storedValue: string): boolean {
 
   const [, salt, hash] = parts
   const verifyHash = crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex')
-  return verifyHash === hash
+  return timingSafeEqualHex(verifyHash, hash)
 }
 
 /**
@@ -79,9 +105,9 @@ export function verifySessionToken(token: string): SessionPayload | null {
     const [payloadBase64, signature] = parts
     const payloadStr = Buffer.from(payloadBase64, 'base64').toString('utf-8')
     
-    // Verify signature
+    // Verify signature (constant-time)
     const expectedSignature = crypto.createHmac('sha256', JWT_SECRET).update(payloadStr).digest('hex')
-    if (expectedSignature !== signature) return null
+    if (!timingSafeEqualHex(expectedSignature, signature)) return null
     
     const payload = JSON.parse(payloadStr) as SessionPayload
     if (payload.expires < Date.now()) return null // Session expired

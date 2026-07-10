@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { supabaseAdmin } from '@/lib/supabaseServer'
 import { getAuthenticatedUser } from '@/lib/auth'
 
@@ -41,6 +42,9 @@ export async function PUT(request: Request) {
       console.error('Erros ao reordenar promoções:', errors)
       return NextResponse.json({ error: 'Algumas promoções falharam ao atualizar' }, { status: 500 })
     }
+
+    revalidatePath('/')
+    revalidatePath('/admin')
 
     return NextResponse.json({ success: true })
   } catch (error) {

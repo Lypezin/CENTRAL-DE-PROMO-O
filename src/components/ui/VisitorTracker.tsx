@@ -7,8 +7,12 @@ export default function VisitorTracker() {
   useEffect(() => {
     // 1. Gera um ID de sessão único se não existir no sessionStorage
     let sessionId = sessionStorage.getItem('visitor_session_id')
-    if (!sessionId) {
-      sessionId = 'sess_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+    // Normalize legacy IDs and enforce format expected by /api/visit
+    if (!sessionId || !/^sess_[a-z0-9]{8,64}$/i.test(sessionId)) {
+      sessionId =
+        'sess_' +
+        Math.random().toString(36).substring(2, 15) +
+        Math.random().toString(36).substring(2, 15)
       sessionStorage.setItem('visitor_session_id', sessionId)
     }
 
