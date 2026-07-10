@@ -23,6 +23,7 @@ export const LeaderboardPodium = memo(function LeaderboardPodium({
   maxScore, formatCurrency, mecanica, isCopa, isNinja, minimoCorridas, getRequirementValue
 }: LeaderboardPodiumProps) {
   const resolvedMetric = resolveRankingMetric(mecanica, isNinja)
+  const showMetricValue = !isNinja
 
   return (
     <>
@@ -58,10 +59,12 @@ export const LeaderboardPodium = memo(function LeaderboardPodium({
                   {!isCopa && <div className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider font-mono">📍 {item.praca}</div>}
                 </div>
                 <div className="space-y-3 mt-auto relative z-10">
-                  <div className="flex justify-between items-center text-[10px] font-mono border-t border-white/[0.02] pt-2">
-                    <span className="text-zinc-500 uppercase">{getRankingMetricHeader(resolvedMetric)}:</span>
-                    <span className="text-white font-bold">{scoreFormatted}</span>
-                  </div>
+                  {showMetricValue && (
+                    <div className="flex justify-between items-center text-[10px] font-mono border-t border-white/[0.02] pt-2">
+                      <span className="text-zinc-500 uppercase">{getRankingMetricHeader(resolvedMetric)}:</span>
+                      <span className="text-white font-bold">{scoreFormatted}</span>
+                    </div>
+                  )}
                   {temPremio && (
                     <div className="flex justify-between items-center text-[10px] font-mono">
                       <span className="text-zinc-500">Prêmio:</span>
@@ -112,10 +115,12 @@ export const LeaderboardPodium = memo(function LeaderboardPodium({
                   {!isCopa && <div className="text-[9px] text-yellow-500/70 font-bold uppercase tracking-wider font-mono">📍 {item.praca}</div>}
                 </div>
                 <div className="space-y-3 mt-auto relative z-10">
-                  <div className="flex justify-between items-center text-[10px] font-mono border-t border-yellow-600/10 pt-2.5">
-                    <span className="text-zinc-500 uppercase">{getRankingMetricHeader(resolvedMetric)}:</span>
-                    <span className="text-white font-extrabold text-xs">{scoreFormatted}</span>
-                  </div>
+                  {showMetricValue && (
+                    <div className="flex justify-between items-center text-[10px] font-mono border-t border-yellow-600/10 pt-2.5">
+                      <span className="text-zinc-500 uppercase">{getRankingMetricHeader(resolvedMetric)}:</span>
+                      <span className="text-white font-extrabold text-xs">{scoreFormatted}</span>
+                    </div>
+                  )}
                   {temPremio && (
                     <div className="flex justify-between items-center text-[10px] font-mono">
                       <span className="text-zinc-500">Prêmio Líder:</span>
@@ -165,10 +170,12 @@ export const LeaderboardPodium = memo(function LeaderboardPodium({
                   {!isCopa && <div className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider font-mono">📍 {item.praca}</div>}
                 </div>
                 <div className="space-y-3 mt-auto relative z-10">
-                  <div className="flex justify-between items-center text-[10px] font-mono border-t border-white/[0.02] pt-2">
-                    <span className="text-zinc-500 uppercase">{getRankingMetricHeader(resolvedMetric)}:</span>
-                    <span className="text-white font-bold">{scoreFormatted}</span>
-                  </div>
+                  {showMetricValue && (
+                    <div className="flex justify-between items-center text-[10px] font-mono border-t border-white/[0.02] pt-2">
+                      <span className="text-zinc-500 uppercase">{getRankingMetricHeader(resolvedMetric)}:</span>
+                      <span className="text-white font-bold">{scoreFormatted}</span>
+                    </div>
+                  )}
                   {temPremio && (
                     <div className="flex justify-between items-center text-[10px] font-mono">
                       <span className="text-zinc-500">Prêmio:</span>
@@ -228,10 +235,12 @@ export const LeaderboardPodium = memo(function LeaderboardPodium({
                 </div>
 
                 <div className="flex justify-between items-end mt-4 pt-3 border-t border-yellow-600/10 relative z-10">
-                  <div>
-                    <div className="text-[10px] text-zinc-500 font-mono uppercase mb-0.5">{getRankingMetricHeader(resolvedMetric)}:</div>
-                    <div className="text-2xl font-mono text-yellow-400 font-black leading-none">{scoreFormatted}</div>
-                  </div>
+                  {showMetricValue && (
+                    <div>
+                      <div className="text-[10px] text-zinc-500 font-mono uppercase mb-0.5">{getRankingMetricHeader(resolvedMetric)}:</div>
+                      <div className="text-2xl font-mono text-yellow-400 font-black leading-none">{scoreFormatted}</div>
+                    </div>
+                  )}
                   
                   {temPremio && (
                     <div className="text-right flex flex-col items-end">
@@ -272,7 +281,9 @@ export const LeaderboardPodium = memo(function LeaderboardPodium({
                   <div className="text-xs font-black text-slate-100 truncate w-full relative z-10 mb-3">{item.pessoa_entregadora}</div>
                   
                   <div className="mt-auto pt-2 border-t border-white/[0.02] relative z-10">
-                    <div className="text-[12px] font-mono text-slate-300 font-bold leading-tight">{scoreFormatted}</div>
+                    {showMetricValue && (
+                      <div className="text-[12px] font-mono text-slate-300 font-bold leading-tight">{scoreFormatted}</div>
+                    )}
                     {temPremio && (
                       <div className={`text-[9px] font-mono font-black mt-1 ${atingiuMinimo ? 'text-emerald-400' : 'text-zinc-600 line-through'}`}>
                         {premioTeoricoDesc ? `🎁 ${premioTeoricoDesc}` : `+${formatCurrency(premioTeoricoValor)}`}
@@ -308,7 +319,9 @@ export const LeaderboardPodium = memo(function LeaderboardPodium({
                   <div className="text-xs font-black text-slate-100 truncate w-full relative z-10 mb-3">{item.pessoa_entregadora}</div>
                   
                   <div className="mt-auto pt-2 border-t border-white/[0.02] relative z-10">
-                    <div className="text-[12px] font-mono text-slate-300 font-bold leading-tight">{scoreFormatted}</div>
+                    {showMetricValue && (
+                      <div className="text-[12px] font-mono text-slate-300 font-bold leading-tight">{scoreFormatted}</div>
+                    )}
                     {temPremio && (
                       <div className={`text-[9px] font-mono font-black mt-1 ${atingiuMinimo ? 'text-emerald-400' : 'text-zinc-600 line-through'}`}>
                         {premioTeoricoDesc ? `🎁 ${premioTeoricoDesc}` : `+${formatCurrency(premioTeoricoValor)}`}
