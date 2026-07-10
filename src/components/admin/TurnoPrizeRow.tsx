@@ -7,6 +7,7 @@ interface TurnoPrizeRowProps {
   idx: number
   isFirst: boolean
   isLast: boolean
+  hideValue?: boolean
   onUpdate: (idx: number, campo: string, valor: any) => void
   onRemove: (idx: number) => void
   onMoveUp?: (idx: number) => void
@@ -18,6 +19,7 @@ export default function TurnoPrizeRow({
   idx,
   isFirst,
   isLast,
+  hideValue,
   onUpdate,
   onRemove,
   onMoveUp,
@@ -71,16 +73,18 @@ export default function TurnoPrizeRow({
       )}
 
       {/* Value */}
-      <div className="flex items-center gap-1 ml-auto sm:ml-0">
-        <span className="text-[9px] text-zinc-600 font-mono">R$</span>
-        <input
-          type="number"
-          value={premio.valor ?? 0}
-          onChange={e => onUpdate(idx, 'valor', e.target.value)}
-          className="w-20 bg-[#08080a] border border-white/[0.06] rounded-md text-[11px] text-white px-2 py-1.5 focus:outline-none focus:border-sky-500"
-          min="0"
-        />
-      </div>
+      {!hideValue && (
+        <div className="flex items-center gap-1 ml-auto sm:ml-0">
+          <span className="text-[9px] text-zinc-600 font-mono">R$</span>
+          <input
+            type="number"
+            value={premio.valor ?? 0}
+            onChange={e => onUpdate(idx, 'valor', e.target.value)}
+            className="w-20 bg-[#08080a] border border-white/[0.06] rounded-md text-[11px] text-white px-2 py-1.5 focus:outline-none focus:border-sky-500"
+            min="0"
+          />
+        </div>
+      )}
 
       {/* Description */}
       <input
