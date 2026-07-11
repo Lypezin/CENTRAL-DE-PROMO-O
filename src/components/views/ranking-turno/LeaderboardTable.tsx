@@ -24,7 +24,6 @@ export const LeaderboardTable = memo(function LeaderboardTable({
   maxScore, formatCurrency, mecanica, isCopa, minimoCorridas, isNinja, getRequirementValue
 }: LeaderboardTableProps) {
   const resolvedMetric = resolveRankingMetric(mecanica, isNinja)
-  const showMetricColumn = !isNinja
 
   return (
     <div className="border-y sm:border sm:rounded-2xl overflow-hidden border-white/[0.04] bg-[#050508]/80 sm:bg-zinc-950/20 shadow-none sm:shadow-2xl sm:shadow-black/80 animate-slide-up w-[calc(100%+16px)] sm:w-full -mx-2 sm:mx-0 max-w-none sm:max-w-full copa-leaderboard-table">
@@ -33,11 +32,9 @@ export const LeaderboardTable = memo(function LeaderboardTable({
         <div className="w-10 sm:w-12 shrink-0 text-center">Pos</div>
         <div className="flex-1 min-w-0 pl-2 sm:pl-5">Entregador</div>
         <div className="w-24 hidden sm:block shrink-0">Praça</div>
-        {showMetricColumn && (
-          <div className="w-18 sm:w-28 shrink-0 text-right pr-2 sm:pr-5">
-            {getRankingMetricHeader(resolvedMetric)}
-          </div>
-        )}
+        <div className="w-18 sm:w-28 shrink-0 text-right pr-2 sm:pr-5">
+          {getRankingMetricHeader(resolvedMetric)}
+        </div>
         <div className="w-24 sm:w-36 shrink-0 text-right">Prêmio</div>
       </div>
 
@@ -108,11 +105,9 @@ export const LeaderboardTable = memo(function LeaderboardTable({
               </div>
 
               {/* Metric value */}
-              {showMetricColumn && (
-                <div className="w-20 sm:w-28 text-right pr-3 sm:pr-5 font-mono text-[14px] sm:text-xs font-black text-zinc-200 group-hover:text-white transition-colors shrink-0">
-                  {scoreFormatted}
-                </div>
-              )}
+              <div className="w-20 sm:w-28 text-right pr-3 sm:pr-5 font-mono text-[14px] sm:text-xs font-black text-zinc-200 group-hover:text-white transition-colors shrink-0">
+                {scoreFormatted}
+              </div>
 
               {/* Eligibility & Prizes Column */}
               <div className="w-24 sm:w-36 text-right flex flex-col items-end justify-center font-mono shrink-0">

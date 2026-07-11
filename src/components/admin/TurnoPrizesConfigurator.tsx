@@ -302,7 +302,6 @@ export default function TurnoPrizesConfigurator({
                 idx={idx}
                 isFirst={idx === 0}
                 isLast={idx === premios.length - 1}
-                hideValue={promo.config_regras?.tema_ninja === true}
                 onUpdate={handleUpdatePremioRow}
                 onRemove={handleRemovePremioRow}
                 onMoveUp={handleMoveUp}
