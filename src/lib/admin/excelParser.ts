@@ -96,9 +96,9 @@ export function processExcelBuffer(buffer: Buffer | ArrayBuffer | Uint8Array, pr
           if (isNaN(num)) {
             obj[campo] = null
           } else {
-            // Se o número for maior que 300 e for um inteiro, assume que está em centavos e divide por 100.
-            // Se contiver decimal ou for menor ou igual a 300, assume que já está em reais.
-            if (num > 300 && Number.isInteger(num)) {
+            // Nesta coluna, valores inteiros da planilha vêm em centavos.
+            // Valores com casas decimais já estão em reais.
+            if (Number.isInteger(num)) {
               obj[campo] = String(num / 100)
             } else {
               obj[campo] = String(num)
