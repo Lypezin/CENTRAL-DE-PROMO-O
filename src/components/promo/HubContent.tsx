@@ -33,7 +33,7 @@ export default function HubContent({
   )
   const filteredPromotions = useMemo(() => {
     const query = searchQuery.trim().toLocaleLowerCase('pt-BR')
-    return initialPromocoes.filter((promo) => {
+    const promotions = initialPromocoes.filter((promo) => {
       const matchesSearch =
         !query ||
         promo.nome.toLocaleLowerCase('pt-BR').includes(query) ||
@@ -44,6 +44,12 @@ export default function HubContent({
         (activeTab === 'encerradas' && promo.status === 'encerrada')
       return matchesSearch && matchesStatus
     })
+
+    if (activeTab === 'encerradas') {
+      promotions.sort((a, b) => b.created_at.localeCompare(a.created_at))
+    }
+
+    return promotions
   }, [initialPromocoes, searchQuery, activeTab])
   const showEliteCard = useMemo(() => {
     if (activeTab === 'encerradas') return false
@@ -144,14 +150,21 @@ export default function HubContent({
               {activeTab === 'encerradas' ? 'Campanhas encerradas' : activeTab === 'todas' ? 'Todas as campanhas' : 'Disputas disponíveis'}
             </h2>
           </div>
-          <p className="text-right text-xs text-zinc-400" aria-live="polite">
-            {resultCount} {resultCount === 1 ? 'resultado' : 'resultados'}
-          </p>
+          <div className="text-right">
+            {activeTab === 'encerradas' && (
+              <p className="mb-1 text-[11px] font-semibold text-lime-200">Criação · mais recentes primeiro</p>
+            )}
+            <p className="text-xs text-zinc-400" aria-live="polite">
+              {resultCount} {resultCount === 1 ? 'resultado' : 'resultados'}
+            </p>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
           {showEliteCard && <ElitePromoCard config={eliteConfig} />}
-          {filteredPromotions.map((promo) => <PromoCard key={promo.id} promo={promo} />)}
+          {filteredPromotions.map((promo) => (
+            <PromoCard key={promo.id} promo={promo} showCreationDate={activeTab === 'encerradas'} />
+          ))}
         </div>
 
         {resultCount === 0 && (

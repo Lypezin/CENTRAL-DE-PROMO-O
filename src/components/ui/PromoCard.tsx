@@ -17,7 +17,13 @@ function formatDate(value: string | null) {
   return Number.isNaN(date.getTime()) ? 'A definir' : date.toLocaleDateString('pt-BR')
 }
 
-export default function PromoCard({ promo }: { promo: Promocao }) {
+export default function PromoCard({
+  promo,
+  showCreationDate = false,
+}: {
+  promo: Promocao
+  showCreationDate?: boolean
+}) {
   const isRanking = promo.tipo === 'ranking_turno'
   const isCopa = promo.destaque_copa
   const isNinja = promo.config_regras?.tema_ninja === true
@@ -161,6 +167,11 @@ export default function PromoCard({ promo }: { promo: Promocao }) {
               <p className="mt-1 text-sm font-semibold tabular-nums text-zinc-200">
                 {formatDate(promo.data_inicio)} <span className="text-zinc-500">—</span> {formatDate(promo.data_fim)}
               </p>
+              {showCreationDate && (
+                <p className="mt-1 text-xs font-medium text-zinc-400">
+                  Criada em <time dateTime={promo.created_at}>{formatDate(promo.created_at)}</time>
+                </p>
+              )}
             </div>
             <span className={`inline-flex min-h-10 items-center gap-2 rounded-xl border border-white/10 bg-black/20 px-3 text-sm font-bold ${theme.accent} transition-colors group-hover:border-white/20 group-hover:bg-white/[.07]`}>
               {isRanking ? 'Ver ranking' : 'Ver campanha'}
