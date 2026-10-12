@@ -67,7 +67,7 @@ export default function ElitePromoCard({ config }: { config: EliteConfig }) {
             <div className="elite-title-rule mt-3 h-[2px] w-[80%] bg-gradient-to-r from-amber-200 via-amber-400 to-transparent" aria-hidden="true" />
           </div>
 
-          <p className="relative z-20 mt-1 line-clamp-2 max-w-[35ch] text-sm leading-6 text-zinc-200">{config.card_description}</p>
+          <p className="relative z-20 mt-1 max-w-[37ch] text-sm leading-6 text-zinc-200">{config.card_description}</p>
 
           <div className="relative z-20 mt-4 flex items-center gap-3">
             <span className="text-[2.3rem] font-black leading-none tracking-[-.04em] text-amber-200 tabular-nums">{config.target}</span>

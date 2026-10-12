@@ -27,8 +27,8 @@
 .elite-trophy-art {
   opacity: .8;
   transform-origin: 60% 70%;
-  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 70%, transparent 100%);
-  mask-image: linear-gradient(to bottom, #000 0%, #000 70%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 52%, transparent 83%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 52%, transparent 83%);
 }
 
 .elite-light-sweep {
