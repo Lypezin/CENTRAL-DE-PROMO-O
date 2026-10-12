@@ -55,7 +55,7 @@ const normalizePromoConfig = (promoData: Promocao): Promocao => {
   }
 }
 
-export function usePromoEditor(id: string | string[]) {
+export function usePromoEditor(id: string | string[], onDeleteSuccess?: () => void) {
   const router = useRouter()
   const toast = useToast()
   
@@ -168,6 +168,7 @@ export function usePromoEditor(id: string | string[]) {
       const res = await fetch(`/api/promocoes/${id}`, { method: 'DELETE' })
       if (res.ok) {
         toast.success('Promoção excluída com sucesso!')
+        onDeleteSuccess?.()
         router.push('/admin')
       } else {
         toast.error('Erro ao excluir promoção.')

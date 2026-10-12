@@ -2,8 +2,9 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useToast } from '@/components/ui/Toast'
+import { SITE_THEME_CHANGE_EVENT, normalizeSiteTheme, type SiteTheme } from '@/lib/siteTheme'
 
-type Tema = 'raios' | 'copa' | 'ninja'
+type Tema = SiteTheme
 
 interface ConfigResponse {
   success: boolean
@@ -22,7 +23,7 @@ export default function SiteConfigPanel() {
       .then((r) => r.json() as Promise<ConfigResponse>)
       .then((data) => {
         if (data.success && data.config?.tema_ativo) {
-          setTema(data.config.tema_ativo)
+          setTema(normalizeSiteTheme(data.config.tema_ativo))
         }
       })
       .catch(() => toast.error('Erro ao carregar configurações'))
@@ -42,9 +43,9 @@ export default function SiteConfigPanel() {
       const data = (await res.json()) as ConfigResponse
       if (data.success) {
         setTema(novoTema)
+        window.dispatchEvent(new CustomEvent(SITE_THEME_CHANGE_EVENT, { detail: novoTema }))
         const labels: Record<Tema, string> = {
           raios: 'Raios Elétricos',
-          copa: 'Copa do Mundo',
           ninja: 'Ninja (Faixa Preta)'
         }
         toast.success(`Tema alterado para "${labels[novoTema]}"`)
@@ -77,10 +78,9 @@ export default function SiteConfigPanel() {
           </span>
         </div>
 
-        <div className="grid grid-cols-3 gap-2 bg-black/45 p-1 rounded-xl border border-white/5 select-none">
+        <div className="grid grid-cols-2 gap-2 bg-black/45 p-1 rounded-xl border border-white/5 select-none">
           {[
             { key: 'raios', label: 'Raios', emoji: '⚡', color: 'hover:text-sky-400', activeBg: 'bg-sky-500/10 border-sky-500/30 text-sky-400 shadow-[0_0_12px_rgba(14,165,233,0.12)]' },
-            { key: 'copa', label: 'Copa', emoji: '🏆', color: 'hover:text-amber-400', activeBg: 'bg-amber-500/10 border-amber-500/30 text-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.12)]' },
             { key: 'ninja', label: 'Ninja', emoji: '🥋', color: 'hover:text-rose-500', activeBg: 'bg-rose-500/10 border-rose-500/30 text-rose-400 shadow-[0_0_12px_rgba(225,29,72,0.12)]' }
           ].map(opt => {
             const isActive = tema === opt.key

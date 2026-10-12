@@ -3,7 +3,6 @@ import { notFound } from 'next/navigation'
 import RankingTurno from '@/components/promo/RankingTurno'
 import Link from 'next/link'
 import StatusBadge from '@/components/ui/StatusBadge'
-import CopaThemeForcer from '@/components/promo/CopaThemeForcer'
 import NinjaThemeForcer from '@/components/promo/NinjaThemeForcer'
 
 export default async function PromoPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -58,7 +57,6 @@ export default async function PromoPage({ params }: { params: Promise<{ slug: st
 
   return (
     <div className={`max-w-5xl mx-auto px-4 md:px-8 py-8 animate-slide-up ${promo.destaque_copa ? 'promo-page-copa' : ''} ${isNinja ? 'promo-page-ninja' : ''}`}>
-      {promo.destaque_copa && <CopaThemeForcer />}
       {isNinja && <NinjaThemeForcer />}
       {/* Back button link */}
       <div className="mb-6">

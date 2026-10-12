@@ -8,6 +8,7 @@ import VisitorTracker from "@/components/ui/VisitorTracker";
 import DynamicBackground from "@/components/ui/DynamicBackground";
 import { supabaseAdmin } from "@/lib/supabaseServer";
 import { ToastProvider } from "@/components/ui/Toast";
+import { readStoredSiteTheme, type SiteTheme } from "@/lib/siteTheme";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,7 +23,7 @@ export const viewport: Viewport = {
 }
 
 const readActiveTheme = unstable_cache(
-  async (): Promise<'raios' | 'copa' | 'ninja'> => {
+  async (): Promise<SiteTheme> => {
     const { data, error } = await supabaseAdmin
       .from('configuracoes')
       .select('valor')
@@ -30,8 +31,7 @@ const readActiveTheme = unstable_cache(
       .maybeSingle()
 
     if (error) throw new Error('Theme configuration unavailable.')
-    const value = data?.valor?.tema_ativo
-    return value === 'copa' || value === 'ninja' ? value : 'raios'
+    return readStoredSiteTheme(data?.valor)
   },
   ['central-promocoes-active-theme'],
   { revalidate: 300, tags: ['hub-theme'] },
@@ -46,7 +46,7 @@ export default async function RootLayout({
   await connection()
 
   // Fetch active theme from Supabase (server-side)
-  let temaAtivo: 'raios' | 'copa' | 'ninja' = 'raios'
+  let temaAtivo: SiteTheme = 'raios'
   try {
     temaAtivo = await readActiveTheme()
   } catch {
@@ -57,8 +57,8 @@ export default async function RootLayout({
     <html lang="pt-BR">
       <body className={`${inter.className} tema-${temaAtivo}`}>
         <ToastProvider>
-          {/* Dynamic theme background (raios or copa) */}
-          <DynamicBackground temaAtivo={temaAtivo} />
+          {/* Dynamic theme background (raios or ninja) */}
+          <DynamicBackground key={temaAtivo} temaAtivo={temaAtivo} />
 
           {/* Modern grid line pattern overlay (Pure CSS, 60fps native performance) */}
           <div className="tech-grid"></div>

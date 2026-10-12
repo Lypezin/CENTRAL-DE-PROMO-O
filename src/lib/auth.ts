@@ -33,6 +33,13 @@ export interface SessionPayload {
   sid: string
 }
 
+export class AdminSessionStoreUnavailableError extends Error {
+  constructor() {
+    super('The administrator session store is unavailable.')
+    this.name = 'AdminSessionStoreUnavailableError'
+  }
+}
+
 export function hashPassword(password: string): string {
   const salt = crypto.randomBytes(16).toString('hex')
   const hash = crypto.pbkdf2Sync(password, salt, 210_000, 64, 'sha512').toString('hex')
@@ -116,26 +123,23 @@ export function verifySessionToken(token: string): SessionPayload | null {
 }
 
 export async function getAuthenticatedUser(): Promise<SessionPayload | null> {
-  try {
-    const token = (await cookies()).get(COOKIE_NAME)?.value
-    if (!token) return null
+  const token = (await cookies()).get(COOKIE_NAME)?.value
+  if (!token) return null
 
-    const payload = verifySessionToken(token)
-    if (!payload) return null
+  const payload = verifySessionToken(token)
+  if (!payload) return null
 
-    const { data, error } = await supabaseAdmin
-      .from('admin_sessions')
-      .select('session_hash')
-      .eq('session_hash', hashSessionId(payload.sid))
-      .eq('username', payload.username)
-      .is('revoked_at', null)
-      .gt('expires_at', new Date().toISOString())
-      .maybeSingle()
+  const { data, error } = await supabaseAdmin
+    .from('admin_sessions')
+    .select('session_hash')
+    .eq('session_hash', hashSessionId(payload.sid))
+    .eq('username', payload.username)
+    .is('revoked_at', null)
+    .gt('expires_at', new Date().toISOString())
+    .maybeSingle()
 
-    return error || !data ? null : payload
-  } catch {
-    return null
-  }
+  if (error) throw new AdminSessionStoreUnavailableError()
+  return data ? payload : null
 }
 
 export async function deleteSession(): Promise<void> {

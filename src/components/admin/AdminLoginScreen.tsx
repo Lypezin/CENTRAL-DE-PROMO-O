@@ -13,31 +13,25 @@ export default function AdminLoginScreen({ onSuccess }: AdminLoginScreenProps) {
   const [nomeAdmin, setNomeAdmin] = useState('')
   const [loading, setLoading] = useState(false)
   const [erro, setErro] = useState('')
+  const [setupError, setSetupError] = useState('')
+  const [setupRetryCount, setSetupRetryCount] = useState(0)
 
   useEffect(() => {
+    let cancelled = false
     async function inicializarPortal() {
       try {
-        const setupRes = await fetch('/api/admin/setup-check')
-        if (setupRes.ok) {
-          const setupData = await setupRes.json()
-          setSetupRequired(setupData.setupRequired)
-
-          if (!setupData.setupRequired) {
-            const verifyRes = await fetch('/api/admin/verify')
-            if (verifyRes.ok) {
-              const verifyData = await verifyRes.json()
-              if (verifyData.authenticated) {
-                onSuccess(verifyData.name || '')
-              }
-            }
-          }
-        }
-      } catch (e) {
-        console.error('Erro na inicialização do portal:', e)
+        const setupRes = await fetch('/api/admin/setup-check', { cache: 'no-store' })
+        if (!setupRes.ok) throw new Error('Admin setup status is unavailable.')
+        const setupData = await setupRes.json() as { setupRequired?: unknown }
+        if (typeof setupData.setupRequired !== 'boolean') throw new Error('Admin setup status is invalid.')
+        if (!cancelled) setSetupRequired(setupData.setupRequired)
+      } catch {
+        if (!cancelled) setSetupError('Não foi possível consultar o serviço de acesso. Tente novamente em instantes.')
       }
     }
-    inicializarPortal()
-  }, [onSuccess])
+    void inicializarPortal()
+    return () => { cancelled = true }
+  }, [setupRetryCount])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -96,10 +90,18 @@ export default function AdminLoginScreen({ onSuccess }: AdminLoginScreenProps) {
 
       <div className="obsidian-card p-8 sm:p-10 rounded-3xl max-w-[420px] w-full relative z-10 animate-slide-up shadow-2xl shadow-black/80 flex flex-col items-center">
         {setupRequired === null ? (
-          <div className="text-center py-10 flex flex-col items-center justify-center min-h-[300px]">
-            <div aria-hidden="true" className="w-12 h-12 border-4 border-sky-500/30 border-t-sky-400 rounded-full animate-spin mb-6"></div>
-            <p role="status" aria-live="polite" className="text-zinc-400 font-mono tracking-widest text-xs uppercase font-bold animate-pulse">Carregando módulos...</p>
-          </div>
+          setupError ? (
+            <div className="text-center py-10 flex min-h-[300px] flex-col items-center justify-center">
+              <p className="text-lg font-black text-amber-200">Acesso temporariamente indisponível</p>
+              <p role="alert" className="mt-2 max-w-sm text-sm leading-6 text-zinc-400">{setupError}</p>
+              <button type="button" onClick={() => { setSetupError(''); setSetupRetryCount((count) => count + 1) }} className="mt-5 min-h-11 rounded-lg bg-lime-300 px-4 text-sm font-black text-zinc-950 transition-colors hover:bg-lime-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white">Tentar novamente</button>
+            </div>
+          ) : (
+            <div className="text-center py-10 flex flex-col items-center justify-center min-h-[300px]">
+              <div aria-hidden="true" className="w-12 h-12 border-4 border-sky-500/30 border-t-sky-400 rounded-full animate-spin mb-6"></div>
+              <p role="status" aria-live="polite" className="text-zinc-400 font-mono tracking-widest text-xs uppercase font-bold animate-pulse">Carregando módulos...</p>
+            </div>
+          )
         ) : setupRequired ? (
           <div className="w-full animate-fade-in">
             <div className="text-center mb-10">

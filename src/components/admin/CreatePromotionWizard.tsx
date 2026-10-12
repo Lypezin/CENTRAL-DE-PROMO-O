@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useToast } from '@/components/ui/Toast'
 import PromoPreviewCard from '@/components/admin/PromoPreviewCard'
+import PromotionManagementWorkspace from '@/components/admin/PromotionManagementWorkspace'
 import TurnoPrizeRow, { type PrizeEditorField, type PrizeEntry, type TurnoPrizeConfig } from '@/components/admin/TurnoPrizeRow'
 import type { MecanicaPromocao, Promocao, RegrasPromocao } from '@/lib/supabase'
 
@@ -39,6 +40,7 @@ type WizardDraft = {
 }
 
 const WIZARD_DRAFT_KEY = 'central-promocoes:create-wizard:v1'
+const WIZARD_CREATED_PROMO_KEY = 'central-promocoes:create-wizard:created-promo:v1'
 
 const SHIFTS = [
   { key: 'CAFE_DA_MANHA', label: 'Café da manhã', short: 'Café' },
@@ -202,6 +204,7 @@ export default function CreatePromotionWizard() {
   const [destaqueCopa, setDestaqueCopa] = useState(false)
   const [temaNinja, setTemaNinja] = useState(false)
   const [prizeGroups, setPrizeGroups] = useState(defaultPrizeGroups)
+  const [createdPromoId, setCreatedPromoId] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [stepError, setStepError] = useState('')
   const [draftHydrated, setDraftHydrated] = useState(false)
@@ -223,6 +226,12 @@ export default function CreatePromotionWizard() {
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
       try {
+        const storedCreatedPromoId = window.sessionStorage.getItem(WIZARD_CREATED_PROMO_KEY)
+        if (storedCreatedPromoId) {
+          setCreatedPromoId(storedCreatedPromoId)
+          return
+        }
+
         const storedDraft = window.sessionStorage.getItem(WIZARD_DRAFT_KEY)
         if (storedDraft) {
           const draft = parseWizardDraft(JSON.parse(storedDraft) as unknown)
@@ -262,6 +271,14 @@ export default function CreatePromotionWizard() {
 
   useEffect(() => {
     if (!draftHydrated) return
+    if (createdPromoId) {
+      try {
+        window.sessionStorage.removeItem(WIZARD_DRAFT_KEY)
+      } catch {
+        // A campanha já criada continua acessível mesmo se o armazenamento da aba estiver indisponível.
+      }
+      return
+    }
     const draft: WizardDraft = {
       version: 1,
       step,
@@ -293,7 +310,7 @@ export default function CreatePromotionWizard() {
     } catch {
       // O wizard continua funcional mesmo se o navegador bloquear o armazenamento.
     }
-  }, [activeShift, activeShifts, cidade, dataFim, dataInicio, descricao, destaqueCopa, draftHydrated, format, goalPrize, grouping, hasUserEnteredData, levels, limitRanking, metric, minimumGoal, nome, prizeGroups, rulesText, step, temaNinja])
+  }, [activeShift, activeShifts, cidade, createdPromoId, dataFim, dataInicio, descricao, destaqueCopa, draftHydrated, format, goalPrize, grouping, hasUserEnteredData, levels, limitRanking, metric, minimumGoal, nome, prizeGroups, rulesText, step, temaNinja])
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
@@ -586,11 +603,12 @@ export default function CreatePromotionWizard() {
 
       try {
         window.sessionStorage.removeItem(WIZARD_DRAFT_KEY)
+        window.sessionStorage.setItem(WIZARD_CREATED_PROMO_KEY, result.id)
       } catch {
-        // O salvamento da campanha já foi concluído; falha ao limpar o cache local não altera o resultado.
+        // A campanha já foi criada; falha no armazenamento local não desfaz a gravação.
       }
+      setCreatedPromoId(result.id)
       toast.success('Rascunho criado. Você já pode importar os dados da campanha.')
-      router.push(`/admin/promo/${result.id}`)
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Falha de conexão ao criar a campanha.'
       pendingFocusFieldRef.current = null
@@ -609,8 +627,8 @@ export default function CreatePromotionWizard() {
     premios: [],
   }
 
-  const resetWizard = () => {
-    if (!window.confirm('Descartar o progresso desta campanha e começar novamente?')) return
+  const resetWizard = (confirmDiscard = true) => {
+    if (confirmDiscard && !window.confirm('Descartar o progresso desta campanha e começar novamente?')) return
     pendingFocusFieldRef.current = null
     setFocusRevision((revision) => revision + 1)
     setStep(0)
@@ -636,9 +654,32 @@ export default function CreatePromotionWizard() {
     setHasRecoveredDraft(false)
     try {
       window.sessionStorage.removeItem(WIZARD_DRAFT_KEY)
+      window.sessionStorage.removeItem(WIZARD_CREATED_PROMO_KEY)
     } catch {
       // Limpar o armazenamento não é necessário para continuar após redefinir o formulário.
     }
+  }
+
+  const returnToCampaigns = () => {
+    resetWizard(false)
+    setCreatedPromoId(null)
+    router.push('/admin')
+  }
+
+  const createAnotherCampaign = () => {
+    resetWizard(false)
+    setCreatedPromoId(null)
+  }
+
+  if (createdPromoId) {
+    return (
+      <PromotionManagementWorkspace
+        promoId={createdPromoId}
+        createdInWizard
+        onReturnToCampaigns={returnToCampaigns}
+        onCreateAnother={createAnotherCampaign}
+      />
+    )
   }
 
   return (
@@ -656,7 +697,7 @@ export default function CreatePromotionWizard() {
           </div>
           <div className="flex flex-wrap items-center gap-2">
             {hasUserEnteredData && <span className="rounded-full border border-sky-300/20 bg-sky-300/[.06] px-3 py-1.5 text-xs font-semibold text-sky-100">{hasRecoveredDraft ? 'Progresso recuperado' : 'Progresso salvo'} nesta aba</span>}
-            {hasUserEnteredData && <button type="button" onClick={resetWizard} className="min-h-9 rounded-lg px-2 text-xs font-semibold text-zinc-400 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-300">Descartar progresso</button>}
+            {hasUserEnteredData && <button type="button" onClick={() => resetWizard()} className="min-h-9 rounded-lg px-2 text-xs font-semibold text-zinc-400 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-300">Descartar progresso</button>}
             <p className="rounded-full border border-lime-300/20 bg-lime-300/[.07] px-3 py-1.5 text-xs font-bold text-lime-200">O rascunho só é criado na revisão final</p>
           </div>
         </header>

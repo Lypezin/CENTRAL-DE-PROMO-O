@@ -3,9 +3,10 @@ import { revalidatePath, revalidateTag } from 'next/cache'
 import { supabaseAdmin } from '@/lib/supabaseServer'
 import { getAuthenticatedUser } from '@/lib/auth'
 import { isSameOriginRequest } from '@/lib/adminSecurity'
+import { isSiteTheme, readStoredSiteTheme, type SiteTheme } from '@/lib/siteTheme'
 
 interface TemaConfig {
-  tema_ativo: 'raios' | 'copa' | 'ninja'
+  tema_ativo: SiteTheme
 }
 
 const DEFAULT_CONFIG: TemaConfig = { tema_ativo: 'raios' }
@@ -22,7 +23,9 @@ export async function GET() {
       return NextResponse.json({ success: true, config: DEFAULT_CONFIG })
     }
 
-    const config = typeof data.valor === 'string' ? JSON.parse(data.valor) : data.valor
+    const config: TemaConfig = {
+      tema_ativo: readStoredSiteTheme(data.valor),
+    }
     return NextResponse.json({ success: true, config })
   } catch (error) {
     console.error('Failed to load hub settings:', error)
@@ -46,9 +49,9 @@ export async function PUT(request: NextRequest) {
     const body = await request.json() as { config: TemaConfig }
     const { config } = body
 
-    if (!config || !config.tema_ativo || !['raios', 'copa', 'ninja'].includes(config.tema_ativo)) {
+    if (!config || !isSiteTheme(config.tema_ativo)) {
       return NextResponse.json(
-        { success: false, error: 'Configuração inválida. tema_ativo deve ser "raios", "copa" ou "ninja".' },
+        { success: false, error: 'Configuração inválida. tema_ativo deve ser "raios" ou "ninja".' },
         { status: 400 }
       )
     }

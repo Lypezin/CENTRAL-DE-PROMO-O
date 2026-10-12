@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import StatusBadge from './StatusBadge'
 import type { Promocao } from '@/lib/supabase'
 
@@ -38,7 +39,7 @@ function FaixaIcon({ className }: { className: string }) {
   )
 }
 
-function PromoCardContent({ promo, showCreationDate = false }: { promo: Promocao; showCreationDate?: boolean }) {
+function PromoCardContent({ promo, showCreationDate = false, preloadNinjaImage = false }: { promo: Promocao; showCreationDate?: boolean; preloadNinjaImage?: boolean }) {
   const calculationType = promo.config_regras?.mecanica?.tipo_calculo
   const isRanking = calculationType
     ? calculationType === 'ranking'
@@ -105,6 +106,19 @@ function PromoCardContent({ promo, showCreationDate = false }: { promo: Promocao
     <article className={`@container/card relative isolate flex h-full min-h-[380px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br ${theme.surface} shadow-[0_18px_44px_-28px_rgba(0,0,0,0.95)] transition duration-300 group-hover:-translate-y-1 group-focus-visible:-translate-y-1 group-hover:border-white/20 group-focus-visible:border-white/20 group-hover:shadow-[0_24px_50px_-25px_rgba(0,0,0,0.95)] group-focus-visible:shadow-[0_24px_50px_-25px_rgba(0,0,0,0.95)] group-focus-visible:ring-2 group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-[#090d0d] ${theme.focusRing} motion-reduce:transform-none motion-reduce:transition-none`}>
       <div className={`h-1.5 w-full shrink-0 bg-gradient-to-r ${theme.bar}`} aria-hidden="true" />
       <div className={`pointer-events-none absolute -right-14 -top-12 h-52 w-52 rounded-full blur-3xl ${theme.glow}`} aria-hidden="true" />
+      {isFaixaPreta && (
+        <div className="faixa-preta-ninja-art pointer-events-none absolute right-0 top-6 z-0 h-[270px] w-[58%] overflow-hidden sm:h-[300px]" aria-hidden="true">
+          <Image
+            src="/images/faixa-preta-ninja.webp"
+            alt=""
+            width={800}
+            height={1200}
+            sizes="(max-width: 640px) 58vw, 210px"
+            loading={preloadNinjaImage ? 'eager' : 'lazy'}
+            className="h-full w-full object-contain object-right-top"
+          />
+        </div>
+      )}
       <div className="pointer-events-none absolute -right-8 top-0 h-64 w-44 -skew-x-[18deg] bg-gradient-to-b from-white/[.035] via-transparent to-transparent [clip-path:polygon(36%_0,100%_0,63%_100%,0_100%)]" aria-hidden="true" />
       <div className={`pointer-events-none absolute -left-1/3 top-0 z-20 h-full w-1/3 -skew-x-[20deg] bg-gradient-to-r from-transparent ${theme.sweep} to-transparent opacity-0 transition duration-1000 group-hover:translate-x-[460%] group-focus-visible:translate-x-[460%] group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:translate-x-0 motion-reduce:group-hover:opacity-0 motion-reduce:group-focus-visible:opacity-0 motion-reduce:transition-none ${isFaixaPreta ? 'faixa-preta-poster-sweep' : ''}`} aria-hidden="true" />
 
@@ -198,9 +212,11 @@ export function PromoCardPreview({ promo }: { promo: Promocao }) {
 export default function PromoCard({
   promo,
   showCreationDate = false,
+  preloadNinjaImage = false,
 }: {
   promo: Promocao
   showCreationDate?: boolean
+  preloadNinjaImage?: boolean
 }) {
   return (
     <Link
@@ -208,7 +224,7 @@ export default function PromoCard({
       className="group block h-full rounded-2xl focus-visible:outline-none"
       aria-label={`Abrir campanha: ${promo.nome}`}
     >
-      <PromoCardContent promo={promo} showCreationDate={showCreationDate} />
+      <PromoCardContent promo={promo} showCreationDate={showCreationDate} preloadNinjaImage={preloadNinjaImage} />
     </Link>
   )
 }

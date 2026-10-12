@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Promocao } from '@/lib/supabase'
 import { useToast } from '@/components/ui/Toast'
+import { useAdminSession } from '@/components/admin/AdminSessionProvider'
 
 import AdminLoginScreen from '@/components/admin/AdminLoginScreen'
 import AdminPromoList from '@/components/admin/AdminPromoList'
@@ -27,9 +28,7 @@ const itemVariants = {
 export default function AdminPage() {
   const router = useRouter()
   const toast = useToast()
-  
-  const [pageState, setPageState] = useState<'login' | 'admin'>('login')
-  const [nomeAdmin, setNomeAdmin] = useState('')
+  const { session, retrying, setAuthenticated, setUnauthenticated, retrySession } = useAdminSession()
   
   const [promocoes, setPromocoes] = useState<Promocao[]>([])
   const [loading, setLoading] = useState(true)
@@ -38,11 +37,10 @@ export default function AdminPage() {
   const [onlineCount, setOnlineCount] = useState<number>(0)
   const [totalVisits, setTotalVisits] = useState<number>(0)
 
-  const handleAdminLoginSuccess = useCallback((nome: string) => {
-    setNomeAdmin(nome)
+  const handleAdminLoginSuccess = useCallback((name: string) => {
     setLoading(true)
-    setPageState('admin')
-  }, [])
+    setAuthenticated(name)
+  }, [setAuthenticated])
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -109,7 +107,7 @@ export default function AdminPage() {
   }, [])
 
   useEffect(() => {
-    if (pageState !== 'admin') return
+    if (session.status !== 'authenticated') return
 
     let cancelled = false
     queueMicrotask(() => {
@@ -129,13 +127,13 @@ export default function AdminPage() {
       clearInterval(interval)
       document.removeEventListener('visibilitychange', refreshVisibleAnalytics)
     }
-  }, [pageState, carregarPromocoes, carregarAnalytics, carregarEliteConfig])
+  }, [session.status, carregarPromocoes, carregarAnalytics, carregarEliteConfig])
 
   const handleLogout = async () => {
     try {
       const response = await fetch('/api/admin/logout', { method: 'POST' })
       if (!response.ok) throw new Error('Logout failed.')
-      setPageState('login')
+      setUnauthenticated()
     } catch {
       toast.error('Não foi possível encerrar a sessão. Tente novamente.')
     }
@@ -168,10 +166,33 @@ export default function AdminPage() {
     }
   }
 
-  if (pageState === 'login') {
+  if (session.status === 'checking') {
     return (
-      <AdminLoginScreen onSuccess={handleAdminLoginSuccess} />
+      <main className="flex min-h-[60vh] items-center justify-center bg-[#030303] text-center">
+        <div>
+          <span className="mx-auto block h-5 w-5 animate-spin rounded-full border-2 border-sky-300/25 border-t-sky-300" aria-hidden="true" />
+          <p className="mt-3 text-sm text-zinc-400">Verificando acesso administrativo…</p>
+        </div>
+      </main>
     )
+  }
+
+  if (session.status === 'unavailable') {
+    return (
+      <main className="flex min-h-[60vh] items-center justify-center bg-[#030303] px-5 text-center text-white">
+        <section className="max-w-md rounded-2xl border border-amber-300/20 bg-[#0a0c0c] p-6 shadow-xl">
+          <p className="text-lg font-black text-amber-200">Não foi possível verificar o acesso</p>
+          <p role="alert" className="mt-2 text-sm leading-6 text-zinc-400">O serviço de sessão está temporariamente indisponível. Sua sessão não foi encerrada; tente verificar novamente.</p>
+          <button type="button" onClick={() => void retrySession()} disabled={retrying} className="mt-5 min-h-11 rounded-lg bg-lime-300 px-4 text-sm font-black text-zinc-950 transition-colors hover:bg-lime-200 disabled:cursor-wait disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white">
+            {retrying ? 'Verificando…' : 'Tentar novamente'}
+          </button>
+        </section>
+      </main>
+    )
+  }
+
+  if (session.status === 'unauthenticated') {
+    return <AdminLoginScreen onSuccess={handleAdminLoginSuccess} />
   }
 
   return (
@@ -196,7 +217,7 @@ export default function AdminPage() {
               Acesso Mestre Ativo
             </div>
             <h1 className="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">Painel Administrativo</h1>
-            <p className="text-zinc-400 text-sm md:text-base">Gerenciamento central de promoções e relatórios. Bem-vindo, <span className="text-white font-medium">{nomeAdmin}</span>.</p>
+            <p className="text-zinc-400 text-sm md:text-base">Gerenciamento central de promoções e relatórios. Bem-vindo, <span className="text-white font-medium">{session.name}</span>.</p>
           </div>
           
           <div className="flex flex-wrap justify-center md:justify-end gap-3 w-full md:w-auto">

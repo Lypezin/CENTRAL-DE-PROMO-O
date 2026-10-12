@@ -1,37 +1,22 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
+import { AdminSessionProvider, useAdminSession } from '@/components/admin/AdminSessionProvider'
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <AdminSessionProvider>
+      <AdminLayoutContent>{children}</AdminLayoutContent>
+    </AdminSessionProvider>
+  )
+}
+
+function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  // null = still checking; only show chrome when authenticated
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
-
-  useEffect(() => {
-    let cancelled = false
-    async function verifySession() {
-      try {
-        const res = await fetch('/api/admin/verify')
-        if (!res.ok) {
-          if (!cancelled) setIsAuthenticated(false)
-          return
-        }
-        const data = await res.json()
-        if (!cancelled) setIsAuthenticated(!!data.authenticated)
-      } catch {
-        if (!cancelled) setIsAuthenticated(false)
-      }
-    }
-    verifySession()
-    return () => {
-      cancelled = true
-    }
-  }, [pathname])
-
-  const showNav = isAuthenticated === true
+  const { session } = useAdminSession()
+  const showNav = session.status === 'authenticated'
 
   return (
     <div className="min-h-screen bg-[#030303]">
@@ -57,7 +42,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 >
                   Dashboard
                 </Link>
-                <a
+                <Link
                   href="/admin#promocoes"
                   className={`px-2.5 py-1 rounded-md text-[11px] font-bold transition-all ${
                     pathname.startsWith('/admin/promo')
@@ -66,7 +51,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   }`}
                 >
                   Promoções
-                </a>
+                </Link>
               </div>
             </div>
             <Link

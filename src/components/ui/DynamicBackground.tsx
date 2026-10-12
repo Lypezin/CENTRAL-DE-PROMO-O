@@ -1,19 +1,17 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { SITE_THEME_CHANGE_EVENT, normalizeSiteTheme, type SiteTheme } from '@/lib/siteTheme'
 
 interface DynamicBackgroundProps {
-  temaAtivo: 'raios' | 'copa' | 'ninja'
+  temaAtivo: SiteTheme
 }
 
 /** Lightweight theme backdrop: no WebGL, canvas animation, or particle loop. */
-function StaticThemeBackground({ theme }: { theme: 'raios' | 'copa' | 'ninja' }) {
-  const gradient =
-    theme === 'copa'
-      ? 'radial-gradient(ellipse at 76% 8%, rgba(22,163,74,0.13) 0%, rgba(245,158,11,0.04) 48%, transparent 78%)'
-      : theme === 'ninja'
-        ? 'radial-gradient(ellipse at 76% 8%, rgba(113,113,122,0.12) 0%, transparent 68%)'
-        : 'radial-gradient(ellipse at 76% 8%, rgba(132,204,22,0.10), transparent 68%)'
+function StaticThemeBackground({ theme }: { theme: SiteTheme }) {
+  const gradient = theme === 'ninja'
+    ? 'radial-gradient(ellipse at 76% 8%, rgba(113,113,122,0.12) 0%, transparent 68%)'
+    : 'radial-gradient(ellipse at 76% 8%, rgba(132,204,22,0.10), transparent 68%)'
 
   return (
     <div className="fixed inset-0 z-[-2] pointer-events-none overflow-hidden bg-[#030303]">
@@ -23,35 +21,35 @@ function StaticThemeBackground({ theme }: { theme: 'raios' | 'copa' | 'ninja' })
 }
 
 export default function DynamicBackground({ temaAtivo }: DynamicBackgroundProps) {
-  const [forcedTheme, setForcedTheme] = useState<'raios' | 'copa' | 'ninja' | null>(null)
+  const [siteThemeOverride, setSiteThemeOverride] = useState<SiteTheme | null>(null)
+  const [forcedTheme, setForcedTheme] = useState<'ninja' | null>(null)
 
   useEffect(() => {
     const handleForceTheme = (e: Event) => {
-      const customEvent = e as CustomEvent<'raios' | 'copa' | 'ninja' | null>
-      setForcedTheme(customEvent.detail)
+      const customEvent = e as CustomEvent<unknown>
+      setForcedTheme(customEvent.detail === 'ninja' ? 'ninja' : null)
+    }
+    const handleSiteTheme = (e: Event) => {
+      const customEvent = e as CustomEvent<unknown>
+      setSiteThemeOverride(normalizeSiteTheme(customEvent.detail))
     }
 
     window.addEventListener('force_theme_change', handleForceTheme)
+    window.addEventListener(SITE_THEME_CHANGE_EVENT, handleSiteTheme)
     return () => {
       window.removeEventListener('force_theme_change', handleForceTheme)
+      window.removeEventListener(SITE_THEME_CHANGE_EVENT, handleSiteTheme)
     }
   }, [])
 
-  const currentTheme = forcedTheme || temaAtivo
+  const currentTheme = forcedTheme || siteThemeOverride || normalizeSiteTheme(temaAtivo)
 
   useEffect(() => {
-    if (currentTheme === 'copa') {
-      document.body.classList.add('tema-copa')
-      document.body.classList.remove('tema-raios', 'tema-ninja')
-    } else if (currentTheme === 'ninja') {
+    document.body.classList.remove('tema-copa', 'tema-raios', 'tema-ninja')
+    if (currentTheme === 'ninja') {
       document.body.classList.add('tema-ninja')
-      document.body.classList.remove('tema-raios', 'tema-copa')
     } else {
       document.body.classList.add('tema-raios')
-      document.body.classList.remove('tema-copa', 'tema-ninja')
-    }
-    return () => {
-      document.body.classList.remove('tema-copa', 'tema-raios', 'tema-ninja')
     }
   }, [currentTheme])
 
