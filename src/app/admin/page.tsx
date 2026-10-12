@@ -234,7 +234,7 @@ export default function AdminPage() {
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
               onClick={() => router.push('/admin/promo/nova')}
-              className="bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white border border-sky-400/50 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider shadow-lg shadow-sky-500/20 transition-all flex items-center gap-2"
+              className="bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white border border-sky-400/50 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider shadow-lg shadow-sky-500/20 transition-all flex items-center gap-2"
               aria-label="Criar nova promoção"
             >
               <span className="text-lg leading-none">+</span>

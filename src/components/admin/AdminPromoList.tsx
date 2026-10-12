@@ -221,7 +221,7 @@ export default function AdminPromoList({ promocoes, loading, onReorder, elitePro
               <div className="h-1.5 w-8 rounded-full bg-white/20"></div>
             </div>
 
-            <div className="h-1 w-full bg-gradient-to-r from-slate-800 to-slate-700 transition-all duration-500 group-hover:from-sky-500 group-hover:to-indigo-500"></div>
+            <div className="h-1 w-full bg-gradient-to-r from-slate-800 to-slate-700 transition-all duration-500 group-hover:from-sky-500 group-hover:to-blue-500"></div>
 
             <div className="flex flex-grow flex-col p-5">
               <div className="mb-4 flex items-start justify-between">

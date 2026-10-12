@@ -171,7 +171,7 @@ export default function AdminLoginScreen({ onSuccess }: AdminLoginScreenProps) {
         ) : (
           <div className="w-full animate-fade-in">
             <div className="text-center mb-10">
-              <div className="w-16 h-16 bg-gradient-to-br from-sky-400/20 to-indigo-500/5 rounded-2xl border border-sky-500/20 flex items-center justify-center mx-auto mb-5 shadow-lg shadow-sky-500/10">
+              <div className="w-16 h-16 bg-gradient-to-br from-sky-400/20 to-blue-500/5 rounded-2xl border border-sky-500/20 flex items-center justify-center mx-auto mb-5 shadow-lg shadow-sky-500/10">
                 <svg className="w-8 h-8 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
               </div>
               <h1 className="text-2xl font-black text-white tracking-tight mb-2">Nível Autorizado</h1>
@@ -214,7 +214,7 @@ export default function AdminLoginScreen({ onSuccess }: AdminLoginScreenProps) {
                 </div>
               )}
 
-              <button type="submit" aria-busy={loading} className="w-full bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-sky-500/25 transition-all active:scale-[0.98] mt-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-200 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950" disabled={loading}>
+              <button type="submit" aria-busy={loading} className="w-full bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-sky-500/25 transition-all active:scale-[0.98] mt-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-200 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950" disabled={loading}>
                 {loading ? 'Autenticando...' : 'Acessar Central'}
               </button>
             </form>

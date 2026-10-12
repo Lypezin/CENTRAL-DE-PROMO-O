@@ -25,7 +25,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
           <div className="max-w-5xl mx-auto px-4 md:px-6 flex items-center justify-between h-12">
             <div className="flex items-center gap-4">
               <Link href="/admin" className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-md bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center text-white font-black text-[9px]">
+                <div className="w-6 h-6 rounded-md bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center text-white font-black text-[9px]">
                   CP
                 </div>
                 <span className="text-xs font-bold text-white hidden sm:inline">Central</span>
