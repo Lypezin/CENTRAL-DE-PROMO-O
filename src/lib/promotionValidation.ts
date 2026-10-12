@@ -7,7 +7,10 @@ const ALLOWED_METRICS = new Set([
   'pedidos_aceitos_e_concluidos',
 ])
 
-export const MAX_PROMOTION_BODY_BYTES = 128_000
+// The admin UI accepts up to 100 prizes per turn, with descriptions and rules.
+// Allow a valid maximum-sized configuration to reach validation instead of
+// rejecting it at the transport layer.
+export const MAX_PROMOTION_BODY_BYTES = 3 * 1024 * 1024
 
 export type PromotionPayloadResult =
   | { ok: true; value: Record<string, unknown> }
@@ -60,17 +63,28 @@ function validPrizeConfig(value: unknown): boolean {
   if (value === null) return true
   if (!Array.isArray(value) || value.length > ALLOWED_TURNS.size) return false
 
+  const seenTurns = new Set<string>()
   return value.every((group) => {
     if (!isRecord(group) || typeof group.turno !== 'string' || !ALLOWED_TURNS.has(group.turno)) return false
+    if (seenTurns.has(group.turno)) return false
+    seenTurns.add(group.turno)
     if (group.minimo_corridas !== undefined && group.minimo_corridas !== null
-      && (typeof group.minimo_corridas !== 'number' || !Number.isFinite(group.minimo_corridas) || group.minimo_corridas < 0 || group.minimo_corridas > 1_000_000)) return false
+      && (typeof group.minimo_corridas !== 'number' || !Number.isInteger(group.minimo_corridas) || group.minimo_corridas < 0 || group.minimo_corridas > 1_000_000)) return false
     if (!Array.isArray(group.premios) || group.premios.length > 100) return false
 
-    return group.premios.every((prize) => {
+    const seenIds = new Set<string>()
+    const intervals: Array<{ start: number; end: number }> = []
+    const validPrizes = group.premios.every((prize) => {
       if (!isRecord(prize)) return false
       if (prize.id !== undefined && prize.id !== null
         && typeof prize.id !== 'string' && typeof prize.id !== 'number') return false
       if (typeof prize.id === 'string' && prize.id.length > 80) return false
+      if (typeof prize.id === 'number' && !Number.isFinite(prize.id)) return false
+      if (prize.id !== undefined && prize.id !== null) {
+        const id = String(prize.id)
+        if (seenIds.has(id)) return false
+        seenIds.add(id)
+      }
       if (prize.descricao !== undefined && prize.descricao !== null && !validText(prize.descricao, 500)) return false
       if (typeof prize.valor !== 'number' || !Number.isFinite(prize.valor) || prize.valor < 0 || prize.valor > 100_000_000) return false
 
@@ -78,9 +92,36 @@ function validPrizeConfig(value: unknown): boolean {
       const range = Number.isInteger(prize.posicao_inicio) && Number(prize.posicao_inicio) >= 1
         && Number.isInteger(prize.posicao_fim) && Number(prize.posicao_fim) >= Number(prize.posicao_inicio)
         && Number(prize.posicao_fim) <= 100_000
-      return single !== range
+      if (single === range) return false
+      intervals.push({
+        start: single ? Number(prize.posicao) : Number(prize.posicao_inicio),
+        end: single ? Number(prize.posicao) : Number(prize.posicao_fim),
+      })
+      return true
     })
+    if (!validPrizes) return false
+    intervals.sort((a, b) => a.start - b.start)
+    return intervals.every((range, index) => index === 0 || range.start > intervals[index - 1].end)
   })
+}
+
+function validGoalRows(value: unknown): value is Array<Record<string, unknown>> {
+  return Array.isArray(value) && value.length <= 100 && value.every((row) => isRecord(row)
+    && typeof row.meta === 'number' && Number.isFinite(row.meta) && row.meta > 0 && row.meta <= 100_000_000
+    && typeof row.premio === 'number' && Number.isFinite(row.premio) && row.premio >= 0 && row.premio <= 100_000_000)
+}
+
+function validLevelRows(value: unknown): value is Array<Record<string, unknown>> {
+  if (!Array.isArray(value) || value.length > 100) return false
+  const rows = value as unknown[]
+  if (!rows.every((row) => isRecord(row)
+    && Number.isInteger(row.nivel) && Number(row.nivel) >= 1 && Number(row.nivel) <= 100
+    && typeof row.meta === 'number' && Number.isFinite(row.meta) && row.meta > 0 && row.meta <= 100_000_000
+    && typeof row.premio === 'number' && Number.isFinite(row.premio) && row.premio >= 0 && row.premio <= 100_000_000)) return false
+
+  const sorted = [...rows].sort((a, b) => Number((a as Record<string, unknown>).nivel) - Number((b as Record<string, unknown>).nivel)) as Array<Record<string, unknown>>
+  return new Set(sorted.map((row) => row.nivel)).size === sorted.length
+    && sorted.every((row, index) => index === 0 || Number(row.meta) > Number(sorted[index - 1].meta))
 }
 
 function validRules(value: unknown): boolean {
@@ -102,10 +143,14 @@ function validRules(value: unknown): boolean {
     if (mechanics.metrica !== undefined && (typeof mechanics.metrica !== 'string' || !ALLOWED_METRICS.has(mechanics.metrica))) return false
     if (mechanics.agrupamento !== undefined && !['turno', 'geral'].includes(String(mechanics.agrupamento))) return false
     if (mechanics.tipo_calculo !== undefined && !['ranking', 'metas', 'niveis'].includes(String(mechanics.tipo_calculo))) return false
-    for (const key of ['metas_predefinidas', 'niveis'] as const) {
-      const rows = mechanics[key]
-      if (rows !== undefined && rows !== null && (!Array.isArray(rows) || rows.length > 100 || !rows.every(isRecord))) return false
-    }
+    if (value.tema_ninja === true && mechanics.metrica !== undefined && mechanics.metrica !== 'faturamento_taxas') return false
+
+    const goals = mechanics.metas_predefinidas
+    if (goals !== undefined && goals !== null && !validGoalRows(goals)) return false
+    const levels = mechanics.niveis
+    if (levels !== undefined && levels !== null && !validLevelRows(levels)) return false
+    if (mechanics.tipo_calculo === 'metas' && (!Array.isArray(goals) || goals.length === 0)) return false
+    if (mechanics.tipo_calculo === 'niveis' && (!Array.isArray(levels) || levels.length === 0)) return false
   }
   return true
 }
@@ -154,6 +199,20 @@ export function validatePromotionPayload(input: unknown, isCreate: boolean): Pro
   }
   if ('config_regras' in input && !validRules(input.config_regras)) {
     return { ok: false, error: 'A configuração de regras é inválida.' }
+  }
+  if ('config_regras' in value && isRecord(value.config_regras) && isRecord(value.config_regras.mecanica)
+    && Array.isArray(value.config_regras.mecanica.niveis)) {
+    value.config_regras = {
+      ...value.config_regras,
+      mecanica: {
+        ...value.config_regras.mecanica,
+        niveis: [...value.config_regras.mecanica.niveis].sort((a, b) => {
+          const levelA = isRecord(a) ? Number(a.nivel) : 0
+          const levelB = isRecord(b) ? Number(b.nivel) : 0
+          return levelA - levelB
+        }),
+      },
+    }
   }
 
   if (isCreate) {

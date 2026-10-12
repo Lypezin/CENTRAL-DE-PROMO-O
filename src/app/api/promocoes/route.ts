@@ -80,8 +80,12 @@ export async function POST(request: Request) {
   try {
     const validation = validatePromotionPayload(await readPromotionJson(request), true)
     if (!validation.ok) return NextResponse.json({ error: validation.error }, { status: 400 })
-    const { nome, descricao, tipo, data_inicio, data_fim, config_premios, config_turnos, cidade, destaque_copa } = validation.value
+    const { nome, descricao, tipo, data_inicio, data_fim, config_premios, config_turnos, config_regras, cidade, destaque_copa } = validation.value
     const safeName = (nome as string).trim()
+    const campaignType = tipo || 'ranking_turno'
+    if (campaignType !== 'ranking_turno') {
+      return NextResponse.json({ error: 'Este tipo de campanha ainda não está disponível.' }, { status: 400 })
+    }
 
     let slug = gerarSlug(safeName)
     if (!slug) return NextResponse.json({ error: 'O nome precisa conter letras ou números.' }, { status: 400 })
@@ -103,13 +107,13 @@ export async function POST(request: Request) {
         slug,
         nome: safeName,
         descricao: descricao ?? null,
-        tipo: tipo || 'ranking_turno',
+        tipo: campaignType,
         status: 'rascunho',
         data_inicio: data_inicio || null,
         data_fim: data_fim || null,
         config_premios: config_premios || null,
         config_turnos: config_turnos || null,
-        config_regras: null,
+        config_regras: config_regras ?? null,
         cidade: cidade || null,
         destaque_copa: destaque_copa ?? false,
       })

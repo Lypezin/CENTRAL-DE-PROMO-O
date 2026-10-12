@@ -6,7 +6,7 @@ import ElitePromoCard from '@/components/promo/ElitePromoCard'
 import type { EliteConfig } from '@/lib/eliteConfig'
 import type { Promocao } from '@/lib/supabase'
 
-type FilterTab = 'todas' | 'ativas' | 'encerradas'
+type FilterTab = 'ativas' | 'encerradas'
 
 export default function HubContent({
   initialPromocoes,
@@ -37,9 +37,9 @@ export default function HubContent({
       const matchesSearch =
         !query ||
         promo.nome.toLocaleLowerCase('pt-BR').includes(query) ||
+        (promo.cidade || '').toLocaleLowerCase('pt-BR').includes(query) ||
         (promo.descricao || '').toLocaleLowerCase('pt-BR').includes(query)
       const matchesStatus =
-        activeTab === 'todas' ||
         (activeTab === 'ativas' && promo.status === 'ativa') ||
         (activeTab === 'encerradas' && promo.status === 'encerrada')
       return matchesSearch && matchesStatus
@@ -78,7 +78,6 @@ export default function HubContent({
 
   const tabs: { id: FilterTab; label: string; count: number }[] = [
     { id: 'ativas', label: 'Em disputa', count: activePromotions.length },
-    { id: 'todas', label: 'Todas', count: initialPromocoes.length },
     { id: 'encerradas', label: 'Histórico', count: endedPromotions.length },
   ]
 
@@ -96,7 +95,7 @@ export default function HubContent({
 
       <section aria-label="Buscar e filtrar campanhas" className="rounded-2xl border border-white/10 bg-[#090d0d]/90 p-3 sm:p-4">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div role="group" aria-label="Filtrar campanhas" className="grid grid-cols-3 gap-1 rounded-xl bg-black/35 p-1 lg:w-auto">
+          <div role="group" aria-label="Filtrar campanhas" className="grid grid-cols-2 gap-1 rounded-xl bg-black/35 p-1 lg:w-auto">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
@@ -114,7 +113,7 @@ export default function HubContent({
             ))}
           </div>
           <label className="relative block w-full lg:max-w-md">
-            <span className="sr-only">Buscar campanha pelo nome ou descrição</span>
+            <span className="sr-only">Buscar campanha pelo nome, cidade ou descrição</span>
             <svg className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m21 21-4.4-4.4m1.9-5.1a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z" />
             </svg>
@@ -123,7 +122,7 @@ export default function HubContent({
               type="search"
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Buscar campanhas..."
+              placeholder="Buscar campanha ou cidade..."
               className="min-h-11 w-full rounded-xl border border-white/10 bg-[#050808] py-2.5 pl-10 pr-10 text-sm text-white outline-none transition-colors placeholder:text-zinc-500 focus:border-lime-300/60 focus:ring-2 focus:ring-lime-300/15"
             />
             {searchQuery && (
@@ -147,7 +146,7 @@ export default function HubContent({
         <div className="mb-4 flex items-end justify-between gap-4">
           <div>
             <h2 id="campaigns-title" className="text-xl font-extrabold tracking-tight text-white">
-              {activeTab === 'encerradas' ? 'Campanhas encerradas' : activeTab === 'todas' ? 'Todas as campanhas' : 'Disputas disponíveis'}
+              {activeTab === 'encerradas' ? 'Campanhas encerradas' : 'Disputas disponíveis'}
             </h2>
           </div>
           <div className="text-right">

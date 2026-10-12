@@ -196,17 +196,7 @@ export default function EditPromoPage() {
             transition={{ duration: 0.3, delay: 0.15 }}
             className="space-y-5"
           >
-            <PromoPreviewCard
-              nome={promo.nome}
-              status={promo.status}
-              cidade={promo.cidade}
-              descricao={promo.descricao}
-              data_inicio={promo.data_inicio}
-              data_fim={promo.data_fim}
-              destaque_copa={promo.destaque_copa}
-              tema_ninja={promo.config_regras?.tema_ninja}
-              config_turnos={promo.config_turnos}
-            />
+            <PromoPreviewCard promo={promo} />
 
             <StatsOverview stats={stats} />
 

@@ -4,6 +4,9 @@ import { supabaseAdmin } from '@/lib/supabaseServer'
 import { resolveRankingMetric } from '@/lib/rankingMetric'
 
 const TURNOS = new Set(['GERAL', 'CAFE_DA_MANHA', 'ALMOCO', 'TARDE', 'JANTAR', 'MADRUGADA'])
+const DEFAULT_PAGE_SIZE = 100
+const MAX_PAGE_SIZE = 1_000
+const MAX_OFFSET = 100_000
 
 interface PublicRankingRow {
   posicao: number
@@ -51,6 +54,7 @@ const readPublicRanking = unstable_cache(
     if (error) throw new Error('Public ranking lookup failed.')
 
     const rows = (data || []) as PublicRankingRow[]
+    const total = Number(rows[0]?.total_registros || 0)
     return {
       status: 200,
       body: {
@@ -67,9 +71,11 @@ const readPublicRanking = unstable_cache(
                 ? row.total_pedidos_concluidos
                 : row.total_corridas_completadas,
         })),
-        total: Number(rows[0]?.total_registros || 0),
+        total,
         limit,
         offset,
+        hasMore: offset + rows.length < total,
+        maxOffset: MAX_OFFSET,
       },
     }
   },
@@ -82,8 +88,8 @@ export async function GET(request: Request) {
   const slug = searchParams.get('slug')?.trim() || ''
   const turno = searchParams.get('turno')?.trim().toUpperCase() || ''
   const busca = searchParams.get('q')?.trim() || ''
-  const limitParam = Number(searchParams.get('limit') || 100)
-  const offsetParam = Number(searchParams.get('offset') || 0)
+  const limitParam = Number(searchParams.get('limit') ?? DEFAULT_PAGE_SIZE)
+  const offsetParam = Number(searchParams.get('offset') ?? 0)
 
   if (!slug || slug.length > 120 || !/^[a-z0-9-]+$/.test(slug)) {
     return NextResponse.json({ error: 'Campanha inválida.' }, { status: 400 })
@@ -91,13 +97,13 @@ export async function GET(request: Request) {
   if (!TURNOS.has(turno) || busca.length > 100) {
     return NextResponse.json({ error: 'Filtro inválido.' }, { status: 400 })
   }
-  if (!Number.isInteger(limitParam) || !Number.isInteger(offsetParam) || offsetParam < 0 || offsetParam > 100000) {
+  if (!Number.isInteger(limitParam) || limitParam < 1 || limitParam > MAX_PAGE_SIZE
+    || !Number.isInteger(offsetParam) || offsetParam < 0 || offsetParam > MAX_OFFSET) {
     return NextResponse.json({ error: 'Paginação inválida.' }, { status: 400 })
   }
 
   try {
-    const limit = Math.min(Math.max(limitParam, 1), 100)
-    const result = await readPublicRanking(slug, turno, busca, limit, offsetParam)
+    const result = await readPublicRanking(slug, turno, busca, limitParam, offsetParam)
     return NextResponse.json(result.body, {
       status: result.status,
       headers: { 'Cache-Control': 'public, max-age=0, s-maxage=30, stale-while-revalidate=60' },

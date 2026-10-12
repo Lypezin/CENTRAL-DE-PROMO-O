@@ -21,6 +21,10 @@ const TURNO_DISPLAY: Record<string, { label: string; emoji: string; cor: string;
   'GERAL': { label: 'Geral', emoji: '🏆', cor: '#e4e4e7', corGradiente: 'linear-gradient(135deg, #71717a, #e4e4e7)' }
 }
 
+const PUBLIC_RANKING_PAGE_SIZE = 100
+const PUBLIC_MURAL_PAGE_SIZE = 1_000
+const PUBLIC_RANKING_MAX_OFFSET = 100_000
+
 export default function RankingTurno({
   promocaoSlug,
   configPremios,
@@ -67,6 +71,8 @@ export default function RankingTurno({
   const [totalResultados, setTotalResultados] = useState(0)
   const [carregandoMais, setCarregandoMais] = useState(false)
   const [erroPaginacao, setErroPaginacao] = useState<string | null>(null)
+  const [muralProgress, setMuralProgress] = useState<{ loaded: number; total: number } | null>(null)
+  const [muralLoadError, setMuralLoadError] = useState<string | null>(null)
   const rankingCache = useRef(new Map<string, { expiresAt: number; rows: EntregaRanking[]; total: number }>())
   const activeRankingKey = useRef('')
   const mapRankingRow = useCallback((value: unknown, index: number, offset = 0): EntregaRanking => {
@@ -106,7 +112,11 @@ export default function RankingTurno({
     let cancelled = false
 
     async function fetchRanking() {
-      const cacheKey = `${promocaoSlug}:${filtroAtivoEfetivo}:${debouncedSearchQuery.toLocaleLowerCase('pt-BR')}`
+      const needsCompleteMural = isMetas || isNiveis
+      // Metas and levels need the complete participant set to render a truthful mural.
+      // Search stays local for these formats; the ranking leaderboard keeps server search + paging.
+      const requestSearch = needsCompleteMural ? '' : debouncedSearchQuery
+      const cacheKey = `${promocaoSlug}:${filtroAtivoEfetivo}:${requestSearch.toLocaleLowerCase('pt-BR')}`
       activeRankingKey.current = cacheKey
       const cached = rankingCache.current.get(cacheKey)
       if (cached && cached.expiresAt > Date.now()) {
@@ -114,6 +124,8 @@ export default function RankingTurno({
           setRankingData(cached.rows)
           setTotalResultados(cached.total)
           setLoadError(null)
+          setMuralLoadError(null)
+          setMuralProgress(null)
           setLoading(false)
         }
         return
@@ -121,32 +133,102 @@ export default function RankingTurno({
       if (!cancelled) setLoading(true)
       if (!cancelled) setLoadError(null)
       if (!cancelled) {
+        setMuralLoadError(null)
+        setMuralProgress(null)
+      }
+      if (!cancelled) {
         setCarregandoMais(false)
         setErroPaginacao(null)
       }
 
+      let rows: EntregaRanking[] = []
+      let total = 0
       try {
-        const params = new URLSearchParams({ slug: promocaoSlug, turno: filtroAtivoEfetivo, limit: '100' })
-        if (debouncedSearchQuery) params.set('q', debouncedSearchQuery)
+        const requestPageSize = needsCompleteMural ? PUBLIC_MURAL_PAGE_SIZE : PUBLIC_RANKING_PAGE_SIZE
+        const params = new URLSearchParams({ slug: promocaoSlug, turno: filtroAtivoEfetivo, limit: String(requestPageSize) })
+        if (requestSearch) params.set('q', requestSearch)
         const response = await fetch(`/api/ranking?${params.toString()}`, { headers: { Accept: 'application/json' } })
-        const result: { error?: string; results?: unknown; total?: unknown } = await response.json()
+        const result: { error?: string; results?: unknown; total?: unknown; limit?: unknown; maxOffset?: unknown } = await response.json()
         if (!response.ok) throw new Error(result.error || 'Não foi possível carregar o ranking.')
 
-        const rows = (Array.isArray(result.results) ? result.results : []).map((value: unknown, index: number) => (
+        rows = (Array.isArray(result.results) ? result.results : []).map((value: unknown, index: number) => (
           mapRankingRow(value, index)
         ))
-        const total = typeof result.total === 'number' && Number.isFinite(result.total) ? result.total : rows.length
+        total = typeof result.total === 'number' && Number.isFinite(result.total) ? result.total : rows.length
+        const pageSize = typeof result.limit === 'number' && Number.isInteger(result.limit) && result.limit > 0
+          ? Math.min(result.limit, requestPageSize)
+          : requestPageSize
+        const maxOffset = typeof result.maxOffset === 'number' && Number.isInteger(result.maxOffset) && result.maxOffset >= 0
+          ? Math.min(result.maxOffset, PUBLIC_RANKING_MAX_OFFSET)
+          : PUBLIC_RANKING_MAX_OFFSET
 
         if (cancelled) return
+        if (needsCompleteMural) {
+          const maxAccessibleRows = maxOffset + pageSize
+          if (total > maxAccessibleRows) {
+            throw new Error(`Esta campanha tem mais de ${maxAccessibleRows.toLocaleString('pt-BR')} participantes; a consulta pública atual não consegue paginar além desse limite.`)
+          }
+          setMuralProgress({ loaded: rows.length, total })
+
+          // The public RPC caps each response at 1,000 rows. Page through it so the
+          // meta/level murals are based on every participant, not just the first page.
+          while (rows.length < total) {
+            if (cancelled || activeRankingKey.current !== cacheKey) return
+
+            const offset = rows.length
+            if (offset > PUBLIC_RANKING_MAX_OFFSET) {
+              throw new Error(`O mural atingiu o limite público de paginação (${PUBLIC_RANKING_MAX_OFFSET.toLocaleString('pt-BR')} participantes).`)
+            }
+
+            const pageParams = new URLSearchParams({
+              slug: promocaoSlug,
+              turno: filtroAtivoEfetivo,
+              limit: String(pageSize),
+              offset: String(offset),
+            })
+            const pageResponse = await fetch(`/api/ranking?${pageParams.toString()}`, { headers: { Accept: 'application/json' } })
+            const pageResult: { error?: string; results?: unknown; total?: unknown } = await pageResponse.json()
+            if (!pageResponse.ok) throw new Error(pageResult.error || 'Não foi possível completar o mural.')
+
+            const pageRows = (Array.isArray(pageResult.results) ? pageResult.results : []).map((value: unknown, index: number) => (
+              mapRankingRow(value, index, offset)
+            ))
+            if (pageRows.length === 0) {
+              throw new Error('A consulta terminou antes de carregar todos os participantes do mural. Tente novamente.')
+            }
+
+            rows = [...rows, ...pageRows]
+            if (typeof pageResult.total === 'number' && Number.isFinite(pageResult.total) && pageResult.total > 0) {
+              total = pageResult.total
+            }
+            // Report progress at a readable cadence instead of rerendering for every page.
+            if (rows.length >= total || rows.length % 1_000 < pageSize) {
+              setMuralProgress({ loaded: rows.length, total })
+            }
+          }
+        }
+
+        if (cancelled || activeRankingKey.current !== cacheKey) return
         rankingCache.current.set(cacheKey, { rows, total, expiresAt: Date.now() + 30_000 })
         setRankingData(rows)
         setTotalResultados(total)
+        setMuralProgress(null)
+        setMuralLoadError(null)
         setErroPaginacao(null)
       } catch (error) {
         if (cancelled) return
-        setRankingData([])
-        setTotalResultados(0)
-        setLoadError(error instanceof Error ? error.message : 'Não foi possível carregar o ranking.')
+        const message = error instanceof Error ? error.message : 'Não foi possível carregar o ranking.'
+        if (isMetas || isNiveis) {
+          setMuralLoadError(message)
+          setRankingData(rows)
+          setTotalResultados(total)
+          setMuralProgress(null)
+          if (rows.length === 0) setLoadError(message)
+        } else {
+          setRankingData([])
+          setTotalResultados(0)
+          setLoadError(message)
+        }
       } finally {
         if (!cancelled) setLoading(false)
       }
@@ -155,10 +237,10 @@ export default function RankingTurno({
     return () => {
       cancelled = true
     }
-  }, [promocaoSlug, filtroAtivoEfetivo, debouncedSearchQuery, reloadSequence, mapRankingRow])
+  }, [promocaoSlug, filtroAtivoEfetivo, debouncedSearchQuery, reloadSequence, mapRankingRow, isMetas, isNiveis])
 
   const carregarMaisResultados = useCallback(async () => {
-    if (!debouncedSearchQuery || carregandoMais || rankingData.length >= totalResultados) return
+    if (!debouncedSearchQuery || isMetas || isNiveis || carregandoMais || rankingData.length >= totalResultados) return
     const requestKey = `${promocaoSlug}:${filtroAtivoEfetivo}:${debouncedSearchQuery.toLocaleLowerCase('pt-BR')}`
     setCarregandoMais(true)
     setErroPaginacao(null)
@@ -167,7 +249,7 @@ export default function RankingTurno({
         slug: promocaoSlug,
         turno: filtroAtivoEfetivo,
         q: debouncedSearchQuery,
-        limit: '100',
+        limit: String(PUBLIC_RANKING_PAGE_SIZE),
         offset: String(rankingData.length),
       })
       const response = await fetch(`/api/ranking?${params.toString()}`, { headers: { Accept: 'application/json' } })
@@ -186,7 +268,7 @@ export default function RankingTurno({
     } finally {
       if (activeRankingKey.current === requestKey) setCarregandoMais(false)
     }
-  }, [debouncedSearchQuery, carregandoMais, rankingData.length, totalResultados, promocaoSlug, filtroAtivoEfetivo, mapRankingRow])
+  }, [debouncedSearchQuery, isMetas, isNiveis, carregandoMais, rankingData.length, totalResultados, promocaoSlug, filtroAtivoEfetivo, mapRankingRow])
 
   // Otimização: filtrar ranking memoizado com base na query debouncada
   const filteredRanking = useMemo(() => {
@@ -264,6 +346,13 @@ export default function RankingTurno({
         {loading ? (
           /* Loading skeleton shell */
           <div className="space-y-3">
+            {(isMetas || isNiveis) && (
+              <p className="text-xs text-zinc-400" role="status" aria-live="polite">
+                {muralProgress
+                  ? `Carregando mural completo: ${muralProgress.loaded.toLocaleString('pt-BR')} de ${muralProgress.total.toLocaleString('pt-BR')} participantes.`
+                  : 'Carregando participantes para montar o mural completo...'}
+              </p>
+            )}
             {[...Array(5)].map((_, i) => (
               <div key={i} className="animate-pulse flex gap-4 items-center p-4 rounded-xl bg-white/[0.02] border border-white/[0.01]">
                 <div className="w-10 h-10 bg-white/5 rounded-xl"></div>
@@ -336,7 +425,23 @@ export default function RankingTurno({
               />
             )}
 
-            {debouncedSearchQuery && rankingData.length < totalResultados && (
+            {muralLoadError && (
+              <div className="mt-6 rounded-xl border border-amber-400/25 bg-amber-400/[.06] p-4 text-sm text-amber-100" role="alert">
+                <p>O mural pode estar incompleto: carregamos {rankingData.length.toLocaleString('pt-BR')} de {totalResultados.toLocaleString('pt-BR')} participantes. {muralLoadError}</p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    rankingCache.current.delete(`${promocaoSlug}:${filtroAtivoEfetivo}:`)
+                    setReloadSequence((value) => value + 1)
+                  }}
+                  className="mt-3 min-h-10 rounded-lg border border-amber-300/30 px-3 font-semibold text-amber-100 underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
+                >
+                  Tentar completar o mural novamente
+                </button>
+              </div>
+            )}
+
+            {debouncedSearchQuery && !isMetas && !isNiveis && rankingData.length < totalResultados && (
               <div className="mt-6 flex flex-col items-center gap-2 border-t border-white/[0.06] pt-5">
                 <p className="text-xs text-zinc-400" aria-live="polite">
                   Mostrando {rankingData.length.toLocaleString('pt-BR')} de {totalResultados.toLocaleString('pt-BR')} participantes encontrados

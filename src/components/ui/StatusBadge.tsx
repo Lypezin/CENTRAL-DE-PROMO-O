@@ -9,7 +9,7 @@ export default function StatusBadge({ status }: { status: 'rascunho' | 'ativa' |
 
   return (
     <span className={`px-2.5 py-0.5 rounded text-[9px] font-extrabold tracking-wider border flex items-center gap-1 font-mono uppercase ${config.classes}`}>
-      {status === 'ativa' && <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse"></span>}
+      {status === 'ativa' && <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.7)]" aria-hidden="true" />}
       {config.label}
     </span>
   )

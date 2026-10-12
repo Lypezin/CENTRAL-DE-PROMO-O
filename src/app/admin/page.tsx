@@ -33,7 +33,6 @@ export default function AdminPage() {
   
   const [promocoes, setPromocoes] = useState<Promocao[]>([])
   const [loading, setLoading] = useState(true)
-  const [creating, setCreating] = useState(false)
   const [elitePromoId, setElitePromoId] = useState('')
 
   const [onlineCount, setOnlineCount] = useState<number>(0)
@@ -169,44 +168,6 @@ export default function AdminPage() {
     }
   }
 
-  const handleCriarPromocao = async () => {
-    setCreating(true)
-    try {
-      const novaPromo = {
-        nome: `Nova Promoção ${new Date().toLocaleDateString()}`,
-        tipo: 'ranking_turno',
-        status: 'rascunho',
-        config_turnos: ['CAFE_DA_MANHA', 'ALMOCO', 'TARDE', 'JANTAR', 'MADRUGADA'],
-        config_premios: [
-          { turno: "CAFE_DA_MANHA", premios: [{ posicao: 1, valor: 300 }, { posicao: 2, valor: 200 }, { posicao_inicio: 3, posicao_fim: 5, valor: 100 }] },
-          { turno: "ALMOCO", premios: [{ posicao: 1, valor: 1500 }, { posicao: 2, valor: 1000 }, { posicao: 3, valor: 500 }, { posicao_inicio: 4, posicao_fim: 10, valor: 300 }, { posicao_inicio: 11, posicao_fim: 15, valor: 100 }] },
-          { turno: "TARDE", premios: [{ posicao: 1, valor: 300 }, { posicao: 2, valor: 200 }, { posicao_inicio: 3, posicao_fim: 5, valor: 100 }] },
-          { turno: "JANTAR", premios: [{ posicao: 1, valor: 1500 }, { posicao: 2, valor: 1000 }, { posicao: 3, valor: 500 }, { posicao_inicio: 4, posicao_fim: 10, valor: 300 }, { posicao_inicio: 11, posicao_fim: 15, valor: 100 }] },
-          { turno: "MADRUGADA", premios: [{ posicao: 1, valor: 300 }, { posicao: 2, valor: 200 }, { posicao_inicio: 3, posicao_fim: 5, valor: 100 }] }
-        ]
-      }
-
-      const res = await fetch('/api/promocoes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(novaPromo)
-      })
-      
-      if (res.ok) {
-        const data = await res.json()
-        toast.success('Promoção criada com sucesso!')
-        router.push(`/admin/promo/${data.id}`)
-      } else {
-        toast.error('Erro ao criar promoção.')
-      }
-    } catch (e) {
-      console.error(e)
-      toast.error('Erro de conexão.')
-    } finally {
-      setCreating(false)
-    }
-  }
-
   if (pageState === 'login') {
     return (
       <AdminLoginScreen onSuccess={handleAdminLoginSuccess} />
@@ -251,22 +212,12 @@ export default function AdminPage() {
             <motion.button
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
-              onClick={handleCriarPromocao} 
-              disabled={creating}
+              onClick={() => router.push('/admin/promo/nova')}
               className="bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white border border-sky-400/50 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider shadow-lg shadow-sky-500/20 transition-all flex items-center gap-2"
               aria-label="Criar nova promoção"
             >
-              {creating ? (
-                <>
-                  <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                  Iniciando...
-                </>
-              ) : (
-                <>
-                  <span className="text-lg leading-none">+</span> 
-                  Nova Promoção
-                </>
-              )}
+              <span className="text-lg leading-none">+</span>
+              Nova Promoção
             </motion.button>
           </div>
         </motion.div>
