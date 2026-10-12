@@ -43,10 +43,10 @@
 }
 
 @keyframes faixa-preta-city-flash {
-  0%, 7% { clip-path: inset(0 100% 0 0); opacity: 0; }
-  11% { opacity: 1; }
-  24% { clip-path: inset(0 0 0 70%); opacity: 1; }
-  29%, 100% { clip-path: inset(0 0 0 100%); opacity: 0; }
+  0%, 9% { clip-path: inset(0 100% 0 0); opacity: 0; }
+  12% { clip-path: inset(0 72% 0 0); opacity: 1; }
+  42% { clip-path: inset(0 0 0 72%); opacity: 1; }
+  47%, 100% { clip-path: inset(0 0 0 100%); opacity: 0; }
 }
 
 @keyframes faixa-preta-city-rule {
@@ -97,7 +97,11 @@
   animation: faixa-preta-strike 5.5s cubic-bezier(.18, .67, .25, 1) 800ms infinite;
 }
 
-.faixa-preta-city-name { position: relative; }
+.faixa-preta-city-name {
+  position: relative;
+  width: fit-content;
+  max-width: 100%;
+}
 
 .faixa-preta-city-name::after {
   content: attr(data-city);
@@ -128,7 +132,7 @@
 }
 
 .faixa-preta-motion-active .faixa-preta-city-name::after {
-  animation: faixa-preta-city-flash 5.5s cubic-bezier(.18, .67, .25, 1) 800ms infinite;
+  animation: faixa-preta-city-flash 7s linear 800ms infinite;
 }
 
 .faixa-preta-motion-active .faixa-preta-city::after {
