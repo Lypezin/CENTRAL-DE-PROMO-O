@@ -85,15 +85,15 @@ function PromoCardContent({ promo, preloadNinjaImage = false }: { promo: Promoca
       }
     : isFaixaPreta
       ? {
-          bar: 'from-slate-950 via-blue-400 to-cyan-500',
-          surface: 'from-[#102a4d] via-[#0a1c33] to-[#071321]',
-          glow: 'bg-blue-500/[.15]',
+          bar: 'from-blue-700 via-sky-300 to-blue-500',
+          surface: 'from-[#16375a] via-[#0d2642] to-[#091a30]',
+          glow: 'bg-sky-400/[.14]',
           stamp: 'border-blue-200/25 bg-blue-400/10 text-blue-100',
           city: 'text-white',
-          cityRule: 'bg-blue-500',
+          cityRule: 'bg-sky-400',
           type: 'text-blue-100',
           focusRing: 'group-focus-visible:ring-blue-300',
-          action: 'border-blue-300/30 bg-blue-500/10 text-blue-100 group-hover:bg-blue-500/20',
+          action: 'border-sky-300/35 bg-blue-400/15 text-sky-50 group-hover:bg-blue-400/25',
           sweep: 'via-blue-100/[.14]',
         }
       : {
@@ -110,7 +110,7 @@ function PromoCardContent({ promo, preloadNinjaImage = false }: { promo: Promoca
         }
 
   return (
-    <article ref={cardRef} className={`promo-card-shell @container/card relative isolate flex h-full min-h-[380px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br ${theme.surface} shadow-[0_18px_44px_-28px_rgba(0,0,0,0.95)] transition duration-300 group-hover:-translate-y-1 group-focus-visible:-translate-y-1 group-hover:border-white/20 group-focus-visible:border-white/20 group-hover:shadow-[0_24px_50px_-25px_rgba(0,0,0,0.95)] group-focus-visible:shadow-[0_24px_50px_-25px_rgba(0,0,0,0.95)] group-focus-visible:ring-2 group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-[#0b1b2c] ${theme.focusRing} motion-reduce:transform-none motion-reduce:transition-none ${isFaixaPreta ? 'faixa-preta-card' : ''} ${motionActive ? 'faixa-preta-motion-active' : ''}`}>
+    <article ref={cardRef} className={`promo-card-shell @container/card relative isolate flex h-full min-h-[380px] flex-col overflow-hidden rounded-2xl border border-sky-200/15 bg-gradient-to-br ${theme.surface} shadow-[0_18px_44px_-28px_rgba(0,0,0,0.95)] transition duration-300 group-hover:-translate-y-1 group-focus-visible:-translate-y-1 group-hover:border-sky-200/30 group-focus-visible:border-sky-200/30 group-hover:shadow-[0_24px_50px_-25px_rgba(0,0,0,0.95)] group-focus-visible:shadow-[0_24px_50px_-25px_rgba(0,0,0,0.95)] group-focus-visible:ring-2 group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-[#071322] ${theme.focusRing} motion-reduce:transform-none motion-reduce:transition-none ${isFaixaPreta ? 'faixa-preta-card' : ''} ${motionActive ? 'faixa-preta-motion-active' : ''}`}>
       <div className={`h-1.5 w-full shrink-0 bg-gradient-to-r ${theme.bar}`} aria-hidden="true" />
       <div className="promo-card-glint pointer-events-none absolute left-0 top-0 z-30 h-1.5 w-[34%]" aria-hidden="true" />
       <div className={`pointer-events-none absolute -right-14 -top-12 h-52 w-52 rounded-full blur-3xl ${theme.glow}`} aria-hidden="true" />
@@ -152,35 +152,35 @@ function PromoCardContent({ promo, preloadNinjaImage = false }: { promo: Promoca
         {promo.cidade && (
           <div className={`relative mt-6 min-w-0 overflow-hidden border-l-[3px] border-white/20 py-2 pl-4 ${isFaixaPreta ? 'faixa-preta-city' : ''}`}>
             <span className={`absolute inset-y-0 left-[-3px] w-[3px] ${theme.cityRule}`} aria-hidden="true" />
-            <span className="block text-[11px] font-extrabold uppercase tracking-[.19em] text-zinc-300">A praça da rodada</span>
+            <span className="block text-[11px] font-extrabold uppercase tracking-[.19em] text-slate-300">A praça da rodada</span>
             <span data-city={isFaixaPreta ? promo.cidade : undefined} className={`mt-1 block break-words [font-size:clamp(2.1rem,13cqi,3rem)] font-black uppercase italic leading-[.94] tracking-[-.07em] ${theme.city} transition-transform duration-300 group-hover:translate-x-1 group-focus-visible:translate-x-1 motion-reduce:transform-none motion-reduce:transition-none ${isFaixaPreta ? 'faixa-preta-city-name' : ''}`}>
               {promo.cidade}
             </span>
           </div>
         )}
 
-        <div className="mt-5 flex items-center gap-2 text-[10px] font-black uppercase tracking-[.18em] text-zinc-300">
+        <div className="mt-5 flex items-center gap-2 text-[10px] font-black uppercase tracking-[.18em] text-slate-300">
           <span className={`h-[2px] w-5 ${theme.cityRule}`} aria-hidden="true" />
           {competitionLabel}
         </div>
         <h3 className="mt-2 line-clamp-2 text-xl font-black leading-tight tracking-[-.035em] text-white sm:text-2xl">
           {promo.nome}
         </h3>
-        <p className="mt-2 line-clamp-2 text-sm leading-6 text-zinc-300">
+        <p className="mt-2 line-clamp-2 text-sm leading-6 text-slate-300">
           {promo.descricao || 'Consulte as regras e acompanhe os resultados desta campanha.'}
         </p>
 
         {promo.config_turnos && promo.config_turnos.length > 0 && (
           <div className="mt-4">
-            <p className="mb-2 text-[11px] font-bold uppercase tracking-[.12em] text-zinc-400">Turnos participantes</p>
+            <p className="mb-2 text-[11px] font-bold uppercase tracking-[.12em] text-slate-400">Turnos participantes</p>
             <div className="flex flex-wrap gap-2">
               {promo.config_turnos.slice(0, 4).map((shift) => (
-                <span key={shift} className="rounded-lg border border-white/10 bg-black/20 px-2.5 py-1.5 text-xs font-semibold text-zinc-200">
+                <span key={shift} className="rounded-lg border border-white/10 bg-black/20 px-2.5 py-1.5 text-xs font-semibold text-slate-200">
                   {SHIFT_LABELS[shift] || shift}
                 </span>
               ))}
               {promo.config_turnos.length > 4 && (
-                <span className="rounded-lg border border-white/10 bg-black/20 px-2.5 py-1.5 text-xs font-semibold text-zinc-300">
+                <span className="rounded-lg border border-white/10 bg-black/20 px-2.5 py-1.5 text-xs font-semibold text-slate-300">
                   +{promo.config_turnos.length - 4}
                 </span>
               )}
@@ -190,9 +190,9 @@ function PromoCardContent({ promo, preloadNinjaImage = false }: { promo: Promoca
 
         <div className="mt-auto flex flex-wrap items-end justify-between gap-4 border-t border-white/10 pt-4">
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-[.12em] text-zinc-400">Período</p>
-            <p className="mt-1 text-sm font-semibold tabular-nums text-zinc-200">
-              {formatDate(promo.data_inicio)} <span className="text-zinc-500">—</span> {formatDate(promo.data_fim)}
+            <p className="text-[11px] font-bold uppercase tracking-[.12em] text-slate-400">Período</p>
+            <p className="mt-1 text-sm font-semibold tabular-nums text-slate-200">
+              {formatDate(promo.data_inicio)} <span className="text-slate-400">—</span> {formatDate(promo.data_fim)}
             </p>
           </div>
           <span className={`inline-flex min-h-10 items-center gap-2 rounded-lg border px-3 text-xs font-black uppercase tracking-[.08em] transition-colors ${theme.action}`}>

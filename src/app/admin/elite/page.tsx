@@ -151,7 +151,7 @@ export default function AdminElitePage() {
         <div className="flex min-h-[50vh] items-center justify-center">
           <div className="space-y-3 text-center">
             <div className="mx-auto h-5 w-5 animate-spin rounded-full border-2 border-blue-400 border-t-transparent" />
-            <p className="font-mono text-xs uppercase tracking-wider text-zinc-500">Carregando configuracao ELITE...</p>
+            <p className="font-mono text-xs uppercase tracking-wider text-slate-400">Carregando configuracao ELITE...</p>
           </div>
         </div>
       </div>
@@ -165,7 +165,7 @@ export default function AdminElitePage() {
           <div>
             <Link
               href="/admin"
-              className="mb-5 inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider text-zinc-500 transition-colors hover:text-blue-300"
+              className="mb-5 inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider text-slate-400 transition-colors hover:text-blue-300"
             >
               <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
@@ -177,7 +177,7 @@ export default function AdminElitePage() {
               ELITE
             </div>
             <h1 className="text-3xl font-black tracking-tight text-white md:text-4xl">Gestao do ELITE</h1>
-            <p className="mt-2 max-w-3xl text-sm leading-relaxed text-zinc-400">
+            <p className="mt-2 max-w-3xl text-sm leading-relaxed text-slate-400">
               Importe a planilha mensal, edite os textos do card e ajuste a meta exibida na consulta publica.
             </p>
           </div>
@@ -208,7 +208,7 @@ export default function AdminElitePage() {
                   <div>
                     <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-300">Planilha mensal</div>
                     <h2 className="mt-2 text-2xl font-black tracking-tight text-white">Base de pedidos</h2>
-                    <p className="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-400">
+                    <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-400">
                       Os meses aparecem para consulta somente quando existem dados importados.
                     </p>
                   </div>
@@ -237,15 +237,15 @@ export default function AdminElitePage() {
               </div>
             </section>
 
-            <section className="rounded-2xl border border-white/[0.06] bg-zinc-950/60 p-5 backdrop-blur-md md:p-6">
+            <section className="rounded-2xl border border-white/[0.06] bg-slate-950/60 p-5 backdrop-blur-md md:p-6">
               <div className="mb-5">
-                <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">Conteudo</div>
+                <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Conteudo</div>
                 <h2 className="mt-2 text-2xl font-black tracking-tight text-white">Textos e meta</h2>
               </div>
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="md:col-span-2">
-                  <label className="mb-1.5 block font-mono text-[10px] font-bold uppercase tracking-wider text-zinc-500">Titulo do card</label>
+                  <label className="mb-1.5 block font-mono text-[10px] font-bold uppercase tracking-wider text-slate-400">Titulo do card</label>
                   <input
                     type="text"
                     value={config.card_title}
@@ -255,7 +255,7 @@ export default function AdminElitePage() {
                 </div>
 
                 <div className="md:col-span-2">
-                  <label className="mb-1.5 block font-mono text-[10px] font-bold uppercase tracking-wider text-zinc-500">Descricao do card</label>
+                  <label className="mb-1.5 block font-mono text-[10px] font-bold uppercase tracking-wider text-slate-400">Descricao do card</label>
                   <textarea
                     rows={3}
                     value={config.card_description}
@@ -265,7 +265,7 @@ export default function AdminElitePage() {
                 </div>
 
                 <div>
-                  <label className="mb-1.5 block font-mono text-[10px] font-bold uppercase tracking-wider text-zinc-500">Etiqueta</label>
+                  <label className="mb-1.5 block font-mono text-[10px] font-bold uppercase tracking-wider text-slate-400">Etiqueta</label>
                   <input
                     type="text"
                     value={config.tag_label}
@@ -275,18 +275,18 @@ export default function AdminElitePage() {
                 </div>
 
                 <div>
-                  <label className="mb-1.5 block font-mono text-[10px] font-bold uppercase tracking-wider text-zinc-500">Meta mensal</label>
+                  <label className="mb-1.5 block font-mono text-[10px] font-bold uppercase tracking-wider text-slate-400">Meta mensal</label>
                   <input
                     type="number"
                     min="1"
                     value={config.target}
                     onChange={(e) => updateConfig('target', Math.max(1, Number(e.target.value) || 1))}
-                    className="admin-input !bg-[#0a1829] !py-2.5"
+                    className="admin-input !bg-[#0a1e32] !py-2.5"
                   />
                 </div>
 
                 <div className="md:col-span-2">
-                  <label className="mb-1.5 block font-mono text-[10px] font-bold uppercase tracking-wider text-zinc-500">Titulo da pagina</label>
+                  <label className="mb-1.5 block font-mono text-[10px] font-bold uppercase tracking-wider text-slate-400">Titulo da pagina</label>
                   <input
                     type="text"
                     value={config.page_title}
@@ -296,7 +296,7 @@ export default function AdminElitePage() {
                 </div>
 
                 <div className="md:col-span-2">
-                  <label className="mb-1.5 block font-mono text-[10px] font-bold uppercase tracking-wider text-zinc-500">Descricao da pagina</label>
+                  <label className="mb-1.5 block font-mono text-[10px] font-bold uppercase tracking-wider text-slate-400">Descricao da pagina</label>
                   <textarea
                     rows={4}
                     value={config.page_description}
@@ -321,17 +321,17 @@ export default function AdminElitePage() {
                   {config.tag_label}
                 </div>
                 <h3 className="text-xl font-black tracking-tight text-white">{config.card_title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-zinc-400">{config.card_description}</p>
+                <p className="mt-2 text-sm leading-relaxed text-slate-400">{config.card_description}</p>
                 <div className="mt-5 border-t border-white/[0.05] pt-4">
-                  <div className="font-mono text-[9px] font-bold uppercase tracking-wider text-zinc-500">Meta mensal</div>
+                  <div className="font-mono text-[9px] font-bold uppercase tracking-wider text-slate-400">Meta mensal</div>
                   <div className="mt-1 text-lg font-black text-blue-100">{config.target} pedidos</div>
                 </div>
               </div>
 
               <div className="mt-4 rounded-2xl border border-white/[0.06] bg-black/20 p-4">
-                <div className="font-mono text-[9px] font-bold uppercase tracking-wider text-zinc-500">Pagina publica</div>
+                <div className="font-mono text-[9px] font-bold uppercase tracking-wider text-slate-400">Pagina publica</div>
                 <h4 className="mt-2 text-base font-black text-white">{config.page_title}</h4>
-                <p className="mt-1 line-clamp-4 text-xs leading-relaxed text-zinc-500">{config.page_description}</p>
+                <p className="mt-1 line-clamp-4 text-xs leading-relaxed text-slate-400">{config.page_description}</p>
               </div>
             </div>
           </aside>

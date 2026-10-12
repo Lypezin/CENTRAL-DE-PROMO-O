@@ -28,10 +28,10 @@ export default function Tooltip({ content, children, position = 'top' }: Tooltip
       {visible && (
         <div
           role="tooltip"
-          className={`absolute z-50 ${positionClasses[position]} px-2.5 py-1.5 text-[10px] font-medium text-white bg-zinc-800 border border-zinc-700 rounded-lg shadow-xl whitespace-nowrap pointer-events-none`}
+          className={`absolute z-50 ${positionClasses[position]} px-2.5 py-1.5 text-[10px] font-medium text-white bg-slate-800 border border-slate-700 rounded-lg shadow-xl whitespace-nowrap pointer-events-none`}
         >
           {content}
-          <div className={`absolute w-2 h-2 bg-zinc-800 border-zinc-700 rotate-45 ${
+          <div className={`absolute w-2 h-2 bg-slate-800 border-slate-700 rotate-45 ${
             position === 'top' ? 'top-full left-1/2 -translate-x-1/2 -mt-1 border-r border-b' :
             position === 'bottom' ? 'bottom-full left-1/2 -translate-x-1/2 -mb-1 border-l border-t' :
             position === 'left' ? 'left-full top-1/2 -translate-y-1/2 -ml-1 border-t border-r' :

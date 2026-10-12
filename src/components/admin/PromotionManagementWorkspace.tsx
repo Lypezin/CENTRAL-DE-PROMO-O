@@ -65,7 +65,7 @@ export default function PromotionManagementWorkspace({
     <div className="flex min-h-[60vh] items-center justify-center" role="status" aria-live="polite">
       <div className="space-y-3 text-center">
         <div className="mx-auto h-5 w-5 animate-spin rounded-full border-2 border-sky-400 border-t-transparent" aria-hidden="true" />
-        <p className="text-xs font-mono uppercase tracking-wider text-zinc-400">Carregando campanha…</p>
+        <p className="text-xs font-mono uppercase tracking-wider text-slate-400">Carregando campanha…</p>
       </div>
     </div>
   )
@@ -74,7 +74,7 @@ export default function PromotionManagementWorkspace({
     <div className="flex min-h-[60vh] items-center justify-center px-4">
       <div className="space-y-3 text-center">
         <p role="alert" className="text-sm font-bold text-rose-300">{loadError || 'Não foi possível carregar esta campanha.'}</p>
-        <button type="button" onClick={() => void carregarPromo()} className="mx-auto block min-h-10 rounded-lg border border-white/10 px-4 text-xs font-semibold text-zinc-200 transition-colors hover:bg-white/[.05] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300">Tentar novamente</button>
+        <button type="button" onClick={() => void carregarPromo()} className="mx-auto block min-h-10 rounded-lg border border-white/10 px-4 text-xs font-semibold text-slate-200 transition-colors hover:bg-white/[.05] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300">Tentar novamente</button>
         {onReturnToCampaigns
           ? <button type="button" onClick={onReturnToCampaigns} className="text-xs font-semibold text-sky-200 underline underline-offset-4">Voltar às campanhas</button>
           : <Link href="/admin" className="text-xs font-semibold text-sky-300 underline underline-offset-4">Voltar ao painel</Link>}
@@ -92,11 +92,11 @@ export default function PromotionManagementWorkspace({
           className="mb-8"
         >
           {onReturnToCampaigns
-            ? <button type="button" onClick={onReturnToCampaigns} className="mb-5 inline-flex min-h-10 items-center gap-1.5 text-[11px] font-mono uppercase tracking-wider text-zinc-400 transition-colors hover:text-sky-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300">
+            ? <button type="button" onClick={onReturnToCampaigns} className="mb-5 inline-flex min-h-10 items-center gap-1.5 text-[11px] font-mono uppercase tracking-wider text-slate-400 transition-colors hover:text-sky-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300">
                 <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" /></svg>
                 Voltar às campanhas
               </button>
-            : <Link href="/admin" className="mb-5 inline-flex min-h-10 items-center gap-1.5 text-[11px] font-mono uppercase tracking-wider text-zinc-500 transition-colors hover:text-sky-400">
+            : <Link href="/admin" className="mb-5 inline-flex min-h-10 items-center gap-1.5 text-[11px] font-mono uppercase tracking-wider text-slate-400 transition-colors hover:text-sky-400">
                 <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" /></svg>
                 Voltar ao painel
               </Link>}
@@ -104,7 +104,7 @@ export default function PromotionManagementWorkspace({
           {createdInWizard && (
             <section role="status" className="mb-5 rounded-xl border border-sky-300/20 bg-sky-300/[.06] px-4 py-3">
               <h2 className="text-sm font-black text-sky-100">Rascunho criado. Continue por aqui.</h2>
-              <p className="mt-1 text-xs leading-5 text-zinc-300">Revise os detalhes, importe a planilha e ative a campanha quando estiver pronta. Esta etapa continua no fluxo novo.</p>
+              <p className="mt-1 text-xs leading-5 text-slate-300">Revise os detalhes, importe a planilha e ative a campanha quando estiver pronta. Esta etapa continua no fluxo novo.</p>
             </section>
           )}
 
@@ -114,16 +114,16 @@ export default function PromotionManagementWorkspace({
                 <h1 className="text-xl font-black tracking-tight text-white md:text-2xl">{promo.nome}</h1>
                 <StatusBadge status={promo.status} />
               </div>
-              <div className="flex flex-wrap items-center gap-3 text-[10px] font-mono text-zinc-400">
+              <div className="flex flex-wrap items-center gap-3 text-[10px] font-mono text-slate-400">
                 {promo.cidade && (
                   <span className="flex items-center gap-1 text-sky-300">
                     <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                     {promo.cidade}
                   </span>
                 )}
-                <span aria-hidden="true" className="text-zinc-600">·</span>
+                <span aria-hidden="true" className="text-slate-600">·</span>
                 <span>ID {promo.id.slice(0, 8)}</span>
-                <span aria-hidden="true" className="text-zinc-600">·</span>
+                <span aria-hidden="true" className="text-slate-600">·</span>
                 <span>/{promo.slug}</span>
               </div>
             </div>
@@ -171,9 +171,9 @@ export default function PromotionManagementWorkspace({
             <StatsOverview stats={stats} />
             <ExcelImportZone promocaoId={promo.id} onUploadSuccess={carregarPromo} />
 
-            <section className="space-y-3 rounded-xl border border-rose-300/20 bg-[#0b1a2d] p-4">
+            <section className="space-y-3 rounded-xl border border-rose-300/20 bg-[#0d2035] p-4">
               <h2 className="text-[11px] font-bold uppercase tracking-wider text-rose-200">Ações de risco</h2>
-              <p className="text-xs leading-5 text-zinc-400">A limpeza remove os dados importados. A exclusão remove a campanha e os dados associados.</p>
+              <p className="text-xs leading-5 text-slate-400">A limpeza remove os dados importados. A exclusão remove a campanha e os dados associados.</p>
               <div className="space-y-2">
                 <button type="button" onClick={() => void handleClearData()} onBlur={() => setConfirmClearData(false)} disabled={clearingData} className="min-h-10 w-full rounded-lg border border-rose-300/20 px-3 py-2 text-left text-[11px] font-bold text-rose-200 transition-colors hover:bg-rose-300/10 disabled:opacity-60">
                   {clearingData ? 'Limpando…' : confirmClearData ? 'Clique novamente para limpar os dados' : 'Limpar dados da planilha'}

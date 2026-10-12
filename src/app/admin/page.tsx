@@ -168,10 +168,10 @@ export default function AdminPage() {
 
   if (session.status === 'checking') {
     return (
-      <main className="flex min-h-[60vh] items-center justify-center bg-[#06101e] text-center">
+      <main className="flex min-h-[60vh] items-center justify-center bg-[#071322] text-center">
         <div>
           <span className="mx-auto block h-5 w-5 animate-spin rounded-full border-2 border-sky-300/25 border-t-sky-300" aria-hidden="true" />
-          <p className="mt-3 text-sm text-zinc-400">Verificando acesso administrativo…</p>
+          <p className="mt-3 text-sm text-slate-400">Verificando acesso administrativo…</p>
         </div>
       </main>
     )
@@ -179,11 +179,11 @@ export default function AdminPage() {
 
   if (session.status === 'unavailable') {
     return (
-      <main className="flex min-h-[60vh] items-center justify-center bg-[#06101e] px-5 text-center text-white">
-        <section className="max-w-md rounded-2xl border border-rose-300/20 bg-[#0b1b2c] p-6 shadow-xl">
+      <main className="flex min-h-[60vh] items-center justify-center bg-[#071322] px-5 text-center text-white">
+        <section className="max-w-md rounded-2xl border border-rose-300/20 bg-[#0d2035] p-6 shadow-xl">
           <p className="text-lg font-black text-rose-200">Não foi possível verificar o acesso</p>
-          <p role="alert" className="mt-2 text-sm leading-6 text-zinc-400">O serviço de sessão está temporariamente indisponível. Sua sessão não foi encerrada; tente verificar novamente.</p>
-          <button type="button" onClick={() => void retrySession()} disabled={retrying} className="mt-5 min-h-11 rounded-lg bg-sky-300 px-4 text-sm font-black text-zinc-950 transition-colors hover:bg-sky-200 disabled:cursor-wait disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white">
+          <p role="alert" className="mt-2 text-sm leading-6 text-slate-400">O serviço de sessão está temporariamente indisponível. Sua sessão não foi encerrada; tente verificar novamente.</p>
+          <button type="button" onClick={() => void retrySession()} disabled={retrying} className="mt-5 min-h-11 rounded-lg bg-sky-300 px-4 text-sm font-black text-slate-950 transition-colors hover:bg-sky-200 disabled:cursor-wait disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white">
             {retrying ? 'Verificando…' : 'Tentar novamente'}
           </button>
         </section>
@@ -199,7 +199,7 @@ export default function AdminPage() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="min-h-screen pb-16 relative overflow-hidden bg-[#06101e]"
+      className="min-h-screen pb-16 relative overflow-hidden bg-[#071322]"
     >
       <div className="tech-grid opacity-30 pointer-events-none"></div>
       <div className="absolute top-0 inset-x-0 h-[300px] bg-gradient-to-b from-sky-500/5 to-transparent pointer-events-none"></div>
@@ -217,7 +217,7 @@ export default function AdminPage() {
               Acesso Mestre Ativo
             </div>
             <h1 className="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">Painel Administrativo</h1>
-            <p className="text-zinc-400 text-sm md:text-base">Gerenciamento central de promoções e relatórios. Bem-vindo, <span className="text-white font-medium">{session.name}</span>.</p>
+            <p className="text-slate-400 text-sm md:text-base">Gerenciamento central de promoções e relatórios. Bem-vindo, <span className="text-white font-medium">{session.name}</span>.</p>
           </div>
 
           <div className="flex flex-wrap justify-center md:justify-end gap-3 w-full md:w-auto">
@@ -225,7 +225,7 @@ export default function AdminPage() {
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
               onClick={handleLogout}
-              className="bg-zinc-900 hover:bg-red-950/40 text-zinc-400 hover:text-red-400 border border-white/[0.04] hover:border-red-500/30 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all"
+              className="bg-slate-900 hover:bg-red-950/40 text-slate-400 hover:text-red-400 border border-white/[0.04] hover:border-red-500/30 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all"
               aria-label="Encerrar sessão"
             >
               Encerrar Sessão
@@ -246,7 +246,7 @@ export default function AdminPage() {
         <motion.div variants={itemVariants} id="promocoes" className="mb-8">
           <div className="mb-4">
             <h2 className="text-xl font-bold text-white">Gestão de Promoções</h2>
-            <p className="mt-1 text-xs text-zinc-400">Crie campanhas, ajuste regras e confira os prazos de publicação.</p>
+            <p className="mt-1 text-xs text-slate-400">Crie campanhas, ajuste regras e confira os prazos de publicação.</p>
           </div>
           <AdminPromoList promocoes={promocoes} loading={loading} onReorder={handleReorder} elitePromoId={elitePromoId} />
         </motion.div>
@@ -258,7 +258,7 @@ export default function AdminPage() {
         <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
           <motion.div
             whileHover={{ scale: 1.02 }}
-            className="obsidian-card p-6 rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-[#081725] to-cyan-950/20 relative overflow-hidden group flex items-center justify-between transition-all hover:border-cyan-500/40"
+            className="obsidian-card p-6 rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-[#0a1e32] to-cyan-950/20 relative overflow-hidden group flex items-center justify-between transition-all hover:border-cyan-500/40"
           >
             <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-cyan-500/10 blur-[30px] rounded-full group-hover:bg-cyan-500/20 transition-colors"></div>
             <div className="relative z-10">
@@ -277,7 +277,7 @@ export default function AdminPage() {
 
           <motion.div
             whileHover={{ scale: 1.02 }}
-            className="obsidian-card p-6 rounded-2xl border border-sky-500/20 bg-gradient-to-br from-[#081725] to-sky-950/20 relative overflow-hidden group flex items-center justify-between transition-all hover:border-sky-500/40"
+            className="obsidian-card p-6 rounded-2xl border border-sky-500/20 bg-gradient-to-br from-[#0a1e32] to-sky-950/20 relative overflow-hidden group flex items-center justify-between transition-all hover:border-sky-500/40"
           >
             <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-sky-500/10 blur-[30px] rounded-full group-hover:bg-sky-500/20 transition-colors"></div>
             <div className="relative z-10">

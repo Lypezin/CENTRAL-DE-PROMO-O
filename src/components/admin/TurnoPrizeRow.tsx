@@ -35,14 +35,14 @@ export default function TurnoPrizeRow({
   const fieldIdPrefix = idPrefix ?? `turno-prize-${idx}`
 
   return (
-    <div className="flex flex-wrap items-center gap-2 bg-[#0a1829] border border-white/[0.04] p-2.5 rounded-lg">
+    <div className="flex flex-wrap items-center gap-2 bg-[#0a1e32] border border-white/[0.04] p-2.5 rounded-lg">
       {/* Type */}
       <select
         id={`${fieldIdPrefix}-type`}
         aria-label={`Tipo de faixa de premiação do item ${idx + 1}`}
         value={isSingle ? 'single' : 'range'}
         onChange={e => onUpdate(idx, 'tipo', e.target.value)}
-        className="min-h-11 bg-[#0b1a2d] border border-white/[0.06] rounded-md text-xs text-zinc-200 px-3 py-1.5 focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-400"
+        className="min-h-11 bg-[#0d2035] border border-white/[0.06] rounded-md text-xs text-slate-200 px-3 py-1.5 focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-400"
       >
         <option value="single">Único</option>
         <option value="range">Faixa</option>
@@ -57,10 +57,10 @@ export default function TurnoPrizeRow({
             type="number"
             value={premio.posicao ?? 1}
             onChange={e => onUpdate(idx, 'posicao', e.target.value)}
-            className="min-h-11 w-14 bg-[#0b1a2d] border border-white/[0.06] rounded-md text-sm text-center text-white px-1 py-1.5 focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-400"
+            className="min-h-11 w-14 bg-[#0d2035] border border-white/[0.06] rounded-md text-sm text-center text-white px-1 py-1.5 focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-400"
             min="1"
           />
-          <span className="text-[10px] text-zinc-500">º</span>
+          <span className="text-[10px] text-slate-400">º</span>
         </div>
       ) : (
         <div className="flex items-center gap-1">
@@ -70,34 +70,34 @@ export default function TurnoPrizeRow({
             type="number"
             value={premio.posicao_inicio ?? 3}
             onChange={e => onUpdate(idx, 'posicao_inicio', e.target.value)}
-            className="min-h-11 w-14 bg-[#0b1a2d] border border-white/[0.06] rounded-md text-sm text-center text-white px-1 py-1.5 focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-400"
+            className="min-h-11 w-14 bg-[#0d2035] border border-white/[0.06] rounded-md text-sm text-center text-white px-1 py-1.5 focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-400"
             min="1"
           />
-          <span className="text-[10px] text-zinc-500">a</span>
+          <span className="text-[10px] text-slate-400">a</span>
           <input
             id={`${fieldIdPrefix}-position-end`}
             aria-label={`Posição final da faixa de prêmios ${idx + 1}`}
             type="number"
             value={premio.posicao_fim ?? 5}
             onChange={e => onUpdate(idx, 'posicao_fim', e.target.value)}
-            className="min-h-11 w-14 bg-[#0b1a2d] border border-white/[0.06] rounded-md text-sm text-center text-white px-1 py-1.5 focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-400"
+            className="min-h-11 w-14 bg-[#0d2035] border border-white/[0.06] rounded-md text-sm text-center text-white px-1 py-1.5 focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-400"
             min="1"
           />
-          <span className="text-[10px] text-zinc-500">º</span>
+          <span className="text-[10px] text-slate-400">º</span>
         </div>
       )}
 
       {/* Value */}
       {!hideValue && (
         <div className="flex items-center gap-1 ml-auto sm:ml-0">
-          <span className="text-[9px] text-zinc-600 font-mono">R$</span>
+          <span className="text-[9px] text-slate-600 font-mono">R$</span>
           <input
             id={`${fieldIdPrefix}-value`}
             aria-label={`Valor do prêmio ${idx + 1} em reais`}
             type="number"
             value={premio.valor ?? 0}
             onChange={e => onUpdate(idx, 'valor', e.target.value)}
-            className="min-h-11 w-24 bg-[#0b1a2d] border border-white/[0.06] rounded-md text-sm text-white px-2 py-1.5 focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-400"
+            className="min-h-11 w-24 bg-[#0d2035] border border-white/[0.06] rounded-md text-sm text-white px-2 py-1.5 focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-400"
             min="0"
           />
         </div>
@@ -111,7 +111,7 @@ export default function TurnoPrizeRow({
         value={premio.descricao || ''}
         onChange={e => onUpdate(idx, 'descricao', e.target.value)}
         placeholder="Descrição"
-        className="min-h-11 flex-1 min-w-[100px] bg-[#0b1a2d] border border-white/[0.06] rounded-md text-sm text-zinc-200 px-3 py-1.5 focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-400 placeholder:text-zinc-500"
+        className="min-h-11 flex-1 min-w-[100px] bg-[#0d2035] border border-white/[0.06] rounded-md text-sm text-slate-200 px-3 py-1.5 focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-400 placeholder:text-slate-400"
       />
 
       {/* Actions */}
@@ -120,7 +120,7 @@ export default function TurnoPrizeRow({
           type="button"
           onClick={() => onMoveUp?.(idx)}
           disabled={isFirst}
-          className={`grid min-h-11 min-w-11 place-items-center rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 ${isFirst ? 'text-zinc-700' : 'text-zinc-300 hover:text-white hover:bg-white/5'}`}
+          className={`grid min-h-11 min-w-11 place-items-center rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 ${isFirst ? 'text-slate-700' : 'text-slate-300 hover:text-white hover:bg-white/5'}`}
           aria-label={`Mover prêmio ${idx + 1} para cima`}
         >
           <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 15l7-7 7 7" /></svg>
@@ -129,7 +129,7 @@ export default function TurnoPrizeRow({
           type="button"
           onClick={() => onMoveDown?.(idx)}
           disabled={isLast}
-          className={`grid min-h-11 min-w-11 place-items-center rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 ${isLast ? 'text-zinc-700' : 'text-zinc-300 hover:text-white hover:bg-white/5'}`}
+          className={`grid min-h-11 min-w-11 place-items-center rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 ${isLast ? 'text-slate-700' : 'text-slate-300 hover:text-white hover:bg-white/5'}`}
           aria-label={`Mover prêmio ${idx + 1} para baixo`}
         >
           <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
@@ -137,7 +137,7 @@ export default function TurnoPrizeRow({
         <button
           type="button"
           onClick={() => onRemove(idx)}
-          className="ml-0.5 grid min-h-11 min-w-11 place-items-center rounded-lg text-zinc-300 transition-colors hover:text-red-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
+          className="ml-0.5 grid min-h-11 min-w-11 place-items-center rounded-lg text-slate-300 transition-colors hover:text-red-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
           aria-label={`Remover prêmio ${idx + 1}`}
         >
           <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>

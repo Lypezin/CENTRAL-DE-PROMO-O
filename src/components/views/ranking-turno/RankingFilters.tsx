@@ -36,16 +36,16 @@ function RankingFiltersComponent({
           placeholder={isMetas || isNiveis ? "Pesquise seu nome para ver seu progresso..." : "Buscar entregador por nome..."}
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
-          className="w-full bg-[#0b1a2d] border border-white/[0.04] focus:border-sky-500/80 rounded-xl py-2.5 pl-10 pr-10 text-xs text-white focus:outline-none focus:ring-1 focus:ring-sky-500/40 transition-all placeholder-zinc-600 font-sans shadow-lg shadow-black/40"
+          className="w-full bg-[#0d2035] border border-white/[0.04] focus:border-sky-500/80 rounded-xl py-2.5 pl-10 pr-10 text-xs text-white focus:outline-none focus:ring-1 focus:ring-sky-500/40 transition-all placeholder-slate-400 font-sans shadow-lg shadow-black/40"
         />
-        <svg className="w-4 h-4 text-zinc-600 group-focus-within:text-sky-400 absolute left-3.5 top-3 transition-colors duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="w-4 h-4 text-slate-600 group-focus-within:text-sky-400 absolute left-3.5 top-3 transition-colors duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
         {searchQuery && (
           <button
             type="button"
             onClick={() => setSearchQuery('')}
-            className="absolute right-3 top-2.5 text-zinc-500 hover:text-white p-0.5 rounded-full hover:bg-white/5 transition-all active:scale-90"
+            className="absolute right-3 top-2.5 text-slate-400 hover:text-white p-0.5 rounded-full hover:bg-white/5 transition-all active:scale-90"
             aria-label="Limpar busca"
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -57,7 +57,7 @@ function RankingFiltersComponent({
 
       {/* Shift selector (Segmented Tray UI - Premium Apple Style) */}
       {!isGeral && (
-        <div role="group" aria-label="Filtrar ranking por turno" className="flex flex-nowrap bg-[#050508]/80 sm:bg-zinc-950/80 p-1 rounded-xl sm:border border-white/[0.04] sm:border-zinc-900 w-[calc(100%+16px)] -mx-2 sm:mx-0 sm:w-auto overflow-x-auto overflow-y-hidden snap-x snap-mandatory shrink-0 scrollbar-none gap-1 shadow-inner">
+        <div role="group" aria-label="Filtrar ranking por turno" className="flex flex-nowrap bg-[#050508]/80 sm:bg-slate-950/80 p-1 rounded-xl sm:border border-white/[0.04] sm:border-slate-900 w-[calc(100%+16px)] -mx-2 sm:mx-0 sm:w-auto overflow-x-auto overflow-y-hidden snap-x snap-mandatory shrink-0 scrollbar-none gap-1 shadow-inner">
           {turnosDisponiveis.map(turno => {
             const display = turnoDisplay[turno]
             const isSelected = filtroAtivo === turno
@@ -69,8 +69,8 @@ function RankingFiltersComponent({
                 onClick={() => setFiltroAtivo(turno)}
                 className={`snap-center flex-grow md:flex-initial px-5 py-3 sm:py-2 min-h-[44px] rounded-lg text-xs font-black uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-2 active:scale-95 cursor-pointer whitespace-nowrap ${
                   isSelected
-                    ? 'bg-zinc-900 text-white shadow-md border border-white/[0.04]'
-                    : 'text-zinc-500 hover:text-zinc-300'
+                    ? 'bg-slate-900 text-white shadow-md border border-white/[0.04]'
+                    : 'text-slate-400 hover:text-slate-300'
                 }`}
               >
                 <span className={`transition-transform duration-300 ${isSelected ? 'scale-110' : 'opacity-70'}`}>

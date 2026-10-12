@@ -14,7 +14,7 @@ function StaticThemeBackground({ theme }: { theme: SiteTheme }) {
     : 'radial-gradient(ellipse at 76% 8%, rgba(6,182,212,0.12), transparent 68%)'
 
   return (
-    <div className="fixed inset-0 z-[-2] pointer-events-none overflow-hidden bg-[#06101e]">
+    <div className="fixed inset-0 z-[-2] pointer-events-none overflow-hidden bg-[#071322]">
       <div className="absolute inset-0 opacity-40" style={{ background: gradient }} />
     </div>
   )

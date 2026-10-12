@@ -129,7 +129,7 @@ export default function AdminPromoList({ promocoes, loading, onReorder, elitePro
   return (
     <>
       <div className="relative mb-5">
-        <svg className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
         <input
@@ -137,13 +137,13 @@ export default function AdminPromoList({ promocoes, loading, onReorder, elitePro
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Buscar promocao por nome, cidade ou slug..."
-          className="w-full rounded-xl border border-white/10 bg-[#0a1829] py-2.5 pl-10 pr-4 text-sm text-white placeholder-zinc-500 transition-all focus:border-sky-500/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1829]"
+          className="w-full rounded-xl border border-white/10 bg-[#0a1e32] py-2.5 pl-10 pr-4 text-sm text-white placeholder-slate-500 transition-all focus:border-sky-500/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1e32]"
           aria-label="Buscar promocoes"
         />
         {searchQuery && (
           <button
             onClick={() => setSearchQuery('')}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 transition-colors hover:text-zinc-300"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition-colors hover:text-slate-300"
             aria-label="Limpar busca"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -155,8 +155,8 @@ export default function AdminPromoList({ promocoes, loading, onReorder, elitePro
 
       {filteredPromocoes.length === 0 && searchQuery && (
         <div className="glass rounded-2xl border border-white/10 p-8 text-center">
-          <p className="text-sm text-zinc-500">
-            Nenhuma promoção encontrada para <span className="font-medium text-zinc-300">&ldquo;{searchQuery}&rdquo;</span>
+          <p className="text-sm text-slate-400">
+            Nenhuma promoção encontrada para <span className="font-medium text-slate-300">&ldquo;{searchQuery}&rdquo;</span>
           </p>
         </div>
       )}
@@ -173,22 +173,22 @@ export default function AdminPromoList({ promocoes, loading, onReorder, elitePro
             </div>
 
             <h3 className="mb-1 text-lg font-black leading-tight text-white transition-colors group-hover:text-blue-200">Consulta ELITE</h3>
-            <p className="mb-4 font-mono text-xs text-zinc-500 opacity-70">{elitePromoId ? `/admin/promo/${elitePromoId}` : '/admin/elite'}</p>
+            <p className="mb-4 font-mono text-xs text-slate-400 opacity-70">{elitePromoId ? `/admin/promo/${elitePromoId}` : '/admin/elite'}</p>
 
-            <p className="mb-5 text-sm leading-relaxed text-zinc-400">
+            <p className="mb-5 text-sm leading-relaxed text-slate-400">
               Abrir a base do ELITE para importar planilha e consultar dados. O layout e os textos ficam em uma tela separada.
             </p>
 
             <div className="mt-auto flex items-center justify-between border-t border-white/[0.04] pt-4">
               <div className="flex flex-col">
-                <span className="mb-1 text-[9px] font-bold uppercase tracking-wider text-zinc-600">Tipo</span>
-                <span className="font-mono text-xs text-zinc-400">{elitePromoId ? 'Base com planilha' : 'Configuracao fixa'}</span>
+                <span className="mb-1 text-[9px] font-bold uppercase tracking-wider text-slate-600">Tipo</span>
+                <span className="font-mono text-xs text-slate-400">{elitePromoId ? 'Base com planilha' : 'Configuracao fixa'}</span>
               </div>
 
               <div className="flex items-center gap-2">
                 <Link
                   href="/admin/elite"
-                  className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-[11px] font-bold text-zinc-200 transition-all hover:border-blue-400/40 hover:text-white"
+                  className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-slate-900 px-3 py-2 text-[11px] font-bold text-slate-200 transition-all hover:border-blue-400/40 hover:text-white"
                 >
                   Layout
                 </Link>
@@ -221,7 +221,7 @@ export default function AdminPromoList({ promocoes, loading, onReorder, elitePro
               <div className="h-1.5 w-8 rounded-full bg-white/20"></div>
             </div>
 
-            <div className="h-1 w-full bg-gradient-to-r from-zinc-800 to-zinc-700 transition-all duration-500 group-hover:from-sky-500 group-hover:to-indigo-500"></div>
+            <div className="h-1 w-full bg-gradient-to-r from-slate-800 to-slate-700 transition-all duration-500 group-hover:from-sky-500 group-hover:to-indigo-500"></div>
 
             <div className="flex flex-grow flex-col p-5">
               <div className="mb-4 flex items-start justify-between">
@@ -234,7 +234,7 @@ export default function AdminPromoList({ promocoes, loading, onReorder, elitePro
               </div>
 
               <h3 className="mb-1 text-lg font-black leading-tight text-white transition-colors group-hover:text-sky-300">{promo.nome}</h3>
-              <p className="mb-4 break-all font-mono text-xs text-zinc-500 opacity-70">/{promo.slug}</p>
+              <p className="mb-4 break-all font-mono text-xs text-slate-400 opacity-70">/{promo.slug}</p>
 
               {promo.status === 'ativa' && isDeadlinePast(promo.data_fim) && promo.data_fim && (
                 <div
@@ -254,8 +254,8 @@ export default function AdminPromoList({ promocoes, loading, onReorder, elitePro
 
               <div className="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-white/[0.04] pt-4">
                 <div className="flex flex-col">
-                  <span className="mb-1 text-[9px] font-bold uppercase tracking-wider text-zinc-600">Periodo</span>
-                  <span className="font-mono text-xs text-zinc-400">
+                  <span className="mb-1 text-[9px] font-bold uppercase tracking-wider text-slate-600">Periodo</span>
+                  <span className="font-mono text-xs text-slate-400">
                     {promo.data_inicio ? new Date(promo.data_inicio).toLocaleDateString('pt-BR') : '-'} ate{' '}
                     {promo.data_fim ? new Date(promo.data_fim).toLocaleDateString('pt-BR') : '-'}
                   </span>
@@ -268,18 +268,18 @@ export default function AdminPromoList({ promocoes, loading, onReorder, elitePro
                       onClick={() => handleMove(promo.id, -1)}
                       disabled={promocoes.findIndex((item) => item.id === promo.id) === 0}
                       aria-label={`Mover ${promo.nome} para cima`}
-                      className="grid min-h-11 min-w-11 place-items-center rounded-lg border border-white/10 bg-zinc-900 text-zinc-300 hover:border-sky-500/40 hover:text-white disabled:cursor-not-allowed disabled:opacity-35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+                      className="grid min-h-11 min-w-11 place-items-center rounded-lg border border-white/10 bg-slate-900 text-slate-300 hover:border-sky-500/40 hover:text-white disabled:cursor-not-allowed disabled:opacity-35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
                     >↑</button>
                     <button
                       type="button"
                       onClick={() => handleMove(promo.id, 1)}
                       disabled={promocoes.findIndex((item) => item.id === promo.id) === promocoes.length - 1}
                       aria-label={`Mover ${promo.nome} para baixo`}
-                      className="grid min-h-11 min-w-11 place-items-center rounded-lg border border-white/10 bg-zinc-900 text-zinc-300 hover:border-sky-500/40 hover:text-white disabled:cursor-not-allowed disabled:opacity-35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+                      className="grid min-h-11 min-w-11 place-items-center rounded-lg border border-white/10 bg-slate-900 text-slate-300 hover:border-sky-500/40 hover:text-white disabled:cursor-not-allowed disabled:opacity-35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
                     >↓</button>
                   </div>
                   <Tooltip content="Gerenciar promoção">
-                  <Link href={`/admin/promo/${promo.id}`} className="flex min-h-11 items-center gap-1.5 rounded-lg border border-white/5 bg-zinc-900 px-4 py-2 text-xs font-bold text-zinc-300 transition-all hover:border-sky-500/50 hover:bg-sky-600 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400">
+                  <Link href={`/admin/promo/${promo.id}`} className="flex min-h-11 items-center gap-1.5 rounded-lg border border-white/5 bg-slate-900 px-4 py-2 text-xs font-bold text-slate-300 transition-all hover:border-sky-500/50 hover:bg-sky-600 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400">
                     Gerenciar
                     <svg className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
@@ -296,7 +296,7 @@ export default function AdminPromoList({ promocoes, loading, onReorder, elitePro
       {promocoes.length === 0 && (
         <div className="glass mt-5 rounded-2xl border border-white/10 p-8 text-center">
           <h3 className="mb-2 text-lg font-bold text-white">Nenhuma promocao cadastrada</h3>
-          <p className="text-sm text-zinc-500">O card fixo do ELITE continua disponivel acima para configuracao.</p>
+          <p className="text-sm text-slate-400">O card fixo do ELITE continua disponivel acima para configuracao.</p>
         </div>
       )}
     </>

@@ -46,7 +46,7 @@ function RankingMetasComponent({
         <div className="space-y-3">
           <h3 className="text-[10px] font-bold text-sky-400 uppercase tracking-wider font-mono pl-1">Resultado da Busca</h3>
           {filteredRanking.length === 0 ? (
-            <p className="text-xs text-zinc-500 pl-1 font-mono">Nenhum entregador encontrado com este nome.</p>
+            <p className="text-xs text-slate-400 pl-1 font-mono">Nenhum entregador encontrado com este nome.</p>
           ) : (
             filteredRanking.map(item => {
               const score = getScore(item)
@@ -56,18 +56,18 @@ function RankingMetasComponent({
               return (
                 <div
                   key={item.id_da_pessoa_entregadora}
-                  className="bg-[#0b1a2d] border border-white/[0.04] p-5 rounded-2xl space-y-4 shadow-xl hover:border-white/[0.08] transition-all duration-300"
+                  className="bg-[#0d2035] border border-white/[0.04] p-5 rounded-2xl space-y-4 shadow-xl hover:border-white/[0.08] transition-all duration-300"
                 >
                   <div className="flex justify-between items-start">
                     <div>
                       <h4 className="font-extrabold text-white text-sm md:text-base tracking-tight">{item.pessoa_entregadora}</h4>
-                      {!isCopa && <p className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider mt-0.5 font-mono">📍 {item.praca}</p>}
+                      {!isCopa && <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5 font-mono">📍 {item.praca}</p>}
                     </div>
                     <div className="text-right">
-                      <div className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider mb-0.5 font-mono">Progresso</div>
+                      <div className="text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-0.5 font-mono">Progresso</div>
                       <div className="text-sm font-bold text-white font-mono">
                         {formatScoreValue(score)}{' '}
-                        <span className="text-zinc-600 text-xs font-normal">/ {formatScoreValue(target)}</span>
+                        <span className="text-slate-600 text-xs font-normal">/ {formatScoreValue(target)}</span>
                       </div>
                     </div>
                   </div>
@@ -84,7 +84,7 @@ function RankingMetasComponent({
                         style={{ width: `${pct}%` }}
                       ></div>
                     </div>
-                    <div className="flex justify-between text-[8px] text-zinc-500 font-bold uppercase tracking-wider font-mono">
+                    <div className="flex justify-between text-[8px] text-slate-400 font-bold uppercase tracking-wider font-mono">
                       <span>0%</span>
                       <span className={atingido ? 'text-cyan-400' : 'text-sky-400'}>{pct.toFixed(0)}% concluído</span>
                       <span>100%</span>
@@ -102,9 +102,9 @@ function RankingMetasComponent({
                       </div>
                     )}
 
-                    <div className="text-[10px] text-zinc-400 font-mono">
+                    <div className="text-[10px] text-slate-400 font-mono">
                       Prêmio Garantido:{' '}
-                      <strong className={atingido ? 'text-cyan-400 font-extrabold' : 'text-zinc-600'}>
+                      <strong className={atingido ? 'text-cyan-400 font-extrabold' : 'text-slate-600'}>
                         {formatCurrency(prize)}
                       </strong>
                     </div>
@@ -115,7 +115,7 @@ function RankingMetasComponent({
           )}
         </div>
       ) : (
-        <div className="text-center py-8 text-xs text-zinc-500 font-mono bg-zinc-950/20 border border-white/[0.02] rounded-2xl p-4">
+        <div className="text-center py-8 text-xs text-slate-400 font-mono bg-slate-950/20 border border-white/[0.02] rounded-2xl p-4">
           💡 Digite seu nome no campo de busca acima para acompanhar seu progresso e ver seu prêmio!
         </div>
       )}
@@ -128,7 +128,7 @@ function RankingMetasComponent({
         </h3>
 
         {winners.length === 0 ? (
-          <p className="text-xs text-zinc-600 pl-1 italic font-sans">
+          <p className="text-xs text-slate-600 pl-1 italic font-sans">
             Ninguém atingiu o objetivo desta semana ainda. Seja o primeiro!
           </p>
         ) : (
@@ -143,7 +143,7 @@ function RankingMetasComponent({
                 </div>
                 <div className="truncate">
                   <div className="font-bold text-white text-xs truncate">{item.pessoa_entregadora}</div>
-                  <div className="text-[9px] text-zinc-500 uppercase tracking-wider font-mono mt-0.5">
+                  <div className="text-[9px] text-slate-400 uppercase tracking-wider font-mono mt-0.5">
                     {!isCopa && `📍 ${item.praca} • `}{formatScoreValue(getScore(item))}
                   </div>
                 </div>

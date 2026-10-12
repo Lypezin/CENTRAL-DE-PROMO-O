@@ -203,10 +203,10 @@ export default function TurnoPrizesConfigurator({
   const isGeral = promo.config_regras?.mecanica?.agrupamento === 'geral'
 
   return (
-    <div className="rounded-xl border border-white/[0.04] bg-[#0b1a2d] p-5 space-y-4">
+    <div className="rounded-xl border border-white/[0.04] bg-[#0d2035] p-5 space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-xs font-bold text-zinc-400 uppercase tracking-wider font-mono flex items-center gap-2">
+        <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider font-mono flex items-center gap-2">
           <svg className="w-3.5 h-3.5 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
           Prêmios & Turnos
         </h2>
@@ -215,7 +215,7 @@ export default function TurnoPrizesConfigurator({
       {/* Turno toggles */}
       {!isGeral && (
         <div className="space-y-2">
-          <p className="text-[10px] text-zinc-500 font-mono uppercase tracking-wider">Turnos ativos</p>
+          <p className="text-[10px] text-slate-400 font-mono uppercase tracking-wider">Turnos ativos</p>
           <div role="group" aria-label="Ativar ou desativar turnos" className="flex flex-wrap gap-1.5">
             {TURNOS.map(t => {
               const isChecked = activeTurnos.includes(t.key)
@@ -228,11 +228,11 @@ export default function TurnoPrizesConfigurator({
                   className={`flex min-h-11 items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 ${
                     isChecked
                       ? 'bg-sky-500/10 border-sky-500/30 text-white'
-                      : 'border-white/[0.04] text-zinc-500 hover:text-zinc-300 hover:border-white/10'
+                      : 'border-white/[0.04] text-slate-400 hover:text-slate-300 hover:border-white/10'
                   }`}
                 >
                   <div aria-hidden="true" className={`w-2.5 h-2.5 rounded-sm border flex items-center justify-center transition-all ${
-                    isChecked ? 'bg-sky-500 border-sky-400' : 'border-zinc-600'
+                    isChecked ? 'bg-sky-500 border-sky-400' : 'border-slate-600'
                   }`}>
                     {isChecked && (
                       <svg className="w-1.5 h-1.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M5 13l4 4L19 7" /></svg>
@@ -248,7 +248,7 @@ export default function TurnoPrizesConfigurator({
       )}
 
       {/* Tab selector */}
-      <div role="group" aria-label="Selecionar turno para editar prêmios" className="flex bg-[#0a1829] p-0.5 rounded-lg border border-white/[0.04] gap-0.5 overflow-x-auto scrollbar-none">
+      <div role="group" aria-label="Selecionar turno para editar prêmios" className="flex bg-[#0a1e32] p-0.5 rounded-lg border border-white/[0.04] gap-0.5 overflow-x-auto scrollbar-none">
         {isGeral ? (
           <span className="inline-flex min-h-11 items-center rounded-md bg-sky-600 px-3 py-1.5 text-xs font-bold text-white">
             Geral
@@ -263,7 +263,7 @@ export default function TurnoPrizesConfigurator({
               className={`flex min-h-11 flex-1 min-w-[80px] items-center justify-center px-2.5 py-1.5 rounded-md text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 ${
                 turnoEditorAtivo === t.key
                   ? 'bg-sky-600 text-white'
-                  : 'text-zinc-500 hover:text-white hover:bg-white/5'
+                  : 'text-slate-400 hover:text-white hover:bg-white/5'
               }`}
             >
               <span aria-hidden="true" className="hidden sm:inline">{t.emoji}</span> {t.label}
@@ -273,8 +273,8 @@ export default function TurnoPrizesConfigurator({
       </div>
 
       {/* Eligibility rule */}
-      <div className="bg-[#0a1829] border border-white/[0.04] rounded-lg p-3 space-y-2">
-        <label htmlFor="turno-minimo" className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono">
+      <div className="bg-[#0a1e32] border border-white/[0.04] rounded-lg p-3 space-y-2">
+        <label htmlFor="turno-minimo" className="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono">
           Mínimo de corridas no turno
         </label>
         <div className="flex items-center gap-3">
@@ -283,17 +283,17 @@ export default function TurnoPrizesConfigurator({
             type="number"
             value={turnoConfigObj.minimo_corridas ?? 0}
             onChange={e => handleUpdateMinimo(Number(e.target.value))}
-            className="admin-input !py-2 !px-3 w-24 bg-[#0b1a2d]"
+            className="admin-input !py-2 !px-3 w-24 bg-[#0d2035]"
             min="0"
           />
-          <span className="text-[10px] text-zinc-500">corridas para ser elegível. Defina 0 para sem meta.</span>
+          <span className="text-[10px] text-slate-400">corridas para ser elegível. Defina 0 para sem meta.</span>
         </div>
       </div>
 
       {/* Prizes */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono">Prêmios por posição</h3>
+          <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono">Prêmios por posição</h3>
           <button
             type="button"
             onClick={handleAddPremioRow}
@@ -323,7 +323,7 @@ export default function TurnoPrizesConfigurator({
           })}
 
           {(!turnoConfigObj.premios || turnoConfigObj.premios.length === 0) && (
-            <div className="text-center py-4 text-[11px] text-zinc-500">
+            <div className="text-center py-4 text-[11px] text-slate-400">
               Nenhum prêmio cadastrado. Use Adicionar para incluir o primeiro.
             </div>
           )}

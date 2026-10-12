@@ -60,11 +60,11 @@ export default function SiteConfigPanel() {
   }, [tema, toast])
 
   return (
-    <div className="rounded-2xl border border-white/[0.06] bg-zinc-950/60 backdrop-blur-md p-6">
+    <div className="rounded-2xl border border-white/[0.06] bg-slate-950/60 backdrop-blur-md p-6">
       {/* Section Header */}
       <div className="flex items-center gap-2.5 mb-6">
         <span className="text-lg">⚙️</span>
-        <h3 className="text-sm font-semibold text-zinc-200 tracking-wide uppercase">
+        <h3 className="text-sm font-semibold text-slate-200 tracking-wide uppercase">
           Configurações do Site
         </h3>
       </div>
@@ -72,8 +72,8 @@ export default function SiteConfigPanel() {
       {/* Theme Toggle (Segmented control) */}
       <div className="flex flex-col gap-3">
         <div className="flex flex-col gap-1 mb-2">
-          <span className="text-sm font-semibold text-zinc-300">Tema Visual do Hub</span>
-          <span className="text-xs text-zinc-500">
+          <span className="text-sm font-semibold text-slate-300">Tema Visual do Hub</span>
+          <span className="text-xs text-slate-400">
             Define o tema padrão da página inicial pública (Hub) para todas as pessoas que acessam.
           </span>
         </div>
@@ -92,7 +92,7 @@ export default function SiteConfigPanel() {
                 className={`flex flex-col items-center justify-center py-2.5 px-2 rounded-lg border text-[11px] font-extrabold uppercase tracking-wider transition-all duration-200 cursor-pointer active:scale-[0.97] ${
                   isActive
                     ? opt.activeBg
-                    : 'bg-transparent border-transparent text-zinc-500 ' + opt.color
+                    : 'bg-transparent border-transparent text-slate-400 ' + opt.color
                 }`}
               >
                 <span className="text-base mb-1">{opt.emoji}</span>

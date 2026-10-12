@@ -342,12 +342,12 @@ export default function RankingTurno({
       />
 
       {/* Main Content Listings based on Rules Model */}
-      <div className="bg-[#0b1a2d] border border-white/[0.04] rounded-2xl p-4 md:p-6 shadow-xl min-h-[300px]">
+      <div className="bg-[#0d2035] border border-white/[0.04] rounded-2xl p-4 md:p-6 shadow-xl min-h-[300px]">
         {loading ? (
           /* Loading skeleton shell */
           <div className="space-y-3">
             {(isMetas || isNiveis) && (
-              <p className="text-xs text-zinc-400" role="status" aria-live="polite">
+              <p className="text-xs text-slate-400" role="status" aria-live="polite">
                 {muralProgress
                   ? `Carregando mural completo: ${muralProgress.loaded.toLocaleString('pt-BR')} de ${muralProgress.total.toLocaleString('pt-BR')} participantes.`
                   : 'Carregando participantes para montar o mural completo...'}
@@ -372,7 +372,7 @@ export default function RankingTurno({
             </button>
           </div>
         ) : rankingData.length === 0 ? (
-          <div className="py-16 text-center text-sm text-zinc-300">
+          <div className="py-16 text-center text-sm text-slate-300">
             {debouncedSearchQuery
               ? 'Nenhum participante corresponde a essa busca.'
               : 'Ainda não há resultados para esta modalidade.'}
@@ -443,7 +443,7 @@ export default function RankingTurno({
 
             {debouncedSearchQuery && !isMetas && !isNiveis && rankingData.length < totalResultados && (
               <div className="mt-6 flex flex-col items-center gap-2 border-t border-white/[0.06] pt-5">
-                <p className="text-xs text-zinc-400" aria-live="polite">
+                <p className="text-xs text-slate-400" aria-live="polite">
                   Mostrando {rankingData.length.toLocaleString('pt-BR')} de {totalResultados.toLocaleString('pt-BR')} participantes encontrados
                 </p>
                 {erroPaginacao && <p className="text-sm text-rose-200" role="alert">{erroPaginacao}</p>}

@@ -381,15 +381,15 @@ export default function ExcelImportZone({
   const rejectedCount = preview?.result.totalLinhasRejeitadas ?? 0
 
   return (
-    <div className={`rounded-xl border border-white/[0.05] bg-[#0b1a2d] ${compact ? 'p-4' : 'p-5'} space-y-4`}>
+    <div className={`rounded-xl border border-white/[0.05] bg-[#0d2035] ${compact ? 'p-4' : 'p-5'} space-y-4`}>
       <div className="space-y-1">
-        <h3 className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-zinc-400 font-mono">
+        <h3 className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 font-mono">
           <svg className="h-3 w-3 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
           </svg>
           {title}
         </h3>
-        <p className="text-sm text-zinc-500">{description}</p>
+        <p className="text-sm text-slate-400">{description}</p>
       </div>
 
       <input
@@ -400,12 +400,12 @@ export default function ExcelImportZone({
         onChange={(event) => selectFile(event.target.files?.[0])}
         disabled={busy}
         aria-describedby="xlsx-import-help"
-        className="block w-full rounded-xl border border-white/10 bg-[#0a1829] px-3 py-2.5 text-sm text-zinc-300 file:mr-4 file:rounded-lg file:border-0 file:bg-sky-500 file:px-3 file:py-1.5 file:text-[11px] file:font-bold file:uppercase file:tracking-wider file:text-white hover:border-white/15 focus:border-sky-500/50 focus:outline-none disabled:opacity-60"
+        className="block w-full rounded-xl border border-white/10 bg-[#0a1e32] px-3 py-2.5 text-sm text-slate-300 file:mr-4 file:rounded-lg file:border-0 file:bg-sky-500 file:px-3 file:py-1.5 file:text-[11px] file:font-bold file:uppercase file:tracking-wider file:text-white hover:border-white/15 focus:border-sky-500/50 focus:outline-none disabled:opacity-60"
       />
 
       <div
         className={`rounded-xl border border-dashed p-4 transition-all ${
-          dragOver ? 'border-sky-500 bg-sky-500/5' : 'border-white/[0.08] bg-[#0a1829] hover:border-white/15'
+          dragOver ? 'border-sky-500 bg-sky-500/5' : 'border-white/[0.08] bg-[#0a1e32] hover:border-white/15'
         }`}
         onDragOver={(event) => {
           event.preventDefault()
@@ -421,7 +421,7 @@ export default function ExcelImportZone({
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div className="min-w-0">
             <div className="text-[11px] font-bold text-white">{arquivo ? 'Arquivo selecionado' : 'Nenhum arquivo selecionado'}</div>
-            <div id="xlsx-import-help" className="mt-1 break-all text-xs text-zinc-500">
+            <div id="xlsx-import-help" className="mt-1 break-all text-xs text-slate-400">
               {arquivo ? `${arquivo.name} • ${(arquivo.size / 1024).toFixed(1)} KB` : 'Escolha um arquivo .xlsx ou arraste-o para esta área. Limite: 25 MB.'}
             </div>
           </div>
@@ -430,7 +430,7 @@ export default function ExcelImportZone({
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={busy}
-            className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-zinc-900 px-4 py-2 text-[11px] font-bold uppercase tracking-wider text-white transition-all hover:border-sky-500/40 hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-slate-900 px-4 py-2 text-[11px] font-bold uppercase tracking-wider text-white transition-all hover:border-sky-500/40 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
           >
             Selecionar arquivo
           </button>
@@ -459,14 +459,14 @@ export default function ExcelImportZone({
               <div className="h-full rounded-full bg-sky-500 transition-all duration-200" style={{ width: `${validationProgress.percent}%` }} />
             </div>
           )}
-          <button type="button" onClick={cancelValidation} className="text-xs font-semibold text-zinc-400 underline decoration-zinc-600 underline-offset-2 hover:text-white">
+          <button type="button" onClick={cancelValidation} className="text-xs font-semibold text-slate-400 underline decoration-slate-600 underline-offset-2 hover:text-white">
             Cancelar validação
           </button>
         </div>
       )}
 
       {preview && (
-        <div className="space-y-3 rounded-xl border border-white/[0.08] bg-[#0a1829] p-4" aria-live="polite">
+        <div className="space-y-3 rounded-xl border border-white/[0.08] bg-[#0a1e32] p-4" aria-live="polite">
           <div>
             <h4 className="text-sm font-bold text-white">Prévia da importação</h4>
             {preview.hasPendingImport && (
@@ -474,10 +474,10 @@ export default function ExcelImportZone({
                 Envio anterior encontrado para este arquivo. Ao confirmar, os lotes serão retomados com segurança.
               </p>
             )}
-            <p className="mt-1 text-xs text-zinc-400">
+            <p className="mt-1 text-xs text-slate-400">
               {validCount.toLocaleString('pt-BR')} registro(s) válidos; {rejectedCount.toLocaleString('pt-BR')} linha(s) rejeitada(s); {preview.result.registrosMesclados.toLocaleString('pt-BR')} linha(s) duplicada(s) serão mescladas.
             </p>
-            <p className="mt-1 text-xs text-zinc-500">
+            <p className="mt-1 text-xs text-slate-400">
               Períodos conhecidos são padronizados e rótulos personalizados são preservados. Na coluna de taxas, inteiros são centavos e decimais são reais.
               {preview.result.colunasNaoMapeadas.length > 0 ? ` Colunas ignoradas: ${preview.result.colunasNaoMapeadas.join(', ')}.` : ''}
             </p>
@@ -510,7 +510,7 @@ export default function ExcelImportZone({
           {validCount === 0 && <p className="text-xs text-red-300">Não há registros válidos para enviar.</p>}
 
           {validCount > 0 && (
-            <label className="flex items-start gap-2 rounded-lg border border-white/10 p-3 text-xs text-zinc-300">
+            <label className="flex items-start gap-2 rounded-lg border border-white/10 p-3 text-xs text-slate-300">
               <input
                 type="checkbox"
                 checked={confirmed}
@@ -526,7 +526,7 @@ export default function ExcelImportZone({
 
       {uploadLoading && (
         <div className="space-y-2" aria-live="polite">
-          <div className="flex justify-between text-[10px] font-mono text-zinc-500">
+          <div className="flex justify-between text-[10px] font-mono text-slate-400">
             <span>Enviando registros validados</span>
             <span className="text-sky-400">{progresso}%</span>
           </div>

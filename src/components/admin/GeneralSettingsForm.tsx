@@ -59,9 +59,9 @@ export default function GeneralSettingsForm({
   )
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-xl border border-white/[0.04] bg-[#0b1a2d] p-5 space-y-5">
+    <form onSubmit={handleSubmit} className="rounded-xl border border-white/[0.04] bg-[#0d2035] p-5 space-y-5">
       <div className="flex items-center justify-between">
-        <h2 className="text-xs font-bold text-zinc-400 uppercase tracking-wider font-mono flex items-center gap-2">
+        <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider font-mono flex items-center gap-2">
           <svg className="w-3.5 h-3.5 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
           Configurações Gerais
         </h2>
@@ -70,7 +70,7 @@ export default function GeneralSettingsForm({
       {/* Row 1: Name + City + Metric */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <div>
-          <label htmlFor="geral-nome" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Nome</label>
+          <label htmlFor="geral-nome" className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono mb-1.5">Nome</label>
           <input
             id="geral-nome"
             type="text"
@@ -81,7 +81,7 @@ export default function GeneralSettingsForm({
           />
         </div>
         <div>
-          <label htmlFor="geral-cidade" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Cidade</label>
+          <label htmlFor="geral-cidade" className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono mb-1.5">Cidade</label>
           <input
             id="geral-cidade"
             type="text"
@@ -92,7 +92,7 @@ export default function GeneralSettingsForm({
           />
         </div>
         <div>
-          <label htmlFor="geral-metrica" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Métrica</label>
+          <label htmlFor="geral-metrica" className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono mb-1.5">Métrica</label>
           <select
             id="geral-metrica"
             value={metricValue}
@@ -123,7 +123,7 @@ export default function GeneralSettingsForm({
                 }
               })
             }}
-            className="admin-input !py-2.5 bg-[#0a1829]"
+            className="admin-input !py-2.5 bg-[#0a1e32]"
           >
             <option value="corridas_completadas">Quantidade de Corridas</option>
             <option value="pedidos_aceitos_e_concluidos">Pedidos Aceitos e Concluídos</option>
@@ -135,10 +135,10 @@ export default function GeneralSettingsForm({
 
       {/* Description */}
       <div>
-        <label htmlFor="geral-descricao" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Descrição</label>
+        <label htmlFor="geral-descricao" className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono mb-1.5">Descrição</label>
         <div className="flex gap-1 mb-1.5">
-          <button type="button" onClick={() => wrapFormat('**')} className="px-2 py-0.5 text-[10px] font-bold text-zinc-500 hover:text-white bg-white/[0.03] hover:bg-white/[0.06] rounded transition-colors" title="Negrito">B</button>
-          <button type="button" onClick={() => wrapFormat('_')} className="px-2 py-0.5 text-[10px] italic text-zinc-500 hover:text-white bg-white/[0.03] hover:bg-white/[0.06] rounded transition-colors" title="Itálico">I</button>
+          <button type="button" onClick={() => wrapFormat('**')} className="px-2 py-0.5 text-[10px] font-bold text-slate-400 hover:text-white bg-white/[0.03] hover:bg-white/[0.06] rounded transition-colors" title="Negrito">B</button>
+          <button type="button" onClick={() => wrapFormat('_')} className="px-2 py-0.5 text-[10px] italic text-slate-400 hover:text-white bg-white/[0.03] hover:bg-white/[0.06] rounded transition-colors" title="Itálico">I</button>
         </div>
         <textarea
           id="geral-descricao"
@@ -153,27 +153,27 @@ export default function GeneralSettingsForm({
       {/* Row 2: Dates + Limit + Status */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <div>
-          <label htmlFor="geral-inicio" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Início</label>
+          <label htmlFor="geral-inicio" className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono mb-1.5">Início</label>
           <input
             id="geral-inicio"
             type="date"
             value={promo.data_inicio || ''}
             onChange={e => setPromo({ ...promo, data_inicio: e.target.value })}
-            className="admin-input !py-2.5 bg-[#0a1829]"
+            className="admin-input !py-2.5 bg-[#0a1e32]"
           />
         </div>
         <div>
-          <label htmlFor="geral-fim" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Término</label>
+          <label htmlFor="geral-fim" className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono mb-1.5">Término</label>
           <input
             id="geral-fim"
             type="date"
             value={promo.data_fim || ''}
             onChange={e => setPromo({ ...promo, data_fim: e.target.value })}
-            className="admin-input !py-2.5 bg-[#0a1829]"
+            className="admin-input !py-2.5 bg-[#0a1e32]"
           />
         </div>
         <div>
-          <label htmlFor="geral-limite" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Limite Ranking</label>
+          <label htmlFor="geral-limite" className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono mb-1.5">Limite Ranking</label>
           <input
             id="geral-limite"
             type="number"
@@ -187,16 +187,16 @@ export default function GeneralSettingsForm({
                 limite_ranking: parseInt(e.target.value) || 15
               }
             })}
-            className="admin-input !py-2.5 bg-[#0a1829]"
+            className="admin-input !py-2.5 bg-[#0a1e32]"
           />
         </div>
         <div>
-          <label htmlFor="geral-status" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Status</label>
+          <label htmlFor="geral-status" className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono mb-1.5">Status</label>
           <select
             id="geral-status"
             value={promo.status}
             onChange={e => setPromo({ ...promo, status: e.target.value as 'rascunho' | 'ativa' | 'encerrada' })}
-            className="admin-input !py-2.5 bg-[#0a1829]"
+            className="admin-input !py-2.5 bg-[#0a1e32]"
           >
             <option value="rascunho">Rascunho</option>
             <option value="ativa">Ativa</option>
@@ -214,11 +214,11 @@ export default function GeneralSettingsForm({
             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[11px] font-bold transition-all ${
               promo.destaque_copa
                 ? 'bg-blue-500/10 border-blue-500/30 text-blue-400'
-                : 'border-white/[0.04] text-zinc-500 hover:text-zinc-300 hover:border-white/10'
+                : 'border-white/[0.04] text-slate-400 hover:text-slate-300 hover:border-white/10'
             }`}
           >
             <div className={`w-3 h-3 rounded-sm border flex items-center justify-center transition-all ${
-              promo.destaque_copa ? 'bg-blue-500 border-blue-400' : 'border-zinc-600'
+              promo.destaque_copa ? 'bg-blue-500 border-blue-400' : 'border-slate-600'
             }`}>
               {promo.destaque_copa && (
                 <svg className="w-2 h-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M5 13l4 4L19 7" /></svg>
@@ -247,12 +247,12 @@ export default function GeneralSettingsForm({
             }}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[11px] font-bold transition-all ${
               promo.config_regras?.tema_ninja
-                ? 'bg-zinc-500/10 border-zinc-500/30 text-zinc-300'
-                : 'border-white/[0.04] text-zinc-500 hover:text-zinc-300 hover:border-white/10'
+                ? 'bg-slate-500/10 border-slate-500/30 text-slate-300'
+                : 'border-white/[0.04] text-slate-400 hover:text-slate-300 hover:border-white/10'
             }`}
           >
             <div className={`w-3 h-3 rounded-sm border flex items-center justify-center transition-all ${
-              promo.config_regras?.tema_ninja ? 'bg-zinc-500 border-zinc-400' : 'border-zinc-600'
+              promo.config_regras?.tema_ninja ? 'bg-slate-500 border-slate-400' : 'border-slate-600'
             }`}>
               {promo.config_regras?.tema_ninja && (
                 <svg className="w-2 h-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M5 13l4 4L19 7" /></svg>

@@ -93,9 +93,9 @@ export default function HubContent({
         </span>
       </header>
 
-      <section aria-label="Buscar e filtrar campanhas" className="rounded-2xl border border-white/10 bg-[#0b1b2c]/90 p-3 sm:p-4">
+      <section aria-label="Buscar e filtrar campanhas" className="rounded-2xl border border-sky-200/15 bg-[#102940]/95 p-3 shadow-[0_16px_38px_-29px_rgba(3,15,32,.85)] sm:p-4">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div role="group" aria-label="Filtrar campanhas" className="grid grid-cols-2 gap-1 rounded-xl bg-black/35 p-1 lg:w-auto">
+          <div role="group" aria-label="Filtrar campanhas" className="grid grid-cols-2 gap-1 rounded-xl bg-[#081b2f] p-1 lg:w-auto">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
@@ -104,8 +104,8 @@ export default function HubContent({
                 onClick={() => setActiveTab(tab.id)}
                 className={`min-h-11 rounded-lg px-3 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 sm:px-4 ${
                   activeTab === tab.id
-                    ? 'bg-white text-[#102238]'
-                    : 'text-zinc-400 hover:bg-white/5 hover:text-white'
+                    ? 'bg-sky-100 text-[#102238] shadow-[0_3px_12px_rgba(0,0,0,.18)]'
+                    : 'text-slate-300 hover:bg-sky-300/10 hover:text-white'
                 }`}
               >
                 {tab.label}<span className="ml-1.5 opacity-70">{tab.count}</span>
@@ -114,7 +114,7 @@ export default function HubContent({
           </div>
           <label className="relative block w-full lg:max-w-md">
             <span className="sr-only">Buscar campanha pelo nome, cidade ou descrição</span>
-            <svg className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <svg className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m21 21-4.4-4.4m1.9-5.1a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z" />
             </svg>
             <input
@@ -123,7 +123,7 @@ export default function HubContent({
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
               placeholder="Buscar campanha ou cidade..."
-              className="min-h-11 w-full rounded-xl border border-white/10 bg-[#081725] py-2.5 pl-10 pr-10 text-sm text-white outline-none transition-colors placeholder:text-zinc-500 focus:border-sky-300/60 focus:ring-2 focus:ring-sky-300/15"
+              className="min-h-11 w-full rounded-xl border border-sky-200/15 bg-[#0a1e32] py-2.5 pl-10 pr-10 text-sm text-white outline-none transition-colors placeholder:text-slate-400 focus:border-sky-300/60 focus:ring-2 focus:ring-sky-300/15"
             />
             {searchQuery && (
               <button
@@ -133,7 +133,7 @@ export default function HubContent({
                   setSearchQuery('')
                   searchInputRef.current?.focus()
                 }}
-                className="absolute right-2 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-lg text-zinc-400 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300"
+                className="absolute right-2 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-lg text-slate-400 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300"
               >
                 <span aria-hidden="true">×</span>
               </button>
@@ -153,7 +153,7 @@ export default function HubContent({
             {activeTab === 'encerradas' && (
               <p className="mb-1 text-[11px] font-semibold text-sky-200">Criação · mais recentes primeiro</p>
             )}
-            <p className="text-xs text-zinc-400" aria-live="polite">
+            <p className="text-xs text-slate-400" aria-live="polite">
               {resultCount} {resultCount === 1 ? 'resultado' : 'resultados'}
             </p>
           </div>
@@ -167,10 +167,10 @@ export default function HubContent({
         </div>
 
         {resultCount === 0 && (
-          <div className="mt-5 rounded-2xl border border-white/10 bg-[#0b1b2c] px-6 py-12 text-center" role="status">
+          <div className="mt-5 rounded-2xl border border-sky-200/15 bg-[#0d2035] px-6 py-12 text-center" role="status">
             <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-white/5 text-xl" aria-hidden="true">⌕</div>
             <h3 className="mt-4 text-lg font-bold text-white">Nenhuma campanha encontrada</h3>
-            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-zinc-400">
+            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-400">
               {searchQuery
                 ? `Não encontramos resultados para “${searchQuery}”. Ajuste a busca ou limpe o filtro.`
                 : 'Não há campanhas nesta categoria no momento.'}
@@ -188,13 +188,13 @@ export default function HubContent({
         )}
       </section>
 
-      <footer className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-white/10 py-7 text-xs text-zinc-500 sm:flex-row">
-        <p>&copy; {new Date().getFullYear()} <span className="font-semibold text-zinc-300">EntreGÔ - Itaim</span>. Todos os direitos reservados.</p>
+      <footer className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-white/10 py-7 text-xs text-slate-400 sm:flex-row">
+        <p>&copy; {new Date().getFullYear()} <span className="font-semibold text-slate-300">EntreGÔ - Itaim</span>. Todos os direitos reservados.</p>
         <button
           ref={termsTriggerRef}
           type="button"
           onClick={() => setIsTermsOpen(true)}
-          className="min-h-10 rounded-lg px-3 font-semibold text-zinc-300 underline decoration-white/20 underline-offset-4 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300"
+          className="min-h-10 rounded-lg px-3 font-semibold text-slate-300 underline decoration-white/20 underline-offset-4 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300"
         >
           Termos de uso
         </button>
@@ -227,17 +227,17 @@ export default function HubContent({
                 first.focus()
               }
             }}
-            className="relative max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-white/10 bg-[#0c1b2e] p-6 text-left shadow-2xl sm:p-8"
+            className="relative max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-sky-200/15 bg-[#0d2035] p-6 text-left shadow-2xl sm:p-8"
           >
             <button
               ref={termsCloseRef}
               type="button"
               aria-label="Fechar termos de uso"
               onClick={() => setIsTermsOpen(false)}
-              className="absolute right-4 top-4 grid h-10 w-10 place-items-center rounded-lg text-zinc-400 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300"
+              className="absolute right-4 top-4 grid h-10 w-10 place-items-center rounded-lg text-slate-400 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300"
             >×</button>
             <h2 id="terms-title" className="pr-10 text-xl font-bold text-white">Termos de uso e condições gerais</h2>
-            <div className="mt-6 space-y-5 text-sm leading-6 text-zinc-300">
+            <div className="mt-6 space-y-5 text-sm leading-6 text-slate-300">
               <section>
                 <h3 className="font-bold text-white">1. Visão geral</h3>
                 <p>Este portal da EntreGÔ - Itaim permite consultar campanhas, acompanhar resultados e visualizar rankings semanais e premiações por turno.</p>

@@ -31,16 +31,16 @@ export default function StatsOverview({ stats }: StatsOverviewProps) {
   ]
 
   return (
-    <div className="rounded-xl border border-white/[0.04] bg-[#0b1a2d] p-4 space-y-2.5">
-      <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono flex items-center gap-1.5">
+    <div className="rounded-xl border border-white/[0.04] bg-[#0d2035] p-4 space-y-2.5">
+      <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono flex items-center gap-1.5">
         <svg className="w-3 h-3 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
         Estatísticas
       </h3>
       {items.map(item => (
         <div key={item.label} className="flex items-center justify-between py-1.5 border-b border-white/[0.03] last:border-0">
           <div className="flex items-center gap-2">
-            <span className="text-zinc-600">{item.icon}</span>
-            <span className="text-[10px] text-zinc-500 font-medium">{item.label}</span>
+            <span className="text-slate-600">{item.icon}</span>
+            <span className="text-[10px] text-slate-400 font-medium">{item.label}</span>
           </div>
           <span className={`text-sm font-black font-mono ${item.color}`}>{item.value}</span>
         </div>
