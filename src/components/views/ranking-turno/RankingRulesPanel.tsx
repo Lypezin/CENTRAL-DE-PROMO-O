@@ -74,11 +74,11 @@ function RankingRulesPanelComponent({
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {activeTurnoConfig?.premios?.map((p, idx) => (
-                  <div key={idx} className="bg-slate-900/30 border border-slate-800/80 rounded-xl p-3.5 text-center font-mono hover:bg-[#11283f] hover:border-white/10 transition-all duration-300 shadow-inner copa-prize-badge">
+                  <div key={idx} className="bg-slate-900/30 border border-slate-800/80 rounded-xl p-3.5 text-center font-mono hover:bg-[#14356f] hover:border-white/10 transition-all duration-300 shadow-inner copa-prize-badge">
                     <div className="text-[9px] text-slate-400 uppercase font-bold tracking-wider mb-1">
                       {p.posicao ? `${p.posicao}º Lugar` : `${p.posicao_inicio}º ao ${p.posicao_fim}º`}
                     </div>
-                    <div className={`font-extrabold text-sm ${p.descricao && !p.valor ? 'text-sky-400' : 'text-cyan-400'}`}>
+                    <div className={`font-extrabold text-sm ${p.descricao && !p.valor ? 'text-blue-400' : 'text-blue-400'}`}>
                       {p.descricao && !p.valor ? `🎁 ${p.descricao}` : formatCurrency(p.valor ?? 0)}
                     </div>
                   </div>
@@ -107,7 +107,7 @@ function RankingRulesPanelComponent({
                   </div>
                   <div className="bg-slate-900/30 border border-slate-800/80 px-4 py-3 rounded-xl flex-1 font-mono hover:border-white/10 transition-colors copa-prize-badge">
                     <div className="text-[9px] text-slate-400 uppercase font-bold tracking-wider mb-1">Prêmio Garantido</div>
-                    <div className="text-base font-bold text-cyan-400">
+                    <div className="text-base font-bold text-blue-400">
                       {formatCurrency(mecanica.metas_predefinidas[0].premio)}
                     </div>
                   </div>
@@ -129,7 +129,7 @@ function RankingRulesPanelComponent({
                   <div key={idx} className="bg-slate-900/30 border border-slate-800/80 rounded-xl p-3 text-center font-mono hover:border-white/10 transition-all duration-300 copa-prize-badge">
                     <div className="text-[9px] text-slate-400 uppercase font-bold tracking-wider mb-1">Nível {n.nivel}</div>
                     <div className="font-bold text-xs text-white">Meta: {formatScoreValue(n.meta)}</div>
-                    <div className="text-cyan-400 font-extrabold text-sm mt-0.5">{formatCurrency(n.premio)}</div>
+                    <div className="text-blue-400 font-extrabold text-sm mt-0.5">{formatCurrency(n.premio)}</div>
                   </div>
                 ))}
               </div>

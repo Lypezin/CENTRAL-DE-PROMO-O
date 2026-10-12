@@ -63,6 +63,8 @@ function PromoCardContent({ promo, preloadNinjaImage = false }: { promo: Promoca
       : isRanking ? 'Ver ranking' : 'Ver campanha'
   const isCopa = promo.destaque_copa
   const isFaixaPreta = !isCopa && promo.config_regras?.tema_ninja === true
+  const cityLetters = isFaixaPreta ? Array.from(promo.cidade || '') : []
+  const cityLetterStepMs = Math.min(360, 3400 / Math.max(cityLetters.length - 1, 1))
   const competitionLabel = isFaixaPreta && isRanking
     ? 'Disputa por posições'
     : calculationType === 'metas'
@@ -72,11 +74,11 @@ function PromoCardContent({ promo, preloadNinjaImage = false }: { promo: Promoca
         : isCopa ? 'Copa' : isRanking ? 'Disputa por ranking' : 'Campanha especial'
   const theme = isCopa
     ? {
-        bar: 'from-cyan-500 via-blue-300 to-cyan-500',
+        bar: 'from-blue-500 via-blue-300 to-blue-500',
         surface: 'from-[#142a40] via-[#0d1e31] to-[#081522]',
         glow: 'bg-blue-300/[.12]',
         stamp: 'border-blue-200/30 bg-blue-200/10 text-blue-100',
-        city: 'text-cyan-50',
+        city: 'text-blue-50',
         cityRule: 'bg-blue-300',
         type: 'text-blue-100',
         focusRing: 'group-focus-visible:ring-blue-200',
@@ -85,32 +87,32 @@ function PromoCardContent({ promo, preloadNinjaImage = false }: { promo: Promoca
       }
     : isFaixaPreta
       ? {
-          bar: 'from-blue-700 via-sky-300 to-blue-500',
-          surface: 'from-[#16375a] via-[#0d2642] to-[#091a30]',
-          glow: 'bg-sky-400/[.14]',
+          bar: 'from-blue-800 via-blue-400 to-blue-600',
+          surface: 'from-[#1a449e] via-[#153473] to-[#0b2352]',
+          glow: 'bg-blue-400/[.14]',
           stamp: 'border-blue-200/25 bg-blue-400/10 text-blue-100',
           city: 'text-white',
-          cityRule: 'bg-sky-400',
+          cityRule: 'bg-blue-400',
           type: 'text-blue-100',
           focusRing: 'group-focus-visible:ring-blue-300',
-          action: 'border-sky-300/35 bg-blue-400/15 text-sky-50 group-hover:bg-blue-400/25',
+          action: 'border-blue-300/35 bg-blue-400/15 text-blue-50 group-hover:bg-blue-400/25',
           sweep: 'via-blue-100/[.14]',
         }
       : {
-          bar: 'from-sky-700 via-sky-300 to-cyan-500',
-          surface: 'from-[#11283d] via-[#0b1c2d] to-[#071421]',
-          glow: 'bg-sky-300/[.11]',
-          stamp: 'border-sky-200/20 bg-sky-300/10 text-sky-100',
+          bar: 'from-blue-700 via-blue-300 to-blue-500',
+          surface: 'from-[#11283d] via-[#0c2758] to-[#081a3c]',
+          glow: 'bg-blue-300/[.11]',
+          stamp: 'border-blue-200/20 bg-blue-300/10 text-blue-100',
           city: 'text-white',
-          cityRule: 'bg-sky-300',
-          type: 'text-sky-100',
-          focusRing: 'group-focus-visible:ring-sky-300',
-          action: 'border-sky-200/25 bg-sky-300/10 text-sky-100 group-hover:bg-sky-300/20',
-          sweep: 'via-sky-100/[.12]',
+          cityRule: 'bg-blue-300',
+          type: 'text-blue-100',
+          focusRing: 'group-focus-visible:ring-blue-300',
+          action: 'border-blue-200/25 bg-blue-300/10 text-blue-100 group-hover:bg-blue-300/20',
+          sweep: 'via-blue-100/[.12]',
         }
 
   return (
-    <article ref={cardRef} className={`promo-card-shell @container/card relative isolate flex h-full min-h-[380px] flex-col overflow-hidden rounded-2xl border border-sky-200/15 bg-gradient-to-br ${theme.surface} shadow-[0_18px_44px_-28px_rgba(0,0,0,0.95)] transition duration-300 group-hover:-translate-y-1 group-focus-visible:-translate-y-1 group-hover:border-sky-200/30 group-focus-visible:border-sky-200/30 group-hover:shadow-[0_24px_50px_-25px_rgba(0,0,0,0.95)] group-focus-visible:shadow-[0_24px_50px_-25px_rgba(0,0,0,0.95)] group-focus-visible:ring-2 group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-[#071322] ${theme.focusRing} motion-reduce:transform-none motion-reduce:transition-none ${isFaixaPreta ? 'faixa-preta-card' : ''} ${motionActive ? 'faixa-preta-motion-active' : ''}`}>
+    <article ref={cardRef} className={`promo-card-shell @container/card relative isolate flex h-full min-h-[380px] flex-col overflow-hidden rounded-2xl border border-blue-200/15 bg-gradient-to-br ${theme.surface} shadow-[0_18px_44px_-28px_rgba(0,0,0,0.95)] transition duration-300 group-hover:-translate-y-1 group-focus-visible:-translate-y-1 group-hover:border-blue-200/30 group-focus-visible:border-blue-200/30 group-hover:shadow-[0_24px_50px_-25px_rgba(0,0,0,0.95)] group-focus-visible:shadow-[0_24px_50px_-25px_rgba(0,0,0,0.95)] group-focus-visible:ring-2 group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-[#07132c] ${theme.focusRing} motion-reduce:transform-none motion-reduce:transition-none ${isFaixaPreta ? 'faixa-preta-card' : ''} ${motionActive ? 'faixa-preta-motion-active' : ''}`}>
       <div className={`h-1.5 w-full shrink-0 bg-gradient-to-r ${theme.bar}`} aria-hidden="true" />
       <div className="promo-card-glint pointer-events-none absolute left-0 top-0 z-30 h-1.5 w-[34%]" aria-hidden="true" />
       <div className={`pointer-events-none absolute -right-14 -top-12 h-52 w-52 rounded-full blur-3xl ${theme.glow}`} aria-hidden="true" />
@@ -153,8 +155,12 @@ function PromoCardContent({ promo, preloadNinjaImage = false }: { promo: Promoca
           <div className={`relative mt-6 min-w-0 overflow-hidden border-l-[3px] border-white/20 py-2 pl-4 ${isFaixaPreta ? 'faixa-preta-city' : ''}`}>
             <span className={`absolute inset-y-0 left-[-3px] w-[3px] ${theme.cityRule}`} aria-hidden="true" />
             <span className="block text-[11px] font-extrabold uppercase tracking-[.19em] text-slate-300">A praça da rodada</span>
-            <span data-city={isFaixaPreta ? promo.cidade : undefined} className={`mt-1 block break-words [font-size:clamp(2.1rem,13cqi,3rem)] font-black uppercase italic leading-[.94] tracking-[-.07em] ${theme.city} transition-transform duration-300 group-hover:translate-x-1 group-focus-visible:translate-x-1 motion-reduce:transform-none motion-reduce:transition-none ${isFaixaPreta ? 'faixa-preta-city-name' : ''}`}>
-              {promo.cidade}
+            <span className={`mt-1 block break-words [font-size:clamp(2.1rem,13cqi,3rem)] font-black uppercase italic leading-[.94] tracking-[-.07em] ${theme.city} transition-transform duration-300 group-hover:translate-x-1 group-focus-visible:translate-x-1 motion-reduce:transform-none motion-reduce:transition-none ${isFaixaPreta ? 'faixa-preta-city-name' : ''}`}>
+              {isFaixaPreta
+                ? <><span className="sr-only">{promo.cidade}</span>{cityLetters.map((letter, index) => letter === ' '
+                  ? <span key={index} aria-hidden="true"> </span>
+                  : <span key={index} aria-hidden="true" className="faixa-preta-city-letter" style={{ '--city-letter-delay': `${450 + index * cityLetterStepMs}ms` } as CSSProperties}>{letter}</span>)}</>
+                : promo.cidade}
             </span>
           </div>
         )}

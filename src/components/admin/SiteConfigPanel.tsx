@@ -80,8 +80,8 @@ export default function SiteConfigPanel() {
 
         <div className="grid grid-cols-2 gap-2 bg-black/45 p-1 rounded-xl border border-white/5 select-none">
           {[
-            { key: 'raios', label: 'Raios', emoji: '⚡', color: 'hover:text-sky-400', activeBg: 'bg-sky-500/10 border-sky-500/30 text-sky-400 shadow-[0_0_12px_rgba(14,165,233,0.12)]' },
-            { key: 'ninja', label: 'Ninja', emoji: '🥋', color: 'hover:text-blue-500', activeBg: 'bg-blue-500/10 border-blue-500/30 text-blue-400 shadow-[0_0_12px_rgba(37,99,235,0.12)]' }
+            { key: 'raios', label: 'Raios', emoji: '⚡', color: 'hover:text-blue-400', activeBg: 'bg-blue-500/10 border-blue-500/30 text-blue-400 shadow-[0_0_12px_rgba(14,165,233,0.12)]' },
+            { key: 'ninja', label: 'Ninja', emoji: '🥋', color: 'hover:text-blue-300', activeBg: 'bg-blue-500/10 border-blue-500/30 text-blue-400 shadow-[0_0_12px_rgba(37,99,235,0.12)]' }
           ].map(opt => {
             const isActive = tema === opt.key
             return (

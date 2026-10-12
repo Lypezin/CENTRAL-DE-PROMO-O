@@ -137,7 +137,7 @@ export default function AdminPromoList({ promocoes, loading, onReorder, elitePro
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Buscar promocao por nome, cidade ou slug..."
-          className="w-full rounded-xl border border-white/10 bg-[#0a1e32] py-2.5 pl-10 pr-4 text-sm text-white placeholder-slate-500 transition-all focus:border-sky-500/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1e32]"
+          className="w-full rounded-xl border border-white/10 bg-[#0a1d3e] py-2.5 pl-10 pr-4 text-sm text-white placeholder-slate-500 transition-all focus:border-blue-500/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1d3e]"
           aria-label="Buscar promocoes"
         />
         {searchQuery && (
@@ -163,7 +163,7 @@ export default function AdminPromoList({ promocoes, loading, onReorder, elitePro
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
         <article className="obsidian-card group relative flex flex-col overflow-hidden rounded-2xl border border-blue-500/20 bg-[linear-gradient(135deg,rgba(23,18,10,0.96),rgba(8,8,8,0.98))] shadow-xl shadow-black/40 transition-all duration-300 hover:border-blue-400/35">
-          <div className="h-1 w-full bg-gradient-to-r from-blue-500 via-cyan-300 to-blue-500 shadow-[0_2px_15px_rgba(251,191,36,0.25)]"></div>
+          <div className="h-1 w-full bg-gradient-to-r from-blue-500 via-blue-300 to-blue-500 shadow-[0_2px_15px_rgba(251,191,36,0.25)]"></div>
           <div className="flex flex-grow flex-col p-5">
             <div className="mb-4 flex items-start justify-between">
               <StatusBadge status="ativa" />
@@ -214,26 +214,26 @@ export default function AdminPromoList({ promocoes, loading, onReorder, elitePro
             onDragEnd={handleDragEnd}
             onDragOver={(e) => e.preventDefault()}
             className={`obsidian-card group relative flex flex-col overflow-hidden rounded-2xl border shadow-xl shadow-black/40 transition-all duration-300 ${searchQuery ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'} ${
-              dragOverItemIndex === index ? 'scale-105 border-dashed border-sky-500 bg-sky-900/20' : 'border-white/[0.04] hover:border-sky-500/30'
+              dragOverItemIndex === index ? 'scale-105 border-dashed border-blue-500 bg-blue-900/20' : 'border-white/[0.04] hover:border-blue-500/30'
             }`}
           >
             <div className="absolute left-1/2 top-2 -translate-x-1/2 opacity-0 transition-opacity group-hover:opacity-40">
               <div className="h-1.5 w-8 rounded-full bg-white/20"></div>
             </div>
 
-            <div className="h-1 w-full bg-gradient-to-r from-slate-800 to-slate-700 transition-all duration-500 group-hover:from-sky-500 group-hover:to-blue-500"></div>
+            <div className="h-1 w-full bg-gradient-to-r from-slate-800 to-slate-700 transition-all duration-500 group-hover:from-blue-500 group-hover:to-blue-500"></div>
 
             <div className="flex flex-grow flex-col p-5">
               <div className="mb-4 flex items-start justify-between">
                 <StatusBadge status={promo.status} />
                 {promo.cidade && (
-                  <span className="rounded border border-sky-900/40 bg-sky-950/20 px-2 py-1 font-mono text-[9px] font-black uppercase tracking-wider text-sky-400 shadow-inner">
+                  <span className="rounded border border-blue-900/40 bg-blue-950/20 px-2 py-1 font-mono text-[9px] font-black uppercase tracking-wider text-blue-400 shadow-inner">
                     {promo.cidade}
                   </span>
                 )}
               </div>
 
-              <h3 className="mb-1 text-lg font-black leading-tight text-white transition-colors group-hover:text-sky-300">{promo.nome}</h3>
+              <h3 className="mb-1 text-lg font-black leading-tight text-white transition-colors group-hover:text-blue-300">{promo.nome}</h3>
               <p className="mb-4 break-all font-mono text-xs text-slate-400 opacity-70">/{promo.slug}</p>
 
               {promo.status === 'ativa' && isDeadlinePast(promo.data_fim) && promo.data_fim && (
@@ -268,18 +268,18 @@ export default function AdminPromoList({ promocoes, loading, onReorder, elitePro
                       onClick={() => handleMove(promo.id, -1)}
                       disabled={promocoes.findIndex((item) => item.id === promo.id) === 0}
                       aria-label={`Mover ${promo.nome} para cima`}
-                      className="grid min-h-11 min-w-11 place-items-center rounded-lg border border-white/10 bg-slate-900 text-slate-300 hover:border-sky-500/40 hover:text-white disabled:cursor-not-allowed disabled:opacity-35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+                      className="grid min-h-11 min-w-11 place-items-center rounded-lg border border-white/10 bg-slate-900 text-slate-300 hover:border-blue-500/40 hover:text-white disabled:cursor-not-allowed disabled:opacity-35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
                     >↑</button>
                     <button
                       type="button"
                       onClick={() => handleMove(promo.id, 1)}
                       disabled={promocoes.findIndex((item) => item.id === promo.id) === promocoes.length - 1}
                       aria-label={`Mover ${promo.nome} para baixo`}
-                      className="grid min-h-11 min-w-11 place-items-center rounded-lg border border-white/10 bg-slate-900 text-slate-300 hover:border-sky-500/40 hover:text-white disabled:cursor-not-allowed disabled:opacity-35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+                      className="grid min-h-11 min-w-11 place-items-center rounded-lg border border-white/10 bg-slate-900 text-slate-300 hover:border-blue-500/40 hover:text-white disabled:cursor-not-allowed disabled:opacity-35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
                     >↓</button>
                   </div>
                   <Tooltip content="Gerenciar promoção">
-                  <Link href={`/admin/promo/${promo.id}`} className="flex min-h-11 items-center gap-1.5 rounded-lg border border-white/5 bg-slate-900 px-4 py-2 text-xs font-bold text-slate-300 transition-all hover:border-sky-500/50 hover:bg-sky-600 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400">
+                  <Link href={`/admin/promo/${promo.id}`} className="flex min-h-11 items-center gap-1.5 rounded-lg border border-white/5 bg-slate-900 px-4 py-2 text-xs font-bold text-slate-300 transition-all hover:border-blue-500/50 hover:bg-blue-600 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400">
                     Gerenciar
                     <svg className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />

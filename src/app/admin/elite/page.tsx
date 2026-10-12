@@ -186,7 +186,7 @@ export default function AdminElitePage() {
             type="button"
             onClick={handleSave}
             disabled={saving}
-            className="inline-flex min-w-[190px] items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 px-5 py-3 text-xs font-black uppercase tracking-wider text-black shadow-lg shadow-blue-500/20 transition-all hover:from-blue-400 hover:to-cyan-400 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex min-w-[190px] items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-blue-500 px-5 py-3 text-xs font-black uppercase tracking-wider text-black shadow-lg shadow-blue-500/20 transition-all hover:from-blue-400 hover:to-blue-400 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {saving ? (
               <>
@@ -202,7 +202,7 @@ export default function AdminElitePage() {
         <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
           <div className="space-y-5">
             <section className="overflow-hidden rounded-2xl border border-blue-500/15 bg-[linear-gradient(180deg,rgba(10,10,12,0.98),rgba(7,7,8,0.98))]">
-              <div className="h-[5px] bg-gradient-to-r from-blue-500 via-cyan-300 to-blue-500" />
+              <div className="h-[5px] bg-gradient-to-r from-blue-500 via-blue-300 to-blue-500" />
               <div className="p-5 md:p-6">
                 <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
                   <div>
@@ -281,7 +281,7 @@ export default function AdminElitePage() {
                     min="1"
                     value={config.target}
                     onChange={(e) => updateConfig('target', Math.max(1, Number(e.target.value) || 1))}
-                    className="admin-input !bg-[#0a1e32] !py-2.5"
+                    className="admin-input !bg-[#0a1d3e] !py-2.5"
                   />
                 </div>
 
@@ -309,7 +309,7 @@ export default function AdminElitePage() {
           </div>
 
           <aside className="h-fit overflow-hidden rounded-2xl border border-blue-500/15 bg-[linear-gradient(180deg,rgba(10,10,12,0.98),rgba(7,7,8,0.98))]">
-            <div className="h-[5px] bg-gradient-to-r from-blue-500 via-cyan-300 to-blue-500" />
+            <div className="h-[5px] bg-gradient-to-r from-blue-500 via-blue-300 to-blue-500" />
             <div className="p-5">
               <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-blue-500/20 bg-blue-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-blue-300">
                 <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />

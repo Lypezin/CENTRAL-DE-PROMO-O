@@ -5,7 +5,7 @@ import type { Promocao } from '@/lib/supabase'
 
 export default function PromoPreviewCard({ promo }: { promo: Promocao }) {
   return (
-    <section className="space-y-3 rounded-xl border border-white/[0.05] bg-[#0d2035] p-3">
+    <section className="space-y-3 rounded-xl border border-white/[0.05] bg-[#0d2350] p-3">
       <h3 className="flex items-center gap-2 px-1 text-[11px] font-bold uppercase tracking-wider text-slate-400">
         <span className="h-1.5 w-1.5 rounded-full bg-blue-400" aria-hidden="true" />
         Prévia do card público

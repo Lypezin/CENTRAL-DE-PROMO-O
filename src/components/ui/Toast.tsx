@@ -95,7 +95,7 @@ function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
       </svg>
     ),
     info: (
-      <svg className="w-5 h-5 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg className="w-5 h-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
     ),
@@ -105,7 +105,7 @@ function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
     success: 'border-emerald-500/20 shadow-emerald-950/20',
     error: 'border-rose-500/20 shadow-rose-950/20',
     warning: 'border-amber-500/20 shadow-amber-950/20',
-    info: 'border-sky-500/20 shadow-sky-950/20',
+    info: 'border-blue-500/20 shadow-blue-950/20',
   }
 
   return (

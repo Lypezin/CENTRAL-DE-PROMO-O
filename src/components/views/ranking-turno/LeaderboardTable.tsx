@@ -63,16 +63,16 @@ export const LeaderboardTable = memo(function LeaderboardTable({
           return (
             <div
               key={item.id_da_pessoa_entregadora}
-              className={`flex items-center px-2 sm:px-5 py-4 sm:py-3.5 hover:bg-white/[0.02] transition-all duration-200 group border-l-2 border-transparent hover:border-sky-500/40 w-full ${isTop1 ? 'bg-cyan-500/[0.02]' : isTop2 ? 'bg-slate-500/[0.02]' : isTop3 ? 'bg-blue-500/[0.02]' : ''}`}
+              className={`flex items-center px-2 sm:px-5 py-4 sm:py-3.5 hover:bg-white/[0.02] transition-all duration-200 group border-l-2 border-transparent hover:border-blue-500/40 w-full ${isTop1 ? 'bg-blue-500/[0.02]' : isTop2 ? 'bg-slate-500/[0.02]' : isTop3 ? 'bg-blue-500/[0.02]' : ''}`}
             >
               {/* Position (Tabular numbers) */}
               <div className="w-10 sm:w-12 shrink-0 flex justify-center font-mono font-black">
                 {isTop1 ? (
-                  <span className="text-cyan-400 bg-cyan-500/10 px-2 py-1 rounded-md text-[9px] sm:text-[9px] border border-cyan-500/20 font-bold tracking-tighter">1º</span>
+                  <span className="text-blue-400 bg-blue-500/10 px-2 py-1 rounded-md text-[9px] sm:text-[9px] border border-blue-500/20 font-bold tracking-tighter">1º</span>
                 ) : isTop2 ? (
                   <span className="text-slate-300 bg-slate-500/10 px-2 py-1 rounded-md text-[9px] sm:text-[9px] border border-slate-500/20 font-bold tracking-tighter">2º</span>
                 ) : isTop3 ? (
-                  <span className="text-blue-500 bg-blue-500/10 px-2 py-1 rounded-md text-[9px] sm:text-[9px] border border-blue-500/20 font-bold tracking-tighter">3º</span>
+                  <span className="text-blue-300 bg-blue-500/10 px-2 py-1 rounded-md text-[9px] sm:text-[9px] border border-blue-500/20 font-bold tracking-tighter">3º</span>
                 ) : (
                   <span className="text-slate-400 text-xs">{(item.posicao < 10 ? `0${item.posicao}` : item.posicao)}</span>
                 )}
@@ -80,7 +80,7 @@ export const LeaderboardTable = memo(function LeaderboardTable({
 
               {/* Driver Name & Micro-bar */}
               <div className="flex-1 min-w-0 pl-3 sm:pl-5 flex flex-col justify-center">
-                <div className="font-black text-slate-100 text-[14px] sm:text-[14px] truncate group-hover:text-sky-300 transition-colors tracking-tight">
+                <div className="font-black text-slate-100 text-[14px] sm:text-[14px] truncate group-hover:text-blue-300 transition-colors tracking-tight">
                   {item.pessoa_entregadora}
                 </div>
 
@@ -92,7 +92,7 @@ export const LeaderboardTable = memo(function LeaderboardTable({
                 <div className="h-[2px] w-3/4 bg-white/[0.02] rounded-full overflow-hidden mt-1.5 hidden sm:block">
                   <div
                     className={`h-full rounded-full transition-all duration-1000 ease-out ${
-                      isTop1 ? 'bg-cyan-500' : isTop2 ? 'bg-slate-400' : isTop3 ? 'bg-blue-600' : 'bg-sky-500'
+                      isTop1 ? 'bg-blue-500' : isTop2 ? 'bg-slate-400' : isTop3 ? 'bg-blue-600' : 'bg-blue-500'
                     }`}
                     style={{ width: `${progresso}%` }}
                   ></div>
@@ -113,7 +113,7 @@ export const LeaderboardTable = memo(function LeaderboardTable({
               <div className="w-24 sm:w-36 text-right flex flex-col items-end justify-center font-mono shrink-0">
                 {temDescricao ? (
                   atingiuMinimo ? (
-                    <span className="inline-flex items-center gap-0.5 text-sky-400 text-[10px] font-black tracking-tight bg-sky-500/10 px-2 py-1 rounded border border-sky-500/20 truncate max-w-[120px] sm:max-w-none" title={premioInfo.descricao}>
+                    <span className="inline-flex items-center gap-0.5 text-blue-400 text-[10px] font-black tracking-tight bg-blue-500/10 px-2 py-1 rounded border border-blue-500/20 truncate max-w-[120px] sm:max-w-none" title={premioInfo.descricao}>
                       🎁 {premioInfo.descricao}
                     </span>
                   ) : (
@@ -121,14 +121,14 @@ export const LeaderboardTable = memo(function LeaderboardTable({
                       <span className="text-[10px] text-slate-600 line-through font-bold truncate max-w-[120px] sm:max-w-none" title={premioInfo.descricao}>
                         🎁 {premioInfo.descricao}
                       </span>
-                      <span className="text-[8px] sm:text-[9px] text-blue-500 bg-blue-500/10 border border-blue-500/20 px-1 py-0.5 rounded font-black uppercase mt-1 tracking-tighter">
+                      <span className="text-[8px] sm:text-[9px] text-blue-300 bg-blue-500/10 border border-blue-500/20 px-1 py-0.5 rounded font-black uppercase mt-1 tracking-tighter">
                         {getRankingMetricShortfallLabel(resolvedMetric, minimoCorridas - requirementValue)}
                       </span>
                     </div>
                   )
                 ) : premioTeorico > 0 ? (
                   atingiuMinimo ? (
-                    <span className="inline-flex items-center gap-0.5 text-cyan-400 text-[11px] font-black tracking-tight bg-cyan-500/10 px-2 py-1 rounded border border-cyan-500/20">
+                    <span className="inline-flex items-center gap-0.5 text-blue-400 text-[11px] font-black tracking-tight bg-blue-500/10 px-2 py-1 rounded border border-blue-500/20">
                       +{formatCurrency(premio)}
                     </span>
                   ) : (
@@ -136,7 +136,7 @@ export const LeaderboardTable = memo(function LeaderboardTable({
                       <span className="text-[10px] text-slate-600 line-through font-bold">
                         +{formatCurrency(premioTeorico)}
                       </span>
-                      <span className="text-[8px] sm:text-[9px] text-blue-500 bg-blue-500/10 border border-blue-500/20 px-1 py-0.5 rounded font-black uppercase mt-1 tracking-tighter">
+                      <span className="text-[8px] sm:text-[9px] text-blue-300 bg-blue-500/10 border border-blue-500/20 px-1 py-0.5 rounded font-black uppercase mt-1 tracking-tighter">
                         {getRankingMetricShortfallLabel(resolvedMetric, minimoCorridas - requirementValue)}
                       </span>
                     </div>

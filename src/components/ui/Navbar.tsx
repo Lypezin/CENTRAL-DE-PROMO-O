@@ -45,12 +45,12 @@ export default function Navbar() {
   ]
 
   return (
-    <nav className="fixed top-0 w-full z-50 bg-[#09192b]/92 backdrop-blur-md border-b border-sky-200/15 transition-all">
+    <nav className="fixed top-0 w-full z-50 bg-[#2c67ea]/95 backdrop-blur-md border-b border-white/20 transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 group">
           <span className="font-extrabold text-sm sm:text-base tracking-tight text-white flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full animate-pulse brand-dot"></span>
-            EntreGÔ <span className="text-slate-400 font-normal">|</span> <span className="text-slate-300 font-medium">Central de Promoções</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-white brand-dot"></span>
+            EntreGÔ <span className="text-blue-200 font-normal">|</span> <span className="text-blue-50 font-medium">Central de Promoções</span>
           </span>
         </Link>
 
@@ -63,12 +63,12 @@ export default function Navbar() {
                 key={link.href}
                 href={link.href}
                 className={`relative text-xs font-semibold uppercase tracking-wider transition-colors duration-200 py-1 ${
-                  isActive ? 'text-white font-bold' : 'text-slate-400 hover:text-white'
+                  isActive ? 'text-white font-bold' : 'text-blue-100 hover:text-white'
                 }`}
               >
                 {link.label}
                 {isActive && (
-                  <span className="absolute -bottom-[19px] left-0 w-full h-[2px] bg-sky-300 nav-active-line" />
+                  <span className="absolute -bottom-[19px] left-0 w-full h-[2px] bg-white nav-active-line" />
                 )}
               </Link>
             )
@@ -76,16 +76,16 @@ export default function Navbar() {
 
           {mounted && (
             <>
-              <span className="w-[1px] h-4 bg-white/10" />
+              <span className="w-[1px] h-4 bg-white/25" />
               <button
                 onClick={toggleEcoMode}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-extrabold uppercase tracking-wider transition-all duration-200 border cursor-pointer ${
                   isEco
-                    ? 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400 shadow-[0_0_12px_rgba(6,182,212,0.12)] hover:bg-cyan-500/20'
-                    : 'bg-blue-500/10 border-blue-300/25 text-blue-100 hover:border-blue-200/50 hover:bg-blue-500/20'
+                    ? 'bg-blue-950/25 border-white/25 text-blue-100 hover:bg-blue-950/35'
+                    : 'bg-white/15 border-white/30 text-white hover:bg-white/25'
                 }`}
               >
-                <span>{isEco ? '🍃 Efeitos pausados' : '⚡ Efeitos ativos'}</span>
+                <span>{isEco ? 'Efeitos pausados' : 'Efeitos ativos'}</span>
               </button>
             </>
           )}
@@ -93,7 +93,7 @@ export default function Navbar() {
 
         {/* Mobile Toggle */}
         <button
-          className="md:hidden p-2 text-slate-400 hover:text-white transition-colors"
+          className="md:hidden p-2 text-white hover:text-blue-100 transition-colors"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           aria-label={isMobileMenuOpen ? "Fechar menu de navegação" : "Abrir menu de navegação"}
         >
@@ -109,7 +109,7 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-[#09192b]/98 backdrop-blur-2xl border-b border-sky-200/15 animate-fade-in shadow-2xl">
+        <div className="md:hidden bg-[#2257cb]/98 backdrop-blur-2xl border-b border-white/20 animate-fade-in shadow-2xl">
           <div className="px-4 py-4 flex flex-col gap-2">
             {links.map(link => {
               const isActive = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href))
@@ -119,7 +119,7 @@ export default function Navbar() {
                   href={link.href}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={`px-3 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors ${
-                    isActive ? 'bg-white/[0.04] text-white' : 'text-slate-400 hover:bg-white/[0.02] hover:text-white'
+                    isActive ? 'bg-white/20 text-white' : 'text-blue-100 hover:bg-white/10 hover:text-white'
                   }`}
                 >
                   {link.label}
@@ -136,12 +136,12 @@ export default function Navbar() {
                   }}
                   className={`w-full flex items-center justify-between px-3 py-3 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
                     isEco
-                      ? 'bg-cyan-500/10 border border-cyan-500/20 text-cyan-400'
-                      : 'bg-blue-500/10 border border-blue-300/25 text-blue-100'
+                      ? 'bg-blue-950/25 border border-white/20 text-blue-100'
+                      : 'bg-white/15 border border-white/30 text-white'
                   }`}
                 >
                   <span>Animação dos cards</span>
-                  <span>{isEco ? '🍃 PAUSADA' : '⚡ ATIVA'}</span>
+                  <span>{isEco ? 'PAUSADA' : 'ATIVA'}</span>
                 </button>
               </div>
             )}

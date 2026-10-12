@@ -36,9 +36,9 @@ function RankingFiltersComponent({
           placeholder={isMetas || isNiveis ? "Pesquise seu nome para ver seu progresso..." : "Buscar entregador por nome..."}
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
-          className="w-full bg-[#0d2035] border border-white/[0.04] focus:border-sky-500/80 rounded-xl py-2.5 pl-10 pr-10 text-xs text-white focus:outline-none focus:ring-1 focus:ring-sky-500/40 transition-all placeholder-slate-400 font-sans shadow-lg shadow-black/40"
+          className="w-full bg-[#0d2350] border border-white/[0.04] focus:border-blue-500/80 rounded-xl py-2.5 pl-10 pr-10 text-xs text-white focus:outline-none focus:ring-1 focus:ring-blue-500/40 transition-all placeholder-slate-400 font-sans shadow-lg shadow-black/40"
         />
-        <svg className="w-4 h-4 text-slate-600 group-focus-within:text-sky-400 absolute left-3.5 top-3 transition-colors duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="w-4 h-4 text-slate-600 group-focus-within:text-blue-400 absolute left-3.5 top-3 transition-colors duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
         {searchQuery && (

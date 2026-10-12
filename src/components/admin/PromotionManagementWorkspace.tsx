@@ -64,7 +64,7 @@ export default function PromotionManagementWorkspace({
   if (loading) return (
     <div className="flex min-h-[60vh] items-center justify-center" role="status" aria-live="polite">
       <div className="space-y-3 text-center">
-        <div className="mx-auto h-5 w-5 animate-spin rounded-full border-2 border-sky-400 border-t-transparent" aria-hidden="true" />
+        <div className="mx-auto h-5 w-5 animate-spin rounded-full border-2 border-blue-400 border-t-transparent" aria-hidden="true" />
         <p className="text-xs font-mono uppercase tracking-wider text-slate-400">Carregando campanha…</p>
       </div>
     </div>
@@ -74,10 +74,10 @@ export default function PromotionManagementWorkspace({
     <div className="flex min-h-[60vh] items-center justify-center px-4">
       <div className="space-y-3 text-center">
         <p role="alert" className="text-sm font-bold text-rose-300">{loadError || 'Não foi possível carregar esta campanha.'}</p>
-        <button type="button" onClick={() => void carregarPromo()} className="mx-auto block min-h-10 rounded-lg border border-white/10 px-4 text-xs font-semibold text-slate-200 transition-colors hover:bg-white/[.05] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300">Tentar novamente</button>
+        <button type="button" onClick={() => void carregarPromo()} className="mx-auto block min-h-10 rounded-lg border border-white/10 px-4 text-xs font-semibold text-slate-200 transition-colors hover:bg-white/[.05] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">Tentar novamente</button>
         {onReturnToCampaigns
-          ? <button type="button" onClick={onReturnToCampaigns} className="text-xs font-semibold text-sky-200 underline underline-offset-4">Voltar às campanhas</button>
-          : <Link href="/admin" className="text-xs font-semibold text-sky-300 underline underline-offset-4">Voltar ao painel</Link>}
+          ? <button type="button" onClick={onReturnToCampaigns} className="text-xs font-semibold text-blue-200 underline underline-offset-4">Voltar às campanhas</button>
+          : <Link href="/admin" className="text-xs font-semibold text-blue-300 underline underline-offset-4">Voltar ao painel</Link>}
       </div>
     </div>
   )
@@ -92,18 +92,18 @@ export default function PromotionManagementWorkspace({
           className="mb-8"
         >
           {onReturnToCampaigns
-            ? <button type="button" onClick={onReturnToCampaigns} className="mb-5 inline-flex min-h-10 items-center gap-1.5 text-[11px] font-mono uppercase tracking-wider text-slate-400 transition-colors hover:text-sky-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300">
+            ? <button type="button" onClick={onReturnToCampaigns} className="mb-5 inline-flex min-h-10 items-center gap-1.5 text-[11px] font-mono uppercase tracking-wider text-slate-400 transition-colors hover:text-blue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">
                 <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" /></svg>
                 Voltar às campanhas
               </button>
-            : <Link href="/admin" className="mb-5 inline-flex min-h-10 items-center gap-1.5 text-[11px] font-mono uppercase tracking-wider text-slate-400 transition-colors hover:text-sky-400">
+            : <Link href="/admin" className="mb-5 inline-flex min-h-10 items-center gap-1.5 text-[11px] font-mono uppercase tracking-wider text-slate-400 transition-colors hover:text-blue-400">
                 <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" /></svg>
                 Voltar ao painel
               </Link>}
 
           {createdInWizard && (
-            <section role="status" className="mb-5 rounded-xl border border-sky-300/20 bg-sky-300/[.06] px-4 py-3">
-              <h2 className="text-sm font-black text-sky-100">Rascunho criado. Continue por aqui.</h2>
+            <section role="status" className="mb-5 rounded-xl border border-blue-300/20 bg-blue-300/[.06] px-4 py-3">
+              <h2 className="text-sm font-black text-blue-100">Rascunho criado. Continue por aqui.</h2>
               <p className="mt-1 text-xs leading-5 text-slate-300">Revise os detalhes, importe a planilha e ative a campanha quando estiver pronta. Esta etapa continua no fluxo novo.</p>
             </section>
           )}
@@ -116,7 +116,7 @@ export default function PromotionManagementWorkspace({
               </div>
               <div className="flex flex-wrap items-center gap-3 text-[10px] font-mono text-slate-400">
                 {promo.cidade && (
-                  <span className="flex items-center gap-1 text-sky-300">
+                  <span className="flex items-center gap-1 text-blue-300">
                     <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                     {promo.cidade}
                   </span>
@@ -146,9 +146,9 @@ export default function PromotionManagementWorkspace({
                 Página pública
               </Link>
               {promo.status !== 'ativa'
-                ? <button type="button" onClick={() => { void handleUpdate({ status: 'ativa' }).catch(() => undefined) }} disabled={saving} className="admin-btn-primary min-h-10 !bg-cyan-600 !py-2 !text-[11px] !text-white hover:!bg-cyan-500 disabled:opacity-60">{saving ? 'Salvando…' : 'Ativar'}</button>
+                ? <button type="button" onClick={() => { void handleUpdate({ status: 'ativa' }).catch(() => undefined) }} disabled={saving} className="admin-btn-primary min-h-10 !bg-blue-600 !py-2 !text-[11px] !text-white hover:!bg-blue-500 disabled:opacity-60">{saving ? 'Salvando…' : 'Ativar'}</button>
                 : <button type="button" onClick={() => { void handleUpdate({ status: 'encerrada' }).catch(() => undefined) }} disabled={saving} className="admin-btn-danger min-h-10 !py-2 !text-[11px] disabled:opacity-60">{saving ? 'Salvando…' : 'Encerrar'}</button>}
-              {onCreateAnother && <button type="button" onClick={onCreateAnother} className="min-h-10 rounded-lg border border-sky-300/25 px-3 text-[11px] font-bold text-sky-100 transition-colors hover:bg-sky-300/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300">Nova campanha</button>}
+              {onCreateAnother && <button type="button" onClick={onCreateAnother} className="min-h-10 rounded-lg border border-blue-300/25 px-3 text-[11px] font-bold text-blue-100 transition-colors hover:bg-blue-300/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">Nova campanha</button>}
             </div>
           </div>
         </motion.div>
@@ -171,7 +171,7 @@ export default function PromotionManagementWorkspace({
             <StatsOverview stats={stats} />
             <ExcelImportZone promocaoId={promo.id} onUploadSuccess={carregarPromo} />
 
-            <section className="space-y-3 rounded-xl border border-rose-300/20 bg-[#0d2035] p-4">
+            <section className="space-y-3 rounded-xl border border-rose-300/20 bg-[#0d2350] p-4">
               <h2 className="text-[11px] font-bold uppercase tracking-wider text-rose-200">Ações de risco</h2>
               <p className="text-xs leading-5 text-slate-400">A limpeza remove os dados importados. A exclusão remove a campanha e os dados associados.</p>
               <div className="space-y-2">

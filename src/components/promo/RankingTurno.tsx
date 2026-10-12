@@ -342,7 +342,7 @@ export default function RankingTurno({
       />
 
       {/* Main Content Listings based on Rules Model */}
-      <div className="bg-[#0d2035] border border-white/[0.04] rounded-2xl p-4 md:p-6 shadow-xl min-h-[300px]">
+      <div className="bg-[#0d2350] border border-white/[0.04] rounded-2xl p-4 md:p-6 shadow-xl min-h-[300px]">
         {loading ? (
           /* Loading skeleton shell */
           <div className="space-y-3">

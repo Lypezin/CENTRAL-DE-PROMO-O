@@ -87,13 +87,13 @@ export default function HubContent({
         <div>
           <h1 id="hub-title" className="text-2xl font-black tracking-[-.03em] text-white sm:text-3xl">Campanhas</h1>
         </div>
-        <span className="inline-flex items-center gap-2 pb-0.5 text-xs font-semibold text-sky-200">
-          <span className="h-2 w-2 rounded-full bg-sky-300" aria-hidden="true" />
+        <span className="inline-flex items-center gap-2 pb-0.5 text-xs font-semibold text-blue-200">
+          <span className="h-2 w-2 rounded-full bg-blue-300" aria-hidden="true" />
           {activePromotions.length} {activePromotions.length === 1 ? 'campanha em disputa' : 'campanhas em disputa'}
         </span>
       </header>
 
-      <section aria-label="Buscar e filtrar campanhas" className="rounded-2xl border border-sky-200/15 bg-[#102940]/95 p-3 shadow-[0_16px_38px_-29px_rgba(3,15,32,.85)] sm:p-4">
+      <section aria-label="Buscar e filtrar campanhas" className="rounded-2xl border border-blue-200/15 bg-[#153473]/95 p-3 shadow-[0_16px_38px_-29px_rgba(3,15,32,.85)] sm:p-4">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div role="group" aria-label="Filtrar campanhas" className="grid grid-cols-2 gap-1 rounded-xl bg-[#081b2f] p-1 lg:w-auto">
             {tabs.map((tab) => (
@@ -102,10 +102,10 @@ export default function HubContent({
                 type="button"
                 aria-pressed={activeTab === tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`min-h-11 rounded-lg px-3 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 sm:px-4 ${
+                className={`min-h-11 rounded-lg px-3 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 sm:px-4 ${
                   activeTab === tab.id
-                    ? 'bg-sky-100 text-[#102238] shadow-[0_3px_12px_rgba(0,0,0,.18)]'
-                    : 'text-slate-300 hover:bg-sky-300/10 hover:text-white'
+                    ? 'bg-blue-600 text-white shadow-[0_3px_12px_rgba(0,0,0,.18)]'
+                    : 'text-slate-300 hover:bg-blue-300/10 hover:text-white'
                 }`}
               >
                 {tab.label}<span className="ml-1.5 opacity-70">{tab.count}</span>
@@ -123,7 +123,7 @@ export default function HubContent({
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
               placeholder="Buscar campanha ou cidade..."
-              className="min-h-11 w-full rounded-xl border border-sky-200/15 bg-[#0a1e32] py-2.5 pl-10 pr-10 text-sm text-white outline-none transition-colors placeholder:text-slate-400 focus:border-sky-300/60 focus:ring-2 focus:ring-sky-300/15"
+              className="min-h-11 w-full rounded-xl border border-blue-200/15 bg-[#0a1d3e] py-2.5 pl-10 pr-10 text-sm text-white outline-none transition-colors placeholder:text-slate-400 focus:border-blue-300/60 focus:ring-2 focus:ring-blue-300/15"
             />
             {searchQuery && (
               <button
@@ -133,7 +133,7 @@ export default function HubContent({
                   setSearchQuery('')
                   searchInputRef.current?.focus()
                 }}
-                className="absolute right-2 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-lg text-slate-400 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300"
+                className="absolute right-2 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-lg text-slate-400 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
               >
                 <span aria-hidden="true">×</span>
               </button>
@@ -151,7 +151,7 @@ export default function HubContent({
           </div>
           <div className="text-right">
             {activeTab === 'encerradas' && (
-              <p className="mb-1 text-[11px] font-semibold text-sky-200">Criação · mais recentes primeiro</p>
+              <p className="mb-1 text-[11px] font-semibold text-blue-200">Criação · mais recentes primeiro</p>
             )}
             <p className="text-xs text-slate-400" aria-live="polite">
               {resultCount} {resultCount === 1 ? 'resultado' : 'resultados'}
@@ -167,7 +167,7 @@ export default function HubContent({
         </div>
 
         {resultCount === 0 && (
-          <div className="mt-5 rounded-2xl border border-sky-200/15 bg-[#0d2035] px-6 py-12 text-center" role="status">
+          <div className="mt-5 rounded-2xl border border-blue-200/15 bg-[#0d2350] px-6 py-12 text-center" role="status">
             <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-white/5 text-xl" aria-hidden="true">⌕</div>
             <h3 className="mt-4 text-lg font-bold text-white">Nenhuma campanha encontrada</h3>
             <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-400">
@@ -179,7 +179,7 @@ export default function HubContent({
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="mt-5 min-h-11 rounded-xl border border-white/15 px-4 text-sm font-semibold text-white hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300"
+                className="mt-5 min-h-11 rounded-xl border border-white/15 px-4 text-sm font-semibold text-white hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
               >
                 Limpar busca
               </button>
@@ -194,7 +194,7 @@ export default function HubContent({
           ref={termsTriggerRef}
           type="button"
           onClick={() => setIsTermsOpen(true)}
-          className="min-h-10 rounded-lg px-3 font-semibold text-slate-300 underline decoration-white/20 underline-offset-4 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300"
+          className="min-h-10 rounded-lg px-3 font-semibold text-slate-300 underline decoration-white/20 underline-offset-4 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
         >
           Termos de uso
         </button>
@@ -227,14 +227,14 @@ export default function HubContent({
                 first.focus()
               }
             }}
-            className="relative max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-sky-200/15 bg-[#0d2035] p-6 text-left shadow-2xl sm:p-8"
+            className="relative max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-blue-200/15 bg-[#0d2350] p-6 text-left shadow-2xl sm:p-8"
           >
             <button
               ref={termsCloseRef}
               type="button"
               aria-label="Fechar termos de uso"
               onClick={() => setIsTermsOpen(false)}
-              className="absolute right-4 top-4 grid h-10 w-10 place-items-center rounded-lg text-slate-400 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300"
+              className="absolute right-4 top-4 grid h-10 w-10 place-items-center rounded-lg text-slate-400 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
             >×</button>
             <h2 id="terms-title" className="pr-10 text-xl font-bold text-white">Termos de uso e condições gerais</h2>
             <div className="mt-6 space-y-5 text-sm leading-6 text-slate-300">
@@ -263,7 +263,7 @@ export default function HubContent({
               <button
                 type="button"
                 onClick={() => setIsTermsOpen(false)}
-                className="min-h-11 rounded-xl bg-sky-300 px-5 text-sm font-bold text-[#102238] hover:bg-sky-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                className="min-h-11 rounded-xl bg-blue-600 px-5 text-sm font-bold text-white hover:bg-blue-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
               >
                 Fechar
               </button>

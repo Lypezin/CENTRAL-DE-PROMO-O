@@ -59,10 +59,10 @@ export default function GeneralSettingsForm({
   )
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-xl border border-white/[0.04] bg-[#0d2035] p-5 space-y-5">
+    <form onSubmit={handleSubmit} className="rounded-xl border border-white/[0.04] bg-[#0d2350] p-5 space-y-5">
       <div className="flex items-center justify-between">
         <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider font-mono flex items-center gap-2">
-          <svg className="w-3.5 h-3.5 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+          <svg className="w-3.5 h-3.5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
           Configurações Gerais
         </h2>
       </div>
@@ -123,7 +123,7 @@ export default function GeneralSettingsForm({
                 }
               })
             }}
-            className="admin-input !py-2.5 bg-[#0a1e32]"
+            className="admin-input !py-2.5 bg-[#0a1d3e]"
           >
             <option value="corridas_completadas">Quantidade de Corridas</option>
             <option value="pedidos_aceitos_e_concluidos">Pedidos Aceitos e Concluídos</option>
@@ -159,7 +159,7 @@ export default function GeneralSettingsForm({
             type="date"
             value={promo.data_inicio || ''}
             onChange={e => setPromo({ ...promo, data_inicio: e.target.value })}
-            className="admin-input !py-2.5 bg-[#0a1e32]"
+            className="admin-input !py-2.5 bg-[#0a1d3e]"
           />
         </div>
         <div>
@@ -169,7 +169,7 @@ export default function GeneralSettingsForm({
             type="date"
             value={promo.data_fim || ''}
             onChange={e => setPromo({ ...promo, data_fim: e.target.value })}
-            className="admin-input !py-2.5 bg-[#0a1e32]"
+            className="admin-input !py-2.5 bg-[#0a1d3e]"
           />
         </div>
         <div>
@@ -187,7 +187,7 @@ export default function GeneralSettingsForm({
                 limite_ranking: parseInt(e.target.value) || 15
               }
             })}
-            className="admin-input !py-2.5 bg-[#0a1e32]"
+            className="admin-input !py-2.5 bg-[#0a1d3e]"
           />
         </div>
         <div>
@@ -196,7 +196,7 @@ export default function GeneralSettingsForm({
             id="geral-status"
             value={promo.status}
             onChange={e => setPromo({ ...promo, status: e.target.value as 'rascunho' | 'ativa' | 'encerrada' })}
-            className="admin-input !py-2.5 bg-[#0a1e32]"
+            className="admin-input !py-2.5 bg-[#0a1d3e]"
           >
             <option value="rascunho">Rascunho</option>
             <option value="ativa">Ativa</option>

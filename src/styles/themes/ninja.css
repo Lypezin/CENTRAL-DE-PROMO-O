@@ -42,12 +42,15 @@
   100% { transform: translate3d(0, 0, 0) skewX(0); opacity: 1; }
 }
 
-@keyframes faixa-preta-city-flash {
-  0%, 9% { clip-path: inset(0 100% 0 0); opacity: 0; }
-  15% { clip-path: inset(0 82% 0 0); opacity: .85; }
-  42% { clip-path: inset(0 38% 0 40%); opacity: 1; }
-  69% { clip-path: inset(0 0 0 82%); opacity: .85; }
-  76%, 100% { clip-path: inset(0 0 0 100%); opacity: 0; }
+@keyframes faixa-preta-city-letter {
+  0%, 28%, 100% {
+    color: #d5e2ff;
+    text-shadow: 0 1px 12px rgba(44, 103, 234, .2);
+  }
+  8%, 16% {
+    color: #fff;
+    text-shadow: 0 0 7px rgba(255, 255, 255, .85), 0 0 22px rgba(113, 151, 242, .8);
+  }
 }
 
 @keyframes faixa-preta-city-rule {
@@ -81,14 +84,14 @@
 .group:hover .faixa-preta-ninja-art,
 .group:focus-visible .faixa-preta-ninja-art {
   opacity: .7;
-  filter: brightness(1.22) drop-shadow(0 0 18px rgba(96, 165, 250, .25));
+  filter: brightness(1.22) drop-shadow(0 0 18px rgba(113, 151, 242, .25));
 }
 
 .faixa-preta-strike {
   width: 32%;
   left: 42%;
   right: auto;
-  background: linear-gradient(90deg, transparent, rgba(37, 99, 235, .05) 12%, rgba(96, 165, 250, .32) 49%, rgba(255, 255, 255, .17) 53%, transparent 82%);
+  background: linear-gradient(90deg, transparent, rgba(44, 103, 234, .05) 12%, rgba(113, 151, 242, .32) 49%, rgba(255, 255, 255, .17) 53%, transparent 82%);
   filter: blur(2px);
   opacity: 0;
   transform: translate3d(-95%, 0, 0) skewX(-24deg);
@@ -104,15 +107,10 @@
   max-width: 100%;
 }
 
-.faixa-preta-city-name::after {
-  content: attr(data-city);
-  position: absolute;
-  inset: 0;
-  color: #f3fbff;
-  text-shadow: 0 0 5px rgba(186, 230, 253, .95), 0 0 18px rgba(56, 189, 248, .72), 0 0 30px rgba(37, 99, 235, .38);
-  pointer-events: none;
-  clip-path: inset(0 100% 0 0);
-  opacity: 0;
+.faixa-preta-city-letter {
+  display: inline-block;
+  color: #d5e2ff;
+  text-shadow: 0 1px 12px rgba(44, 103, 234, .2);
 }
 
 .faixa-preta-city::after {
@@ -122,7 +120,7 @@
   right: 1rem;
   bottom: 0;
   height: 2px;
-  background: linear-gradient(90deg, #60a5fa, rgba(37, 99, 235, .55), transparent);
+  background: linear-gradient(90deg, #7197f2, rgba(44, 103, 234, .65), transparent);
   transform: scaleX(0);
   transform-origin: left;
   pointer-events: none;
@@ -132,16 +130,12 @@
   animation: faixa-preta-city-entrance 650ms cubic-bezier(.16, 1, .3, 1) 170ms both;
 }
 
-.faixa-preta-motion-active .faixa-preta-city-name::after {
-  animation: faixa-preta-city-flash 7.8s linear 950ms infinite;
+.faixa-preta-motion-active .faixa-preta-city-letter {
+  animation: faixa-preta-city-letter 7s ease-in-out var(--city-letter-delay, 0ms) infinite;
 }
 
 .faixa-preta-motion-active .faixa-preta-city::after {
   animation: faixa-preta-city-rule 550ms cubic-bezier(.16, 1, .3, 1) 360ms both;
-}
-
-.faixa-preta-card:not(.faixa-preta-motion-active) .faixa-preta-city-name::after {
-  animation-play-state: paused;
 }
 
 .faixa-preta-card:not(.faixa-preta-motion-active) .faixa-preta-ninja-art,
@@ -173,17 +167,17 @@ html[data-motion='eco'] .faixa-preta-motion-active .faixa-preta-strike {
 body.tema-ninja {
   --ninja-bg: #071322;
   --ninja-primary: #16375a;
-  --ninja-accent: #38bdf8;
-  --ninja-glow: rgba(96, 165, 250, 0.08);
+  --ninja-accent: #7197f2;
+  --ninja-glow: rgba(113, 151, 242, 0.08);
   background-image:
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(37, 99, 235, 0.14), transparent),
-    radial-gradient(ellipse 50% 50% at 50% 100%, rgba(6, 182, 212, 0.06), transparent);
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(44, 103, 234, 0.14), transparent),
+    radial-gradient(ellipse 50% 50% at 50% 100%, rgba(78, 128, 237, 0.06), transparent);
 }
 
 /* Gradients */
 .text-gradient-ninja {
   color: #eaf5ff;
-  text-shadow: 0 2px 24px rgba(56, 189, 248, 0.18);
+  text-shadow: 0 2px 24px rgba(113, 151, 242, 0.18);
 }
 
 /* Base Card overrides in Ninja theme */
@@ -196,33 +190,33 @@ body.tema-ninja .obsidian-card:hover {
   border-color: rgba(147, 197, 253, 0.28);
   box-shadow:
     0 12px 40px -10px rgba(0, 0, 0, 0.8),
-    0 0 25px -5px rgba(56, 189, 248, 0.08);
+    0 0 25px -5px rgba(113, 151, 242, 0.08);
 }
 
 /* Podium customization in Ninja Theme */
 /* 1st Place - Faixa Preta podium */
 body.tema-ninja .copa-podium-1 {
   background: linear-gradient(135deg, #0a1a2d 0%, #163451 60%, #081624 100%) !important;
-  border: 1px solid rgba(37, 99, 235, 0.35) !important;
+  border: 1px solid rgba(44, 103, 234, 0.35) !important;
   box-shadow:
     0 20px 40px -15px rgba(0, 0, 0, 0.9),
-    0 0 25px -3px rgba(37, 99, 235, 0.12),
+    0 0 25px -3px rgba(44, 103, 234, 0.12),
     inset 0 1px 1px rgba(255, 255, 255, 0.02) !important;
 }
 
 body.tema-ninja .copa-podium-1:hover {
-  border-color: #2563eb !important;
+  border-color: #2c67ea !important;
   box-shadow:
     0 25px 50px -12px rgba(0, 0, 0, 0.95),
-    0 0 35px -2px rgba(37, 99, 235, 0.25),
+    0 0 35px -2px rgba(44, 103, 234, 0.25),
     inset 0 1px 1px rgba(255, 255, 255, 0.05) !important;
 }
 
 body.tema-ninja .copa-podium-1 .podium-sparkle {
   color: #f4f4f5 !important;
-  background-color: rgba(37, 99, 235, 0.15) !important;
-  border-color: rgba(37, 99, 235, 0.35) !important;
-  box-shadow: 0 0 12px rgba(37, 99, 235, 0.25) !important;
+  background-color: rgba(44, 103, 234, 0.15) !important;
+  border-color: rgba(44, 103, 234, 0.35) !important;
+  box-shadow: 0 0 12px rgba(44, 103, 234, 0.25) !important;
   font-family: monospace;
 }
 
@@ -234,7 +228,7 @@ body.tema-ninja .copa-podium-1::after {
   top: 12px;
   font-size: 1.5rem;
   opacity: 0.22;
-  filter: drop-shadow(0 0 8px #2563eb);
+  filter: drop-shadow(0 0 8px #2c67ea);
 }
 
 /* 2nd Place - Brushed Titanium/Silver */
@@ -260,9 +254,9 @@ body.tema-ninja .copa-podium-3:hover {
 }
 
 /* Progress micro-tracks inside cards and leaderboards */
-body.tema-ninja .copa-podium-1 .bg-cyan-400 {
-  background-color: #2563eb !important;
-  box-shadow: 0 0 12px rgba(37, 99, 235, 0.6) !important;
+body.tema-ninja .copa-podium-1 .bg-blue-400 {
+  background-color: #2c67ea !important;
+  box-shadow: 0 0 12px rgba(44, 103, 234, 0.6) !important;
 }
 
 body.tema-ninja .copa-podium-2 .bg-slate-400 {
@@ -288,13 +282,13 @@ body.tema-ninja .copa-leaderboard-table > div:first-child {
 }
 
 /* Rows styling in table */
-body.tema-ninja .copa-leaderboard-table .hover\:border-sky-500\/40:hover {
-  border-left-color: rgba(37, 99, 235, 0.45) !important;
+body.tema-ninja .copa-leaderboard-table .hover\:border-blue-500\/40:hover {
+  border-left-color: rgba(44, 103, 234, 0.45) !important;
   background-color: rgba(228, 228, 231, 0.015) !important;
 }
 
-body.tema-ninja .copa-leaderboard-table .bg-cyan-500\/\[0\.02\] {
-  background-color: rgba(37, 99, 235, 0.02) !important;
+body.tema-ninja .copa-leaderboard-table .bg-blue-500\/\[0\.02\] {
+  background-color: rgba(44, 103, 234, 0.02) !important;
 }
 
 body.tema-ninja .copa-leaderboard-table .bg-slate-500\/\[0\.02\] {
@@ -302,8 +296,8 @@ body.tema-ninja .copa-leaderboard-table .bg-slate-500\/\[0\.02\] {
 }
 
 /* Table micro-bar progress */
-body.tema-ninja .copa-leaderboard-table .bg-cyan-500 {
-  background-color: #2563eb !important;
+body.tema-ninja .copa-leaderboard-table .bg-blue-500 {
+  background-color: #2c67ea !important;
 }
 
 body.tema-ninja .copa-leaderboard-table .bg-slate-400 {
@@ -314,26 +308,26 @@ body.tema-ninja .copa-leaderboard-table .bg-blue-600 {
   background-color: #71717a !important;
 }
 
-body.tema-ninja .copa-leaderboard-table .bg-sky-500 {
+body.tema-ninja .copa-leaderboard-table .bg-blue-500 {
   background-color: #3f3f46 !important;
 }
 
 /* Prizes badges in tables */
-body.tema-ninja .copa-leaderboard-table .text-sky-400 {
+body.tema-ninja .copa-leaderboard-table .text-blue-400 {
   color: #f4f4f5 !important;
   background-color: rgba(255, 255, 255, 0.04) !important;
   border-color: rgba(255, 255, 255, 0.12) !important;
 }
 
-body.tema-ninja .copa-leaderboard-table .text-cyan-400 {
-  color: #3b82f6 !important;
+body.tema-ninja .copa-leaderboard-table .text-blue-400 {
+  color: #376de4 !important;
   background-color: rgba(59, 130, 246, 0.06) !important;
   border-color: rgba(59, 130, 246, 0.2) !important;
 }
 
 /* Position badges in table */
-body.tema-ninja .copa-leaderboard-table .text-cyan-400 {
-  color: #3b82f6 !important;
+body.tema-ninja .copa-leaderboard-table .text-blue-400 {
+  color: #376de4 !important;
   background-color: rgba(59, 130, 246, 0.1) !important;
   border-color: rgba(59, 130, 246, 0.25) !important;
 }
@@ -355,11 +349,11 @@ body.tema-ninja .obsidian-card:hover .font-black {
   color: #ffffff !important;
 }
 
-body.tema-ninja .copa-leaderboard-table .group-hover\:text-sky-300 {
+body.tema-ninja .copa-leaderboard-table .group-hover\:text-blue-300 {
   color: #ffffff !important;
 }
-body.tema-ninja .copa-leaderboard-table .group:hover .group-hover\:text-sky-300 {
-  color: #3b82f6 !important;
+body.tema-ninja .copa-leaderboard-table .group:hover .group-hover\:text-blue-300 {
+  color: #376de4 !important;
 }
 
 /* Filter components style */
@@ -376,7 +370,7 @@ body.tema-ninja .hub-filter-btn[class*="text-white"] {
 }
 
 body.tema-ninja .hub-filter-btn:not([class*="text-white"]):hover {
-  color: #3b82f6 !important;
+  color: #376de4 !important;
 }
 
 body.tema-ninja .hub-search-input {
@@ -385,7 +379,7 @@ body.tema-ninja .hub-search-input {
 }
 
 body.tema-ninja .hub-search-input:focus {
-  border-color: #3b82f6 !important;
+  border-color: #376de4 !important;
   box-shadow: 0 0 15px rgba(59, 130, 246, 0.1) !important;
 }
 
@@ -407,5 +401,5 @@ body.tema-ninja .ninja-hero-banner::before {
   left: 0;
   width: 100%;
   height: 4px;
-  background: linear-gradient(90deg, #000000 0%, #3b82f6 35%, #000000 70%, #3b82f6 100%);
+  background: linear-gradient(90deg, #000000 0%, #376de4 35%, #000000 70%, #376de4 100%);
 }

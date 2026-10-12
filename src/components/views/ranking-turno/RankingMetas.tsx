@@ -44,7 +44,7 @@ function RankingMetasComponent({
       {/* 🔍 INDIVIDUAL SEARCH CARD RESULT */}
       {searchQuery ? (
         <div className="space-y-3">
-          <h3 className="text-[10px] font-bold text-sky-400 uppercase tracking-wider font-mono pl-1">Resultado da Busca</h3>
+          <h3 className="text-[10px] font-bold text-blue-400 uppercase tracking-wider font-mono pl-1">Resultado da Busca</h3>
           {filteredRanking.length === 0 ? (
             <p className="text-xs text-slate-400 pl-1 font-mono">Nenhum entregador encontrado com este nome.</p>
           ) : (
@@ -56,7 +56,7 @@ function RankingMetasComponent({
               return (
                 <div
                   key={item.id_da_pessoa_entregadora}
-                  className="bg-[#0d2035] border border-white/[0.04] p-5 rounded-2xl space-y-4 shadow-xl hover:border-white/[0.08] transition-all duration-300"
+                  className="bg-[#0d2350] border border-white/[0.04] p-5 rounded-2xl space-y-4 shadow-xl hover:border-white/[0.08] transition-all duration-300"
                 >
                   <div className="flex justify-between items-start">
                     <div>
@@ -78,22 +78,22 @@ function RankingMetasComponent({
                       <div
                         className={`h-full rounded-full transition-all duration-1000 ${
                           atingido
-                            ? 'bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.3)]'
-                            : 'bg-sky-500 shadow-[0_0_8px_rgba(56,189,248,0.2)]'
+                            ? 'bg-blue-400 shadow-[0_0_10px_rgba(34,211,238,0.3)]'
+                            : 'bg-blue-500 shadow-[0_0_8px_rgba(56,189,248,0.2)]'
                         }`}
                         style={{ width: `${pct}%` }}
                       ></div>
                     </div>
                     <div className="flex justify-between text-[8px] text-slate-400 font-bold uppercase tracking-wider font-mono">
                       <span>0%</span>
-                      <span className={atingido ? 'text-cyan-400' : 'text-sky-400'}>{pct.toFixed(0)}% concluído</span>
+                      <span className={atingido ? 'text-blue-400' : 'text-blue-400'}>{pct.toFixed(0)}% concluído</span>
                       <span>100%</span>
                     </div>
                   </div>
 
                   <div className="pt-3.5 flex flex-wrap items-center justify-between gap-3 border-t border-white/[0.02]">
                     {atingido ? (
-                      <div className="inline-flex items-center gap-1.5 bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[9px] font-extrabold px-3 py-1 rounded-lg uppercase tracking-wider font-mono shadow-sm">
+                      <div className="inline-flex items-center gap-1.5 bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[9px] font-extrabold px-3 py-1 rounded-lg uppercase tracking-wider font-mono shadow-sm">
                         <span>✅</span> Concluído!
                       </div>
                     ) : (
@@ -104,7 +104,7 @@ function RankingMetasComponent({
 
                     <div className="text-[10px] text-slate-400 font-mono">
                       Prêmio Garantido:{' '}
-                      <strong className={atingido ? 'text-cyan-400 font-extrabold' : 'text-slate-600'}>
+                      <strong className={atingido ? 'text-blue-400 font-extrabold' : 'text-slate-600'}>
                         {formatCurrency(prize)}
                       </strong>
                     </div>
@@ -122,8 +122,8 @@ function RankingMetasComponent({
 
       {/* 🏆 MURAL DOS CONQUISTADORES (Honor Board with clean cards) */}
       <div className="space-y-4 border-t border-white/[0.04] pt-6">
-        <h3 className="text-[10px] font-bold tracking-wider text-cyan-400 uppercase flex items-center gap-2 pl-1 font-mono">
-          <span className="w-1.5 h-1.5 bg-cyan-500 rounded-full animate-pulse"></span>
+        <h3 className="text-[10px] font-bold tracking-wider text-blue-400 uppercase flex items-center gap-2 pl-1 font-mono">
+          <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></span>
           Mural dos Conquistadores (Objetivo Atingido)
         </h3>
 
@@ -136,9 +136,9 @@ function RankingMetasComponent({
             {winners.map((item, idx) => (
               <div
                 key={item.id_da_pessoa_entregadora}
-                className="flex items-center gap-3 bg-cyan-500/5 border border-cyan-500/10 p-3.5 rounded-xl hover:border-cyan-400/30 transition-all duration-300 shadow-sm"
+                className="flex items-center gap-3 bg-blue-500/5 border border-blue-500/10 p-3.5 rounded-xl hover:border-blue-400/30 transition-all duration-300 shadow-sm"
               >
-                <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 text-xs font-mono font-bold select-none">
+                <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 text-xs font-mono font-bold select-none">
                   {idx + 1 < 10 ? `0${idx + 1}` : idx + 1}
                 </div>
                 <div className="truncate">
@@ -147,7 +147,7 @@ function RankingMetasComponent({
                     {!isCopa && `📍 ${item.praca} • `}{formatScoreValue(getScore(item))}
                   </div>
                 </div>
-                <div className="ml-auto bg-cyan-500/15 text-cyan-300 border border-cyan-500/20 px-2.5 py-1 rounded-lg text-[10px] font-black font-mono">
+                <div className="ml-auto bg-blue-500/15 text-blue-300 border border-blue-500/20 px-2.5 py-1 rounded-lg text-[10px] font-black font-mono">
                   +{formatCurrency(prize)}
                 </div>
               </div>

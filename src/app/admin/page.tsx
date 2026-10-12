@@ -168,9 +168,9 @@ export default function AdminPage() {
 
   if (session.status === 'checking') {
     return (
-      <main className="flex min-h-[60vh] items-center justify-center bg-[#071322] text-center">
+      <main className="flex min-h-[60vh] items-center justify-center bg-[#07132c] text-center">
         <div>
-          <span className="mx-auto block h-5 w-5 animate-spin rounded-full border-2 border-sky-300/25 border-t-sky-300" aria-hidden="true" />
+          <span className="mx-auto block h-5 w-5 animate-spin rounded-full border-2 border-blue-300/25 border-t-blue-300" aria-hidden="true" />
           <p className="mt-3 text-sm text-slate-400">Verificando acesso administrativo…</p>
         </div>
       </main>
@@ -179,11 +179,11 @@ export default function AdminPage() {
 
   if (session.status === 'unavailable') {
     return (
-      <main className="flex min-h-[60vh] items-center justify-center bg-[#071322] px-5 text-center text-white">
-        <section className="max-w-md rounded-2xl border border-rose-300/20 bg-[#0d2035] p-6 shadow-xl">
+      <main className="flex min-h-[60vh] items-center justify-center bg-[#07132c] px-5 text-center text-white">
+        <section className="max-w-md rounded-2xl border border-rose-300/20 bg-[#0d2350] p-6 shadow-xl">
           <p className="text-lg font-black text-rose-200">Não foi possível verificar o acesso</p>
           <p role="alert" className="mt-2 text-sm leading-6 text-slate-400">O serviço de sessão está temporariamente indisponível. Sua sessão não foi encerrada; tente verificar novamente.</p>
-          <button type="button" onClick={() => void retrySession()} disabled={retrying} className="mt-5 min-h-11 rounded-lg bg-sky-300 px-4 text-sm font-black text-slate-950 transition-colors hover:bg-sky-200 disabled:cursor-wait disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white">
+          <button type="button" onClick={() => void retrySession()} disabled={retrying} className="mt-5 min-h-11 rounded-lg bg-blue-300 px-4 text-sm font-black text-slate-950 transition-colors hover:bg-blue-200 disabled:cursor-wait disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white">
             {retrying ? 'Verificando…' : 'Tentar novamente'}
           </button>
         </section>
@@ -199,10 +199,10 @@ export default function AdminPage() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="min-h-screen pb-16 relative overflow-hidden bg-[#071322]"
+      className="min-h-screen pb-16 relative overflow-hidden bg-[#07132c]"
     >
       <div className="tech-grid opacity-30 pointer-events-none"></div>
-      <div className="absolute top-0 inset-x-0 h-[300px] bg-gradient-to-b from-sky-500/5 to-transparent pointer-events-none"></div>
+      <div className="absolute top-0 inset-x-0 h-[300px] bg-gradient-to-b from-blue-500/5 to-transparent pointer-events-none"></div>
 
       <motion.div
         variants={containerVariants}
@@ -212,8 +212,8 @@ export default function AdminPage() {
       >
         <motion.div variants={itemVariants} className="flex flex-col md:flex-row justify-between items-center md:items-end mb-10 gap-6 border-b border-white/[0.04] pb-6">
           <div className="text-center md:text-left flex-1">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-sky-500/10 border border-sky-500/20 rounded-full text-[10px] font-bold text-sky-400 uppercase tracking-widest font-mono mb-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse"></span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-500/10 border border-blue-500/20 rounded-full text-[10px] font-bold text-blue-400 uppercase tracking-widest font-mono mb-3">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></span>
               Acesso Mestre Ativo
             </div>
             <h1 className="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">Painel Administrativo</h1>
@@ -234,7 +234,7 @@ export default function AdminPage() {
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
               onClick={() => router.push('/admin/promo/nova')}
-              className="bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white border border-sky-400/50 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider shadow-lg shadow-sky-500/20 transition-all flex items-center gap-2"
+              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 text-white border border-blue-400/50 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider shadow-lg shadow-blue-500/20 transition-all flex items-center gap-2"
               aria-label="Criar nova promoção"
             >
               <span className="text-lg leading-none">+</span>
@@ -258,17 +258,17 @@ export default function AdminPage() {
         <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
           <motion.div
             whileHover={{ scale: 1.02 }}
-            className="obsidian-card p-6 rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-[#0a1e32] to-cyan-950/20 relative overflow-hidden group flex items-center justify-between transition-all hover:border-cyan-500/40"
+            className="obsidian-card p-6 rounded-2xl border border-blue-500/20 bg-gradient-to-br from-[#0a1d3e] to-blue-950/20 relative overflow-hidden group flex items-center justify-between transition-all hover:border-blue-500/40"
           >
-            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-cyan-500/10 blur-[30px] rounded-full group-hover:bg-cyan-500/20 transition-colors"></div>
+            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-blue-500/10 blur-[30px] rounded-full group-hover:bg-blue-500/20 transition-colors"></div>
             <div className="relative z-10">
-              <div className="text-[10px] font-bold text-cyan-500/80 uppercase tracking-wider font-mono mb-2 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-cyan-500 animate-ping"></span>
+              <div className="text-[10px] font-bold text-blue-300/80 uppercase tracking-wider font-mono mb-2 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-blue-500 animate-ping"></span>
                 Pessoas Conectadas Agora
               </div>
               <div className="text-4xl font-black text-white font-mono tracking-tighter">{onlineCount}</div>
             </div>
-            <div className="text-cyan-400 bg-cyan-500/10 p-4 rounded-2xl border border-cyan-500/20 relative z-10">
+            <div className="text-blue-400 bg-blue-500/10 p-4 rounded-2xl border border-blue-500/20 relative z-10">
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
               </svg>
@@ -277,17 +277,17 @@ export default function AdminPage() {
 
           <motion.div
             whileHover={{ scale: 1.02 }}
-            className="obsidian-card p-6 rounded-2xl border border-sky-500/20 bg-gradient-to-br from-[#0a1e32] to-sky-950/20 relative overflow-hidden group flex items-center justify-between transition-all hover:border-sky-500/40"
+            className="obsidian-card p-6 rounded-2xl border border-blue-500/20 bg-gradient-to-br from-[#0a1d3e] to-blue-950/20 relative overflow-hidden group flex items-center justify-between transition-all hover:border-blue-500/40"
           >
-            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-sky-500/10 blur-[30px] rounded-full group-hover:bg-sky-500/20 transition-colors"></div>
+            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-blue-500/10 blur-[30px] rounded-full group-hover:bg-blue-500/20 transition-colors"></div>
             <div className="relative z-10">
-              <div className="text-[10px] font-bold text-sky-500/80 uppercase tracking-wider font-mono mb-2 flex items-center gap-2">
-                <svg className="w-3 h-3 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+              <div className="text-[10px] font-bold text-blue-300/80 uppercase tracking-wider font-mono mb-2 flex items-center gap-2">
+                <svg className="w-3 h-3 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                 Tráfego Total
               </div>
               <div className="text-4xl font-black text-white font-mono tracking-tighter">{totalVisits.toLocaleString('pt-BR')}</div>
             </div>
-            <div className="text-sky-400 bg-sky-500/10 p-4 rounded-2xl border border-sky-500/20 relative z-10">
+            <div className="text-blue-400 bg-blue-500/10 p-4 rounded-2xl border border-blue-500/20 relative z-10">
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
               </svg>

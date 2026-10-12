@@ -10,11 +10,11 @@ interface DynamicBackgroundProps {
 /** Lightweight theme backdrop: no WebGL, canvas animation, or particle loop. */
 function StaticThemeBackground({ theme }: { theme: SiteTheme }) {
   const gradient = theme === 'ninja'
-    ? 'radial-gradient(ellipse at 76% 8%, rgba(37,99,235,0.18) 0%, transparent 68%)'
-    : 'radial-gradient(ellipse at 76% 8%, rgba(6,182,212,0.12), transparent 68%)'
+    ? 'radial-gradient(ellipse at 76% 8%, rgba(44,103,234,0.18) 0%, transparent 68%)'
+    : 'radial-gradient(ellipse at 76% 8%, rgba(78,128,237,0.12), transparent 68%)'
 
   return (
-    <div className="fixed inset-0 z-[-2] pointer-events-none overflow-hidden bg-[#071322]">
+    <div className="fixed inset-0 z-[-2] pointer-events-none overflow-hidden bg-[#07132c]">
       <div className="absolute inset-0 opacity-40" style={{ background: gradient }} />
     </div>
   )
