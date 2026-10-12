@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useToast } from '@/components/ui/Toast'
 import PromoPreviewCard from '@/components/admin/PromoPreviewCard'
-import PromotionManagementWorkspace from '@/components/admin/PromotionManagementWorkspace'
+import PromotionCreationCompletion from '@/components/admin/PromotionCreationCompletion'
 import TurnoPrizeRow, { type PrizeEditorField, type PrizeEntry, type TurnoPrizeConfig } from '@/components/admin/TurnoPrizeRow'
 import type { MecanicaPromocao, Promocao, RegrasPromocao } from '@/lib/supabase'
 
@@ -673,9 +673,8 @@ export default function CreatePromotionWizard() {
 
   if (createdPromoId) {
     return (
-      <PromotionManagementWorkspace
+      <PromotionCreationCompletion
         promoId={createdPromoId}
-        createdInWizard
         onReturnToCampaigns={returnToCampaigns}
         onCreateAnother={createAnotherCampaign}
       />

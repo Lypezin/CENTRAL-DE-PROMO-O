@@ -162,7 +162,7 @@ export default function HubContent({
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
           {showEliteCard && <ElitePromoCard config={eliteConfig} />}
           {filteredPromotions.map((promo, index) => (
-            <PromoCard key={promo.id} promo={promo} showCreationDate={activeTab === 'encerradas'} preloadNinjaImage={index === 0 && !showEliteCard} />
+            <PromoCard key={promo.id} promo={promo} preloadNinjaImage={index === 0 && !showEliteCard} animationDelayMs={index * 70} />
           ))}
         </div>
 

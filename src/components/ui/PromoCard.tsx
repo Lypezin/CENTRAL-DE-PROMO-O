@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
+import type { CSSProperties } from 'react'
 import StatusBadge from './StatusBadge'
 import type { Promocao } from '@/lib/supabase'
 
@@ -20,16 +21,6 @@ function formatDate(value: string | null) {
   return Number.isNaN(date.getTime()) ? 'A definir' : date.toLocaleDateString('pt-BR')
 }
 
-function formatCreationDate(value: string) {
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return 'Data indisponível'
-  return new Intl.DateTimeFormat('pt-BR', {
-    dateStyle: 'short',
-    timeStyle: 'medium',
-    timeZone: 'America/Sao_Paulo',
-  }).format(date)
-}
-
 function FaixaIcon({ className }: { className: string }) {
   return (
     <svg viewBox="0 0 40 40" className={className} fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
@@ -39,7 +30,7 @@ function FaixaIcon({ className }: { className: string }) {
   )
 }
 
-function PromoCardContent({ promo, showCreationDate = false, preloadNinjaImage = false }: { promo: Promocao; showCreationDate?: boolean; preloadNinjaImage?: boolean }) {
+function PromoCardContent({ promo, preloadNinjaImage = false }: { promo: Promocao; preloadNinjaImage?: boolean }) {
   const calculationType = promo.config_regras?.mecanica?.tipo_calculo
   const isRanking = calculationType
     ? calculationType === 'ranking'
@@ -103,8 +94,9 @@ function PromoCardContent({ promo, showCreationDate = false, preloadNinjaImage =
         }
 
   return (
-    <article className={`@container/card relative isolate flex h-full min-h-[380px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br ${theme.surface} shadow-[0_18px_44px_-28px_rgba(0,0,0,0.95)] transition duration-300 group-hover:-translate-y-1 group-focus-visible:-translate-y-1 group-hover:border-white/20 group-focus-visible:border-white/20 group-hover:shadow-[0_24px_50px_-25px_rgba(0,0,0,0.95)] group-focus-visible:shadow-[0_24px_50px_-25px_rgba(0,0,0,0.95)] group-focus-visible:ring-2 group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-[#090d0d] ${theme.focusRing} motion-reduce:transform-none motion-reduce:transition-none`}>
+    <article className={`promo-card-shell @container/card relative isolate flex h-full min-h-[380px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br ${theme.surface} shadow-[0_18px_44px_-28px_rgba(0,0,0,0.95)] transition duration-300 group-hover:-translate-y-1 group-focus-visible:-translate-y-1 group-hover:border-white/20 group-focus-visible:border-white/20 group-hover:shadow-[0_24px_50px_-25px_rgba(0,0,0,0.95)] group-focus-visible:shadow-[0_24px_50px_-25px_rgba(0,0,0,0.95)] group-focus-visible:ring-2 group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-[#090d0d] ${theme.focusRing} motion-reduce:transform-none motion-reduce:transition-none`}>
       <div className={`h-1.5 w-full shrink-0 bg-gradient-to-r ${theme.bar}`} aria-hidden="true" />
+      <div className="promo-card-glint pointer-events-none absolute left-0 top-0 z-30 h-1.5 w-[34%]" aria-hidden="true" />
       <div className={`pointer-events-none absolute -right-14 -top-12 h-52 w-52 rounded-full blur-3xl ${theme.glow}`} aria-hidden="true" />
       {isFaixaPreta && (
         <div className="faixa-preta-ninja-art pointer-events-none absolute right-0 top-6 z-0 h-[270px] w-[58%] overflow-hidden sm:h-[300px]" aria-hidden="true">
@@ -183,11 +175,6 @@ function PromoCardContent({ promo, showCreationDate = false, preloadNinjaImage =
             <p className="mt-1 text-sm font-semibold tabular-nums text-zinc-200">
               {formatDate(promo.data_inicio)} <span className="text-zinc-500">—</span> {formatDate(promo.data_fim)}
             </p>
-            {showCreationDate && (
-              <p className="mt-1 text-xs font-medium text-zinc-400">
-                Criada em <time dateTime={promo.created_at}>{formatCreationDate(promo.created_at)}</time>
-              </p>
-            )}
           </div>
           <span className={`inline-flex min-h-10 items-center gap-2 rounded-lg border px-3 text-xs font-black uppercase tracking-[.08em] transition-colors ${theme.action}`}>
             {callToAction}
@@ -203,7 +190,7 @@ function PromoCardContent({ promo, showCreationDate = false, preloadNinjaImage =
 
 export function PromoCardPreview({ promo }: { promo: Promocao }) {
   return (
-    <div className="group">
+    <div className="promo-card-link group block h-full rounded-2xl">
       <PromoCardContent promo={promo} />
     </div>
   )
@@ -211,20 +198,21 @@ export function PromoCardPreview({ promo }: { promo: Promocao }) {
 
 export default function PromoCard({
   promo,
-  showCreationDate = false,
   preloadNinjaImage = false,
+  animationDelayMs = 0,
 }: {
   promo: Promocao
-  showCreationDate?: boolean
   preloadNinjaImage?: boolean
+  animationDelayMs?: number
 }) {
   return (
     <Link
       href={`/promo/${promo.slug}`}
-      className="group block h-full rounded-2xl focus-visible:outline-none"
+      className="promo-card-link group block h-full rounded-2xl focus-visible:outline-none"
+      style={{ '--promo-card-delay': `${Math.max(0, Math.min(animationDelayMs, 500))}ms` } as CSSProperties & { '--promo-card-delay': string }}
       aria-label={`Abrir campanha: ${promo.nome}`}
     >
-      <PromoCardContent promo={promo} showCreationDate={showCreationDate} preloadNinjaImage={preloadNinjaImage} />
+      <PromoCardContent promo={promo} preloadNinjaImage={preloadNinjaImage} />
     </Link>
   )
 }
