@@ -50,7 +50,6 @@ const COLUMN_ALIASES: Record<string, string> = {
 }
 
 const NUMERIC_COLUMNS = new Set([
-  'duracao_do_periodo',
   'numero_minimo_de_entregadores_regulares_na_escala',
   'tempo_disponivel_escalado',
   'tempo_disponivel_absoluto',
@@ -125,6 +124,19 @@ export function parseExcelDate(value: unknown): string {
   }
 
   return ''
+}
+
+function parseDuration(value: unknown): string | null {
+  if (value === null || value === undefined || value === '') return null
+
+  if (value instanceof Date && Number.isFinite(value.getTime())) {
+    // read-excel-file turns Excel time-formatted cells into Dates based on the
+    // 1899-12-30 epoch. Keep the original serial-day representation in text.
+    const excelEpoch = Date.UTC(1899, 11, 30)
+    return String((value.getTime() - excelEpoch) / 86_400_000)
+  }
+
+  return String(value).trim() || null
 }
 
 function parseNumeric(value: unknown, field: string): number | null {
@@ -232,6 +244,8 @@ export async function processExcelBuffer(
           } else if (field === 'periodo') {
             const rawPeriod = value === null || value === undefined ? '' : String(value).trim()
             record[field] = rawPeriod ? normalizarPeriodo(rawPeriod) ?? rawPeriod : 'GERAL'
+          } else if (field === 'duracao_do_periodo') {
+            record[field] = parseDuration(value)
           } else if (NUMERIC_COLUMNS.has(field)) {
             record[field] = parseNumeric(value, field)
           } else {

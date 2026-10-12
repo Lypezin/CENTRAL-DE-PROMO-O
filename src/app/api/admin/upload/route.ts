@@ -13,6 +13,7 @@ const IMPORT_PERIODS = new Set(['GERAL', 'CAFE_DA_MANHA', 'ALMOCO', 'TARDE', 'JA
 
 const TEXT_FIELD_LIMITS: Record<string, number> = {
   periodo: 80,
+  duracao_do_periodo: 80,
   tag: 120,
   id_da_pessoa_entregadora: 160,
   pessoa_entregadora: 300,
@@ -22,7 +23,6 @@ const TEXT_FIELD_LIMITS: Record<string, number> = {
 }
 
 const NUMERIC_FIELDS = new Set([
-  'duracao_do_periodo',
   'numero_minimo_de_entregadores_regulares_na_escala',
   'tempo_disponivel_escalado',
   'tempo_disponivel_absoluto',
