@@ -1,4 +1,4 @@
--- Apply only after the server-side application version is deployed and verified.
+-- Applied after the server-side application version was deployed and verified.
 -- Remove broad policies and direct table privileges only from this app's tables.
 -- The XML NFSe tables, policies, functions, indexes and grants are intentionally untouched.
 do $block$
@@ -27,7 +27,6 @@ begin
   end loop;
 end
 $block$;
-
 -- Public API access is mediated by server routes using the service-role key.
 -- Keep only known Central de Promoções routines in scope. Do not affect functions
 -- that another product may add to the shared public schema later.
