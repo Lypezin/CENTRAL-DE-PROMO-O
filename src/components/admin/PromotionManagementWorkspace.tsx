@@ -37,6 +37,7 @@ export default function PromotionManagementWorkspace({
     setPromo,
     stats,
     loading,
+    loadError,
     saving,
     deleting,
     confirmDelete,
@@ -72,7 +73,8 @@ export default function PromotionManagementWorkspace({
   if (!promo) return (
     <div className="flex min-h-[60vh] items-center justify-center px-4">
       <div className="space-y-3 text-center">
-        <p role="alert" className="text-sm font-bold text-rose-300">Não foi possível carregar esta campanha.</p>
+        <p role="alert" className="text-sm font-bold text-rose-300">{loadError || 'Não foi possível carregar esta campanha.'}</p>
+        <button type="button" onClick={() => void carregarPromo()} className="mx-auto block min-h-10 rounded-lg border border-white/10 px-4 text-xs font-semibold text-zinc-200 transition-colors hover:bg-white/[.05] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-300">Tentar novamente</button>
         {onReturnToCampaigns
           ? <button type="button" onClick={onReturnToCampaigns} className="text-xs font-semibold text-lime-200 underline underline-offset-4">Voltar às campanhas</button>
           : <Link href="/admin" className="text-xs font-semibold text-sky-300 underline underline-offset-4">Voltar ao painel</Link>}
@@ -150,6 +152,13 @@ export default function PromotionManagementWorkspace({
             </div>
           </div>
         </motion.div>
+
+        {loadError && (
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-300/20 bg-amber-300/[.05] px-4 py-3" role="status">
+            <p className="text-xs leading-5 text-amber-100">{loadError}</p>
+            <button type="button" onClick={() => void carregarPromo()} className="min-h-9 shrink-0 rounded-lg border border-amber-200/20 px-3 text-xs font-bold text-amber-100 transition-colors hover:bg-amber-200/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200">Recarregar</button>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.1 }} className="space-y-5 lg:col-span-2">

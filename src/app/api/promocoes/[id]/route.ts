@@ -18,7 +18,15 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params
-  const isAdmin = (await getAuthenticatedUser()) !== null
+  let isAdmin = false
+  try {
+    isAdmin = (await getAuthenticatedUser()) !== null
+  } catch {
+    return NextResponse.json(
+      { error: 'Não foi possível verificar a sessão administrativa.' },
+      { status: 503, headers: { 'Cache-Control': 'no-store' } }
+    )
+  }
 
   const { data: promocao, error } = await supabaseAdmin
     .from('promocoes')
@@ -27,7 +35,15 @@ export async function GET(
     .in('status', isAdmin ? ['rascunho', 'ativa', 'encerrada'] : ['ativa', 'encerrada'])
     .single()
 
-  if (error || !promocao) {
+  if (error) {
+    console.error('Failed to load promotion:', error)
+    return NextResponse.json(
+      { error: 'Não foi possível carregar a campanha agora.' },
+      { status: 503, headers: { 'Cache-Control': 'no-store' } }
+    )
+  }
+
+  if (!promocao) {
     return NextResponse.json(
       { error: 'Promoção não encontrada' },
       { status: 404 }

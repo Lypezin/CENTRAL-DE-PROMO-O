@@ -62,6 +62,7 @@ export function usePromoEditor(id: string | string[], onDeleteSuccess?: () => vo
   const [promo, setPromoState] = useState<Promocao | null>(null)
   const [stats, setStats] = useState<PromocaoStats | null>(null)
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
@@ -102,18 +103,27 @@ export function usePromoEditor(id: string | string[], onDeleteSuccess?: () => vo
   }, [])
 
   const carregarPromo = useCallback(async () => {
+    setLoading(true)
+    setLoadError(null)
     try {
       const res = await fetch(`/api/promocoes/${id}`)
-      if (res.ok) {
-        const data = await res.json()
-        const initializedPromo = normalizePromoConfig(data.promocao as Promocao)
-        setPromo(initializedPromo)
-        setStats(data.stats)
-
-        setLocalPremios(normalizePrizeGroups(data.promocao.config_premios))
+      const data = await res.json().catch(() => null) as { promocao?: Promocao; stats?: PromocaoStats | null } | null
+      if (!res.ok) {
+        throw new Error(res.status === 404
+          ? 'Esta campanha não existe ou não está disponível nesta sessão.'
+          : 'O serviço está temporariamente indisponível. Tente carregar a campanha novamente.')
       }
+      if (!data?.promocao) {
+        throw new Error('A resposta do servidor não trouxe os dados da campanha. Tente novamente.')
+      }
+
+      const initializedPromo = normalizePromoConfig(data.promocao)
+      setPromo(initializedPromo)
+      setStats(data.stats ?? null)
+      setLocalPremios(normalizePrizeGroups(data.promocao.config_premios))
     } catch (e) {
       console.error(e)
+      setLoadError(e instanceof Error ? e.message : 'Não foi possível carregar a campanha. Tente novamente.')
     } finally {
       setLoading(false)
     }
@@ -238,6 +248,7 @@ export function usePromoEditor(id: string | string[], onDeleteSuccess?: () => vo
     setPromo,
     stats,
     loading,
+    loadError,
     saving,
     deleting,
     confirmDelete,
