@@ -181,14 +181,22 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  html:not([data-motion='normal']) *,
+  html:not([data-motion='normal']) *::before,
+  html:not([data-motion='normal']) *::after {
     scroll-behavior: auto !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+html[data-motion='eco'] *,
+html[data-motion='eco'] *::before,
+html[data-motion='eco'] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
 }
 
 /* Glassmorphism utility aprimorado */

@@ -26,8 +26,14 @@
 }
 
 @keyframes faixa-preta-ninja-drift {
-  0%, 100% { opacity: .3; transform: translate3d(0, 3px, 0) scale(.995); }
-  50% { opacity: .46; transform: translate3d(-4px, -4px, 0) scale(1.025); }
+  0%, 100% { opacity: .4; transform: translate3d(0, 2px, 0) scale(1); }
+  50% { opacity: .62; transform: translate3d(-7px, -6px, 0) scale(1.04); }
+}
+
+@keyframes faixa-preta-strike {
+  0%, 8% { opacity: 0; transform: translate3d(-95%, 0, 0) skewX(-24deg); }
+  16% { opacity: .85; }
+  32%, 100% { opacity: 0; transform: translate3d(150%, 0, 0) skewX(-24deg); }
 }
 
 .promo-card-link {
@@ -41,11 +47,11 @@
 }
 
 .faixa-preta-ninja-art {
-  opacity: .34;
+  opacity: .48;
   transform-origin: right top;
   -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, .62) 31%, #000 64%);
   mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, .62) 31%, #000 64%);
-  animation: faixa-preta-ninja-reveal 720ms cubic-bezier(0.16, 1, 0.3, 1) 100ms both, faixa-preta-ninja-drift 7s ease-in-out 820ms infinite;
+  animation: faixa-preta-ninja-reveal 720ms cubic-bezier(0.16, 1, 0.3, 1) 100ms both, faixa-preta-ninja-drift 5.5s ease-in-out 820ms infinite;
   transition: opacity 320ms ease, filter 320ms ease;
 }
 
@@ -55,17 +61,48 @@
 
 .group:hover .faixa-preta-ninja-art,
 .group:focus-visible .faixa-preta-ninja-art {
-  opacity: .54;
-  filter: brightness(1.14);
+  opacity: .7;
+  filter: brightness(1.22) drop-shadow(0 0 18px rgba(244, 63, 94, .25));
+}
+
+.faixa-preta-strike {
+  width: 32%;
+  left: 42%;
+  right: auto;
+  background: linear-gradient(90deg, transparent, rgba(225, 29, 72, .05) 12%, rgba(244, 63, 94, .32) 49%, rgba(255, 255, 255, .17) 53%, transparent 82%);
+  filter: blur(2px);
+  opacity: 0;
+  transform: translate3d(-95%, 0, 0) skewX(-24deg);
+}
+
+.faixa-preta-motion-active .faixa-preta-strike {
+  animation: faixa-preta-strike 5.5s cubic-bezier(.18, .67, .25, 1) 800ms infinite;
+}
+
+.faixa-preta-card:not(.faixa-preta-motion-active) .faixa-preta-ninja-art,
+.faixa-preta-card:not(.faixa-preta-motion-active) .promo-card-glint {
+  animation-play-state: paused;
+}
+
+@media (hover: hover) {
+  .faixa-preta-card:hover .faixa-preta-ninja-art img,
+  .group:focus-visible .faixa-preta-card .faixa-preta-ninja-art img {
+    transform: translate3d(-5px, -3px, 0) scale(1.045);
+  }
+  .faixa-preta-ninja-art img { transition: transform 450ms cubic-bezier(.16, 1, .3, 1); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .promo-card-link { animation: none; }
-  .promo-card-glint { animation: none; display: none; }
-  .faixa-preta-poster-sweep { animation: none; }
-  .faixa-preta-ninja-art { animation: none; opacity: .38; transition-duration: 160ms; }
-  .group:hover .faixa-preta-ninja-art,
-  .group:focus-visible .faixa-preta-ninja-art { transform: none; }
+  html:not([data-motion='normal']) .promo-card-link { animation: none; }
+  html:not([data-motion='normal']) .promo-card-glint { animation: none; display: none; }
+  html:not([data-motion='normal']) .faixa-preta-poster-sweep { animation: none; }
+  html:not([data-motion='normal']) .faixa-preta-ninja-art { animation: none; opacity: .48; transition-duration: 160ms; }
+  html:not([data-motion='normal']) .group:hover .faixa-preta-ninja-art,
+  html:not([data-motion='normal']) .group:focus-visible .faixa-preta-ninja-art { transform: none; }
+}
+
+html[data-motion='eco'] .faixa-preta-motion-active .faixa-preta-strike {
+  animation: none;
 }
 
 body.tema-ninja {

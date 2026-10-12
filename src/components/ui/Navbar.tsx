@@ -34,12 +34,16 @@ export default function Navbar() {
 
   useEffect(() => {
     // Keep non-React browser effects separate from the preference subscription.
+    document.documentElement.dataset.motion = localStorage.getItem('performance_mode') === 'normal'
+      ? 'normal'
+      : isEco ? 'eco' : 'auto'
     window.dispatchEvent(new CustomEvent('performance_mode_change', { detail: { isEco } }))
   }, [isEco])
 
   const toggleEcoMode = () => {
     const nextVal = !isEco
     localStorage.setItem('performance_mode', nextVal ? 'eco' : 'normal')
+    document.documentElement.dataset.motion = nextVal ? 'eco' : 'normal'
     window.dispatchEvent(new CustomEvent('performance_mode_change', { detail: { isEco: nextVal } }))
   }
 
@@ -88,7 +92,7 @@ export default function Navbar() {
                     : 'bg-zinc-900/60 border-zinc-800/80 text-zinc-400 hover:text-white hover:border-zinc-700 hover:bg-zinc-800/40'
                 }`}
               >
-                <span>{isEco ? '🍃 Modo Eco: On' : '⚡ Desempenho'}</span>
+                <span>{isEco ? '🍃 Efeitos pausados' : '⚡ Efeitos ativos'}</span>
               </button>
             </>
           )}
@@ -143,8 +147,8 @@ export default function Navbar() {
                       : 'bg-zinc-900/40 border border-zinc-800/40 text-zinc-400'
                   }`}
                 >
-                  <span>Modo Econômico</span>
-                  <span>{isEco ? '🍃 LIGADO' : '⚡ DESLIGADO'}</span>
+                  <span>Animação dos cards</span>
+                  <span>{isEco ? '🍃 PAUSADA' : '⚡ ATIVA'}</span>
                 </button>
               </div>
             )}

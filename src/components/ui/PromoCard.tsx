@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import type { CSSProperties } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import StatusBadge from './StatusBadge'
 import type { Promocao } from '@/lib/supabase'
 
@@ -31,6 +31,22 @@ function FaixaIcon({ className }: { className: string }) {
 }
 
 function PromoCardContent({ promo, preloadNinjaImage = false }: { promo: Promocao; preloadNinjaImage?: boolean }) {
+  const cardRef = useRef<HTMLElement>(null)
+  const [motionActive, setMotionActive] = useState(false)
+
+  useEffect(() => {
+    const node = cardRef.current
+    if (!node) return
+    const updateVisibility = (visible: boolean) => setMotionActive(visible && !document.hidden)
+    const observer = new IntersectionObserver(([entry]) => updateVisibility(entry.isIntersecting), { threshold: 0.1 })
+    observer.observe(node)
+    const onVisibilityChange = () => updateVisibility(node.getBoundingClientRect().bottom > 0 && node.getBoundingClientRect().top < window.innerHeight)
+    document.addEventListener('visibilitychange', onVisibilityChange)
+    return () => {
+      observer.disconnect()
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+    }
+  }, [])
   const calculationType = promo.config_regras?.mecanica?.tipo_calculo
   const isRanking = calculationType
     ? calculationType === 'ranking'
@@ -94,10 +110,13 @@ function PromoCardContent({ promo, preloadNinjaImage = false }: { promo: Promoca
         }
 
   return (
-    <article className={`promo-card-shell @container/card relative isolate flex h-full min-h-[380px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br ${theme.surface} shadow-[0_18px_44px_-28px_rgba(0,0,0,0.95)] transition duration-300 group-hover:-translate-y-1 group-focus-visible:-translate-y-1 group-hover:border-white/20 group-focus-visible:border-white/20 group-hover:shadow-[0_24px_50px_-25px_rgba(0,0,0,0.95)] group-focus-visible:shadow-[0_24px_50px_-25px_rgba(0,0,0,0.95)] group-focus-visible:ring-2 group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-[#090d0d] ${theme.focusRing} motion-reduce:transform-none motion-reduce:transition-none`}>
+    <article ref={cardRef} className={`promo-card-shell @container/card relative isolate flex h-full min-h-[380px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br ${theme.surface} shadow-[0_18px_44px_-28px_rgba(0,0,0,0.95)] transition duration-300 group-hover:-translate-y-1 group-focus-visible:-translate-y-1 group-hover:border-white/20 group-focus-visible:border-white/20 group-hover:shadow-[0_24px_50px_-25px_rgba(0,0,0,0.95)] group-focus-visible:shadow-[0_24px_50px_-25px_rgba(0,0,0,0.95)] group-focus-visible:ring-2 group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-[#090d0d] ${theme.focusRing} motion-reduce:transform-none motion-reduce:transition-none ${isFaixaPreta ? 'faixa-preta-card' : ''} ${motionActive ? 'faixa-preta-motion-active' : ''}`}>
       <div className={`h-1.5 w-full shrink-0 bg-gradient-to-r ${theme.bar}`} aria-hidden="true" />
       <div className="promo-card-glint pointer-events-none absolute left-0 top-0 z-30 h-1.5 w-[34%]" aria-hidden="true" />
       <div className={`pointer-events-none absolute -right-14 -top-12 h-52 w-52 rounded-full blur-3xl ${theme.glow}`} aria-hidden="true" />
+      {isFaixaPreta && (
+        <div className="faixa-preta-strike pointer-events-none absolute inset-0 z-0" aria-hidden="true" />
+      )}
       {isFaixaPreta && (
         <div className="faixa-preta-ninja-art pointer-events-none absolute right-0 top-6 z-0 h-[270px] w-[58%] overflow-hidden sm:h-[300px]" aria-hidden="true">
           <Image
