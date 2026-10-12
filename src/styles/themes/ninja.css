@@ -36,6 +36,24 @@
   32%, 100% { opacity: 0; transform: translate3d(150%, 0, 0) skewX(-24deg); }
 }
 
+@keyframes faixa-preta-city-entrance {
+  0% { transform: translate3d(-18px, 0, 0) skewX(-7deg); opacity: .55; }
+  75% { transform: translate3d(2px, 0, 0) skewX(1deg); opacity: 1; }
+  100% { transform: translate3d(0, 0, 0) skewX(0); opacity: 1; }
+}
+
+@keyframes faixa-preta-city-flash {
+  0%, 7% { clip-path: inset(0 100% 0 0); opacity: 0; }
+  11% { opacity: 1; }
+  24% { clip-path: inset(0 0 0 70%); opacity: 1; }
+  29%, 100% { clip-path: inset(0 0 0 100%); opacity: 0; }
+}
+
+@keyframes faixa-preta-city-rule {
+  0% { transform: scaleX(0); opacity: .4; }
+  100% { transform: scaleX(1); opacity: 1; }
+}
+
 .promo-card-link {
   animation: promo-card-enter 620ms cubic-bezier(.16, 1, .3, 1) var(--promo-card-delay, 0ms) both;
 }
@@ -77,6 +95,48 @@
 
 .faixa-preta-motion-active .faixa-preta-strike {
   animation: faixa-preta-strike 5.5s cubic-bezier(.18, .67, .25, 1) 800ms infinite;
+}
+
+.faixa-preta-city-name { position: relative; }
+
+.faixa-preta-city-name::after {
+  content: attr(data-city);
+  position: absolute;
+  inset: 0;
+  color: #fff7f7;
+  text-shadow: 0 0 8px rgba(251, 113, 133, .95), 0 0 22px rgba(225, 29, 72, .65);
+  pointer-events: none;
+  clip-path: inset(0 100% 0 0);
+  opacity: 0;
+}
+
+.faixa-preta-city::after {
+  content: '';
+  position: absolute;
+  left: 1rem;
+  right: 1rem;
+  bottom: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #fb7185, rgba(225, 29, 72, .55), transparent);
+  transform: scaleX(0);
+  transform-origin: left;
+  pointer-events: none;
+}
+
+.faixa-preta-motion-active .faixa-preta-city-name {
+  animation: faixa-preta-city-entrance 650ms cubic-bezier(.16, 1, .3, 1) 170ms both;
+}
+
+.faixa-preta-motion-active .faixa-preta-city-name::after {
+  animation: faixa-preta-city-flash 5.5s cubic-bezier(.18, .67, .25, 1) 800ms infinite;
+}
+
+.faixa-preta-motion-active .faixa-preta-city::after {
+  animation: faixa-preta-city-rule 550ms cubic-bezier(.16, 1, .3, 1) 360ms both;
+}
+
+.faixa-preta-card:not(.faixa-preta-motion-active) .faixa-preta-city-name::after {
+  animation-play-state: paused;
 }
 
 .faixa-preta-card:not(.faixa-preta-motion-active) .faixa-preta-ninja-art,

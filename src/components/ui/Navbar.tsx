@@ -14,12 +14,7 @@ function subscribeToBrowserPreference(callback: () => void): () => void {
 }
 
 function getEcoPreference(): boolean {
-  const stored = localStorage.getItem('performance_mode')
-  if (stored === 'eco' || stored === 'normal') return stored === 'eco'
-
-  const prefersReduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true
-  const isSmallMobile = window.innerWidth < 768 && (navigator.hardwareConcurrency || 4) <= 4
-  return prefersReduced || isSmallMobile
+  return localStorage.getItem('performance_mode') === 'eco'
 }
 
 function subscribeToMount(): () => void {
@@ -34,9 +29,7 @@ export default function Navbar() {
 
   useEffect(() => {
     // Keep non-React browser effects separate from the preference subscription.
-    document.documentElement.dataset.motion = localStorage.getItem('performance_mode') === 'normal'
-      ? 'normal'
-      : isEco ? 'eco' : 'auto'
+    document.documentElement.dataset.motion = isEco ? 'eco' : 'normal'
     window.dispatchEvent(new CustomEvent('performance_mode_change', { detail: { isEco } }))
   }, [isEco])
 

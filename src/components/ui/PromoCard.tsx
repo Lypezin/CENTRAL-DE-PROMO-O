@@ -150,10 +150,10 @@ function PromoCardContent({ promo, preloadNinjaImage = false }: { promo: Promoca
         </div>
 
         {promo.cidade && (
-          <div className="relative mt-6 min-w-0 overflow-hidden border-l-[3px] border-white/20 py-2 pl-4">
+          <div className={`relative mt-6 min-w-0 overflow-hidden border-l-[3px] border-white/20 py-2 pl-4 ${isFaixaPreta ? 'faixa-preta-city' : ''}`}>
             <span className={`absolute inset-y-0 left-[-3px] w-[3px] ${theme.cityRule}`} aria-hidden="true" />
             <span className="block text-[11px] font-extrabold uppercase tracking-[.19em] text-zinc-300">A praça da rodada</span>
-            <span className={`mt-1 block break-words [font-size:clamp(2.1rem,13cqi,3rem)] font-black uppercase italic leading-[.94] tracking-[-.07em] ${theme.city} transition-transform duration-300 group-hover:translate-x-1 group-focus-visible:translate-x-1 motion-reduce:transform-none motion-reduce:transition-none`}>
+            <span data-city={isFaixaPreta ? promo.cidade : undefined} className={`mt-1 block break-words [font-size:clamp(2.1rem,13cqi,3rem)] font-black uppercase italic leading-[.94] tracking-[-.07em] ${theme.city} transition-transform duration-300 group-hover:translate-x-1 group-focus-visible:translate-x-1 motion-reduce:transform-none motion-reduce:transition-none ${isFaixaPreta ? 'faixa-preta-city-name' : ''}`}>
               {promo.cidade}
             </span>
           </div>
