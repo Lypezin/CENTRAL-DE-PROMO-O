@@ -59,13 +59,12 @@ interface ImportBatchResponse {
 }
 
 const MAX_BATCH_SIZE = 500
-const VALID_IMPORT_PERIODS = new Set(['GERAL', 'CAFE_DA_MANHA', 'ALMOCO', 'TARDE', 'JANTAR', 'MADRUGADA'])
 const IMPORT_ID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
 async function getImportStorageKey(file: File, promotionId: string): Promise<string> {
   const digest = await crypto.subtle.digest('SHA-256', await file.arrayBuffer())
   const fingerprint = Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('')
-  return `central-promocoes-import:auto-currency-v1:${promotionId}:${encodeURIComponent(file.name)}:${fingerprint}`
+  return `central-promocoes-import:parser-contract-v2:${promotionId}:${encodeURIComponent(file.name)}:${fingerprint}`
 }
 
 function parseFileInWorker(
@@ -267,14 +266,6 @@ export default function ExcelImportZone({
       const storageKey = await getImportStorageKey(arquivo, resolvedPromocaoId)
       if (controller.signal.aborted) return
       const hasPendingImport = getSavedImportId(storageKey) !== null
-      const unsupportedPeriods = Array.from(new Set(
-        result.registrosUnicos
-          .map((record) => record.periodo)
-          .filter((period): period is string => typeof period === 'string' && !VALID_IMPORT_PERIODS.has(period.toLocaleUpperCase('pt-BR'))),
-      ))
-      if (unsupportedPeriods.length > 0) {
-        throw new Error(`Período não reconhecido na planilha: ${unsupportedPeriods.slice(0, 5).join(', ')}. Use GERAL ou um dos turnos cadastrados.`)
-      }
       setPreview({ result, promocaoId: resolvedPromocaoId, storageKey, hasPendingImport })
     } catch (error) {
       parserWorkerRef.current = null
@@ -487,7 +478,7 @@ export default function ExcelImportZone({
               {validCount.toLocaleString('pt-BR')} registro(s) válidos; {rejectedCount.toLocaleString('pt-BR')} linha(s) rejeitada(s); {preview.result.registrosMesclados.toLocaleString('pt-BR')} linha(s) duplicada(s) serão mescladas.
             </p>
             <p className="mt-1 text-xs text-zinc-500">
-              Na coluna de taxas, números inteiros são interpretados como centavos e valores decimais como reais, seguindo o padrão anterior.
+              Períodos conhecidos são padronizados e rótulos personalizados são preservados. Na coluna de taxas, inteiros são centavos e decimais são reais.
               {preview.result.colunasNaoMapeadas.length > 0 ? ` Colunas ignoradas: ${preview.result.colunasNaoMapeadas.join(', ')}.` : ''}
             </p>
           </div>
@@ -495,6 +486,16 @@ export default function ExcelImportZone({
           {rejectedCount > 0 && (
             <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-3">
               <h5 className="text-xs font-bold text-amber-200">Linhas que não serão importadas</h5>
+              {preview.result.motivosRejeicao.length > 0 && (
+                <>
+                  <p className="mt-2 text-xs font-semibold text-amber-100/90">Problemas encontrados em todas as linhas:</p>
+                  <ul className="mt-1 space-y-1 text-xs text-amber-100/80">
+                    {preview.result.motivosRejeicao.map(({ motivo, total }) => (
+                      <li key={motivo}>{motivo}: {total.toLocaleString('pt-BR')} ocorrência(s)</li>
+                    ))}
+                  </ul>
+                </>
+              )}
               <ul className="mt-2 max-h-40 space-y-1 overflow-auto text-xs text-amber-100/80">
                 {preview.result.linhasRejeitadas.map((item) => (
                   <li key={`${item.linha}-${item.motivo}`}>Linha {item.linha}: {item.motivo}</li>

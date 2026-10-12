@@ -1,5 +1,11 @@
 import { readSheet } from 'read-excel-file/web-worker'
 import { normalizarPeriodo } from '@/lib/config'
+import {
+  IMPORT_INTEGER_MINIMUMS,
+  IMPORT_NUMERIC_FIELDS,
+  IMPORT_NUMERIC_FIELDS_TO_SUM,
+  IMPORT_TEXT_FIELD_LIMITS,
+} from '@/lib/admin/importContract'
 
 export type ImportRecord = Record<string, string | number | null>
 export type ParseProgress = {
@@ -20,6 +26,7 @@ export interface ParseResult {
   colunasNaoMapeadas: string[]
   linhasRejeitadas: RejectedRow[]
   totalLinhasRejeitadas: number
+  motivosRejeicao: { motivo: string; total: number }[]
 }
 
 export const MAX_IMPORT_FILE_SIZE = 25 * 1024 * 1024
@@ -49,31 +56,10 @@ const COLUMN_ALIASES: Record<string, string> = {
   pontos: 'pontos',
 }
 
-const NUMERIC_COLUMNS = new Set([
-  'numero_minimo_de_entregadores_regulares_na_escala',
-  'tempo_disponivel_escalado',
-  'tempo_disponivel_absoluto',
-  'numero_de_corridas_ofertadas',
-  'numero_de_corridas_aceitas',
-  'numero_de_corridas_rejeitadas',
-  'numero_de_corridas_completadas',
-  'numero_de_corridas_canceladas_pela_pessoa_entregadora',
-  'numero_de_pedidos_aceitos_e_concluidos',
-  'soma_das_taxas_das_corridas_aceitas',
-  'pontos',
-])
-
-const NUMERIC_COLUMNS_TO_SUM = Array.from(NUMERIC_COLUMNS)
-const INTEGER_COLUMNS = new Set([
-  'numero_minimo_de_entregadores_regulares_na_escala',
-  'numero_de_corridas_ofertadas',
-  'numero_de_corridas_aceitas',
-  'numero_de_corridas_rejeitadas',
-  'numero_de_corridas_completadas',
-  'numero_de_corridas_canceladas_pela_pessoa_entregadora',
-  'numero_de_pedidos_aceitos_e_concluidos',
-])
 const POSTGRES_INTEGER_MAX = 2_147_483_647
+const POSTGRES_INTEGER_MIN = -2_147_483_648
+const MILLISECONDS_PER_EXCEL_DAY = 86_400_000
+const EXCEL_1900_EPOCH = Date.UTC(1899, 11, 30)
 
 export function normalizarColuna(col: unknown): string {
   return String(col ?? '')
@@ -126,24 +112,36 @@ export function parseExcelDate(value: unknown): string {
   return ''
 }
 
-function parseDuration(value: unknown): string | null {
+function excelSerialFromDate(value: Date): number {
+  // read-excel-file turns date/time formatted numeric cells into Date instances.
+  // Restore the serial value so values match the previous cellDates:false importer.
+  return Number(((value.getTime() - EXCEL_1900_EPOCH) / MILLISECONDS_PER_EXCEL_DAY).toFixed(10))
+}
+
+function cellText(value: unknown): string | null {
   if (value === null || value === undefined || value === '') return null
-
-  if (value instanceof Date && Number.isFinite(value.getTime())) {
-    // read-excel-file turns Excel time-formatted cells into Dates based on the
-    // 1899-12-30 epoch. Keep the original serial-day representation in text.
-    const excelEpoch = Date.UTC(1899, 11, 30)
-    return String((value.getTime() - excelEpoch) / 86_400_000)
-  }
-
+  if (value instanceof Date && Number.isFinite(value.getTime())) return String(excelSerialFromDate(value))
   return String(value).trim() || null
+}
+
+function parseText(value: unknown, field: string): string | null {
+  const text = cellText(value)
+  if (text === null) return null
+  if (text.includes('\u0000')) throw new Error(`caractere inválido em ${field}`)
+  if (text.length > IMPORT_TEXT_FIELD_LIMITS[field]) {
+    throw new Error(`${field} excede o limite de ${IMPORT_TEXT_FIELD_LIMITS[field]} caracteres`)
+  }
+  return text
 }
 
 function parseNumeric(value: unknown, field: string): number | null {
   if (value === null || value === undefined || (typeof value === 'string' && value.trim() === '')) return null
 
   let number: number
-  if (typeof value === 'number') {
+  if (value instanceof Date) {
+    if (!Number.isFinite(value.getTime())) throw new Error(`valor numérico inválido em ${field}`)
+    number = excelSerialFromDate(value)
+  } else if (typeof value === 'number') {
     number = value
   } else {
     let text = String(value).trim().replace(/\s/g, '').replace(/^R\$/i, '')
@@ -157,10 +155,11 @@ function parseNumeric(value: unknown, field: string): number | null {
 
   if (!Number.isFinite(number)) throw new Error(`valor numérico inválido em ${field}`)
 
-  if (INTEGER_COLUMNS.has(field)) {
+  if (field in IMPORT_INTEGER_MINIMUMS) {
     if (!Number.isInteger(number)) throw new Error(`${field} deve ser um número inteiro`)
-    if (number < 0 || number > POSTGRES_INTEGER_MAX) {
-      throw new Error(`${field} deve ser inteiro entre 0 e ${POSTGRES_INTEGER_MAX}`)
+    const minimum = Math.max(POSTGRES_INTEGER_MIN, IMPORT_INTEGER_MINIMUMS[field])
+    if (number < minimum || number > POSTGRES_INTEGER_MAX) {
+      throw new Error(`${field} deve ser inteiro entre ${minimum} e ${POSTGRES_INTEGER_MAX}`)
     }
   }
 
@@ -217,12 +216,15 @@ export async function processExcelBuffer(
     }
   })
 
-  if (!mappedIndexes.has('data_do_periodo') || !mappedIndexes.has('id_da_pessoa_entregadora')) {
-    throw new Error('A planilha precisa conter as colunas “data_do_periodo” e “id_da_pessoa_entregadora”.')
+  const requiredHeaders = ['data_do_periodo', 'id_da_pessoa_entregadora', 'pessoa_entregadora']
+  const missingHeaders = requiredHeaders.filter((field) => !mappedIndexes.has(field))
+  if (missingHeaders.length > 0) {
+    throw new Error(`A planilha precisa conter as colunas obrigatórias: ${missingHeaders.join(', ')}.`)
   }
 
   const validRecords: ImportRecord[] = []
   const rejectedRows: RejectedRow[] = []
+  const rejectionCounts = new Map<string, number>()
   const mappedColumns = Object.entries(colMap).map(([indexText, field]) => [Number(indexText), field] as const)
   const totalRows = rawData.length - 1
   const validationYieldEvery = Math.max(250, Math.ceil(totalRows / 100))
@@ -235,40 +237,51 @@ export async function processExcelBuffer(
     const isEmpty = !row.some((cell) => cell !== null && cell !== undefined && cell !== '')
 
     if (!isEmpty) {
-      try {
-        const record: ImportRecord = {}
-        for (const [columnIndex, field] of mappedColumns) {
+      const record: ImportRecord = {}
+      const rowErrors: string[] = []
+      const invalidFields = new Set<string>()
+      for (const [columnIndex, field] of mappedColumns) {
+        try {
           const value = readCell(row, columnIndex)
           if (field === 'data_do_periodo') {
             record[field] = parseExcelDate(value)
           } else if (field === 'periodo') {
-            const rawPeriod = value === null || value === undefined ? '' : String(value).trim()
+            const rawPeriod = parseText(value, field) ?? ''
             record[field] = rawPeriod ? normalizarPeriodo(rawPeriod) ?? rawPeriod : 'GERAL'
-          } else if (field === 'duracao_do_periodo') {
-            record[field] = parseDuration(value)
-          } else if (NUMERIC_COLUMNS.has(field)) {
+          } else if (IMPORT_NUMERIC_FIELDS.has(field)) {
             record[field] = parseNumeric(value, field)
           } else {
-            record[field] = value === null || value === undefined ? null : String(value).trim()
+            record[field] = parseText(value, field)
           }
+        } catch (error) {
+          invalidFields.add(field)
+          rowErrors.push(error instanceof Error ? error.message : `valor inválido em ${field}`)
+          record[field] = null
         }
+      }
 
-        if (!record.data_do_periodo) throw new Error('data_do_periodo ausente ou inválida')
-        if (typeof record.id_da_pessoa_entregadora !== 'string' || !record.id_da_pessoa_entregadora) {
-          throw new Error('id_da_pessoa_entregadora ausente')
-        }
+      if (!record.data_do_periodo && !invalidFields.has('data_do_periodo')) {
+        rowErrors.push('data_do_periodo ausente ou inválida')
+      }
+      if (!record.id_da_pessoa_entregadora && !invalidFields.has('id_da_pessoa_entregadora')) {
+        rowErrors.push('id_da_pessoa_entregadora ausente')
+      }
+      if (!record.pessoa_entregadora && !invalidFields.has('pessoa_entregadora')) {
+        rowErrors.push('pessoa_entregadora ausente')
+      }
 
-        record.promocao_id = promocaoId
-        record.periodo ||= 'GERAL'
-        validRecords.push(record)
-      } catch (error) {
+      record.promocao_id = promocaoId
+      record.periodo ||= 'GERAL'
+      if (rowErrors.length > 0) {
         totalLinhasRejeitadas += 1
-        if (rejectedRows.length < MAX_REJEITADAS_EXIBIDAS) {
-          rejectedRows.push({
-            linha: index + 1,
-            motivo: error instanceof Error ? error.message : 'Dados inválidos',
-          })
+        for (const reason of new Set(rowErrors)) {
+          rejectionCounts.set(reason, (rejectionCounts.get(reason) ?? 0) + 1)
         }
+        if (rejectedRows.length < MAX_REJEITADAS_EXIBIDAS) {
+          rejectedRows.push({ linha: index + 1, motivo: Array.from(new Set(rowErrors)).join(' • ') })
+        }
+      } else {
+        validRecords.push(record)
       }
     }
 
@@ -289,7 +302,7 @@ export async function processExcelBuffer(
     if (!existing) {
       deduplicated.set(key, { ...record })
     } else {
-      for (const field of NUMERIC_COLUMNS_TO_SUM) {
+      for (const field of IMPORT_NUMERIC_FIELDS_TO_SUM) {
         const previous = existing[field]
         const incoming = record[field]
         if (previous === null && incoming === null) continue
@@ -314,5 +327,7 @@ export async function processExcelBuffer(
     colunasNaoMapeadas,
     linhasRejeitadas: rejectedRows,
     totalLinhasRejeitadas,
+    motivosRejeicao: Array.from(rejectionCounts, ([motivo, total]) => ({ motivo, total }))
+      .sort((left, right) => right.total - left.total || left.motivo.localeCompare(right.motivo)),
   }
 }

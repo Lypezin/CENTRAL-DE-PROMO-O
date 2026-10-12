@@ -3,48 +3,19 @@ import { revalidateTag } from 'next/cache'
 import { supabaseAdmin } from '@/lib/supabaseServer'
 import { getAuthenticatedUser } from '@/lib/auth'
 import { hasJsonContentType, isSameOriginRequest } from '@/lib/adminSecurity'
+import {
+  IMPORT_INTEGER_MINIMUMS,
+  IMPORT_NUMERIC_FIELDS,
+  IMPORT_TEXT_FIELD_LIMITS,
+} from '@/lib/admin/importContract'
 
 const MAX_BATCH_SIZE = 500
 const MAX_IMPORT_ROWS = 100_000
 const MAX_BODY_SIZE = 2_000_000
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
-const IMPORT_PERIODS = new Set(['GERAL', 'CAFE_DA_MANHA', 'ALMOCO', 'TARDE', 'JANTAR', 'MADRUGADA'])
-
-const TEXT_FIELD_LIMITS: Record<string, number> = {
-  periodo: 80,
-  duracao_do_periodo: 80,
-  tag: 120,
-  id_da_pessoa_entregadora: 160,
-  pessoa_entregadora: 300,
-  praca: 200,
-  sub_praca: 200,
-  origem: 120,
-}
-
-const NUMERIC_FIELDS = new Set([
-  'numero_minimo_de_entregadores_regulares_na_escala',
-  'tempo_disponivel_escalado',
-  'tempo_disponivel_absoluto',
-  'numero_de_corridas_ofertadas',
-  'numero_de_corridas_aceitas',
-  'numero_de_corridas_rejeitadas',
-  'numero_de_corridas_completadas',
-  'numero_de_corridas_canceladas_pela_pessoa_entregadora',
-  'numero_de_pedidos_aceitos_e_concluidos',
-  'soma_das_taxas_das_corridas_aceitas',
-  'pontos',
-])
-const INTEGER_FIELDS = new Set([
-  'numero_minimo_de_entregadores_regulares_na_escala',
-  'numero_de_corridas_ofertadas',
-  'numero_de_corridas_aceitas',
-  'numero_de_corridas_rejeitadas',
-  'numero_de_corridas_completadas',
-  'numero_de_corridas_canceladas_pela_pessoa_entregadora',
-  'numero_de_pedidos_aceitos_e_concluidos',
-])
 const POSTGRES_INTEGER_MAX = 2_147_483_647
+const POSTGRES_INTEGER_MIN = -2_147_483_648
 
 type JsonRecord = Record<string, unknown>
 
@@ -119,23 +90,35 @@ function sanitizeImportRows(input: unknown[], promotionId: string): JsonRecord[]
     if (
       typeof row.id_da_pessoa_entregadora !== 'string' ||
       row.id_da_pessoa_entregadora.trim().length === 0 ||
-      row.id_da_pessoa_entregadora.length > TEXT_FIELD_LIMITS.id_da_pessoa_entregadora ||
+      row.id_da_pessoa_entregadora.length > IMPORT_TEXT_FIELD_LIMITS.id_da_pessoa_entregadora ||
       row.id_da_pessoa_entregadora.includes('\u0000')
     ) return null
     row.id_da_pessoa_entregadora = row.id_da_pessoa_entregadora.trim()
-    if (typeof row.periodo !== 'string' || row.periodo.trim().length === 0 || row.periodo.length > TEXT_FIELD_LIMITS.periodo) return null
-    const period = row.periodo.trim().toLocaleUpperCase('pt-BR')
-    if (!IMPORT_PERIODS.has(period)) return null
-    row.periodo = period
+    if (
+      typeof row.periodo !== 'string' ||
+      row.periodo.trim().length === 0 ||
+      row.periodo.trim().length > IMPORT_TEXT_FIELD_LIMITS.periodo ||
+      row.periodo.includes('\u0000')
+    ) return null
+    row.periodo = row.periodo.trim()
 
-    for (const field of Object.keys(TEXT_FIELD_LIMITS)) {
-      if (field === 'periodo' || field === 'id_da_pessoa_entregadora' || !(field in value)) continue
+    const personName = value.pessoa_entregadora
+    if (
+      typeof personName !== 'string' ||
+      personName.trim().length === 0 ||
+      personName.trim().length > IMPORT_TEXT_FIELD_LIMITS.pessoa_entregadora ||
+      personName.includes('\u0000')
+    ) return null
+    row.pessoa_entregadora = personName.trim()
+
+    for (const field of Object.keys(IMPORT_TEXT_FIELD_LIMITS)) {
+      if (field === 'periodo' || field === 'id_da_pessoa_entregadora' || field === 'pessoa_entregadora' || !(field in value)) continue
       const fieldValue = value[field]
       if (fieldValue === null || fieldValue === undefined || fieldValue === '') {
         row[field] = null
       } else if (
         typeof fieldValue === 'string' &&
-        fieldValue.length <= TEXT_FIELD_LIMITS[field] &&
+        fieldValue.length <= IMPORT_TEXT_FIELD_LIMITS[field] &&
         !fieldValue.includes('\u0000')
       ) {
         row[field] = fieldValue.trim() || null
@@ -144,15 +127,15 @@ function sanitizeImportRows(input: unknown[], promotionId: string): JsonRecord[]
       }
     }
 
-    for (const field of NUMERIC_FIELDS) {
+    for (const field of IMPORT_NUMERIC_FIELDS) {
       if (!(field in value)) continue
       const fieldValue = value[field]
       if (fieldValue === null || fieldValue === undefined || fieldValue === '') {
         row[field] = null
       } else if (typeof fieldValue === 'number' && Number.isFinite(fieldValue)) {
-        if (INTEGER_FIELDS.has(field) && (
+        if (field in IMPORT_INTEGER_MINIMUMS && (
           !Number.isInteger(fieldValue) ||
-          fieldValue < 0 ||
+          fieldValue < Math.max(POSTGRES_INTEGER_MIN, IMPORT_INTEGER_MINIMUMS[field]) ||
           fieldValue > POSTGRES_INTEGER_MAX
         )) return null
         row[field] = fieldValue
