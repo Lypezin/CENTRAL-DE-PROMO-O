@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import PromoCard from '@/components/ui/PromoCard'
 import ElitePromoCard from '@/components/promo/ElitePromoCard'
@@ -8,13 +7,6 @@ import type { EliteConfig } from '@/lib/eliteConfig'
 import type { Promocao } from '@/lib/supabase'
 
 type FilterTab = 'todas' | 'ativas' | 'encerradas'
-
-function formatDate(value: string | null) {
-  if (!value) return null
-  const [year, month, day] = value.slice(0, 10).split('-')
-  if (!year || !month || !day) return null
-  return `${day}/${month}/${year}`
-}
 
 export default function HubContent({
   initialPromocoes,
@@ -39,8 +31,6 @@ export default function HubContent({
     () => initialPromocoes.filter((promo) => promo.status === 'encerrada'),
     [initialPromocoes],
   )
-  const featuredPromotion = activePromotions[0]
-
   const filteredPromotions = useMemo(() => {
     const query = searchQuery.trim().toLocaleLowerCase('pt-BR')
     return initialPromocoes.filter((promo) => {
@@ -88,90 +78,17 @@ export default function HubContent({
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 pb-16 pt-5 sm:px-6 md:px-8 md:pt-8">
-      <section
-        aria-labelledby="hub-title"
-        className="relative isolate overflow-hidden rounded-[28px] border border-white/10 bg-[#0b1111] shadow-[0_28px_90px_rgba(0,0,0,0.32)]"
-      >
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 -z-10 opacity-70"
-          style={{
-            background:
-              'radial-gradient(ellipse at 82% 15%, rgba(132,204,22,.17), transparent 34%), linear-gradient(115deg, transparent 35%, rgba(255,255,255,.025) 35.1%, transparent 35.4%)',
-          }}
-        />
-        <div className="grid gap-8 p-5 sm:p-8 lg:grid-cols-[1.2fr_.8fr] lg:gap-12 lg:p-10">
-          <div className="flex flex-col justify-center">
-            <div className="mb-5 flex flex-wrap items-center gap-2 text-[11px] font-bold uppercase tracking-[.18em] text-lime-300">
-              <span className="inline-flex h-7 items-center gap-2 rounded-full border border-lime-300/20 bg-lime-300/10 px-3">
-                <span className="h-1.5 w-1.5 rounded-full bg-lime-300" aria-hidden="true" />
-                EntreGÔ · Itaim
-              </span>
-              <span className="text-zinc-500">Central de Promoções</span>
-            </div>
-            <h1 id="hub-title" className="max-w-2xl text-3xl font-black leading-[1.04] tracking-[-.04em] text-white sm:text-5xl lg:text-[56px]">
-              Sua próxima posição começa aqui.
-            </h1>
-            <p className="mt-4 max-w-xl text-sm leading-6 text-zinc-300 sm:text-base">
-              Acompanhe as campanhas, confira as regras do turno e veja sua colocação no ranking.
-            </p>
-
-            <div className="mt-7 flex flex-wrap gap-3 text-sm">
-              <div className="rounded-xl border border-white/10 bg-black/25 px-4 py-3">
-                <span className="block text-xl font-extrabold tabular-nums text-white">{activePromotions.length}</span>
-                <span className="text-xs text-zinc-400">campanhas em disputa</span>
-              </div>
-              <div className="rounded-xl border border-white/10 bg-black/25 px-4 py-3">
-                <span className="block text-xl font-extrabold tabular-nums text-white">{endedPromotions.length}</span>
-                <span className="text-xs text-zinc-400">campanhas no histórico</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex min-h-[230px] flex-col justify-between rounded-2xl border border-lime-200/15 bg-[#111918]/90 p-5 sm:p-6">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-[11px] font-bold uppercase tracking-[.18em] text-lime-300">Agora em destaque</p>
-                <h2 className="mt-3 text-2xl font-extrabold leading-tight tracking-tight text-white">
-                  {featuredPromotion?.nome || 'A próxima disputa começa em breve'}
-                </h2>
-              </div>
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-lime-300 text-[#111918]" aria-hidden="true">
-                <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.8">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 21h8m-4-4v4m-7-17h14v5a7 7 0 0 1-14 0V4Zm0 3H3v1a5 5 0 0 0 5 5m11-6h2v1a5 5 0 0 1-5 5M8 4h8" />
-                </svg>
-              </span>
-            </div>
-
-            {featuredPromotion ? (
-              <>
-                <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-zinc-300">
-                  <span className="inline-flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-lime-300" aria-hidden="true" />
-                    Em andamento
-                  </span>
-                  {featuredPromotion.data_fim && <span>Encerra em {formatDate(featuredPromotion.data_fim)}</span>}
-                </div>
-                <Link
-                  href={`/promo/${featuredPromotion.slug}`}
-                  className="mt-6 inline-flex min-h-12 items-center justify-between gap-4 rounded-xl bg-lime-300 px-4 font-bold text-[#101615] transition-colors hover:bg-lime-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#111918]"
-                >
-                  <span>Ver campanha e ranking</span>
-                  <svg viewBox="0 0 20 20" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 10h12m-5-5 5 5-5 5" />
-                  </svg>
-                </Link>
-              </>
-            ) : (
-              <p className="mt-4 text-sm leading-6 text-zinc-400">
-                Consulte as campanhas anteriores ou volte em breve para acompanhar uma nova disputa.
-              </p>
-            )}
-          </div>
+      <header className="mb-5 flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
+        <div>
+          <h1 id="hub-title" className="text-2xl font-black tracking-[-.03em] text-white sm:text-3xl">Campanhas</h1>
         </div>
-      </section>
+        <span className="inline-flex items-center gap-2 pb-0.5 text-xs font-semibold text-lime-200">
+          <span className="h-2 w-2 rounded-full bg-lime-300" aria-hidden="true" />
+          {activePromotions.length} {activePromotions.length === 1 ? 'campanha em disputa' : 'campanhas em disputa'}
+        </span>
+      </header>
 
-      <section aria-label="Buscar e filtrar campanhas" className="mt-6 rounded-2xl border border-white/10 bg-[#090d0d]/90 p-3 sm:p-4">
+      <section aria-label="Buscar e filtrar campanhas" className="rounded-2xl border border-white/10 bg-[#090d0d]/90 p-3 sm:p-4">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div role="group" aria-label="Filtrar campanhas" className="grid grid-cols-3 gap-1 rounded-xl bg-black/35 p-1 lg:w-auto">
             {tabs.map((tab) => (
@@ -220,11 +137,12 @@ export default function HubContent({
         </div>
       </section>
 
-      <section className="mt-8" aria-labelledby="campaigns-title">
+      <section className="mt-6" aria-labelledby="campaigns-title">
         <div className="mb-4 flex items-end justify-between gap-4">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[.18em] text-lime-300">Calendário competitivo</p>
-            <h2 id="campaigns-title" className="mt-1 text-2xl font-extrabold tracking-tight text-white">Campanhas</h2>
+            <h2 id="campaigns-title" className="text-xl font-extrabold tracking-tight text-white">
+              {activeTab === 'encerradas' ? 'Campanhas encerradas' : activeTab === 'todas' ? 'Todas as campanhas' : 'Disputas disponíveis'}
+            </h2>
           </div>
           <p className="text-right text-xs text-zinc-400" aria-live="polite">
             {resultCount} {resultCount === 1 ? 'resultado' : 'resultados'}
