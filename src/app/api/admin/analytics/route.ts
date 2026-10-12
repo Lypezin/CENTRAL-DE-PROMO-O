@@ -23,8 +23,9 @@ export async function GET() {
     ])
 
     if (onlineRes.error || totalRes.error) {
+      console.error('Failed to load visitor analytics:', onlineRes.error?.code || totalRes.error?.code)
       return NextResponse.json({
-        error: onlineRes.error?.message || totalRes.error?.message
+        error: 'Não foi possível carregar os indicadores.'
       }, { status: 500 })
     }
 
@@ -33,7 +34,7 @@ export async function GET() {
       total: totalRes.count || 0
     })
   } catch (e) {
-    const msg = e instanceof Error ? e.message : 'Erro interno'
-    return NextResponse.json({ error: msg }, { status: 500 })
+    console.error('Failed to load visitor analytics:', e)
+    return NextResponse.json({ error: 'Não foi possível carregar os indicadores.' }, { status: 500 })
   }
 }

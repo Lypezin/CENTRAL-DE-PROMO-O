@@ -1,133 +1,156 @@
-import { cookies } from 'next/headers'
-import crypto from 'crypto'
+import 'server-only'
 
-// Session HMAC key: optional JWT_SECRET env, otherwise stable derived fallback.
-// Never throws at import time (Vercel `next build` imports this module during page data collection).
-const JWT_SECRET =
-  process.env.JWT_SECRET && process.env.JWT_SECRET.length > 0
-    ? process.env.JWT_SECRET
-    : crypto
-        .createHash('sha256')
-        .update(process.env.NEXT_PUBLIC_SUPABASE_URL || 'central-promocoes-session')
-        .digest('hex')
+import { cookies } from 'next/headers'
+import crypto from 'node:crypto'
+import { supabaseAdmin } from '@/lib/supabaseServer'
+
+const COOKIE_NAME = 'admin_auth_session'
+const SESSION_DURATION_MS = 8 * 60 * 60 * 1000
+
+function getJwtSecret(): string {
+  const secret = process.env.JWT_SECRET?.trim()
+  if (!secret || secret.length < 32) {
+    throw new Error('JWT_SECRET must contain at least 32 characters.')
+  }
+  return secret
+}
+
+export function assertSessionConfiguration(): void {
+  getJwtSecret()
+}
 
 function timingSafeEqualHex(a: string, b: string): boolean {
-  try {
-    const bufA = Buffer.from(a, 'utf8')
-    const bufB = Buffer.from(b, 'utf8')
-    if (bufA.length !== bufB.length) return false
-    return crypto.timingSafeEqual(bufA, bufB)
-  } catch {
-    return false
-  }
+  if (!/^[a-f0-9]+$/i.test(a) || !/^[a-f0-9]+$/i.test(b)) return false
+  const bufA = Buffer.from(a, 'hex')
+  const bufB = Buffer.from(b, 'hex')
+  return bufA.length === bufB.length && bufA.length > 0 && crypto.timingSafeEqual(bufA, bufB)
 }
 
 export interface SessionPayload {
   username: string
   name: string
   expires: number
+  sid: string
 }
 
-/**
- * Encrypts a password using PBKDF2 with a dynamic 16-byte salt and SHA-512.
- * Returns a formatted string 'pbdf2:salt:hash'
- */
 export function hashPassword(password: string): string {
   const salt = crypto.randomBytes(16).toString('hex')
-  const hash = crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex')
+  const hash = crypto.pbkdf2Sync(password, salt, 210_000, 64, 'sha512').toString('hex')
   return `pbkdf2:${salt}:${hash}`
 }
 
-/**
- * Verifies a password against a stored hash string.
- * Supports legacy SHA-256 hashes (exactly 64 hex characters) and new PBKDF2 hashes.
- */
 export function verifyPassword(password: string, storedValue: string): boolean {
-  if (!storedValue) return false
+  if (!storedValue || password.length > 1024) return false
 
-  // Backwards compatibility check: old SHA-256 hash was a 64-char hex string
   if (!storedValue.startsWith('pbkdf2:')) {
     const oldHash = crypto.createHash('sha256').update(password).digest('hex')
     return timingSafeEqualHex(oldHash, storedValue)
   }
 
   const parts = storedValue.split(':')
-  if (parts.length !== 3) return false
+  if (parts.length !== 3 || !/^[a-f0-9]{32}$/i.test(parts[1]) || !/^[a-f0-9]{128}$/i.test(parts[2])) {
+    return false
+  }
 
   const [, salt, hash] = parts
-  const verifyHash = crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex')
+  const verifyHash = crypto.pbkdf2Sync(password, salt, 210_000, 64, 'sha512').toString('hex')
   return timingSafeEqualHex(verifyHash, hash)
 }
 
-/**
- * Creates a signed session token and sets it as an HTTP-only secure cookie.
- */
+function hashSessionId(sid: string): string {
+  return crypto.createHash('sha256').update(sid).digest('hex')
+}
+
 export async function createSession(username: string, name: string): Promise<string> {
-  const expires = Date.now() + 1000 * 60 * 60 * 8 // 8 hours
-  const payload: SessionPayload = { username, name, expires }
+  const sid = crypto.randomUUID()
+  const expires = Date.now() + SESSION_DURATION_MS
+  const payload: SessionPayload = { username, name, expires, sid }
   const payloadStr = JSON.stringify(payload)
-  
-  // Create signature using HMAC-SHA256
-  const signature = crypto.createHmac('sha256', JWT_SECRET).update(payloadStr).digest('hex')
-  
-  // Format token as payloadBase64.signature
-  const token = `${Buffer.from(payloadStr).toString('base64')}.${signature}`
-  
+  const signature = crypto.createHmac('sha256', getJwtSecret()).update(payloadStr).digest('hex')
+  const token = `${Buffer.from(payloadStr).toString('base64url')}.${signature}`
+
+  const { error } = await supabaseAdmin.from('admin_sessions').insert({
+    session_hash: hashSessionId(sid),
+    username,
+    expires_at: new Date(expires).toISOString(),
+  })
+  if (error) throw new Error('Could not create an administrator session.')
+
   const cookieStore = await cookies()
-  cookieStore.set('admin_auth_session', token, {
+  cookieStore.set(COOKIE_NAME, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
-    maxAge: 60 * 60 * 8, // 8 hours
+    maxAge: SESSION_DURATION_MS / 1000,
     path: '/',
   })
 
   return token
 }
 
-/**
- * Verifies a signed session token.
- */
 export function verifySessionToken(token: string): SessionPayload | null {
-  if (!token) return null
+  if (!token || token.length > 2048) return null
+
   try {
-    const parts = token.split('.')
-    if (parts.length !== 2) return null
-    
-    const [payloadBase64, signature] = parts
-    const payloadStr = Buffer.from(payloadBase64, 'base64').toString('utf-8')
-    
-    // Verify signature (constant-time)
-    const expectedSignature = crypto.createHmac('sha256', JWT_SECRET).update(payloadStr).digest('hex')
-    if (!timingSafeEqualHex(expectedSignature, signature)) return null
-    
-    const payload = JSON.parse(payloadStr) as SessionPayload
-    if (payload.expires < Date.now()) return null // Session expired
-    
-    return payload
+    const [payloadBase64, signature, extra] = token.split('.')
+    if (!payloadBase64 || !signature || extra !== undefined) return null
+
+    const payloadStr = Buffer.from(payloadBase64, 'base64url').toString('utf-8')
+    const expected = crypto.createHmac('sha256', getJwtSecret()).update(payloadStr).digest('hex')
+    if (!timingSafeEqualHex(expected, signature)) return null
+
+    const value: unknown = JSON.parse(payloadStr)
+    if (!value || typeof value !== 'object') return null
+    const payload = value as Partial<SessionPayload>
+    if (
+      typeof payload.username !== 'string' || payload.username.length < 1 || payload.username.length > 120 ||
+      typeof payload.name !== 'string' || payload.name.length < 1 || payload.name.length > 120 ||
+      typeof payload.sid !== 'string' || !/^[0-9a-f-]{36}$/i.test(payload.sid) ||
+      typeof payload.expires !== 'number' || !Number.isFinite(payload.expires) || payload.expires <= Date.now()
+    ) return null
+
+    return payload as SessionPayload
   } catch {
     return null
   }
 }
 
-/**
- * Helper to fetch the currently authenticated user from cookies.
- */
 export async function getAuthenticatedUser(): Promise<SessionPayload | null> {
   try {
-    const cookieStore = await cookies()
-    const token = cookieStore.get('admin_auth_session')?.value
+    const token = (await cookies()).get(COOKIE_NAME)?.value
     if (!token) return null
-    return verifySessionToken(token)
+
+    const payload = verifySessionToken(token)
+    if (!payload) return null
+
+    const { data, error } = await supabaseAdmin
+      .from('admin_sessions')
+      .select('session_hash')
+      .eq('session_hash', hashSessionId(payload.sid))
+      .eq('username', payload.username)
+      .is('revoked_at', null)
+      .gt('expires_at', new Date().toISOString())
+      .maybeSingle()
+
+    return error || !data ? null : payload
   } catch {
     return null
   }
 }
 
-/**
- * Deletes the session cookie.
- */
 export async function deleteSession(): Promise<void> {
   const cookieStore = await cookies()
-  cookieStore.delete('admin_auth_session')
+  const token = cookieStore.get(COOKIE_NAME)?.value
+  const payload = token ? verifySessionToken(token) : null
+
+  if (payload) {
+    const { error } = await supabaseAdmin
+      .from('admin_sessions')
+      .update({ revoked_at: new Date().toISOString() })
+      .eq('session_hash', hashSessionId(payload.sid))
+      .is('revoked_at', null)
+    if (error) throw new Error('Could not revoke administrator session.')
+  }
+
+  cookieStore.delete(COOKIE_NAME)
 }

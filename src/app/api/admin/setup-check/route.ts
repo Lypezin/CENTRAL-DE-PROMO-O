@@ -1,17 +1,17 @@
 import { NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabaseServer'
 
 export async function GET() {
   try {
-    const { data: setupRequired, error } = await supabase.rpc('check_admin_setup_required')
+    const { data: setupRequired, error } = await supabaseAdmin.rpc('check_admin_setup_required')
 
     if (error) {
-      return NextResponse.json({ success: false, error: error.message }, { status: 500 })
+      console.error('Admin setup status lookup failed:', error.code)
+      return NextResponse.json({ success: false, error: 'Não foi possível verificar a configuração.' }, { status: 503 })
     }
 
-    return NextResponse.json({ success: true, setupRequired: !!setupRequired })
-  } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Erro interno'
-    return NextResponse.json({ success: false, error: msg }, { status: 500 })
+    return NextResponse.json({ success: true, setupRequired: !!setupRequired }, { headers: { 'Cache-Control': 'no-store' } })
+  } catch {
+    return NextResponse.json({ success: false, error: 'Não foi possível verificar a configuração.' }, { status: 503 })
   }
 }

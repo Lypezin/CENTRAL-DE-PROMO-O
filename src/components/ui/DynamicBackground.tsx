@@ -1,25 +1,19 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import dynamic from 'next/dynamic'
-import { usePathname } from 'next/navigation'
-
-const LightningBackground = dynamic(() => import('./LightningBackground'), { ssr: false })
-const WorldCupBackground = dynamic(() => import('./WorldCupBackground'), { ssr: false })
-const NinjaBackground = dynamic(() => import('./NinjaBackground'), { ssr: false })
 
 interface DynamicBackgroundProps {
   temaAtivo: 'raios' | 'copa' | 'ninja'
 }
 
-/** Lightweight static backdrop for admin (no WebGL/particles). */
-function AdminStaticBackground({ theme }: { theme: 'raios' | 'copa' | 'ninja' }) {
+/** Lightweight theme backdrop: no WebGL, canvas animation, or particle loop. */
+function StaticThemeBackground({ theme }: { theme: 'raios' | 'copa' | 'ninja' }) {
   const gradient =
     theme === 'copa'
-      ? 'radial-gradient(ellipse at center, rgba(22,163,74,0.12) 0%, rgba(245,158,11,0.04) 55%, transparent 100%)'
+      ? 'radial-gradient(ellipse at 76% 8%, rgba(22,163,74,0.13) 0%, rgba(245,158,11,0.04) 48%, transparent 78%)'
       : theme === 'ninja'
-        ? 'radial-gradient(ellipse at center, rgba(113,113,122,0.12) 0%, transparent 70%)'
-        : 'radial-gradient(ellipse at center, rgba(56,189,248,0.12), transparent 70%)'
+        ? 'radial-gradient(ellipse at 76% 8%, rgba(113,113,122,0.12) 0%, transparent 68%)'
+        : 'radial-gradient(ellipse at 76% 8%, rgba(132,204,22,0.10), transparent 68%)'
 
   return (
     <div className="fixed inset-0 z-[-2] pointer-events-none overflow-hidden bg-[#030303]">
@@ -29,8 +23,6 @@ function AdminStaticBackground({ theme }: { theme: 'raios' | 'copa' | 'ninja' })
 }
 
 export default function DynamicBackground({ temaAtivo }: DynamicBackgroundProps) {
-  const pathname = usePathname()
-  const isAdminRoute = pathname?.startsWith('/admin') ?? false
   const [forcedTheme, setForcedTheme] = useState<'raios' | 'copa' | 'ninja' | null>(null)
 
   useEffect(() => {
@@ -63,12 +55,6 @@ export default function DynamicBackground({ temaAtivo }: DynamicBackgroundProps)
     }
   }, [currentTheme])
 
-  // Admin: keep theme class for CSS tokens, skip heavy GPU backgrounds
-  if (isAdminRoute) {
-    return <AdminStaticBackground theme={currentTheme} />
-  }
-
-  if (currentTheme === 'ninja') return <NinjaBackground />
-  if (currentTheme === 'copa') return <WorldCupBackground />
-  return <LightningBackground />
+  // Static backgrounds prevent shader failures and continuous GPU work on every route.
+  return <StaticThemeBackground theme={currentTheme} />
 }

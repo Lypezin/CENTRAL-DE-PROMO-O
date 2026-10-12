@@ -1,10 +1,43 @@
 'use client'
 
-import { useRef, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import Link from 'next/link'
 import StatusBadge from '@/components/ui/StatusBadge'
 import Tooltip from '@/components/ui/Tooltip'
 import { Promocao } from '@/lib/supabase'
+
+function isDeadlinePast(dateFim: string | null): boolean {
+  if (!dateFim) return false
+
+  const dateOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateFim)
+  if (dateOnly) {
+    const [, year, month, day] = dateOnly
+    const deadline = new Date(Number(year), Number(month) - 1, Number(day))
+
+    if (
+      deadline.getFullYear() !== Number(year) ||
+      deadline.getMonth() !== Number(month) - 1 ||
+      deadline.getDate() !== Number(day)
+    ) {
+      return false
+    }
+
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    return deadline < today
+  }
+
+  const deadlineTimestamp = Date.parse(dateFim)
+  return Number.isFinite(deadlineTimestamp) && deadlineTimestamp < Date.now()
+}
+
+function formatDeadline(dateFim: string): string {
+  const dateOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateFim)
+  if (dateOnly) return `${dateOnly[3]}/${dateOnly[2]}/${dateOnly[1]}`
+
+  const date = new Date(dateFim)
+  return Number.isNaN(date.getTime()) ? dateFim : date.toLocaleDateString('pt-BR')
+}
 
 interface AdminPromoListProps {
   promocoes: Promocao[]
@@ -14,11 +47,9 @@ interface AdminPromoListProps {
 }
 
 export default function AdminPromoList({ promocoes, loading, onReorder, elitePromoId }: AdminPromoListProps) {
-  const router = useRouter()
   const [draggedItemIndex, setDraggedItemIndex] = useState<number | null>(null)
   const [dragOverItemIndex, setDragOverItemIndex] = useState<number | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
-  const isDragging = useRef(false)
 
   const filteredPromocoes = promocoes.filter((promo) => {
     const query = searchQuery.toLowerCase()
@@ -29,12 +60,7 @@ export default function AdminPromoList({ promocoes, loading, onReorder, elitePro
     )
   })
 
-  const handleMouseDown = () => {
-    isDragging.current = false
-  }
-
   const handleDragStart = (index: number) => {
-    isDragging.current = true
     setDraggedItemIndex(index)
   }
 
@@ -66,10 +92,18 @@ export default function AdminPromoList({ promocoes, loading, onReorder, elitePro
     setDragOverItemIndex(null)
   }
 
-  const handleCardClick = (promoId: string) => {
-    if (!isDragging.current) {
-      router.push(`/admin/promo/${promoId}`)
-    }
+  const handleMove = (promoId: string, direction: -1 | 1) => {
+    const sourceIndex = promocoes.findIndex((promo) => promo.id === promoId)
+    const targetIndex = sourceIndex + direction
+    if (sourceIndex < 0 || targetIndex < 0 || targetIndex >= promocoes.length) return
+
+    const newOrder = [...promocoes]
+    ;[newOrder[sourceIndex], newOrder[targetIndex]] = [newOrder[targetIndex], newOrder[sourceIndex]]
+    const updatedPromos = newOrder.map((promo, index) => ({
+      ...promo,
+      config_regras: { ...(promo.config_regras || {}), ordem: index + 1 },
+    }))
+    onReorder?.(updatedPromos)
   }
 
   if (loading) {
@@ -103,7 +137,7 @@ export default function AdminPromoList({ promocoes, loading, onReorder, elitePro
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Buscar promocao por nome, cidade ou slug..."
-          className="w-full rounded-xl border border-white/10 bg-[#0a0a0c] py-2.5 pl-10 pr-4 text-sm text-white placeholder-zinc-500 transition-all focus:border-sky-500/50 focus:outline-none"
+          className="w-full rounded-xl border border-white/10 bg-[#0a0a0c] py-2.5 pl-10 pr-4 text-sm text-white placeholder-zinc-500 transition-all focus:border-sky-500/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0c]"
           aria-label="Buscar promocoes"
         />
         {searchQuery && (
@@ -122,16 +156,13 @@ export default function AdminPromoList({ promocoes, loading, onReorder, elitePro
       {filteredPromocoes.length === 0 && searchQuery && (
         <div className="glass rounded-2xl border border-white/10 p-8 text-center">
           <p className="text-sm text-zinc-500">
-            Nenhuma promocao encontrada para <span className="font-medium text-zinc-300">"{searchQuery}"</span>
+            Nenhuma promoção encontrada para <span className="font-medium text-zinc-300">&ldquo;{searchQuery}&rdquo;</span>
           </p>
         </div>
       )}
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-        <div
-          onClick={() => router.push(elitePromoId ? `/admin/promo/${elitePromoId}` : '/admin/elite')}
-          className="obsidian-card group relative flex cursor-pointer flex-col overflow-hidden rounded-2xl border border-amber-500/20 bg-[linear-gradient(135deg,rgba(23,18,10,0.96),rgba(8,8,8,0.98))] shadow-xl shadow-black/40 transition-all duration-300 hover:border-amber-400/35"
-        >
+        <article className="obsidian-card group relative flex flex-col overflow-hidden rounded-2xl border border-amber-500/20 bg-[linear-gradient(135deg,rgba(23,18,10,0.96),rgba(8,8,8,0.98))] shadow-xl shadow-black/40 transition-all duration-300 hover:border-amber-400/35">
           <div className="h-1 w-full bg-gradient-to-r from-amber-500 via-yellow-300 to-amber-500 shadow-[0_2px_15px_rgba(251,191,36,0.25)]"></div>
           <div className="flex flex-grow flex-col p-5">
             <div className="mb-4 flex items-start justify-between">
@@ -155,40 +186,34 @@ export default function AdminPromoList({ promocoes, loading, onReorder, elitePro
               </div>
 
               <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    router.push('/admin/elite')
-                  }}
+                <Link
+                  href="/admin/elite"
                   className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-[11px] font-bold text-zinc-200 transition-all hover:border-amber-400/40 hover:text-white"
                 >
                   Layout
-                </button>
+                </Link>
                 <Tooltip content="Abrir base do ELITE">
-                  <span className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-amber-500/20 bg-amber-950/25 px-4 py-2 text-xs font-bold text-amber-200 transition-all hover:border-amber-400 hover:bg-amber-500 hover:text-black active:scale-95">
+                  <Link href={elitePromoId ? `/admin/promo/${elitePromoId}` : '/admin/elite'} className="flex items-center gap-1.5 rounded-lg border border-amber-500/20 bg-amber-950/25 px-4 py-2 text-xs font-bold text-amber-200 transition-all hover:border-amber-400 hover:bg-amber-500 hover:text-black active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300">
                     Planilha
                     <svg className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                     </svg>
-                  </span>
+                  </Link>
                 </Tooltip>
               </div>
             </div>
           </div>
-        </div>
+        </article>
 
         {filteredPromocoes.map((promo, index) => (
-          <div
+          <article
             key={promo.id}
-            draggable
-            onMouseDown={handleMouseDown}
+            draggable={!searchQuery}
             onDragStart={() => handleDragStart(index)}
             onDragEnter={() => handleDragEnter(index)}
             onDragEnd={handleDragEnd}
             onDragOver={(e) => e.preventDefault()}
-            onClick={() => handleCardClick(promo.id)}
-            className={`obsidian-card group relative flex cursor-grab flex-col overflow-hidden rounded-2xl border shadow-xl shadow-black/40 transition-all duration-300 active:cursor-grabbing ${
+            className={`obsidian-card group relative flex flex-col overflow-hidden rounded-2xl border shadow-xl shadow-black/40 transition-all duration-300 ${searchQuery ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'} ${
               dragOverItemIndex === index ? 'scale-105 border-dashed border-sky-500 bg-sky-900/20' : 'border-white/[0.04] hover:border-sky-500/30'
             }`}
           >
@@ -211,7 +236,23 @@ export default function AdminPromoList({ promocoes, loading, onReorder, elitePro
               <h3 className="mb-1 text-lg font-black leading-tight text-white transition-colors group-hover:text-sky-300">{promo.nome}</h3>
               <p className="mb-4 break-all font-mono text-xs text-zinc-500 opacity-70">/{promo.slug}</p>
 
-              <div className="mt-auto flex items-center justify-between border-t border-white/[0.04] pt-4">
+              {promo.status === 'ativa' && isDeadlinePast(promo.data_fim) && promo.data_fim && (
+                <div
+                  role="note"
+                  aria-label={`Aviso: prazo encerrado em ${formatDeadline(promo.data_fim)}`}
+                  className="mb-4 flex items-start gap-2 rounded-lg border border-amber-400/60 bg-amber-950/70 px-3 py-2 text-sm leading-5 text-amber-100"
+                >
+                  <svg className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3.75m0 3h.008v.008H12v-.008zM10.29 3.86 1.82 18.14A2 2 0 0 0 3.54 21h16.92a2 2 0 0 0 1.72-2.86L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                  </svg>
+                  <span>
+                    <span className="font-semibold">Prazo encerrado em {formatDeadline(promo.data_fim)}.</span>{' '}
+                    O status continua ativo e precisa ser atualizado manualmente.
+                  </span>
+                </div>
+              )}
+
+              <div className="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-white/[0.04] pt-4">
                 <div className="flex flex-col">
                   <span className="mb-1 text-[9px] font-bold uppercase tracking-wider text-zinc-600">Periodo</span>
                   <span className="font-mono text-xs text-zinc-400">
@@ -220,17 +261,35 @@ export default function AdminPromoList({ promocoes, loading, onReorder, elitePro
                   </span>
                 </div>
 
-                <Tooltip content="Gerenciar promocao">
-                  <span className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-white/5 bg-zinc-900 px-4 py-2 text-xs font-bold text-zinc-300 transition-all hover:border-sky-500/50 hover:bg-sky-600 hover:text-white active:scale-95">
+                <div className="flex items-center gap-2">
+                  <div role="group" aria-label={`Reordenar ${promo.nome}`} className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => handleMove(promo.id, -1)}
+                      disabled={promocoes.findIndex((item) => item.id === promo.id) === 0}
+                      aria-label={`Mover ${promo.nome} para cima`}
+                      className="grid min-h-11 min-w-11 place-items-center rounded-lg border border-white/10 bg-zinc-900 text-zinc-300 hover:border-sky-500/40 hover:text-white disabled:cursor-not-allowed disabled:opacity-35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+                    >↑</button>
+                    <button
+                      type="button"
+                      onClick={() => handleMove(promo.id, 1)}
+                      disabled={promocoes.findIndex((item) => item.id === promo.id) === promocoes.length - 1}
+                      aria-label={`Mover ${promo.nome} para baixo`}
+                      className="grid min-h-11 min-w-11 place-items-center rounded-lg border border-white/10 bg-zinc-900 text-zinc-300 hover:border-sky-500/40 hover:text-white disabled:cursor-not-allowed disabled:opacity-35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+                    >↓</button>
+                  </div>
+                  <Tooltip content="Gerenciar promoção">
+                  <Link href={`/admin/promo/${promo.id}`} className="flex min-h-11 items-center gap-1.5 rounded-lg border border-white/5 bg-zinc-900 px-4 py-2 text-xs font-bold text-zinc-300 transition-all hover:border-sky-500/50 hover:bg-sky-600 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400">
                     Gerenciar
                     <svg className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                     </svg>
-                  </span>
-                </Tooltip>
+                  </Link>
+                  </Tooltip>
+                </div>
               </div>
             </div>
-          </div>
+          </article>
         ))}
       </div>
 

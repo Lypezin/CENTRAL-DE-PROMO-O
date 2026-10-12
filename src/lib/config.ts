@@ -1,3 +1,5 @@
+import type { GrupoPremiosConfig } from '@/lib/supabase'
+
 // Configuração dos turnos e seus prêmios
 export const TURNOS_CONFIG = {
   'CAFE_DA_MANHA': {
@@ -108,23 +110,23 @@ export function getMedalha(posicao: number): string {
 }
 
 // Helper para calcular prêmio a partir da config JSONB de uma promoção
-export function getPremioFromConfig(configPremios: any[], turno: string, posicao: number): number {
-  const turnoConfig = configPremios.find((c: any) => c.turno === turno)
+export function getPremioFromConfig(configPremios: GrupoPremiosConfig[], turno: string, posicao: number): number {
+  const turnoConfig = configPremios.find((config) => config.turno === turno)
   if (!turnoConfig) return 0
-  for (const p of turnoConfig.premios) {
-    if ('posicao' in p && p.posicao === posicao) return p.valor
-    if ('posicao_inicio' in p && posicao >= p.posicao_inicio && posicao <= p.posicao_fim) return p.valor
+  for (const p of turnoConfig.premios ?? []) {
+    if (p.posicao === posicao) return p.valor ?? 0
+    if (p.posicao_inicio !== undefined && p.posicao_fim !== undefined && posicao >= p.posicao_inicio && posicao <= p.posicao_fim) return p.valor ?? 0
   }
   return 0
 }
 
 // Helper para obter informação completa do prêmio (valor + descrição) a partir da config JSONB
-export function getPremioInfoFromConfig(configPremios: any[], turno: string, posicao: number): { valor: number, descricao?: string } {
-  const turnoConfig = configPremios.find((c: any) => c.turno === turno)
+export function getPremioInfoFromConfig(configPremios: GrupoPremiosConfig[], turno: string, posicao: number): { valor: number, descricao?: string } {
+  const turnoConfig = configPremios.find((config) => config.turno === turno)
   if (!turnoConfig) return { valor: 0 }
-  for (const p of turnoConfig.premios) {
-    if ('posicao' in p && p.posicao === posicao) return { valor: p.valor || 0, descricao: p.descricao }
-    if ('posicao_inicio' in p && posicao >= p.posicao_inicio && posicao <= p.posicao_fim) return { valor: p.valor || 0, descricao: p.descricao }
+  for (const p of turnoConfig.premios ?? []) {
+    if (p.posicao === posicao) return { valor: p.valor ?? 0, descricao: p.descricao }
+    if (p.posicao_inicio !== undefined && p.posicao_fim !== undefined && posicao >= p.posicao_inicio && posicao <= p.posicao_fim) return { valor: p.valor ?? 0, descricao: p.descricao }
   }
   return { valor: 0 }
 }

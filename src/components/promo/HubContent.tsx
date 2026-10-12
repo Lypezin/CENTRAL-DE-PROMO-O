@@ -1,23 +1,19 @@
 'use client'
 
-import { useState, useRef, useMemo, useEffect } from 'react'
+import Link from 'next/link'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import PromoCard from '@/components/ui/PromoCard'
-import { Promocao } from '@/lib/supabase'
 import ElitePromoCard from '@/components/promo/ElitePromoCard'
-import { EliteConfig } from '@/lib/eliteConfig'
+import type { EliteConfig } from '@/lib/eliteConfig'
+import type { Promocao } from '@/lib/supabase'
 
-type PrizeItem = {
-  valor?: number
-}
+type FilterTab = 'todas' | 'ativas' | 'encerradas'
 
-type PrizeConfig = {
-  premios?: PrizeItem[]
-}
-
-declare global {
-  interface Window {
-    __onlineCount?: number
-  }
+function formatDate(value: string | null) {
+  if (!value) return null
+  const [year, month, day] = value.slice(0, 10).split('-')
+  if (!year || !month || !day) return null
+  return `${day}/${month}/${year}`
 }
 
 export default function HubContent({
@@ -28,311 +24,321 @@ export default function HubContent({
   eliteConfig: EliteConfig
 }) {
   const [searchQuery, setSearchQuery] = useState('')
-  const [activeTab, setActiveTab] = useState<'todas' | 'ativas' | 'encerradas'>('ativas')
+  const [activeTab, setActiveTab] = useState<FilterTab>('ativas')
   const [isTermsOpen, setIsTermsOpen] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
-  const [onlineCount, setOnlineCount] = useState<number>(1)
-  const [isCopa, setIsCopa] = useState<boolean>(false)
+  const termsCloseRef = useRef<HTMLButtonElement>(null)
+  const termsTriggerRef = useRef<HTMLButtonElement>(null)
+  const hasOpenedTerms = useRef(false)
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const count = window.__onlineCount
-      if (typeof count === 'number') {
-        queueMicrotask(() => setOnlineCount(count))
-      }
-    }
+  const activePromotions = useMemo(
+    () => initialPromocoes.filter((promo) => promo.status === 'ativa'),
+    [initialPromocoes],
+  )
+  const endedPromotions = useMemo(
+    () => initialPromocoes.filter((promo) => promo.status === 'encerrada'),
+    [initialPromocoes],
+  )
+  const featuredPromotion = activePromotions[0]
 
-    const handleUpdate = (e: Event) => {
-      setOnlineCount((e as CustomEvent).detail)
-    }
-    window.addEventListener('online_presence_update', handleUpdate)
-
-    queueMicrotask(() => setIsCopa(document.body.classList.contains('tema-copa')))
-    const observer = new MutationObserver(() => {
-      setIsCopa(document.body.classList.contains('tema-copa'))
-    })
-    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] })
-
-    return () => {
-      window.removeEventListener('online_presence_update', handleUpdate)
-      observer.disconnect()
-    }
-  }, [])
-
-  const ativas = useMemo(() => initialPromocoes.filter((p) => p.status === 'ativa'), [initialPromocoes])
-  const encerradas = useMemo(() => initialPromocoes.filter((p) => p.status === 'encerrada'), [initialPromocoes])
-
-  const filteredPromocoes = useMemo(() => {
-    const query = searchQuery.toLowerCase().trim()
+  const filteredPromotions = useMemo(() => {
+    const query = searchQuery.trim().toLocaleLowerCase('pt-BR')
     return initialPromocoes.filter((promo) => {
       const matchesSearch =
         !query ||
-        promo.nome.toLowerCase().includes(query) ||
-        (promo.descricao && promo.descricao.toLowerCase().includes(query))
-
-      if (activeTab === 'ativas') {
-        return matchesSearch && promo.status === 'ativa'
-      } else if (activeTab === 'encerradas') {
-        return matchesSearch && promo.status === 'encerrada'
-      }
-      return matchesSearch
+        promo.nome.toLocaleLowerCase('pt-BR').includes(query) ||
+        (promo.descricao || '').toLocaleLowerCase('pt-BR').includes(query)
+      const matchesStatus =
+        activeTab === 'todas' ||
+        (activeTab === 'ativas' && promo.status === 'ativa') ||
+        (activeTab === 'encerradas' && promo.status === 'encerrada')
+      return matchesSearch && matchesStatus
     })
   }, [initialPromocoes, searchQuery, activeTab])
+  const showEliteCard = useMemo(() => {
+    if (activeTab === 'encerradas') return false
+    const query = searchQuery.trim().toLocaleLowerCase('pt-BR')
+    return !query || [eliteConfig.card_title, eliteConfig.card_description, 'elite']
+      .some((value) => value.toLocaleLowerCase('pt-BR').includes(query))
+  }, [activeTab, searchQuery, eliteConfig.card_title, eliteConfig.card_description])
+  const resultCount = filteredPromotions.length + (showEliteCard ? 1 : 0)
 
-  const totalPrizesLabel = useMemo(() => {
-    let total = 0
-    initialPromocoes.forEach((p) => {
-      if (p.config_premios && Array.isArray(p.config_premios)) {
-        ;(p.config_premios as PrizeConfig[]).forEach((c) => {
-          if (c.premios && Array.isArray(c.premios)) {
-            c.premios.forEach((pr) => {
-              if (pr.valor) {
-                total += pr.valor
-              }
-            })
-          }
-        })
+  useEffect(() => {
+    if (!isTermsOpen) {
+      if (hasOpenedTerms.current) {
+        termsTriggerRef.current?.focus()
+        hasOpenedTerms.current = false
       }
-    })
-    return total > 0 ? `R$ ${total.toLocaleString('pt-BR')}` : 'R$ 15.000+'
-  }, [initialPromocoes])
+      return
+    }
+    hasOpenedTerms.current = true
+    termsCloseRef.current?.focus()
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsTermsOpen(false)
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [isTermsOpen])
+
+  const tabs: { id: FilterTab; label: string; count: number }[] = [
+    { id: 'ativas', label: 'Em disputa', count: activePromotions.length },
+    { id: 'todas', label: 'Todas', count: initialPromocoes.length },
+    { id: 'encerradas', label: 'Histórico', count: endedPromotions.length },
+  ]
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 md:px-8 py-6">
-      <section className="mb-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8 pt-8">
-        <div className={`max-w-2xl text-left ${isCopa ? 'copa-hero-panel' : ''}`}>
-          <div className="flex flex-wrap items-center gap-2 mb-4">
-            <div
-              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider font-mono ${
-                isCopa
-                  ? 'bg-green-950/20 border border-green-900/30 text-green-400'
-                  : 'bg-sky-950/20 border border-sky-900/30 text-sky-400'
-              }`}
-            >
-              <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${isCopa ? 'bg-green-400' : 'bg-sky-400'}`}></span>
-              Painel Operacional
+    <div className="mx-auto w-full max-w-7xl px-4 pb-16 pt-5 sm:px-6 md:px-8 md:pt-8">
+      <section
+        aria-labelledby="hub-title"
+        className="relative isolate overflow-hidden rounded-[28px] border border-white/10 bg-[#0b1111] shadow-[0_28px_90px_rgba(0,0,0,0.32)]"
+      >
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 -z-10 opacity-70"
+          style={{
+            background:
+              'radial-gradient(ellipse at 82% 15%, rgba(132,204,22,.17), transparent 34%), linear-gradient(115deg, transparent 35%, rgba(255,255,255,.025) 35.1%, transparent 35.4%)',
+          }}
+        />
+        <div className="grid gap-8 p-5 sm:p-8 lg:grid-cols-[1.2fr_.8fr] lg:gap-12 lg:p-10">
+          <div className="flex flex-col justify-center">
+            <div className="mb-5 flex flex-wrap items-center gap-2 text-[11px] font-bold uppercase tracking-[.18em] text-lime-300">
+              <span className="inline-flex h-7 items-center gap-2 rounded-full border border-lime-300/20 bg-lime-300/10 px-3">
+                <span className="h-1.5 w-1.5 rounded-full bg-lime-300" aria-hidden="true" />
+                EntreGÔ · Itaim
+              </span>
+              <span className="text-zinc-500">Central de Promoções</span>
             </div>
+            <h1 id="hub-title" className="max-w-2xl text-3xl font-black leading-[1.04] tracking-[-.04em] text-white sm:text-5xl lg:text-[56px]">
+              Sua próxima posição começa aqui.
+            </h1>
+            <p className="mt-4 max-w-xl text-sm leading-6 text-zinc-300 sm:text-base">
+              Acompanhe as campanhas, confira as regras do turno e veja sua colocação no ranking.
+            </p>
 
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-emerald-950/20 border border-emerald-900/30 text-[10px] font-bold text-emerald-400 uppercase tracking-wider font-mono">
-              <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span>
-              {onlineCount} {onlineCount === 1 ? 'entregador online' : 'entregadores online'}
-            </div>
-
-            {isCopa && (
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-amber-950/20 border border-amber-800/30 text-[10px] font-bold text-amber-400 uppercase tracking-wider font-mono copa-shimmer copa-badge-glow copa-edition-badge">
-                Edição Copa
+            <div className="mt-7 flex flex-wrap gap-3 text-sm">
+              <div className="rounded-xl border border-white/10 bg-black/25 px-4 py-3">
+                <span className="block text-xl font-extrabold tabular-nums text-white">{activePromotions.length}</span>
+                <span className="text-xs text-zinc-400">campanhas em disputa</span>
               </div>
+              <div className="rounded-xl border border-white/10 bg-black/25 px-4 py-3">
+                <span className="block text-xl font-extrabold tabular-nums text-white">{endedPromotions.length}</span>
+                <span className="text-xs text-zinc-400">campanhas no histórico</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex min-h-[230px] flex-col justify-between rounded-2xl border border-lime-200/15 bg-[#111918]/90 p-5 sm:p-6">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-[.18em] text-lime-300">Agora em destaque</p>
+                <h2 className="mt-3 text-2xl font-extrabold leading-tight tracking-tight text-white">
+                  {featuredPromotion?.nome || 'A próxima disputa começa em breve'}
+                </h2>
+              </div>
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-lime-300 text-[#111918]" aria-hidden="true">
+                <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.8">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 21h8m-4-4v4m-7-17h14v5a7 7 0 0 1-14 0V4Zm0 3H3v1a5 5 0 0 0 5 5m11-6h2v1a5 5 0 0 1-5 5M8 4h8" />
+                </svg>
+              </span>
+            </div>
+
+            {featuredPromotion ? (
+              <>
+                <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-zinc-300">
+                  <span className="inline-flex items-center gap-2">
+                    <span className="h-2 w-2 rounded-full bg-lime-300" aria-hidden="true" />
+                    Em andamento
+                  </span>
+                  {featuredPromotion.data_fim && <span>Encerra em {formatDate(featuredPromotion.data_fim)}</span>}
+                </div>
+                <Link
+                  href={`/promo/${featuredPromotion.slug}`}
+                  className="mt-6 inline-flex min-h-12 items-center justify-between gap-4 rounded-xl bg-lime-300 px-4 font-bold text-[#101615] transition-colors hover:bg-lime-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#111918]"
+                >
+                  <span>Ver campanha e ranking</span>
+                  <svg viewBox="0 0 20 20" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 10h12m-5-5 5 5-5 5" />
+                  </svg>
+                </Link>
+              </>
+            ) : (
+              <p className="mt-4 text-sm leading-6 text-zinc-400">
+                Consulte as campanhas anteriores ou volte em breve para acompanhar uma nova disputa.
+              </p>
             )}
           </div>
-          <h1 className={`text-3xl md:text-5xl font-black text-white mb-4 tracking-tight leading-tight ${isCopa ? 'text-gradient-neon' : ''}`}>
-            Central de Promoções
-            {isCopa && <span className="text-lg md:text-2xl font-bold text-amber-400/80 ml-3 gold-text-glow">🏆</span>}
-          </h1>
-          <p className="text-zinc-400 text-sm md:text-base leading-relaxed max-w-xl">
-            Acompanhe o seu progresso em tempo real, veja a premiação de cada turno, consulte o histórico de campanhas e dispute as melhores colocações.
+        </div>
+      </section>
+
+      <section aria-label="Buscar e filtrar campanhas" className="mt-6 rounded-2xl border border-white/10 bg-[#090d0d]/90 p-3 sm:p-4">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div role="group" aria-label="Filtrar campanhas" className="grid grid-cols-3 gap-1 rounded-xl bg-black/35 p-1 lg:w-auto">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                aria-pressed={activeTab === tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`min-h-11 rounded-lg px-3 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-300 sm:px-4 ${
+                  activeTab === tab.id
+                    ? 'bg-white text-[#111615]'
+                    : 'text-zinc-400 hover:bg-white/5 hover:text-white'
+                }`}
+              >
+                {tab.label}<span className="ml-1.5 opacity-70">{tab.count}</span>
+              </button>
+            ))}
+          </div>
+          <label className="relative block w-full lg:max-w-md">
+            <span className="sr-only">Buscar campanha pelo nome ou descrição</span>
+            <svg className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m21 21-4.4-4.4m1.9-5.1a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z" />
+            </svg>
+            <input
+              ref={searchInputRef}
+              type="search"
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Buscar campanhas..."
+              className="min-h-11 w-full rounded-xl border border-white/10 bg-[#050808] py-2.5 pl-10 pr-10 text-sm text-white outline-none transition-colors placeholder:text-zinc-500 focus:border-lime-300/60 focus:ring-2 focus:ring-lime-300/15"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                aria-label="Limpar busca"
+                onClick={() => {
+                  setSearchQuery('')
+                  searchInputRef.current?.focus()
+                }}
+                className="absolute right-2 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-lg text-zinc-400 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-300"
+              >
+                <span aria-hidden="true">×</span>
+              </button>
+            )}
+          </label>
+        </div>
+      </section>
+
+      <section className="mt-8" aria-labelledby="campaigns-title">
+        <div className="mb-4 flex items-end justify-between gap-4">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[.18em] text-lime-300">Calendário competitivo</p>
+            <h2 id="campaigns-title" className="mt-1 text-2xl font-extrabold tracking-tight text-white">Campanhas</h2>
+          </div>
+          <p className="text-right text-xs text-zinc-400" aria-live="polite">
+            {resultCount} {resultCount === 1 ? 'resultado' : 'resultados'}
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full lg:w-auto lg:min-w-[500px]">
-          <div className="bg-[#08080a] border border-white/[0.04] rounded-2xl p-5 relative overflow-hidden group hub-stat-card">
-            <div className="text-2xl font-bold text-white mb-0.5 font-mono tracking-tight">{ativas.length}</div>
-            <div className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider font-mono">Promoções Ativas</div>
-            <div className="absolute top-4 right-4 text-sky-500/25">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </div>
-          </div>
-
-          <div className="bg-[#08080a] border border-white/[0.04] rounded-2xl p-5 relative overflow-hidden group hub-stat-card">
-            <div className="text-2xl font-bold text-white mb-0.5 font-mono tracking-tight">{encerradas.length}</div>
-            <div className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider font-mono">Histórico</div>
-            <div className="absolute top-4 right-4 text-indigo-500/25">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-          </div>
-
-          <div className="bg-[#08080a] border border-white/[0.04] rounded-2xl p-5 relative overflow-hidden group hub-stat-card">
-            <div className="text-2xl font-bold text-emerald-400 mb-0.5 font-mono tracking-tight">{totalPrizesLabel}</div>
-            <div className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider font-mono">Prêmios Acumulados</div>
-            <div className="absolute top-4 right-4 text-emerald-500/25">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M12 16V5" />
-              </svg>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="mb-8 flex flex-col md:flex-row gap-4 items-center justify-between animate-slide-up">
-        <div className="flex bg-zinc-950/80 p-1 rounded-xl border border-zinc-900 w-full md:w-auto overflow-x-auto shrink-0 scrollbar-none gap-1 hub-filter-bar">
-          <button
-            onClick={() => setActiveTab('todas')}
-            className={`flex-grow md:flex-initial px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-200 active:scale-95 hub-filter-btn ${
-              activeTab === 'todas' ? 'bg-zinc-900 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'
-            }`}
-          >
-            Todas
-          </button>
-          <button
-            onClick={() => setActiveTab('ativas')}
-            className={`flex-grow md:flex-initial px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-200 flex items-center justify-center gap-1.5 active:scale-95 hub-filter-btn ${
-              activeTab === 'ativas' ? 'bg-zinc-900 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'
-            }`}
-          >
-            <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></span>
-            Ativas ({ativas.length})
-          </button>
-          <button
-            onClick={() => setActiveTab('encerradas')}
-            className={`flex-grow md:flex-initial px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-200 active:scale-95 hub-filter-btn ${
-              activeTab === 'encerradas' ? 'bg-zinc-900 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'
-            }`}
-          >
-            Histórico ({encerradas.length})
-          </button>
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+          {showEliteCard && <ElitePromoCard config={eliteConfig} />}
+          {filteredPromotions.map((promo) => <PromoCard key={promo.id} promo={promo} />)}
         </div>
 
-        <div className="relative w-full md:w-80">
-          <input
-            ref={searchInputRef}
-            type="text"
-            placeholder="Buscar campanha pelo nome..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[#08080a] border border-white/[0.04] focus:border-sky-500/80 rounded-xl py-2.5 pl-10 pr-8 text-xs text-white focus:outline-none focus:ring-1 focus:ring-sky-500/40 transition-all placeholder-zinc-600 font-sans hub-search-input"
-          />
-          <svg className="w-4 h-4 text-zinc-600 absolute left-3.5 top-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-2.5 text-zinc-500 hover:text-white p-0.5 rounded-full hover:bg-white/5 transition-all"
-            >
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          )}
-        </div>
-      </section>
-
-      <section className="animate-slide-up">
-        <div className="grid-promos gap-6">
-          <div className="animate-fade-in">
-            <ElitePromoCard config={eliteConfig} />
-          </div>
-          {filteredPromocoes.map((promo) => (
-            <div key={promo.id} className="animate-fade-in">
-              <PromoCard promo={promo} />
-            </div>
-          ))}
-        </div>
-
-        {filteredPromocoes.length === 0 && (
-          <div className="mt-6 text-center py-10 px-6 bg-[#08080a] rounded-2xl border border-white/[0.04] flex flex-col items-center justify-center">
-            <div className="text-3xl mb-4">🔍</div>
-            <h3 className="text-base font-bold text-white mb-1">Nenhuma campanha encontrada</h3>
-            <p className="text-zinc-500 max-w-sm text-xs">
+        {resultCount === 0 && (
+          <div className="mt-5 rounded-2xl border border-white/10 bg-[#090d0d] px-6 py-12 text-center" role="status">
+            <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-white/5 text-xl" aria-hidden="true">⌕</div>
+            <h3 className="mt-4 text-lg font-bold text-white">Nenhuma campanha encontrada</h3>
+            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-zinc-400">
               {searchQuery
-                ? `Não encontramos resultados para "${searchQuery}". Tente digitar outro termo ou limpar o filtro.`
-                : 'No momento, somente o card ELITE está fixo nesta visualização.'}
+                ? `Não encontramos resultados para “${searchQuery}”. Ajuste a busca ou limpe o filtro.`
+                : 'Não há campanhas nesta categoria no momento.'}
             </p>
             {searchQuery && (
               <button
+                type="button"
                 onClick={() => setSearchQuery('')}
-                className="mt-6 px-4 py-2 rounded-xl bg-zinc-900/60 border border-zinc-800/80 hover:bg-zinc-900 text-white font-bold text-[10px] uppercase tracking-wider transition-all"
+                className="mt-5 min-h-11 rounded-xl border border-white/15 px-4 text-sm font-semibold text-white hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-300"
               >
-                Limpar Busca
+                Limpar busca
               </button>
             )}
           </div>
         )}
       </section>
 
-      <footer className="mt-24 py-8 border-t border-white/[0.04] text-[10px] text-zinc-600 flex flex-col sm:flex-row items-center justify-between gap-4 font-mono">
-        <div>
-          &copy; {new Date().getFullYear()} <span className="text-white font-bold">EntreGÔ - Itaim</span>. Todos os direitos reservados.
-        </div>
-        <div className="flex gap-4">
-          <button
-            type="button"
-            onClick={() => setIsTermsOpen(true)}
-            className="hover:text-zinc-400 transition-colors cursor-pointer bg-transparent border-none outline-none font-bold uppercase tracking-wider"
-          >
-            Termos de Uso
-          </button>
-          <span>&bull;</span>
-          <span className="hover:text-zinc-400 transition-colors cursor-pointer font-bold uppercase tracking-wider">Suporte ao Entregador</span>
-        </div>
+      <footer className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-white/10 py-7 text-xs text-zinc-500 sm:flex-row">
+        <p>&copy; {new Date().getFullYear()} <span className="font-semibold text-zinc-300">EntreGÔ - Itaim</span>. Todos os direitos reservados.</p>
+        <button
+          ref={termsTriggerRef}
+          type="button"
+          onClick={() => setIsTermsOpen(true)}
+          className="min-h-10 rounded-lg px-3 font-semibold text-zinc-300 underline decoration-white/20 underline-offset-4 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-300"
+        >
+          Termos de uso
+        </button>
       </footer>
 
       {isTermsOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm animate-fade-in">
-          <div className="bg-[#08080a] border border-white/[0.06] max-w-2xl w-full rounded-2xl p-6 md:p-8 max-h-[80vh] overflow-y-auto relative shadow-2xl animate-slide-up text-left">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setIsTermsOpen(false)
+          }}
+        >
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="terms-title"
+            onKeyDown={(event) => {
+              if (event.key !== 'Tab') return
+              const focusable = event.currentTarget.querySelectorAll<HTMLElement>(
+                'button:not([disabled]), a[href], input:not([disabled]), [tabindex]:not([tabindex="-1"])',
+              )
+              if (focusable.length === 0) return
+              const first = focusable[0]
+              const last = focusable[focusable.length - 1]
+              if (event.shiftKey && document.activeElement === first) {
+                event.preventDefault()
+                last.focus()
+              } else if (!event.shiftKey && document.activeElement === last) {
+                event.preventDefault()
+                first.focus()
+              }
+            }}
+            className="relative max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-white/10 bg-[#0b1010] p-6 text-left shadow-2xl sm:p-8"
+          >
             <button
+              ref={termsCloseRef}
+              type="button"
+              aria-label="Fechar termos de uso"
               onClick={() => setIsTermsOpen(false)}
-              className="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors p-1 rounded-full hover:bg-white/5"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-
-            <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2 tracking-tight">
-              <span>📄</span> Termos de Uso e Condições Gerais
-            </h3>
-
-            <div className="space-y-5 text-xs text-zinc-400 leading-relaxed font-sans">
-              <section className="space-y-1.5">
-                <h4 className="font-bold text-white">1. Visão Geral</h4>
-                <p>
-                  Bem-vindo à Central de Promoções da <strong>EntreGÔ - Itaim</strong>. Este portal destina-se a fins de consulta, acompanhamento de desempenho em tempo real, divulgação de rankings semanais e visualização de premiações de corridas por turnos para nossos entregadores parceiros.
-                </p>
+              className="absolute right-4 top-4 grid h-10 w-10 place-items-center rounded-lg text-zinc-400 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-300"
+            >×</button>
+            <h2 id="terms-title" className="pr-10 text-xl font-bold text-white">Termos de uso e condições gerais</h2>
+            <div className="mt-6 space-y-5 text-sm leading-6 text-zinc-300">
+              <section>
+                <h3 className="font-bold text-white">1. Visão geral</h3>
+                <p>Este portal da EntreGÔ - Itaim permite consultar campanhas, acompanhar resultados e visualizar rankings semanais e premiações por turno.</p>
               </section>
-
-              <section className="space-y-1.5">
-                <h4 className="font-bold text-white">2. Participação e Elegibilidade</h4>
-                <p>
-                  A participação em qualquer campanha ou ranking é voluntária. Os entregadores devem cumprir com todas as regras específicas da campanha detalhada em tela, incluindo o <strong>mínimo de corridas completadas no turno correspondente</strong>, para se tornarem elegíveis aos prêmios acumulados.
-                </p>
+              <section>
+                <h3 className="font-bold text-white">2. Participação e elegibilidade</h3>
+                <p>A participação é voluntária. Cada campanha pode ter regras próprias, incluindo quantidade mínima de corridas concluídas no turno correspondente.</p>
               </section>
-
-              <section className="space-y-1.5">
-                <h4 className="font-bold text-white">3. Integridade e Fair Play</h4>
-                <p>
-                  Prezamos pelo respeito e honestidade nas ruas. Qualquer atitude fraudulenta, simulação de corridas, agrupamento indevido de entregas, compartilhamento de contas ou manipulação de dados importados acarretará na <strong>desclassificação imediata e irrecorrível</strong> do entregador de qualquer campanha ativa.
-                </p>
+              <section>
+                <h3 className="font-bold text-white">3. Integridade</h3>
+                <p>Fraude, simulação de corridas, agrupamento indevido de entregas, compartilhamento de contas ou manipulação de dados pode resultar em desclassificação da campanha.</p>
               </section>
-
-              <section className="space-y-1.5">
-                <h4 className="font-bold text-white">4. Importação e Atualização de Dados</h4>
-                <p>
-                  Os dados apresentados são consolidados e atualizados periodicamente através de relatórios internos da base <strong>EntreGÔ - Itaim</strong>. Embora busquemos a maior precisão possível, divergências cadastrais ou operacionais de corridas devem ser reportadas à liderança de suporte no prazo de até 48 horas após a conclusão da respectiva semana.
-                </p>
+              <section>
+                <h3 className="font-bold text-white">4. Dados e correções</h3>
+                <p>Os resultados são atualizados a partir de relatórios internos. Divergências cadastrais ou operacionais devem ser comunicadas à liderança de suporte em até 48 horas após a semana correspondente.</p>
               </section>
-
-              <section className="space-y-1.5">
-                <h4 className="font-bold text-white">5. Disposições Finais</h4>
-                <p>
-                  A <strong>EntreGÔ - Itaim</strong> reserva-se o direito de ajustar, suspender ou prorrogar prazos e regras das promoções mediante aviso prévio oficial aos entregadores.
-                </p>
+              <section>
+                <h3 className="font-bold text-white">5. Atualizações de campanha</h3>
+                <p>A EntreGÔ - Itaim pode ajustar, suspender ou prorrogar prazos e regras das campanhas mediante comunicação aos entregadores.</p>
               </section>
             </div>
-
-            <div className="mt-8 pt-4 border-t border-white/[0.04] flex justify-end">
+            <div className="mt-7 flex justify-end border-t border-white/10 pt-5">
               <button
                 type="button"
                 onClick={() => setIsTermsOpen(false)}
-                className="admin-btn-primary !py-2 !px-5 text-[10px] uppercase tracking-wider font-extrabold"
+                className="min-h-11 rounded-xl bg-lime-300 px-5 text-sm font-bold text-[#111615] hover:bg-lime-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
               >
-                Entendi e Aceito
+                Fechar
               </button>
             </div>
-          </div>
+          </section>
         </div>
       )}
     </div>

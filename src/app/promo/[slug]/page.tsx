@@ -1,24 +1,33 @@
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabaseServer'
 import { notFound } from 'next/navigation'
 import RankingTurno from '@/components/promo/RankingTurno'
+import Link from 'next/link'
 import StatusBadge from '@/components/ui/StatusBadge'
 import CopaThemeForcer from '@/components/promo/CopaThemeForcer'
 import NinjaThemeForcer from '@/components/promo/NinjaThemeForcer'
 
-export const revalidate = 60 // ISR: revalidate promo page every 60s
-
 export default async function PromoPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
 
-  const { data: promocoes, error } = await supabase.rpc('get_promocao_por_slug', { p_slug: slug })
+  const { data: promo, error } = await supabaseAdmin
+    .from('promocoes')
+    .select('id,slug,nome,descricao,tipo,status,data_inicio,data_fim,cidade,destaque_copa,config_premios,config_turnos,config_regras')
+    .eq('slug', slug)
+    .in('status', ['ativa', 'encerrada'])
+    .maybeSingle()
   
-  if (error || !promocoes || promocoes.length === 0) {
+  if (error || !promo || promo.config_regras?.elite_internal) {
     notFound()
   }
 
-  const promo = promocoes[0]
   const configPremios = promo.config_premios || []
   const configTurnos = promo.config_turnos || ['CAFE_DA_MANHA', 'ALMOCO', 'TARDE', 'JANTAR', 'MADRUGADA']
+  const configRegrasPublicas = promo.config_regras ? {
+    limite_ranking: promo.config_regras.limite_ranking,
+    tema_ninja: promo.config_regras.tema_ninja,
+    mecanica: promo.config_regras.mecanica,
+    regras_texto: promo.config_regras.regras_texto,
+  } : {}
 
   const formatData = (dataStr: string | null) => {
     if (!dataStr) return 'TBD'
@@ -28,13 +37,13 @@ export default async function PromoPage({ params }: { params: Promise<{ slug: st
 
   // Fetch earliest and latest dates
   const [minDataRes, maxDataRes] = await Promise.all([
-    supabase
+    supabaseAdmin
       .from('entregas')
       .select('data_do_periodo')
       .eq('promocao_id', promo.id)
       .order('data_do_periodo', { ascending: true })
       .limit(1),
-    supabase
+    supabaseAdmin
       .from('entregas')
       .select('data_do_periodo')
       .eq('promocao_id', promo.id)
@@ -53,12 +62,12 @@ export default async function PromoPage({ params }: { params: Promise<{ slug: st
       {isNinja && <NinjaThemeForcer />}
       {/* Back button link */}
       <div className="mb-6">
-        <a href="/" className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-zinc-500 hover:text-white transition-colors duration-200 font-mono">
-          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <Link href="/" className="inline-flex min-h-11 items-center gap-2 rounded-lg pr-3 text-xs font-semibold text-zinc-400 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300">
+          <svg aria-hidden="true" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
           </svg>
           Voltar ao Hub
-        </a>
+        </Link>
       </div>
 
       {/* HEADER UNIFICADO */}
@@ -246,10 +255,10 @@ export default async function PromoPage({ params }: { params: Promise<{ slug: st
       <div className="mb-12">
         {promo.tipo === 'ranking_turno' ? (
           <RankingTurno 
-            promocaoId={promo.id} 
+            promocaoSlug={promo.slug}
             configPremios={configPremios} 
             configTurnos={configTurnos} 
-            configRegras={promo.config_regras || {}}
+            configRegras={configRegrasPublicas}
             isCopa={promo.destaque_copa}
             isNinja={isNinja}
           />

@@ -1,13 +1,13 @@
 'use client'
 
 import { memo, useMemo } from 'react'
-import { EntregaRanking } from '@/lib/supabase'
+import type { EntregaRanking, MecanicaPromocao } from '@/lib/supabase'
 
 interface RankingMetasProps {
   searchQuery: string
   filteredRanking: EntregaRanking[]
   rankingData: EntregaRanking[]
-  mecanica: any
+  mecanica: MecanicaPromocao
   getScore: (item: EntregaRanking) => number
   formatScoreValue: (val: number) => string
   formatCurrency: (val: number) => string

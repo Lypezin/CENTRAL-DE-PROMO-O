@@ -1,5 +1,6 @@
 'use client'
 import TurnoPrizeRow from './TurnoPrizeRow'
+import type { PrizeEditorField, PrizeEntry, TurnoPrizeConfig } from './TurnoPrizeRow'
 
 import React from 'react'
 import { Promocao } from '@/lib/supabase'
@@ -7,8 +8,8 @@ import { useToast } from '@/components/ui/Toast'
 
 interface TurnoPrizesConfiguratorProps {
   promo: Promocao
-  localPremios: any[]
-  setLocalPremios: React.Dispatch<React.SetStateAction<any[]>>
+  localPremios: TurnoPrizeConfig[] | null
+  setLocalPremios: React.Dispatch<React.SetStateAction<TurnoPrizeConfig[] | null>>
   turnoEditorAtivo: string
   setTurnoEditorAtivo: React.Dispatch<React.SetStateAction<string>>
   activeTurnos: string[]
@@ -61,11 +62,12 @@ export default function TurnoPrizesConfigurator({
 
   const handleUpdateMinimo = (minimo: number) => {
     setLocalPremios(prev => {
-      const exists = prev.some(t => t.turno === turnoEditorAtivo)
+      const gruposAtuais = prev ?? []
+      const exists = gruposAtuais.some(t => t.turno === turnoEditorAtivo)
       if (!exists) {
-        return [...prev, { turno: turnoEditorAtivo, minimo_corridas: Number(minimo), premios: [] }]
+        return [...gruposAtuais, { turno: turnoEditorAtivo, minimo_corridas: Number(minimo), premios: [] }]
       }
-      return prev.map(t => {
+      return gruposAtuais.map(t => {
         if (t.turno === turnoEditorAtivo) {
           return { ...t, minimo_corridas: Number(minimo) }
         }
@@ -74,13 +76,13 @@ export default function TurnoPrizesConfigurator({
     })
   }
 
-  const handleUpdatePremioRow = (idx: number, campo: string, valor: any) => {
+  const handleUpdatePremioRow = (idx: number, campo: PrizeEditorField, valor: string | number) => {
     setLocalPremios(prev => {
-      return prev.map(t => {
+      return (prev ?? []).map(t => {
         if (t.turno === turnoEditorAtivo) {
-          const novosPremios = (t.premios || []).map((premio: any, pIdx: number) => {
+          const novosPremios = (t.premios || []).map((premio: PrizeEntry, pIdx: number) => {
             if (pIdx === idx) {
-              const novoPremio = { ...premio }
+              const novoPremio: PrizeEntry = { ...premio }
               if (campo === 'tipo') {
                 if (valor === 'single') {
                   delete novoPremio.posicao_inicio
@@ -92,9 +94,15 @@ export default function TurnoPrizesConfigurator({
                   novoPremio.posicao_fim = 5
                 }
               } else if (campo === 'descricao') {
-                novoPremio[campo] = valor
-              } else {
-                novoPremio[campo] = valor === '' ? 0 : Number(valor)
+                novoPremio.descricao = String(valor)
+              } else if (campo === 'posicao') {
+                novoPremio.posicao = valor === '' ? 0 : Number(valor)
+              } else if (campo === 'posicao_inicio') {
+                novoPremio.posicao_inicio = valor === '' ? 0 : Number(valor)
+              } else if (campo === 'posicao_fim') {
+                novoPremio.posicao_fim = valor === '' ? 0 : Number(valor)
+              } else if (campo === 'valor') {
+                novoPremio.valor = valor === '' ? 0 : Number(valor)
               }
               return novoPremio
             }
@@ -109,18 +117,19 @@ export default function TurnoPrizesConfigurator({
 
   const handleAddPremioRow = () => {
     setLocalPremios(prev => {
-      const exists = prev.some(t => t.turno === turnoEditorAtivo)
+      const gruposAtuais = prev ?? []
+      const exists = gruposAtuais.some(t => t.turno === turnoEditorAtivo)
       const novoId = Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
       
       if (!exists) {
-        return [...prev, {
+        return [...gruposAtuais, {
           turno: turnoEditorAtivo,
           minimo_corridas: 0,
           premios: [{ id: novoId, posicao: 1, valor: 100 }]
         }]
       }
       
-      return prev.map(t => {
+      return gruposAtuais.map(t => {
         if (t.turno === turnoEditorAtivo) {
           const premiosAtuais = t.premios || []
           return {
@@ -138,9 +147,9 @@ export default function TurnoPrizesConfigurator({
 
   const handleRemovePremioRow = (idx: number) => {
     setLocalPremios(prev => {
-      return prev.map(t => {
+      return (prev ?? []).map(t => {
         if (t.turno === turnoEditorAtivo) {
-          const novosPremios = (t.premios || []).filter((_: any, pIdx: number) => pIdx !== idx)
+          const novosPremios = (t.premios || []).filter((_, pIdx: number) => pIdx !== idx)
           return { ...t, premios: novosPremios }
         }
         return t
@@ -151,7 +160,7 @@ export default function TurnoPrizesConfigurator({
   const handleMoveUp = (idx: number) => {
     if (idx <= 0) return
     setLocalPremios(prev => {
-      return prev.map(t => {
+      return (prev ?? []).map(t => {
         if (t.turno === turnoEditorAtivo && t.premios) {
           const novosPremios = [...t.premios]
           const tmp = novosPremios[idx]
@@ -166,7 +175,7 @@ export default function TurnoPrizesConfigurator({
 
   const handleMoveDown = (idx: number) => {
     setLocalPremios(prev => {
-      return prev.map(t => {
+      return (prev ?? []).map(t => {
         if (t.turno === turnoEditorAtivo && t.premios && idx < t.premios.length - 1) {
           const novosPremios = [...t.premios]
           const tmp = novosPremios[idx]
@@ -181,11 +190,11 @@ export default function TurnoPrizesConfigurator({
 
   const handleSavePrizes = () => {
     onSave({
-      config_premios: localPremios
+      config_premios: localPremios ?? []
     }).then(() => toast.success('Prêmios salvos!'))
   }
 
-  const turnoConfigObj = localPremios.find(t => t.turno === turnoEditorAtivo) || {
+  const turnoConfigObj = localPremios?.find(t => t.turno === turnoEditorAtivo) || {
     turno: turnoEditorAtivo,
     minimo_corridas: 0,
     premios: []
@@ -207,7 +216,7 @@ export default function TurnoPrizesConfigurator({
       {!isGeral && (
         <div className="space-y-2">
           <p className="text-[10px] text-zinc-500 font-mono uppercase tracking-wider">Turnos ativos</p>
-          <div className="flex flex-wrap gap-1.5">
+          <div role="group" aria-label="Ativar ou desativar turnos" className="flex flex-wrap gap-1.5">
             {TURNOS.map(t => {
               const isChecked = activeTurnos.includes(t.key)
               return (
@@ -215,20 +224,21 @@ export default function TurnoPrizesConfigurator({
                   key={t.key}
                   type="button"
                   onClick={() => handleToggleTurno(t.key)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[11px] font-bold transition-all ${
+                  aria-pressed={isChecked}
+                  className={`flex min-h-11 items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 ${
                     isChecked 
                       ? 'bg-sky-500/10 border-sky-500/30 text-white' 
                       : 'border-white/[0.04] text-zinc-500 hover:text-zinc-300 hover:border-white/10'
                   }`}
                 >
-                  <div className={`w-2.5 h-2.5 rounded-sm border flex items-center justify-center transition-all ${
+                  <div aria-hidden="true" className={`w-2.5 h-2.5 rounded-sm border flex items-center justify-center transition-all ${
                     isChecked ? 'bg-sky-500 border-sky-400' : 'border-zinc-600'
                   }`}>
                     {isChecked && (
                       <svg className="w-1.5 h-1.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M5 13l4 4L19 7" /></svg>
                     )}
                   </div>
-                  <span>{t.emoji}</span>
+                  <span aria-hidden="true">{t.emoji}</span>
                   <span>{t.label}</span>
                 </button>
               )
@@ -238,24 +248,25 @@ export default function TurnoPrizesConfigurator({
       )}
 
       {/* Tab selector */}
-      <div className="flex bg-[#0a0a0c] p-0.5 rounded-lg border border-white/[0.04] gap-0.5 overflow-x-auto scrollbar-none">
+      <div role="group" aria-label="Selecionar turno para editar prêmios" className="flex bg-[#0a0a0c] p-0.5 rounded-lg border border-white/[0.04] gap-0.5 overflow-x-auto scrollbar-none">
         {isGeral ? (
-          <div className="px-3 py-1.5 bg-sky-600 text-white rounded-md text-[11px] font-bold flex items-center gap-1.5">
-            <span>🏆</span> Geral
-          </div>
+          <span className="inline-flex min-h-11 items-center rounded-md bg-sky-600 px-3 py-1.5 text-xs font-bold text-white">
+            Geral
+          </span>
         ) : (
           TURNOS.filter(t => activeTurnos.includes(t.key)).map(t => (
             <button
               key={t.key}
               type="button"
               onClick={() => setTurnoEditorAtivo(t.key)}
-              className={`flex-1 min-w-[80px] px-2.5 py-1.5 rounded-md text-[11px] font-bold transition-all ${
+              aria-pressed={turnoEditorAtivo === t.key}
+              className={`flex min-h-11 flex-1 min-w-[80px] items-center justify-center px-2.5 py-1.5 rounded-md text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 ${
                 turnoEditorAtivo === t.key 
                   ? 'bg-sky-600 text-white' 
                   : 'text-zinc-500 hover:text-white hover:bg-white/5'
               }`}
             >
-              <span className="hidden sm:inline">{t.emoji}</span> {t.label}
+              <span aria-hidden="true" className="hidden sm:inline">{t.emoji}</span> {t.label}
             </button>
           ))
         )}
@@ -286,14 +297,14 @@ export default function TurnoPrizesConfigurator({
           <button
             type="button"
             onClick={handleAddPremioRow}
-            className="text-[11px] font-bold text-sky-400 hover:text-sky-300 transition-colors"
+            className="inline-flex min-h-11 items-center rounded px-2 text-xs font-bold text-sky-300 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
           >
             + Adicionar
           </button>
         </div>
 
         <div className="space-y-1.5">
-          {turnoConfigObj.premios?.map((p: any, idx: number) => {
+          {turnoConfigObj.premios?.map((p: PrizeEntry, idx: number) => {
             const premios = turnoConfigObj.premios || []
             return (
               <TurnoPrizeRow
@@ -312,7 +323,7 @@ export default function TurnoPrizesConfigurator({
 
           {(!turnoConfigObj.premios || turnoConfigObj.premios.length === 0) && (
             <div className="text-center py-4 text-[11px] text-zinc-500">
-              Nenhum prêmio cadastrado. Clique em "+ Adicionar".
+              Nenhum prêmio cadastrado. Use Adicionar para incluir o primeiro.
             </div>
           )}
         </div>
@@ -324,11 +335,12 @@ export default function TurnoPrizesConfigurator({
           type="button"
           onClick={handleSavePrizes}
           disabled={saving}
-          className="admin-btn-primary !py-2 !px-5 text-[11px] flex items-center gap-2"
+          aria-busy={saving}
+          className="admin-btn-primary !min-h-11 !py-2 !px-5 text-xs flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
         >
           {saving ? (
             <>
-              <span className="w-3 h-3 border-[1.5px] border-current border-t-transparent rounded-full animate-spin" />
+              <span aria-hidden="true" className="w-3 h-3 border-[1.5px] border-current border-t-transparent rounded-full animate-spin" />
               Salvando...
             </>
           ) : (

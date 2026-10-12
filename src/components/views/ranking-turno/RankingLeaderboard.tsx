@@ -1,7 +1,7 @@
 'use client'
 
 import { memo, useMemo } from 'react'
-import { EntregaRanking } from '@/lib/supabase'
+import type { EntregaRanking, GrupoPremiosConfig, MecanicaPromocao } from '@/lib/supabase'
 import { LeaderboardPodium } from './LeaderboardPodium'
 import { LeaderboardTable } from './LeaderboardTable'
 import { getRankingMetricValue, resolveRankingMetric } from '@/lib/rankingMetric'
@@ -9,14 +9,14 @@ import { getRankingMetricValue, resolveRankingMetric } from '@/lib/rankingMetric
 interface RankingLeaderboardProps {
   searchQuery: string
   rankingToDisplay: EntregaRanking[]
-  activeTurnoConfig: any
-  configPremios: any[]
+  activeTurnoConfig: GrupoPremiosConfig | null
+  configPremios: GrupoPremiosConfig[]
   filtroAtivo: string
   getScore: (item: EntregaRanking) => number
   formatScoreValue: (val: number) => string
   maxScore: number
   formatCurrency: (val: number) => string
-  mecanica: any
+  mecanica: MecanicaPromocao
   isCopa?: boolean
   isNinja?: boolean
 }

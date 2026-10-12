@@ -1,13 +1,13 @@
 'use client'
 
 import { memo, useMemo } from 'react'
-import { EntregaRanking } from '@/lib/supabase'
+import type { EntregaRanking, MecanicaPromocao } from '@/lib/supabase'
 
 interface RankingNiveisProps {
   searchQuery: string
   filteredRanking: EntregaRanking[]
   rankingData: EntregaRanking[]
-  mecanica: any
+  mecanica: MecanicaPromocao
   getScore: (item: EntregaRanking) => number
   formatScoreValue: (val: number) => string
   formatCurrency: (val: number) => string
@@ -81,7 +81,7 @@ function RankingNiveisComponent({
                   <div className="space-y-2.5">
                     <div className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider font-mono select-none">Progresso na Régua de Níveis:</div>
                     <div className="flex overflow-x-auto gap-3 pb-2.5 scrollbar-none snap-x">
-                      {niveis.map((n: any) => {
+                      {niveis.map((n) => {
                         const concluido = score >= n.meta
                         return (
                           <div 

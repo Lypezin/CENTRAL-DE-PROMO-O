@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidateTag } from 'next/cache'
 import { supabaseAdmin } from '@/lib/supabaseServer'
 import { getAuthenticatedUser } from '@/lib/auth'
 import { DEFAULT_ELITE_CONFIG, EliteConfig, normalizeEliteConfig } from '@/lib/eliteConfig'
+import { isSameOriginRequest } from '@/lib/adminSecurity'
 
 const ELITE_DATA_SLUG = 'elite-dados-internos'
 const EMPTY_PRIZE_CONFIG: never[] = []
@@ -54,19 +56,22 @@ async function saveEliteConfigValue(config: EliteConfig) {
 
 async function ensureEliteDataPromotion(existingPromotionId?: string) {
   if (existingPromotionId) {
-    const { data } = await supabaseAdmin.from('promocoes').select('id').eq('id', existingPromotionId).maybeSingle()
-    if (data?.id) {
+    const { data } = await supabaseAdmin.from('promocoes').select('id,config_regras').eq('id', existingPromotionId).maybeSingle()
+    if (data?.id && data.config_regras?.elite_internal === true) {
       return data.id
     }
   }
 
   const { data: existingBySlug } = await supabaseAdmin
     .from('promocoes')
-    .select('id')
+    .select('id,config_regras')
     .eq('slug', ELITE_DATA_SLUG)
     .maybeSingle()
 
   if (existingBySlug?.id) {
+    if (existingBySlug.config_regras?.elite_internal !== true) {
+      throw new Error('The reserved ELITE campaign slug is assigned to another campaign.')
+    }
     return existingBySlug.id
   }
 
@@ -108,11 +113,11 @@ async function ensureEliteDataPromotion(existingPromotionId?: string) {
   if (error) {
     const { data: retryBySlug } = await supabaseAdmin
       .from('promocoes')
-      .select('id')
+      .select('id,config_regras')
       .eq('slug', ELITE_DATA_SLUG)
       .maybeSingle()
 
-    if (retryBySlug?.id) {
+    if (retryBySlug?.id && retryBySlug.config_regras?.elite_internal === true) {
       return retryBySlug.id
     }
 
@@ -153,12 +158,15 @@ export async function GET() {
     const config = await loadEliteConfigWithDataPromo()
     return NextResponse.json({ success: true, config })
   } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Erro interno'
-    return NextResponse.json({ success: true, config: DEFAULT_ELITE_CONFIG, warning: msg })
+    console.error('Failed to load ELITE configuration:', error)
+    return NextResponse.json({ success: true, config: DEFAULT_ELITE_CONFIG, warning: 'Não foi possível carregar a configuração salva.' })
   }
 }
 
 export async function PUT(request: NextRequest) {
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ success: false, error: 'Origem da solicitação inválida.' }, { status: 403 })
+  }
   const user = await getAuthenticatedUser()
   if (!user) {
     return NextResponse.json({ success: false, error: 'Nao autorizado' }, { status: 401 })
@@ -172,8 +180,8 @@ export async function PUT(request: NextRequest) {
     try {
       dataPromoId = await ensureEliteDataPromotion(incomingConfig.data_promocao_id)
     } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Erro ao preparar base interna do ELITE'
-      return NextResponse.json({ success: false, error: msg }, { status: 500 })
+      console.error('Failed to prepare the ELITE dataset:', error)
+      return NextResponse.json({ success: false, error: 'Não foi possível preparar a base de dados ELITE.' }, { status: 500 })
     }
 
     if (!dataPromoId) {
@@ -194,9 +202,11 @@ export async function PUT(request: NextRequest) {
       metadata: { admin: user.username, config },
     })
 
+    revalidateTag('public-hub-data', { expire: 0 })
+
     return NextResponse.json({ success: true, config })
   } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Erro interno'
-    return NextResponse.json({ success: false, error: msg }, { status: 500 })
+    console.error('Failed to save ELITE configuration:', error)
+    return NextResponse.json({ success: false, error: 'Não foi possível salvar a configuração ELITE.' }, { status: 500 })
   }
 }

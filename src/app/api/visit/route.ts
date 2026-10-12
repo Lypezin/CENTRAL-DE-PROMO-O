@@ -1,35 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabaseServer'
+import { consumeRateLimit, hasJsonContentType, isSameOriginRequest } from '@/lib/adminSecurity'
 
-interface RateLimitEntry {
-  count: number
-  resetTime: number
-}
-
-const rateLimitMap = new Map<string, RateLimitEntry>()
-const RATE_LIMIT = 30
-const RATE_WINDOW_MS = 60_000
 const SESSION_ID_RE = /^sess_[a-z0-9]{8,64}$/i
 
-function checkRateLimit(key: string): boolean {
-  const now = Date.now()
-  const entry = rateLimitMap.get(key)
-  if (!entry || now > entry.resetTime) {
-    rateLimitMap.set(key, { count: 1, resetTime: now + RATE_WINDOW_MS })
-    return true
-  }
-  entry.count += 1
-  return entry.count <= RATE_LIMIT
-}
-
 export async function POST(request: NextRequest) {
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ success: false, error: 'Origem inválida.' }, { status: 403 })
+  }
+  if (!hasJsonContentType(request)) {
+    return NextResponse.json({ success: false, error: 'Formato inválido.' }, { status: 415 })
+  }
+  const contentLength = Number(request.headers.get('content-length') || 0)
+  if (contentLength > 2048) {
+    return NextResponse.json({ success: false, error: 'Solicitação muito grande.' }, { status: 413 })
+  }
+
   try {
-    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
-    if (!checkRateLimit(ip)) {
+    const allowed = await consumeRateLimit(request, 'visit', 30, 60)
+    if (!allowed) {
       return NextResponse.json({ success: false, error: 'Muitas requisições' }, { status: 429 })
     }
 
-    const { session_id } = await request.json()
+    const body: unknown = await request.json()
+    const session_id = body && typeof body === 'object' ? (body as Record<string, unknown>).session_id : null
     if (!session_id || typeof session_id !== 'string') {
       return NextResponse.json({ success: false, error: 'session_id é obrigatório' }, { status: 400 })
     }
@@ -39,7 +33,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'session_id inválido' }, { status: 400 })
     }
 
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('visitas_log')
       .upsert(
         { session_id: trimmed, last_ping: new Date().toISOString() },
@@ -47,12 +41,12 @@ export async function POST(request: NextRequest) {
       )
 
     if (error) {
-      return NextResponse.json({ success: false, error: error.message }, { status: 500 })
+      console.error('Visit tracking write failed:', error.code)
+      return NextResponse.json({ success: false, error: 'Não foi possível registrar a visita.' }, { status: 503 })
     }
 
     return NextResponse.json({ success: true })
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : 'Erro interno'
-    return NextResponse.json({ success: false, error: msg }, { status: 500 })
+  } catch {
+    return NextResponse.json({ success: false, error: 'Não foi possível registrar a visita.' }, { status: 503 })
   }
 }

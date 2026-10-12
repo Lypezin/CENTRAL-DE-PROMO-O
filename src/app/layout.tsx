@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
+import { unstable_cache } from 'next/cache'
+import { connection } from 'next/server'
 import "./globals.css";
 import Navbar from "@/components/ui/Navbar";
 import VisitorTracker from "@/components/ui/VisitorTracker";
@@ -19,24 +21,35 @@ export const viewport: Viewport = {
   initialScale: 1,
 }
 
+const readActiveTheme = unstable_cache(
+  async (): Promise<'raios' | 'copa' | 'ninja'> => {
+    const { data, error } = await supabaseAdmin
+      .from('configuracoes')
+      .select('valor')
+      .eq('chave', 'tema_hub')
+      .maybeSingle()
+
+    if (error) throw new Error('Theme configuration unavailable.')
+    const value = data?.valor?.tema_ativo
+    return value === 'copa' || value === 'ninja' ? value : 'raios'
+  },
+  ['central-promocoes-active-theme'],
+  { revalidate: 300, tags: ['hub-theme'] },
+)
+
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Keep secrets and database reads out of the build while caching the theme across requests.
+  await connection()
+
   // Fetch active theme from Supabase (server-side)
   let temaAtivo: 'raios' | 'copa' | 'ninja' = 'raios'
   try {
-    const { data } = await supabaseAdmin
-      .from('configuracoes')
-      .select('valor')
-      .eq('chave', 'tema_hub')
-      .single()
-    if (data?.valor?.tema_ativo) {
-      temaAtivo = data.valor.tema_ativo
-    }
-  } catch (e) {
-    console.error('Failed to fetch theme:', e);
+    temaAtivo = await readActiveTheme()
+  } catch {
     // Default to 'raios' if table doesn't exist yet
   }
 

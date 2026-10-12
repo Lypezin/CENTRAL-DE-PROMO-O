@@ -1,87 +1,76 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabaseServer'
-import { hashPassword, createSession } from '@/lib/auth'
-
-interface RateLimitEntry {
-  count: number
-  resetTime: number
-}
-
-const rateLimitMap = new Map<string, RateLimitEntry>()
-const RATE_LIMIT_LIMIT = 10
-const RATE_LIMIT_WINDOW = 60 * 1000
+import { assertSessionConfiguration, createSession, hashPassword } from '@/lib/auth'
+import { consumeRateLimit, getRequestIp, hasJsonContentType, isSameOriginRequest } from '@/lib/adminSecurity'
 
 export async function POST(request: NextRequest) {
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ success: false, error: 'Origem da solicitação inválida.' }, { status: 403 })
+  }
+  if (!hasJsonContentType(request)) {
+    return NextResponse.json({ success: false, error: 'Formato de solicitação inválido.' }, { status: 415 })
+  }
+  const contentLength = Number(request.headers.get('content-length') || 0)
+  if (contentLength > 8192) {
+    return NextResponse.json({ success: false, error: 'Solicitação muito grande.' }, { status: 413 })
+  }
+
+  let body: unknown
   try {
-    const { name, email, password } = await request.json()
-    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'desconhecido'
+    body = await request.json()
+  } catch {
+    return NextResponse.json({ success: false, error: 'JSON inválido.' }, { status: 400 })
+  }
 
-    // Simple In-Memory Rate Limiting
-    const clientKey = `${ip}:${email || 'unknown'}`
-    const now = Date.now()
-    const rateInfo = rateLimitMap.get(clientKey)
+  const values = body && typeof body === 'object' ? body as Record<string, unknown> : {}
+  const name = typeof values.name === 'string' ? values.name.trim() : ''
+  const username = typeof values.email === 'string' ? values.email.trim().toLowerCase() : ''
+  const password = typeof values.password === 'string' ? values.password : ''
+  if (!name || name.length > 120 || username.length > 120 || !/^\S+@\S+\.\S+$/.test(username) || password.length < 6 || password.length > 1024) {
+    return NextResponse.json({ success: false, error: 'Informe nome, e-mail e uma senha com pelo menos 6 caracteres.' }, { status: 400 })
+  }
 
-    if (rateInfo) {
-      if (now > rateInfo.resetTime) {
-        rateLimitMap.set(clientKey, { count: 1, resetTime: now + RATE_LIMIT_WINDOW })
-      } else {
-        rateInfo.count += 1
-        if (rateInfo.count > RATE_LIMIT_LIMIT) {
-          return NextResponse.json(
-            { success: false, error: 'Muitas tentativas de cadastro. Por favor, aguarde um minuto e tente novamente.' },
-            { status: 429 }
-          )
-        }
-      }
-    } else {
-      rateLimitMap.set(clientKey, { count: 1, resetTime: now + RATE_LIMIT_WINDOW })
+  try {
+    // Fail before creating the first admin if the environment cannot issue a session.
+    assertSessionConfiguration()
+    const ipAllowed = await consumeRateLimit(request, 'registration', 5, 300)
+    const userAllowed = await consumeRateLimit(request, 'registration', 5, 300, username)
+    if (!ipAllowed || !userAllowed) {
+      return NextResponse.json(
+        { success: false, error: 'Muitas tentativas de cadastro. Tente novamente mais tarde.' },
+        { status: 429, headers: { 'Retry-After': '300' } },
+      )
     }
 
-    if (!name || !email || !password) {
-      return NextResponse.json({ success: false, error: 'Todos os campos são obrigatórios' }, { status: 400 })
-    }
-
-    if (password.length < 6) {
-      return NextResponse.json({ success: false, error: 'A senha deve ter no mínimo 6 caracteres' }, { status: 400 })
-    }
-
-    // Hash password using secure PBKDF2-SHA512
-    const secureHash = hashPassword(password)
-
-    // Call database function to safely register the first admin
-    const { data: success, error } = await supabaseAdmin.rpc('register_first_admin', {
-      p_usuario: email,
-      p_senha_hash: secureHash,
-      p_nome: name
+    const { data: created, error } = await supabaseAdmin.rpc('register_first_admin', {
+      p_usuario: username,
+      p_senha_hash: hashPassword(password),
+      p_nome: name,
     })
 
-    if (error) {
-      return NextResponse.json({ success: false, error: error.message }, { status: 500 })
+    if (error) throw new Error('Administrator registration failed.')
+    if (!created) {
+      return NextResponse.json(
+        { success: false, error: 'O administrador principal já foi cadastrado no sistema.' },
+        { status: 409 },
+      )
     }
 
-    if (!success) {
-      return NextResponse.json({ success: false, error: 'O administrador principal já foi cadastrado no sistema.' }, { status: 400 })
-    }
-
-    // Log registration success
+    const ip = getRequestIp(request)
     await supabaseAdmin.from('admin_logs').insert({
       acao: 'setup_primeiro_admin',
-      detalhe: `Primeiro administrador (${name} - ${email}) registrado com sucesso`,
+      detalhe: 'Primeiro administrador cadastrado.',
       status: 'success',
-      metadata: { email, nome: name, seguranca: 'pbkdf2' },
+      metadata: { username },
       ip,
     })
 
-    const response = NextResponse.json({ success: true, nome: name })
-    await createSession(email, name)
-    
-    // Clear legacy cookie just in case it exists
-    response.cookies.delete('admin_auth')
-
-    return response
-  } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Erro interno'
-    return NextResponse.json({ success: false, error: msg }, { status: 500 })
+    await createSession(username, name)
+    return NextResponse.json({ success: true, nome: name }, { headers: { 'Cache-Control': 'no-store' } })
+  } catch {
+    return NextResponse.json(
+      { success: false, error: 'Não foi possível concluir o cadastro agora. Tente novamente.' },
+      { status: 503 },
+    )
   }
 }
-

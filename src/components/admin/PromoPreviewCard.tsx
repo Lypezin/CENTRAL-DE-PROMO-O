@@ -1,8 +1,6 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import StatusBadge from '@/components/ui/StatusBadge'
-import { Promocao } from '@/lib/supabase'
 
 const TURNO_ICONS: Record<string, { icon: string; label: string }> = {
   'CAFE_DA_MANHA': { icon: '☕', label: 'Café' },

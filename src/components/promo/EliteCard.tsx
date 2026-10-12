@@ -155,8 +155,8 @@ export default function EliteCard({ config }: { config: EliteConfig }) {
                       </button>
                     ))
                   ) : (
-                    <div className="rounded-xl border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-[11px] text-zinc-500">
-                      Nenhum mes disponivel
+                    <div role="status" className="max-w-lg rounded-xl border border-amber-400/20 bg-amber-400/5 px-4 py-3 text-sm leading-6 text-zinc-300">
+                      Ainda não há dados ELITE para consulta. A equipe de gestão precisa importar a planilha mensal; tente novamente depois da atualização.
                     </div>
                   )}
                 </div>

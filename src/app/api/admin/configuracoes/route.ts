@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 import { supabaseAdmin } from '@/lib/supabaseServer'
 import { getAuthenticatedUser } from '@/lib/auth'
+import { isSameOriginRequest } from '@/lib/adminSecurity'
 
 interface TemaConfig {
   tema_ativo: 'raios' | 'copa' | 'ninja'
@@ -24,12 +25,15 @@ export async function GET() {
     const config = typeof data.valor === 'string' ? JSON.parse(data.valor) : data.valor
     return NextResponse.json({ success: true, config })
   } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Erro interno'
-    return NextResponse.json({ success: false, error: msg }, { status: 500 })
+    console.error('Failed to load hub settings:', error)
+    return NextResponse.json({ success: false, error: 'Não foi possível carregar as configurações.' }, { status: 500 })
   }
 }
 
 export async function PUT(request: NextRequest) {
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ success: false, error: 'Origem da solicitação inválida.' }, { status: 403 })
+  }
   try {
     const user = await getAuthenticatedUser()
     if (!user) {
@@ -74,10 +78,11 @@ export async function PUT(request: NextRequest) {
 
     revalidatePath('/')
     revalidatePath('/admin')
+    revalidateTag('hub-theme', { expire: 0 })
 
     return NextResponse.json({ success: true, config })
   } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Erro interno'
-    return NextResponse.json({ success: false, error: msg }, { status: 500 })
+    console.error('Failed to save hub settings:', error)
+    return NextResponse.json({ success: false, error: 'Não foi possível salvar as configurações.' }, { status: 500 })
   }
 }

@@ -23,6 +23,49 @@ export interface EntregaRanking {
   total_pontos: number
 }
 
+export interface PremioConfig {
+  id?: string | number
+  posicao?: number
+  posicao_inicio?: number
+  posicao_fim?: number
+  valor?: number
+  descricao?: string
+}
+
+export interface GrupoPremiosConfig {
+  turno?: string
+  minimo_corridas?: number
+  premios?: PremioConfig[]
+}
+
+export interface MetaPredefinida {
+  meta: number
+  premio: number
+}
+
+export interface NivelProgressivo {
+  nivel: number
+  meta: number
+  premio: number
+}
+
+export interface MecanicaPromocao {
+  metrica?: string
+  tipo_calculo?: string
+  agrupamento?: string
+  metas_predefinidas?: MetaPredefinida[]
+  niveis?: NivelProgressivo[]
+}
+
+export interface RegrasPromocao {
+  ordem?: number
+  limite_ranking?: number
+  tema_ninja?: boolean
+  elite_internal?: boolean
+  regras_texto?: string[]
+  mecanica?: MecanicaPromocao
+}
+
 export interface DatasDisponiveis {
   data_minima: string
   data_maxima: string
@@ -47,9 +90,9 @@ export interface Promocao {
   status: 'rascunho' | 'ativa' | 'encerrada'
   data_inicio: string | null
   data_fim: string | null
-  config_premios: any
+  config_premios: GrupoPremiosConfig[] | null
   config_turnos: string[] | null
-  config_regras: any
+  config_regras: RegrasPromocao | null
   cidade: string | null
   destaque_copa?: boolean
   created_at: string

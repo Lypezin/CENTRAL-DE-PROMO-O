@@ -1,16 +1,17 @@
 'use client'
 
 import { memo } from 'react'
+import type { GrupoPremiosConfig, MecanicaPromocao } from '@/lib/supabase'
 
 interface RankingRulesPanelProps {
   painelAberto: boolean
   setPainelAberto: (val: boolean) => void
   activeTurnoDisplay: { label: string; emoji: string; cor: string; corGradiente: string }
-  activeTurnoConfig: any
+  activeTurnoConfig: GrupoPremiosConfig | null
   isMetas: boolean
   isNiveis: boolean
   isGeral: boolean
-  mecanica: any
+  mecanica: MecanicaPromocao
   formatCurrency: (val: number) => string
   formatScoreValue: (val: number) => string
 }
@@ -72,13 +73,13 @@ function RankingRulesPanelComponent({
               </div>
               
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {activeTurnoConfig?.premios?.map((p: any, idx: number) => (
+                {activeTurnoConfig?.premios?.map((p, idx) => (
                   <div key={idx} className="bg-zinc-900/30 border border-zinc-800/80 rounded-xl p-3.5 text-center font-mono hover:bg-[#0c0c0f] hover:border-white/10 transition-all duration-300 shadow-inner copa-prize-badge">
                     <div className="text-[9px] text-zinc-500 uppercase font-bold tracking-wider mb-1">
                       {p.posicao ? `${p.posicao}º Lugar` : `${p.posicao_inicio}º ao ${p.posicao_fim}º`}
                     </div>
                     <div className={`font-extrabold text-sm ${p.descricao && !p.valor ? 'text-sky-400' : 'text-emerald-400'}`}>
-                      {p.descricao && !p.valor ? `🎁 ${p.descricao}` : formatCurrency(p.valor)}
+                      {p.descricao && !p.valor ? `🎁 ${p.descricao}` : formatCurrency(p.valor ?? 0)}
                     </div>
                   </div>
                 ))}
@@ -124,7 +125,7 @@ function RankingRulesPanelComponent({
                 Suba os degraus de produtividade e multiplique seu frete! Acumule pontos e garanta prêmios maiores a cada nível alcançado:
               </p>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {(mecanica.niveis || []).map((n: any, idx: number) => (
+                {(mecanica.niveis || []).map((n, idx) => (
                   <div key={idx} className="bg-zinc-900/30 border border-zinc-800/80 rounded-xl p-3 text-center font-mono hover:border-white/10 transition-all duration-300 copa-prize-badge">
                     <div className="text-[9px] text-zinc-500 uppercase font-bold tracking-wider mb-1">Nível {n.nivel}</div>
                     <div className="font-bold text-xs text-white">Meta: {formatScoreValue(n.meta)}</div>

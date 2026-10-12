@@ -1,8 +1,11 @@
 import { NextResponse } from 'next/server'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 import { supabaseAdmin } from '@/lib/supabaseServer'
 import { gerarSlug } from '@/lib/config'
 import { getAuthenticatedUser } from '@/lib/auth'
+import { isSameOriginRequest } from '@/lib/adminSecurity'
+import { readPromotionJson, validatePromotionPayload, MAX_PROMOTION_BODY_BYTES } from '@/lib/promotionValidation'
+import { projectPublicPrizes, projectPublicRules } from '@/lib/promotionPublic'
 
 async function isAuthenticated(): Promise<boolean> {
   const user = await getAuthenticatedUser()
@@ -19,7 +22,7 @@ export async function GET(request: Request) {
 
   let query = supabaseAdmin
     .from('promocoes')
-    .select('id, slug, nome, descricao, tipo, status, data_inicio, data_fim, cidade, created_at, updated_at, destaque_copa, config_regras')
+    .select('id, slug, nome, descricao, tipo, status, data_inicio, data_fim, cidade, created_at, updated_at, destaque_copa, config_premios, config_regras')
     .order('created_at', { ascending: false })
 
   if (isAdmin) {
@@ -38,12 +41,13 @@ export async function GET(request: Request) {
   const { data, error } = await query
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    console.error('Promotion list query failed:', error.code)
+    return NextResponse.json({ error: 'Não foi possível carregar as campanhas.' }, { status: 503, headers: { 'Cache-Control': 'no-store' } })
   }
 
   const rows = data || []
   if (isAdmin) {
-    return NextResponse.json(rows)
+    return NextResponse.json(rows, { headers: { 'Cache-Control': 'private, no-store' } })
   }
 
   // Strip internal elite promos and avoid leaking sensitive rule internals
@@ -51,34 +55,36 @@ export async function GET(request: Request) {
     .filter((p) => !p.config_regras?.elite_internal)
     .map((p) => ({
       ...p,
-      config_regras: p.config_regras
-        ? {
-            ordem: p.config_regras.ordem,
-            limite_ranking: p.config_regras.limite_ranking,
-            tema_ninja: p.config_regras.tema_ninja,
-            mecanica: p.config_regras.mecanica,
-          }
-        : null,
+      config_premios: projectPublicPrizes(p.config_premios),
+      config_regras: projectPublicRules(p.config_regras),
     }))
 
-  return NextResponse.json(publicRows)
+  return NextResponse.json(publicRows, { headers: { 'Cache-Control': 'public, max-age=0, s-maxage=30, stale-while-revalidate=60' } })
 }
 
 // POST: Criar nova promoção (requer autenticação admin)
 export async function POST(request: Request) {
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ error: 'Origem da solicitação inválida.' }, { status: 403 })
+  }
   if (!(await isAuthenticated())) {
     return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
   }
+  if (!request.headers.get('content-type')?.toLowerCase().startsWith('application/json')) {
+    return NextResponse.json({ error: 'Formato de solicitação inválido.' }, { status: 415 })
+  }
+  if (Number(request.headers.get('content-length') || 0) > MAX_PROMOTION_BODY_BYTES) {
+    return NextResponse.json({ error: 'Solicitação muito grande.' }, { status: 413 })
+  }
 
   try {
-    const body = await request.json()
-    const { nome, descricao, tipo, data_inicio, data_fim, config_premios, config_turnos, cidade, destaque_copa } = body
+    const validation = validatePromotionPayload(await readPromotionJson(request), true)
+    if (!validation.ok) return NextResponse.json({ error: validation.error }, { status: 400 })
+    const { nome, descricao, tipo, data_inicio, data_fim, config_premios, config_turnos, cidade, destaque_copa } = validation.value
+    const safeName = (nome as string).trim()
 
-    if (!nome || typeof nome !== 'string' || nome.trim().length === 0) {
-      return NextResponse.json({ error: 'Nome é obrigatório' }, { status: 400 })
-    }
-
-    let slug = gerarSlug(nome.trim())
+    let slug = gerarSlug(safeName)
+    if (!slug) return NextResponse.json({ error: 'O nome precisa conter letras ou números.' }, { status: 400 })
 
     // Verificar se o slug já existe para garantir unicidade
     const { data: existente } = await supabaseAdmin
@@ -95,8 +101,8 @@ export async function POST(request: Request) {
       .from('promocoes')
       .insert({
         slug,
-        nome: nome.trim(),
-        descricao: descricao || null,
+        nome: safeName,
+        descricao: descricao ?? null,
         tipo: tipo || 'ranking_turno',
         status: 'rascunho',
         data_inicio: data_inicio || null,
@@ -111,15 +117,18 @@ export async function POST(request: Request) {
       .single()
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
+      console.error('Promotion creation failed:', error.code)
+      return NextResponse.json({ error: 'Não foi possível criar a campanha.' }, { status: 503 })
     }
 
     revalidatePath('/')
     revalidatePath('/admin')
+    revalidateTag('public-hub-data', { expire: 0 })
+    revalidateTag('public-ranking', { expire: 0 })
 
     return NextResponse.json(data, { status: 201 })
   } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Erro interno'
-    return NextResponse.json({ error: msg }, { status: 500 })
+    console.error('Promotion creation failed:', error instanceof Error ? error.name : 'UnknownError')
+    return NextResponse.json({ error: 'Não foi possível criar a campanha.' }, { status: 503 })
   }
 }

@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 import { supabaseAdmin } from '@/lib/supabaseServer'
 import { getAuthenticatedUser } from '@/lib/auth'
+import { isSameOriginRequest } from '@/lib/adminSecurity'
+import { readPromotionJson, validatePromotionPayload, MAX_PROMOTION_BODY_BYTES } from '@/lib/promotionValidation'
+import { projectPublicPrizes, projectPublicRules } from '@/lib/promotionPublic'
 
 async function isAuthenticated(): Promise<boolean> {
   const user = await getAuthenticatedUser()
@@ -21,6 +24,7 @@ export async function GET(
     .from('promocoes')
     .select('*')
     .eq('id', id)
+    .in('status', isAdmin ? ['rascunho', 'ativa', 'encerrada'] : ['ativa', 'encerrada'])
     .single()
 
   if (error || !promocao) {
@@ -31,7 +35,7 @@ export async function GET(
   }
 
   if (!isAdmin) {
-    if (promocao.status === 'rascunho' || promocao.config_regras?.elite_internal) {
+    if (promocao.config_regras?.elite_internal) {
       return NextResponse.json(
         { error: 'Promoção não encontrada' },
         { status: 404 }
@@ -41,15 +45,35 @@ export async function GET(
 
   // Buscar estatísticas via RPC
   let stats = null
-  const { data: statsData } = await supabaseAdmin.rpc('get_promocao_stats', {
-    p_promocao_id: id,
-  })
-
-  if (statsData && statsData.length > 0) {
-    stats = statsData[0]
+  if (isAdmin) {
+    const { data: statsData, error: statsError } = await supabaseAdmin.rpc('get_promocao_stats', {
+      p_promocao_id: id,
+    })
+    if (statsError) {
+      return NextResponse.json({ error: 'Não foi possível carregar os indicadores da campanha.' }, { status: 503 })
+    }
+    stats = statsData?.[0] || null
   }
 
-  return NextResponse.json({ promocao, stats })
+  const publicPromo = isAdmin ? promocao : {
+    id: promocao.id,
+    slug: promocao.slug,
+    nome: promocao.nome,
+    descricao: promocao.descricao,
+    tipo: promocao.tipo,
+    status: promocao.status,
+    data_inicio: promocao.data_inicio,
+    data_fim: promocao.data_fim,
+    cidade: promocao.cidade,
+    destaque_copa: promocao.destaque_copa,
+    config_premios: projectPublicPrizes(promocao.config_premios),
+    config_turnos: promocao.config_turnos,
+    config_regras: projectPublicRules(promocao.config_regras),
+  }
+
+  return NextResponse.json({ promocao: publicPromo, stats }, {
+    headers: { 'Cache-Control': isAdmin ? 'no-store' : 'public, max-age=0, s-maxage=30, stale-while-revalidate=60' },
+  })
 }
 
 // PUT: Atualizar promoção (requer autenticação admin)
@@ -57,42 +81,44 @@ export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ error: 'Origem da solicitação inválida.' }, { status: 403 })
+  }
   if (!(await isAuthenticated())) {
     return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+  }
+  if (!request.headers.get('content-type')?.toLowerCase().startsWith('application/json')) {
+    return NextResponse.json({ error: 'Formato de solicitação inválido.' }, { status: 415 })
+  }
+  if (Number(request.headers.get('content-length') || 0) > MAX_PROMOTION_BODY_BYTES) {
+    return NextResponse.json({ error: 'Solicitação muito grande.' }, { status: 413 })
   }
 
   const { id } = await params
 
   try {
-    const body = await request.json()
+    const validation = validatePromotionPayload(await readPromotionJson(request), false)
+    if (!validation.ok) return NextResponse.json({ error: validation.error }, { status: 400 })
+    const updates = validation.value
 
-    // Campos permitidos para atualização
-    const camposPermitidos = [
-      'nome',
-      'descricao',
-      'tipo',
-      'status',
-      'data_inicio',
-      'data_fim',
-      'config_premios',
-      'config_turnos',
-      'config_regras',
-      'cidade',
-      'destaque_copa',
-    ]
+    if ('data_inicio' in updates || 'data_fim' in updates) {
+      const { data: current, error: currentError } = await supabaseAdmin
+        .from('promocoes')
+        .select('data_inicio,data_fim')
+        .eq('id', id)
+        .maybeSingle()
 
-    const updates: Record<string, unknown> = {}
-    for (const campo of camposPermitidos) {
-      if (campo in body) {
-        updates[campo] = body[campo]
+      if (currentError) {
+        console.error('Promotion date validation failed:', currentError.code)
+        return NextResponse.json({ error: 'Não foi possível validar as datas da campanha.' }, { status: 503 })
       }
-    }
+      if (!current) return NextResponse.json({ error: 'Promoção não encontrada.' }, { status: 404 })
 
-    if (Object.keys(updates).length === 0) {
-      return NextResponse.json(
-        { error: 'Nenhum campo para atualizar' },
-        { status: 400 }
-      )
+      const start = updates.data_inicio ?? current.data_inicio
+      const end = updates.data_fim ?? current.data_fim
+      if (typeof start === 'string' && typeof end === 'string' && start > end) {
+        return NextResponse.json({ error: 'A data de início deve ser anterior à data de término.' }, { status: 400 })
+      }
     }
 
     updates.updated_at = new Date().toISOString()
@@ -105,7 +131,7 @@ export async function PUT(
       .single()
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
+      return NextResponse.json({ error: 'Não foi possível atualizar a campanha.' }, { status: 500 })
     }
 
     if (!data) {
@@ -117,14 +143,16 @@ export async function PUT(
 
     revalidatePath('/')
     revalidatePath('/admin')
+    revalidateTag('public-hub-data', { expire: 0 })
+    revalidateTag('public-ranking', { expire: 0 })
     if (data.slug) {
       revalidatePath(`/promo/${data.slug}`)
     }
 
     return NextResponse.json(data)
   } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Erro interno'
-    return NextResponse.json({ error: msg }, { status: 500 })
+    console.error('Promotion update failed:', error)
+    return NextResponse.json({ error: 'Não foi possível atualizar a campanha.' }, { status: 500 })
   }
 }
 
@@ -133,6 +161,9 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ error: 'Origem da solicitação inválida.' }, { status: 403 })
+  }
   if (!(await isAuthenticated())) {
     return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
   }
@@ -148,13 +179,15 @@ export async function DELETE(
 
       if (error) {
         return NextResponse.json(
-          { error: `Erro ao limpar dados da promoção: ${error.message}` },
+          { error: 'Não foi possível limpar os dados da campanha.' },
           { status: 500 }
         )
       }
 
       revalidatePath('/')
       revalidatePath('/admin')
+      revalidateTag('public-hub-data', { expire: 0 })
+      revalidateTag('public-ranking', { expire: 0 })
       return NextResponse.json({ success: true, apenas_dados: true })
     } else {
       // Executa a deleção completa da promoção via RPC
@@ -162,17 +195,19 @@ export async function DELETE(
 
       if (error) {
         return NextResponse.json(
-          { error: `Erro ao excluir promoção: ${error.message}` },
+          { error: 'Não foi possível excluir a campanha.' },
           { status: 500 }
         )
       }
 
       revalidatePath('/')
       revalidatePath('/admin')
+      revalidateTag('public-hub-data', { expire: 0 })
+      revalidateTag('public-ranking', { expire: 0 })
       return NextResponse.json({ success: true })
     }
   } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Erro interno'
-    return NextResponse.json({ error: msg }, { status: 500 })
+    console.error('Promotion deletion failed:', error)
+    return NextResponse.json({ error: 'Não foi possível concluir a operação.' }, { status: 500 })
   }
 }

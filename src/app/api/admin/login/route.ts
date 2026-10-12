@@ -1,113 +1,95 @@
+import { createHash } from 'node:crypto'
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabaseServer'
-import { verifyPassword, hashPassword, createSession } from '@/lib/auth'
-
-interface RateLimitEntry {
-  count: number
-  resetTime: number
-}
-
-const rateLimitMap = new Map<string, RateLimitEntry>()
-const RATE_LIMIT_LIMIT = 10
-const RATE_LIMIT_WINDOW = 60 * 1000
+import { createSession, hashPassword, verifyPassword } from '@/lib/auth'
+import { consumeRateLimit, getRequestIp, hasJsonContentType, isSameOriginRequest } from '@/lib/adminSecurity'
 
 export async function POST(request: NextRequest) {
-  const { username, password } = await request.json()
-  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'desconhecido'
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ success: false, error: 'Origem da solicitação inválida.' }, { status: 403 })
+  }
+  if (!hasJsonContentType(request)) {
+    return NextResponse.json({ success: false, error: 'Formato de solicitação inválido.' }, { status: 415 })
+  }
+  const contentLength = Number(request.headers.get('content-length') || 0)
+  if (contentLength > 8192) {
+    return NextResponse.json({ success: false, error: 'Solicitação muito grande.' }, { status: 413 })
+  }
 
-  // Simple In-Memory Rate Limiting
-  const clientKey = `${ip}:${username || 'unknown'}`
-  const now = Date.now()
-  const rateInfo = rateLimitMap.get(clientKey)
+  let body: unknown
+  try {
+    body = await request.json()
+  } catch {
+    return NextResponse.json({ success: false, error: 'JSON inválido.' }, { status: 400 })
+  }
 
-  if (rateInfo) {
-    if (now > rateInfo.resetTime) {
-      rateLimitMap.set(clientKey, { count: 1, resetTime: now + RATE_LIMIT_WINDOW })
-    } else {
-      rateInfo.count += 1
-      if (rateInfo.count > RATE_LIMIT_LIMIT) {
-        return NextResponse.json(
-          { success: false, error: 'Muitas tentativas de login. Por favor, aguarde um minuto e tente novamente.' },
-          { status: 429 }
-        )
-      }
+  if (!body || typeof body !== 'object') {
+    return NextResponse.json({ success: false, error: 'Credenciais inválidas.' }, { status: 400 })
+  }
+  const { username, password } = body as Record<string, unknown>
+  if (
+    typeof username !== 'string' || typeof password !== 'string' ||
+    username.trim().length < 1 || username.trim().length > 120 ||
+    password.length < 1 || password.length > 1024
+  ) {
+    return NextResponse.json({ success: false, error: 'Usuário e senha são obrigatórios.' }, { status: 400 })
+  }
+
+  try {
+    const normalizedUsername = username.trim().toLowerCase()
+    const ipAllowed = await consumeRateLimit(request, 'login', 30, 60)
+    const userAllowed = await consumeRateLimit(request, 'login', 10, 60, normalizedUsername)
+    if (!ipAllowed || !userAllowed) {
+      return NextResponse.json(
+        { success: false, error: 'Muitas tentativas de login. Aguarde um minuto e tente novamente.' },
+        { status: 429, headers: { 'Retry-After': '60' } },
+      )
     }
-  } else {
-    rateLimitMap.set(clientKey, { count: 1, resetTime: now + RATE_LIMIT_WINDOW })
-  }
+    const { data: admin, error } = await supabaseAdmin
+      .from('admin_usuarios')
+      .select('id, usuario, nome, senha')
+      .eq('usuario', normalizedUsername)
+      .maybeSingle()
 
-  if (!username || !password) {
-    return NextResponse.json({ success: false, error: 'Usuário e senha são obrigatórios' }, { status: 400 })
-  }
+    if (error) throw new Error('Administrator lookup failed.')
 
-  // Retrieve admin user using secure RPC bridge
-  const { data, error } = await supabaseAdmin.rpc('get_admin_by_username', {
-    p_usuario: username
-  })
-
-  if (error) {
-    return NextResponse.json({ success: false, error: 'Erro de conexão com o banco de dados' }, { status: 500 })
-  }
-
-  if (data && data.length > 0) {
-    const admin = data[0]
-
-    // Verify password using PBKDF2 (and check legacy SHA-256)
-    const isValid = verifyPassword(password, admin.senha)
-
-    if (isValid) {
-      const isLegacyHash = !admin.senha.startsWith('pbkdf2:')
-
-      // Silent Automatic Security Migration: Upgrade SHA-256 legacy hash to PBKDF2
-      if (isLegacyHash) {
-        const secureHash = hashPassword(password)
-        
-        // Update database with the new PBKDF2 salted hash
+    if (admin && verifyPassword(password, admin.senha)) {
+      const legacyHash = !admin.senha.startsWith('pbkdf2:')
+      if (legacyHash) {
         const { error: updateError } = await supabaseAdmin
           .from('admin_usuarios')
-          .update({ senha: secureHash })
+          .update({ senha: hashPassword(password) })
           .eq('id', admin.id)
-
-        if (!updateError) {
-          await supabaseAdmin.from('admin_logs').insert({
-            acao: 'seguranca_migracao_senha',
-            detalhe: `Senha do administrador ${admin.nome} (${username}) migrada com sucesso de SHA-256 para PBKDF2-SHA512.`,
-            status: 'success',
-            metadata: { admin_id: admin.id, migrado: true },
-            ip,
-          })
-        }
+        if (updateError) throw new Error('Password migration failed.')
       }
 
-      // Log login success
+      const ip = getRequestIp(request)
       await supabaseAdmin.from('admin_logs').insert({
-        acao: 'login_sucesso',
-        detalhe: `Login do administrador ${admin.nome} (${username}) realizado com sucesso`,
+        acao: legacyHash ? 'login_sucesso_hash_atualizado' : 'login_sucesso',
+        detalhe: 'Login administrativo realizado com sucesso.',
         status: 'success',
-        metadata: { admin_id: admin.id, nome: admin.nome, seguranca: isLegacyHash ? 'migrado' : 'pbkdf2' },
+        metadata: { admin_id: admin.id },
         ip,
       })
 
-      // Create signed session cookie (sets admin_auth_session)
-      const response = NextResponse.json({ success: true, nome: admin.nome })
-      await createSession(username, admin.nome)
-      
-      // Clear legacy cookie just in case it exists
-      response.cookies.delete('admin_auth')
-      
-      return response
+      await createSession(admin.usuario, admin.nome)
+      return NextResponse.json({ success: true, nome: admin.nome }, { headers: { 'Cache-Control': 'no-store' } })
     }
+
+    const ip = getRequestIp(request)
+    await supabaseAdmin.from('admin_logs').insert({
+      acao: 'login_falhou',
+      detalhe: 'Tentativa de login administrativo malsucedida.',
+      status: 'error',
+      metadata: { usuario_hash: createHash('sha256').update(normalizedUsername.toLowerCase()).digest('hex') },
+      ip,
+    })
+
+    return NextResponse.json({ success: false, error: 'Usuário ou senha incorretos.' }, { status: 401 })
+  } catch {
+    return NextResponse.json(
+      { success: false, error: 'Não foi possível autenticar agora. Tente novamente.' },
+      { status: 503 },
+    )
   }
-
-  // Log login failure
-  await supabaseAdmin.from('admin_logs').insert({
-    acao: 'login_falhou',
-    detalhe: `Tentativa de login malsucedida para o usuário: ${username}`,
-    status: 'error',
-    metadata: { usuario_tentado: username },
-    ip,
-  })
-
-  return NextResponse.json({ success: false, error: 'Usuário ou senha incorretos' }, { status: 401 })
 }
-

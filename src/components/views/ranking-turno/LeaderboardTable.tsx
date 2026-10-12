@@ -1,18 +1,18 @@
 import { memo } from 'react'
-import { EntregaRanking } from '@/lib/supabase'
+import type { EntregaRanking, GrupoPremiosConfig, MecanicaPromocao } from '@/lib/supabase'
 import { getPremioFromConfig, getPremioInfoFromConfig } from '@/lib/config'
 import { getRankingMetricHeader, getRankingMetricShortfallLabel, resolveRankingMetric } from '@/lib/rankingMetric'
 
 export interface LeaderboardTableProps {
   searchQuery: string
   rankingToDisplay: EntregaRanking[]
-  configPremios: any[]
+  configPremios: GrupoPremiosConfig[]
   filtroAtivo: string
   getScore: (item: EntregaRanking) => number
   formatScoreValue: (val: number) => string
   maxScore: number
   formatCurrency: (val: number) => string
-  mecanica: any
+  mecanica: MecanicaPromocao
   isCopa?: boolean
   minimoCorridas: number
   isNinja?: boolean

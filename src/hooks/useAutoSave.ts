@@ -23,10 +23,8 @@ export function useAutoSave<T extends Record<string, unknown>>(
   const savingRef = useRef(false)
   const latestDataRef = useRef(data)
   const onSaveRef = useRef(onSave)
+  const saveRef = useRef<(() => Promise<void>) | null>(null)
   const [status, setStatus] = useState<AutoSaveStatus>('idle')
-
-  latestDataRef.current = data
-  onSaveRef.current = onSave
 
   const save = useCallback(async () => {
     if (savingRef.current) {
@@ -51,7 +49,7 @@ export function useAutoSave<T extends Record<string, unknown>>(
         pendingRef.current = false
         if (timerRef.current) clearTimeout(timerRef.current)
         timerRef.current = setTimeout(() => {
-          void save()
+          void saveRef.current?.()
         }, delay)
       }
     } catch {
@@ -60,6 +58,12 @@ export function useAutoSave<T extends Record<string, unknown>>(
       savingRef.current = false
     }
   }, [delay])
+
+  useEffect(() => {
+    latestDataRef.current = data
+    onSaveRef.current = onSave
+    saveRef.current = save
+  }, [data, onSave, save])
 
   useEffect(() => {
     if (shallowEqualRecord(data, prevDataRef.current)) return
@@ -73,7 +77,7 @@ export function useAutoSave<T extends Record<string, unknown>>(
     // unless we already saved once (then show pending via saving after delay)
 
     timerRef.current = setTimeout(() => {
-      void save()
+      void saveRef.current?.()
     }, delay)
 
     return () => {
@@ -81,16 +85,16 @@ export function useAutoSave<T extends Record<string, unknown>>(
         clearTimeout(timerRef.current)
       }
     }
-  }, [data, delay, save])
+  }, [data, delay])
 
   const triggerNow = useCallback(() => {
     if (timerRef.current) {
       clearTimeout(timerRef.current)
     }
     if (pendingRef.current || !shallowEqualRecord(latestDataRef.current, prevDataRef.current)) {
-      void save()
+      void saveRef.current?.()
     }
-  }, [save])
+  }, [])
 
   const resetStatus = useCallback(() => {
     setStatus('idle')

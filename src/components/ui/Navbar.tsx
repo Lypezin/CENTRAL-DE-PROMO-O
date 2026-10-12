@@ -2,42 +2,43 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useSyncExternalStore } from 'react'
+
+function subscribeToBrowserPreference(callback: () => void): () => void {
+  window.addEventListener('storage', callback)
+  window.addEventListener('performance_mode_change', callback)
+  return () => {
+    window.removeEventListener('storage', callback)
+    window.removeEventListener('performance_mode_change', callback)
+  }
+}
+
+function getEcoPreference(): boolean {
+  const stored = localStorage.getItem('performance_mode')
+  if (stored === 'eco' || stored === 'normal') return stored === 'eco'
+
+  const prefersReduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true
+  const isSmallMobile = window.innerWidth < 768 && (navigator.hardwareConcurrency || 4) <= 4
+  return prefersReduced || isSmallMobile
+}
+
+function subscribeToMount(): () => void {
+  return () => {}
+}
 
 export default function Navbar() {
   const pathname = usePathname()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [isEco, setIsEco] = useState(false)
-  const [mounted, setMounted] = useState(false)
+  const isEco = useSyncExternalStore(subscribeToBrowserPreference, getEcoPreference, () => false)
+  const mounted = useSyncExternalStore(subscribeToMount, () => true, () => false)
 
   useEffect(() => {
-    setMounted(true)
-
-    const stored = localStorage.getItem('performance_mode')
-    if (stored === 'eco' || stored === 'normal') {
-      const eco = stored === 'eco'
-      setIsEco(eco)
-      // Sync listeners (backgrounds may mount after this)
-      window.dispatchEvent(new CustomEvent('performance_mode_change', { detail: { isEco: eco } }))
-      return
-    }
-
-    // Auto eco when user prefers reduced motion or is on a small mobile viewport
-    // Does not persist until the user toggles manually — keeps beauty as default on desktop
-    const prefersReduced =
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const isSmallMobile = window.innerWidth < 768 && (navigator.hardwareConcurrency || 4) <= 4
-
-    if (prefersReduced || isSmallMobile) {
-      setIsEco(true)
-      window.dispatchEvent(new CustomEvent('performance_mode_change', { detail: { isEco: true } }))
-    }
-  }, [])
+    // Keep non-React browser effects separate from the preference subscription.
+    window.dispatchEvent(new CustomEvent('performance_mode_change', { detail: { isEco } }))
+  }, [isEco])
 
   const toggleEcoMode = () => {
     const nextVal = !isEco
-    setIsEco(nextVal)
     localStorage.setItem('performance_mode', nextVal ? 'eco' : 'normal')
     window.dispatchEvent(new CustomEvent('performance_mode_change', { detail: { isEco: nextVal } }))
   }

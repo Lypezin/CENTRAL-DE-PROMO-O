@@ -11,8 +11,7 @@ export default function VisitorTracker() {
     if (!sessionId || !/^sess_[a-z0-9]{8,64}$/i.test(sessionId)) {
       sessionId =
         'sess_' +
-        Math.random().toString(36).substring(2, 15) +
-        Math.random().toString(36).substring(2, 15)
+        crypto.randomUUID().replaceAll('-', '').toLowerCase()
       sessionStorage.setItem('visitor_session_id', sessionId)
     }
 
@@ -42,8 +41,9 @@ export default function VisitorTracker() {
       .on('presence', { event: 'sync' }, () => {
         const state = channel.presenceState()
         const count = Object.keys(state).length
-        const finalCount = count > 0 ? count : 1
-        ;(window as any).__onlineCount = finalCount
+        const finalCount = count
+        const appWindow = window as Window & { __onlineCount?: number }
+        appWindow.__onlineCount = finalCount
         window.dispatchEvent(new CustomEvent('online_presence_update', { detail: finalCount }))
       })
       .subscribe(async (status) => {

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
-import { supabase, EntregaRanking } from '@/lib/supabase'
+import type { EntregaRanking, GrupoPremiosConfig, MecanicaPromocao, RegrasPromocao } from '@/lib/supabase'
 import { formatCurrency } from '@/lib/config'
 import { formatRankingMetricValue, getRankingMetricValue, resolveRankingMetric } from '@/lib/rankingMetric'
 
@@ -22,21 +22,21 @@ const TURNO_DISPLAY: Record<string, { label: string; emoji: string; cor: string;
 }
 
 export default function RankingTurno({
-  promocaoId,
+  promocaoSlug,
   configPremios,
   configTurnos,
   configRegras = {},
   isCopa = false,
   isNinja = false
 }: {
-  promocaoId: string
-  configPremios: any[]
+  promocaoSlug: string
+  configPremios: GrupoPremiosConfig[]
   configTurnos: string[]
-  configRegras?: any
+  configRegras?: RegrasPromocao
   isCopa?: boolean
   isNinja?: boolean
 }) {
-  const mecanica = useMemo(() => configRegras?.mecanica || {
+  const mecanica = useMemo<MecanicaPromocao>(() => configRegras?.mecanica || {
     metrica: 'corridas_completadas',
     tipo_calculo: 'ranking',
     agrupamento: 'turno'
@@ -52,12 +52,43 @@ export default function RankingTurno({
   }, [isGeral, configTurnos])
   
   const [filtroAtivo, setFiltroAtivo] = useState(isGeral ? 'GERAL' : (turnosDisponiveis[0] || 'CAFE_DA_MANHA'))
+  const filtroAtivoEfetivo = isGeral
+    ? 'GERAL'
+    : filtroAtivo === 'GERAL'
+      ? turnosDisponiveis[0] || 'CAFE_DA_MANHA'
+      : filtroAtivo
   const [searchQuery, setSearchQuery] = useState('')
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('')
   const [rankingData, setRankingData] = useState<EntregaRanking[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const [reloadSequence, setReloadSequence] = useState(0)
   const [painelAberto, setPainelAberto] = useState(false)
-  const rankingCache = useRef(new Map())
+  const [totalResultados, setTotalResultados] = useState(0)
+  const [carregandoMais, setCarregandoMais] = useState(false)
+  const [erroPaginacao, setErroPaginacao] = useState<string | null>(null)
+  const rankingCache = useRef(new Map<string, { expiresAt: number; rows: EntregaRanking[]; total: number }>())
+  const activeRankingKey = useRef('')
+  const mapRankingRow = useCallback((value: unknown, index: number, offset = 0): EntregaRanking => {
+    const row = value && typeof value === 'object' ? value as Record<string, unknown> : {}
+    const score = typeof row.score === 'number' && Number.isFinite(row.score) ? row.score : 0
+    const metricValues = {
+      total_soma_taxas: resolvedMetric === 'faturamento_taxas' ? score : 0,
+      total_corridas_completadas: resolvedMetric === 'corridas_completadas' ? score : 0,
+      total_corridas_aceitas: 0,
+      total_pedidos_concluidos: resolvedMetric === 'pedidos_aceitos_e_concluidos' ? score : 0,
+      total_pontos: resolvedMetric === 'pontos' ? score : 0,
+    }
+
+    return {
+      posicao: typeof row.posicao === 'number' ? row.posicao : offset + index + 1,
+      periodo: typeof row.periodo === 'string' ? row.periodo : filtroAtivoEfetivo,
+      pessoa_entregadora: typeof row.pessoa_entregadora === 'string' ? row.pessoa_entregadora : 'Entregador',
+      praca: typeof row.praca === 'string' ? row.praca : 'Praça não informada',
+      ...metricValues,
+      id_da_pessoa_entregadora: `${filtroAtivoEfetivo}:${String(row.posicao ?? offset + index + 1)}:${offset + index}`,
+    }
+  }, [resolvedMetric, filtroAtivoEfetivo])
 
   // Otimização de Performance: Debouncing nativo e leve para evitar recalcular filtros pesados em tempo de digitação
   useEffect(() => {
@@ -68,48 +99,94 @@ export default function RankingTurno({
   }, [searchQuery])
 
   const activeTurnoConfig = useMemo(() => {
-    return configPremios?.find(c => c.turno === filtroAtivo) || null
-  }, [configPremios, filtroAtivo])
-
-  useEffect(() => {
-    if (isGeral && filtroAtivo !== 'GERAL') {
-      setFiltroAtivo('GERAL')
-    } else if (!isGeral && filtroAtivo === 'GERAL') {
-      setFiltroAtivo(turnosDisponiveis[0] || 'CAFE_DA_MANHA')
-    }
-  }, [isGeral, turnosDisponiveis, filtroAtivo])
+    return configPremios?.find(c => c.turno === filtroAtivoEfetivo) || null
+  }, [configPremios, filtroAtivoEfetivo])
 
   useEffect(() => {
     let cancelled = false
 
     async function fetchRanking() {
-      const cacheKey = promocaoId + ':' + filtroAtivo
-      if (rankingCache.current.has(cacheKey)) {
+      const cacheKey = `${promocaoSlug}:${filtroAtivoEfetivo}:${debouncedSearchQuery.toLocaleLowerCase('pt-BR')}`
+      activeRankingKey.current = cacheKey
+      const cached = rankingCache.current.get(cacheKey)
+      if (cached && cached.expiresAt > Date.now()) {
         if (!cancelled) {
-          setRankingData(rankingCache.current.get(cacheKey))
+          setRankingData(cached.rows)
+          setTotalResultados(cached.total)
+          setLoadError(null)
           setLoading(false)
         }
         return
       }
       if (!cancelled) setLoading(true)
-      const { data, error } = await supabase.rpc('get_ranking_por_promocao', {
-        p_promocao_id: promocaoId,
-        p_periodo: filtroAtivo,
-        p_limite: 200
-      })
-      // Ignore stale responses when turno/promo changed mid-flight
-      if (cancelled) return
-      if (!error && data) {
-        rankingCache.current.set(cacheKey, data)
-        setRankingData(data)
+      if (!cancelled) setLoadError(null)
+      if (!cancelled) {
+        setCarregandoMais(false)
+        setErroPaginacao(null)
       }
-      setLoading(false)
+
+      try {
+        const params = new URLSearchParams({ slug: promocaoSlug, turno: filtroAtivoEfetivo, limit: '100' })
+        if (debouncedSearchQuery) params.set('q', debouncedSearchQuery)
+        const response = await fetch(`/api/ranking?${params.toString()}`, { headers: { Accept: 'application/json' } })
+        const result: { error?: string; results?: unknown; total?: unknown } = await response.json()
+        if (!response.ok) throw new Error(result.error || 'Não foi possível carregar o ranking.')
+
+        const rows = (Array.isArray(result.results) ? result.results : []).map((value: unknown, index: number) => (
+          mapRankingRow(value, index)
+        ))
+        const total = typeof result.total === 'number' && Number.isFinite(result.total) ? result.total : rows.length
+
+        if (cancelled) return
+        rankingCache.current.set(cacheKey, { rows, total, expiresAt: Date.now() + 30_000 })
+        setRankingData(rows)
+        setTotalResultados(total)
+        setErroPaginacao(null)
+      } catch (error) {
+        if (cancelled) return
+        setRankingData([])
+        setTotalResultados(0)
+        setLoadError(error instanceof Error ? error.message : 'Não foi possível carregar o ranking.')
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
     }
     fetchRanking()
     return () => {
       cancelled = true
     }
-  }, [promocaoId, filtroAtivo])
+  }, [promocaoSlug, filtroAtivoEfetivo, debouncedSearchQuery, reloadSequence, mapRankingRow])
+
+  const carregarMaisResultados = useCallback(async () => {
+    if (!debouncedSearchQuery || carregandoMais || rankingData.length >= totalResultados) return
+    const requestKey = `${promocaoSlug}:${filtroAtivoEfetivo}:${debouncedSearchQuery.toLocaleLowerCase('pt-BR')}`
+    setCarregandoMais(true)
+    setErroPaginacao(null)
+    try {
+      const params = new URLSearchParams({
+        slug: promocaoSlug,
+        turno: filtroAtivoEfetivo,
+        q: debouncedSearchQuery,
+        limit: '100',
+        offset: String(rankingData.length),
+      })
+      const response = await fetch(`/api/ranking?${params.toString()}`, { headers: { Accept: 'application/json' } })
+      const result: { error?: string; results?: unknown; total?: unknown } = await response.json()
+      if (!response.ok) throw new Error(result.error || 'Não foi possível carregar mais resultados.')
+      if (activeRankingKey.current !== requestKey) return
+
+      const nextRows = (Array.isArray(result.results) ? result.results : []).map((value: unknown, index: number) => (
+        mapRankingRow(value, index, rankingData.length)
+      ))
+      setRankingData((current) => [...current, ...nextRows])
+      if (typeof result.total === 'number' && Number.isFinite(result.total)) setTotalResultados(result.total)
+    } catch (error) {
+      if (activeRankingKey.current !== requestKey) return
+      setErroPaginacao(error instanceof Error ? error.message : 'Não foi possível carregar mais resultados.')
+    } finally {
+      if (activeRankingKey.current === requestKey) setCarregandoMais(false)
+    }
+  }, [debouncedSearchQuery, carregandoMais, rankingData.length, totalResultados, promocaoSlug, filtroAtivoEfetivo, mapRankingRow])
 
   // Otimização: filtrar ranking memoizado com base na query debouncada
   const filteredRanking = useMemo(() => {
@@ -144,13 +221,13 @@ export default function RankingTurno({
   }, [rankingToDisplay, getScore])
 
   const activeTurnoDisplay = useMemo(() => {
-    return TURNO_DISPLAY[filtroAtivo] || {
-      label: filtroAtivo,
+    return TURNO_DISPLAY[filtroAtivoEfetivo] || {
+      label: filtroAtivoEfetivo,
       emoji: '🏆',
       cor: '#3B82F6',
       corGradiente: 'linear-gradient(135deg, #3B82F6, #8B5CF6)'
     }
-  }, [filtroAtivo])
+  }, [filtroAtivoEfetivo])
 
   return (
     <div className="w-full max-w-5xl mx-auto flex flex-col gap-6 font-sans">
@@ -159,7 +236,7 @@ export default function RankingTurno({
       <RankingFilters 
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
-        filtroAtivo={filtroAtivo}
+        filtroAtivo={filtroAtivoEfetivo}
         setFiltroAtivo={setFiltroAtivo}
         isGeral={isGeral}
         turnosDisponiveis={turnosDisponiveis}
@@ -198,9 +275,18 @@ export default function RankingTurno({
               </div>
             ))}
           </div>
+        ) : loadError ? (
+          <div className="py-12 text-center text-sm text-rose-200" role="alert">
+            <p>{loadError}</p>
+            <button type="button" onClick={() => { rankingCache.current.delete(`${promocaoSlug}:${filtroAtivoEfetivo}:${debouncedSearchQuery.toLocaleLowerCase('pt-BR')}`); setReloadSequence((value) => value + 1) }} className="mt-3 underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4">
+              Tentar novamente
+            </button>
+          </div>
         ) : rankingData.length === 0 ? (
-          <div className="text-center py-16 text-zinc-500 text-xs font-mono select-none">
-            Nenhum registro ou dado disponível para esta modalidade.
+          <div className="py-16 text-center text-sm text-zinc-300">
+            {debouncedSearchQuery
+              ? 'Nenhum participante corresponde a essa busca.'
+              : 'Ainda não há resultados para esta modalidade.'}
           </div>
         ) : (
           <div>
@@ -211,7 +297,7 @@ export default function RankingTurno({
                 rankingToDisplay={rankingToDisplay}
                 activeTurnoConfig={activeTurnoConfig}
                 configPremios={configPremios}
-                filtroAtivo={filtroAtivo}
+                filtroAtivo={filtroAtivoEfetivo}
                 getScore={getScore}
                 formatScoreValue={formatScoreValue}
                 maxScore={maxScore}
@@ -248,6 +334,23 @@ export default function RankingTurno({
                 formatCurrency={formatCurrency}
                 isCopa={isCopa}
               />
+            )}
+
+            {debouncedSearchQuery && rankingData.length < totalResultados && (
+              <div className="mt-6 flex flex-col items-center gap-2 border-t border-white/[0.06] pt-5">
+                <p className="text-xs text-zinc-400" aria-live="polite">
+                  Mostrando {rankingData.length.toLocaleString('pt-BR')} de {totalResultados.toLocaleString('pt-BR')} participantes encontrados
+                </p>
+                {erroPaginacao && <p className="text-sm text-rose-200" role="alert">{erroPaginacao}</p>}
+                <button
+                  type="button"
+                  onClick={carregarMaisResultados}
+                  disabled={carregandoMais}
+                  className="min-h-11 rounded-xl border border-white/10 px-5 text-sm font-semibold text-white transition hover:border-amber-300/50 hover:bg-white/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 disabled:cursor-wait disabled:opacity-60"
+                >
+                  {carregandoMais ? 'Carregando...' : 'Carregar mais participantes'}
+                </button>
+              </div>
             )}
           </div>
         )}

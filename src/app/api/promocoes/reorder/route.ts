@@ -1,54 +1,49 @@
 import { NextResponse } from 'next/server'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 import { supabaseAdmin } from '@/lib/supabaseServer'
 import { getAuthenticatedUser } from '@/lib/auth'
+import { isSameOriginRequest } from '@/lib/adminSecurity'
 
-async function isAuthenticated(): Promise<boolean> {
-  const user = await getAuthenticatedUser()
-  return user !== null
-}
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
-// PUT: Atualizar a ordem (config_regras.ordem) de várias promoções
 export async function PUT(request: Request) {
-  if (!(await isAuthenticated())) {
-    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ error: 'Origem da solicitação inválida.' }, { status: 403 })
+  }
+  if (!(await getAuthenticatedUser())) {
+    return NextResponse.json({ error: 'Não autorizado.' }, { status: 401 })
   }
 
   try {
-    const updates: { id: string; config_regras: any }[] = await request.json()
-
-    if (!Array.isArray(updates)) {
-      return NextResponse.json({ error: 'Formato inválido. Esperado um array.' }, { status: 400 })
+    const body: unknown = await request.json()
+    if (!Array.isArray(body) || body.length < 1 || body.length > 100) {
+      return NextResponse.json({ error: 'A lista de campanhas é inválida.' }, { status: 400 })
     }
 
-    // Processar atualizações em paralelo
-    const results = await Promise.all(
-      updates.map(async (promo) => {
-        const { id, config_regras } = promo
-        const { error } = await supabaseAdmin
-          .from('promocoes')
-          .update({
-            config_regras,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', id)
-        
-        return { id, error }
-      })
-    )
+    const updates = body.map((item: unknown) => {
+      if (!item || typeof item !== 'object' || Array.isArray(item)) return null
+      const record = item as Record<string, unknown>
+      if (typeof record.id !== 'string' || !UUID_RE.test(record.id)) return null
+      if (!record.config_regras || typeof record.config_regras !== 'object' || Array.isArray(record.config_regras)) return null
+      return { id: record.id, config_regras: record.config_regras }
+    })
 
-    const errors = results.filter(r => r.error)
-    if (errors.length > 0) {
-      console.error('Erros ao reordenar promoções:', errors)
-      return NextResponse.json({ error: 'Algumas promoções falharam ao atualizar' }, { status: 500 })
+    if (updates.some((item) => !item) || new Set(updates.map((item) => item?.id)).size !== updates.length) {
+      return NextResponse.json({ error: 'A lista contém dados inválidos ou campanhas duplicadas.' }, { status: 400 })
+    }
+
+    const { error } = await supabaseAdmin.rpc('reorder_promocoes_atomic', { p_updates: updates })
+    if (error) {
+      console.error('Atomic promotion reorder failed:', error.code)
+      return NextResponse.json({ error: 'Não foi possível salvar a ordem das campanhas.' }, { status: 500 })
     }
 
     revalidatePath('/')
     revalidatePath('/admin')
-
+    revalidatePath('/api/promocoes')
+    revalidateTag('public-hub-data', { expire: 0 })
     return NextResponse.json({ success: true })
-  } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Erro interno'
-    return NextResponse.json({ error: msg }, { status: 500 })
+  } catch {
+    return NextResponse.json({ error: 'Não foi possível salvar a ordem das campanhas.' }, { status: 500 })
   }
 }

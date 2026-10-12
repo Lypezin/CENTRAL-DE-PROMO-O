@@ -28,7 +28,6 @@ export default function AdminPage() {
   const router = useRouter()
   const toast = useToast()
   
-  const [isMounted, setIsMounted] = useState(false)
   const [pageState, setPageState] = useState<'login' | 'admin'>('login')
   const [nomeAdmin, setNomeAdmin] = useState('')
   
@@ -37,21 +36,27 @@ export default function AdminPage() {
   const [creating, setCreating] = useState(false)
   const [elitePromoId, setElitePromoId] = useState('')
 
-  const [onlineCount, setOnlineCount] = useState<number>(1)
+  const [onlineCount, setOnlineCount] = useState<number>(0)
   const [totalVisits, setTotalVisits] = useState<number>(0)
 
-  useEffect(() => {
-    setIsMounted(true)
+  const handleAdminLoginSuccess = useCallback((nome: string) => {
+    setNomeAdmin(nome)
+    setLoading(true)
+    setPageState('admin')
   }, [])
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const count = (window as any).__onlineCount
-      if (typeof count === 'number') setOnlineCount(count)
+      const appWindow = window as Window & { __onlineCount?: number }
+      const count = appWindow.__onlineCount
+      if (typeof count === 'number') {
+        queueMicrotask(() => setOnlineCount(count))
+      }
     }
 
     const handleUpdate = (e: Event) => {
-      setOnlineCount((e as CustomEvent).detail)
+      const count = (e as CustomEvent<number>).detail
+      if (typeof count === 'number') setOnlineCount(count)
     }
     window.addEventListener('online_presence_update', handleUpdate)
     return () => {
@@ -72,25 +77,24 @@ export default function AdminPage() {
   }, [])
 
   const carregarPromocoes = useCallback(async () => {
-    setLoading(true)
     try {
       const res = await fetch('/api/promocoes')
-      if (res.ok) {
-        const data: Promocao[] = await res.json()
-        const visiblePromos = data.filter((promo) => promo.config_regras?.elite_internal !== true)
-        const sortedData = visiblePromos.sort((a, b) => {
-          const aOrdem = a.config_regras?.ordem ?? 999
-          const bOrdem = b.config_regras?.ordem ?? 999
-          return aOrdem - bOrdem
-        })
-        setPromocoes(sortedData)
-      }
+      if (!res.ok) throw new Error('Não foi possível carregar as campanhas.')
+      const data: Promocao[] = await res.json()
+      const visiblePromos = data.filter((promo) => promo.config_regras?.elite_internal !== true)
+      const sortedData = visiblePromos.sort((a, b) => {
+        const aOrdem = a.config_regras?.ordem ?? 999
+        const bOrdem = b.config_regras?.ordem ?? 999
+        return aOrdem - bOrdem
+      })
+      setPromocoes(sortedData)
     } catch (e) {
       console.error(e)
+      toast.error('Não foi possível carregar as campanhas. Atualize a página para tentar novamente.')
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [toast])
 
   const carregarEliteConfig = useCallback(async () => {
     try {
@@ -106,26 +110,44 @@ export default function AdminPage() {
   }, [])
 
   useEffect(() => {
-    if (pageState === 'admin') {
-      carregarPromocoes()
-      carregarAnalytics()
-      carregarEliteConfig()
+    if (pageState !== 'admin') return
 
-      const interval = setInterval(carregarAnalytics, 10000)
-      return () => clearInterval(interval)
+    let cancelled = false
+    queueMicrotask(() => {
+      if (cancelled) return
+      void carregarPromocoes()
+      void carregarAnalytics()
+      void carregarEliteConfig()
+    })
+
+    const refreshVisibleAnalytics = () => {
+      if (document.visibilityState === 'visible') void carregarAnalytics()
+    }
+    const interval = setInterval(refreshVisibleAnalytics, 60000)
+    document.addEventListener('visibilitychange', refreshVisibleAnalytics)
+    return () => {
+      cancelled = true
+      clearInterval(interval)
+      document.removeEventListener('visibilitychange', refreshVisibleAnalytics)
     }
   }, [pageState, carregarPromocoes, carregarAnalytics, carregarEliteConfig])
 
   const handleLogout = async () => {
-    await fetch('/api/admin/logout', { method: 'POST' })
-    setPageState('login')
+    try {
+      const response = await fetch('/api/admin/logout', { method: 'POST' })
+      if (!response.ok) throw new Error('Logout failed.')
+      setPageState('login')
+    } catch {
+      toast.error('Não foi possível encerrar a sessão. Tente novamente.')
+    }
   }
 
   const handleReorder = async (newOrder: Promocao[]) => {
+    const previousOrder = promocoes
     setPromocoes(newOrder)
     
     try {
-      const updates = newOrder.map((promo, index) => ({
+      const updates = newOrder.map((promo) => ({
         id: promo.id,
         config_regras: promo.config_regras
       }))
@@ -142,6 +164,7 @@ export default function AdminPage() {
       toast.success('Ordem atualizada com sucesso!')
     } catch (e) {
       console.error(e)
+      setPromocoes(previousOrder)
       toast.error('Erro ao salvar nova ordem. Atualize a página.')
     }
   }
@@ -184,26 +207,9 @@ export default function AdminPage() {
     }
   }
 
-  if (!isMounted) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-[#030303]">
-        <div className="tech-grid opacity-60"></div>
-        <div className="glass p-8 rounded-2xl max-w-md w-full border border-white/10 relative z-10 text-center py-8 text-gray-400">
-          <div className="animate-spin text-3xl mb-3 flex justify-center">🔄</div>
-          Carregando portal...
-        </div>
-      </div>
-    )
-  }
-
   if (pageState === 'login') {
     return (
-      <AdminLoginScreen 
-        onSuccess={(nome) => {
-          setNomeAdmin(nome)
-          setPageState('admin')
-        }} 
-      />
+      <AdminLoginScreen onSuccess={handleAdminLoginSuccess} />
     )
   }
 
@@ -265,6 +271,14 @@ export default function AdminPage() {
           </div>
         </motion.div>
 
+        <motion.div variants={itemVariants} id="promocoes" className="mb-8">
+          <div className="mb-4">
+            <h2 className="text-xl font-bold text-white">Gestão de Promoções</h2>
+            <p className="mt-1 text-xs text-zinc-400">Crie campanhas, ajuste regras e confira os prazos de publicação.</p>
+          </div>
+          <AdminPromoList promocoes={promocoes} loading={loading} onReorder={handleReorder} elitePromoId={elitePromoId} />
+        </motion.div>
+
         <motion.div variants={itemVariants} className="mb-8">
           <SiteConfigPanel />
         </motion.div>
@@ -309,14 +323,6 @@ export default function AdminPage() {
           </motion.div>
         </motion.div>
 
-        <motion.div variants={itemVariants} id="promocoes">
-          <div className="mb-4">
-            <h2 className="text-xl font-bold text-white">Gestão de Promoções</h2>
-            <p className="text-xs text-zinc-500 mt-1">Selecione uma promoção ativa ou arquivada para editar regras e painéis.</p>
-          </div>
-          
-          <AdminPromoList promocoes={promocoes} loading={loading} onReorder={handleReorder} elitePromoId={elitePromoId} />
-        </motion.div>
       </motion.div>
     </motion.div>
   )
