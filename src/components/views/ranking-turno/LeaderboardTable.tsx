@@ -26,7 +26,8 @@ export const LeaderboardTable = memo(function LeaderboardTable({
   const resolvedMetric = resolveRankingMetric(mecanica, isNinja)
 
   return (
-    <div className="min-w-0 w-full overflow-hidden rounded-xl border border-white/[0.06] bg-[#050508]/80 sm:bg-slate-950/20 sm:shadow-2xl sm:shadow-black/80 animate-slide-up copa-leaderboard-table">
+    <section aria-label="Classificação dos participantes" className="min-w-0 w-full overflow-hidden rounded-xl border border-white/[0.09] bg-[#071630] sm:bg-slate-950/20 sm:shadow-2xl sm:shadow-black/80 animate-slide-up copa-leaderboard-table">
+      <div className="border-b border-white/10 px-4 py-3 sm:hidden"><h2 className="text-sm font-black text-white">Classificação</h2><p className="mt-0.5 text-xs text-slate-300">Participantes após o pódio</p></div>
       {/* Table Header (Desktop and Mobile) */}
       <div className="hidden sm:flex items-center px-5 py-3 bg-slate-950/50 border-b border-white/[0.04] text-[10px] font-bold text-slate-300 uppercase tracking-wider select-none w-full">
         <div className="w-10 sm:w-12 shrink-0 text-center">Pos</div>
@@ -39,7 +40,7 @@ export const LeaderboardTable = memo(function LeaderboardTable({
       </div>
 
       {/* Table Body Rows */}
-      <div className="divide-y divide-white/[0.03] font-sans w-full">
+      <div className="space-y-2 p-2 font-sans w-full sm:space-y-1 sm:p-2">
         {rankingToDisplay.map((item, idx) => {
           const isPodium = !searchQuery && idx < 3
           if (isPodium) return null
@@ -63,10 +64,10 @@ export const LeaderboardTable = memo(function LeaderboardTable({
           return (
             <div
               key={item.id_da_pessoa_entregadora}
-              className={`grid min-w-0 grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-3 px-4 py-4 transition-colors duration-200 group hover:bg-white/[0.02] sm:flex sm:items-center sm:gap-0 sm:px-5 sm:py-3.5 ${isTop1 ? 'bg-blue-500/[0.02]' : isTop2 ? 'bg-slate-500/[0.02]' : isTop3 ? 'bg-blue-500/[0.02]' : ''}`}
+              className={`grid min-w-0 grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-3 rounded-xl border px-4 py-4 transition-colors duration-200 group sm:flex sm:items-center sm:gap-0 sm:px-4 sm:py-3.5 ${isTop1 ? 'border-blue-300/45 bg-[#123b79] hover:bg-[#174687]' : isTop2 ? 'border-slate-300/25 bg-[#193252] hover:bg-[#203c60]' : isTop3 ? 'border-blue-300/25 bg-[#152e56] hover:bg-[#1a3966]' : idx % 2 === 0 ? 'border-white/10 bg-[#102849] hover:bg-[#163355]' : 'border-white/[.08] bg-[#0b203e] hover:bg-[#123052]'}`}
             >
               {/* Position (Tabular numbers) */}
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/[.04] font-mono font-black sm:h-auto sm:w-12 sm:bg-transparent">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/[.09] font-mono font-black sm:h-9 sm:w-12 sm:bg-white/[.06]">
                 {isTop1 ? (
                   <span className="text-blue-400 bg-blue-500/10 px-2 py-1 rounded-md text-[9px] sm:text-[9px] border border-blue-500/20 font-bold tracking-tighter">1º</span>
                 ) : isTop2 ? (
@@ -154,6 +155,6 @@ export const LeaderboardTable = memo(function LeaderboardTable({
           )
         })}
       </div>
-    </div>
+    </section>
   )
 })

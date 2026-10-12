@@ -73,7 +73,7 @@ function RankingLeaderboardComponent({
         />
       )}
 
-      <LeaderboardTable 
+      {(searchQuery || rankingToDisplay.length > 3) && <LeaderboardTable
         searchQuery={searchQuery}
         rankingToDisplay={rankingToDisplay}
         configPremios={configPremios}
@@ -87,7 +87,7 @@ function RankingLeaderboardComponent({
         isNinja={isNinja}
         minimoCorridas={minimoCorridas}
         getRequirementValue={getRequirementValue}
-      />
+      />}
     </div>
   )
 }
