@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState, type FormEvent, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -37,6 +37,8 @@ const FORMATS: Array<{ value: CompetitionFormat; label: string; detail: string }
 ]
 
 const STEP_LABELS = ['Campanha', 'Competição', 'Premiação', 'Revisão']
+const BRL_FORMAT = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
+const NUMBER_FORMAT = new Intl.NumberFormat('pt-BR')
 
 function makePrize(id: string, posicao: number, valor: number): PrizeEntry {
   return { id, posicao, valor, descricao: '' }
@@ -113,6 +115,13 @@ export default function CreatePromotionWizard() {
   const [prizeGroups, setPrizeGroups] = useState(defaultPrizeGroups)
   const [saving, setSaving] = useState(false)
   const [stepError, setStepError] = useState('')
+  const stepErrorRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!stepError) return
+    stepErrorRef.current?.focus()
+    stepErrorRef.current?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' })
+  }, [reduceMotion, stepError])
 
   const configTurnos = useMemo(
     () => format !== 'ranking' || grouping === 'geral' ? ['GERAL'] : activeShifts,
@@ -281,8 +290,8 @@ export default function CreatePromotionWizard() {
       if (groups.some((group) => !Number.isInteger(Number(group.minimo_corridas)) || Number(group.minimo_corridas) < 0 || Number(group.minimo_corridas) > 1_000_000)) return 'O mínimo de corridas deve ficar entre 0 e 1.000.000.'
     }
     if (currentStep === 2 && format === 'metas') {
-      if (!Number.isFinite(minimumGoal) || minimumGoal <= 0) return 'A meta precisa ser maior que zero.'
-      if (!Number.isFinite(goalPrize) || goalPrize < 0) return 'O prêmio precisa ser um valor igual ou maior que zero.'
+      if (!Number.isFinite(minimumGoal) || minimumGoal <= 0 || minimumGoal > 100_000_000) return 'A meta deve ficar entre 0 e 100.000.000, com valor maior que zero.'
+      if (!Number.isFinite(goalPrize) || goalPrize < 0 || goalPrize > 100_000_000) return 'O prêmio deve ficar entre R$ 0 e R$ 100.000.000.'
     }
     if (currentStep === 2 && format === 'niveis') {
       if (levels.length === 0 || levels.length > 100) return 'A campanha precisa ter entre 1 e 100 níveis.'
@@ -422,6 +431,11 @@ export default function CreatePromotionWizard() {
                   aria-labelledby="wizard-step-title"
                   className="min-h-[440px] rounded-2xl border border-white/10 bg-[#0a0c0c]/90 p-5 shadow-[0_18px_60px_rgba(0,0,0,.25)] sm:p-7"
                 >
+                  {stepError && (
+                    <div ref={stepErrorRef} tabIndex={-1} role="alert" aria-live="assertive" className="mb-5 rounded-lg border border-rose-300/20 bg-rose-300/[.07] px-4 py-3 text-sm text-rose-100 focus:outline-none focus:ring-2 focus:ring-rose-300/60">
+                      {stepError}
+                    </div>
+                  )}
                   {step === 0 && (
                     <>
                       <StepHeading icon="flag" title="Dados da campanha" description="As informações que os entregadores vão reconhecer no cartão da promoção." />
@@ -562,12 +576,12 @@ export default function CreatePromotionWizard() {
                           )}
 
                           <div>
-                            <div role="tablist" aria-label="Editar premiação de um turno" className="flex gap-1 overflow-x-auto border-b border-white/10 pb-1">
+                            <div role="group" aria-label="Selecionar turno para editar a premiação" className="flex gap-1 overflow-x-auto border-b border-white/10 pb-1">
                               {(grouping === 'geral' ? ['GERAL'] : activeShifts).map((shift) => {
                                 const info = shiftInfo(shift)
                                 const selected = activeShift === shift
                                 const count = prizeGroups.find((group) => group.turno === shift)?.premios.length ?? 0
-                                return <button key={shift} type="button" role="tab" aria-selected={selected} onClick={() => setActiveShift(shift)} className={`shrink-0 rounded-t-lg px-3 py-2 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-300 ${selected ? 'border-b-2 border-lime-300 text-white' : 'text-zinc-500 hover:text-zinc-200'}`}>{info?.short ?? 'Geral'} <span className="ml-1 text-[10px] text-zinc-500">{count}</span></button>
+                                return <button key={shift} type="button" aria-pressed={selected} onClick={() => setActiveShift(shift)} className={`shrink-0 rounded-t-lg px-3 py-2 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-300 ${selected ? 'border-b-2 border-lime-300 text-white' : 'text-zinc-500 hover:text-zinc-200'}`}>{info?.short ?? 'Geral'} <span className="ml-1 text-[10px] text-zinc-500">{count}</span></button>
                               })}
                             </div>
 
@@ -589,10 +603,10 @@ export default function CreatePromotionWizard() {
                       ) : format === 'metas' ? (
                         <div className="mt-7 grid gap-5 rounded-xl border border-white/[.08] bg-black/20 p-5 sm:grid-cols-2">
                           <Field label={metric === 'faturamento_taxas' ? 'Valor da meta (R$)' : 'Valor da meta'} required hint="Quanto cada entregador precisa alcançar">
-                            <input type="number" min="1" step="1" value={minimumGoal} onChange={(event) => setMinimumGoal(Number(event.target.value))} className="wizard-input tabular-nums" />
+                            <input type="number" min="0.01" max="100000000" step={metric === 'faturamento_taxas' ? '0.01' : '1'} value={minimumGoal} onChange={(event) => setMinimumGoal(Number(event.target.value))} className="wizard-input tabular-nums" />
                           </Field>
                           <Field label="Prêmio por pessoa" required hint="Valor em reais">
-                            <div className="relative"><span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-500">R$</span><input type="number" min="0" step="0.01" value={goalPrize} onChange={(event) => setGoalPrize(Number(event.target.value))} className="wizard-input pl-10 tabular-nums" /></div>
+                            <div className="relative"><span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-500">R$</span><input type="number" min="0" max="100000000" step="0.01" value={goalPrize} onChange={(event) => setGoalPrize(Number(event.target.value))} className="wizard-input pl-10 tabular-nums" /></div>
                           </Field>
                         </div>
                       ) : (
@@ -600,9 +614,9 @@ export default function CreatePromotionWizard() {
                           <div className="flex items-end justify-between gap-3"><div><h2 className="text-sm font-bold text-zinc-200">Níveis de produtividade</h2><p className="mt-1 text-xs text-zinc-500">Cada meta deve ser maior que a anterior. Até 100 níveis.</p></div><button type="button" disabled={levels.length >= 100} onClick={() => setLevels((current) => [...current, { id: `level-${Date.now()}`, nivel: current.length + 1, meta: (current.at(-1)?.meta ?? 0) + 50, premio: (current.at(-1)?.premio ?? 0) + 100 }])} className="min-h-10 rounded-lg border border-lime-300/20 px-3 text-xs font-bold text-lime-100 transition-colors hover:bg-lime-300/[.08] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-300">+ Adicionar nível</button></div>
                           {levels.map((level, index) => (
                             <div key={level.id} className="grid gap-3 rounded-xl border border-white/[.08] bg-black/20 p-4 sm:grid-cols-[100px_minmax(0,1fr)_minmax(0,1fr)_44px] sm:items-end">
-                              <Field label="Nível"><input type="number" min="1" value={level.nivel} onChange={(event) => setLevels((current) => current.map((item) => item.id === level.id ? { ...item, nivel: Number(event.target.value) } : item))} className="wizard-input tabular-nums" /></Field>
-                              <Field label={metric === 'faturamento_taxas' ? 'Meta em taxas (R$)' : 'Meta'}><input type="number" min="1" step="1" value={level.meta} onChange={(event) => setLevels((current) => current.map((item) => item.id === level.id ? { ...item, meta: Number(event.target.value) } : item))} className="wizard-input tabular-nums" /></Field>
-                              <Field label="Prêmio (R$)"><input type="number" min="0" step="0.01" value={level.premio} onChange={(event) => setLevels((current) => current.map((item) => item.id === level.id ? { ...item, premio: Number(event.target.value) } : item))} className="wizard-input tabular-nums" /></Field>
+                              <Field label="Nível"><input type="number" min="1" max="100" value={level.nivel} onChange={(event) => setLevels((current) => current.map((item) => item.id === level.id ? { ...item, nivel: Number(event.target.value) } : item))} className="wizard-input tabular-nums" /></Field>
+                              <Field label={metric === 'faturamento_taxas' ? 'Meta em taxas (R$)' : 'Meta'}><input type="number" min="0.01" max="100000000" step={metric === 'faturamento_taxas' ? '0.01' : '1'} value={level.meta} onChange={(event) => setLevels((current) => current.map((item) => item.id === level.id ? { ...item, meta: Number(event.target.value) } : item))} className="wizard-input tabular-nums" /></Field>
+                              <Field label="Prêmio (R$)"><input type="number" min="0" max="100000000" step="0.01" value={level.premio} onChange={(event) => setLevels((current) => current.map((item) => item.id === level.id ? { ...item, premio: Number(event.target.value) } : item))} className="wizard-input tabular-nums" /></Field>
                               <button type="button" disabled={levels.length <= 1} onClick={() => setLevels((current) => current.filter((item) => item.id !== level.id))} aria-label={`Remover nível ${index + 1}`} className="grid min-h-11 min-w-11 place-items-center rounded-lg text-zinc-400 transition-colors hover:bg-rose-300/10 hover:text-rose-200 disabled:opacity-30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300">×</button>
                             </div>
                           ))}
@@ -625,6 +639,26 @@ export default function CreatePromotionWizard() {
                           <SummaryItem label="Premiações configuradas" value={`${totalRewards} item(ns)`} />
                           <SummaryItem label="Tema" value={[destaqueCopa && 'Edição Copa', temaNinja && 'Faixa Preta'].filter(Boolean).join(' · ') || 'Esportivo padrão'} />
                         </dl>
+                        <div className="mt-5 border-t border-white/[.08] pt-4">
+                          <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">Detalhes das premiações</h3>
+                          <div className="mt-3 max-h-72 space-y-4 overflow-y-auto pr-1">
+                            {format === 'ranking' && configPremios.map((group) => (
+                              <section key={group.turno} aria-label={`Premiação: ${shiftInfo(group.turno)?.label ?? 'ranking geral'}`}>
+                                <p className="text-sm font-bold text-zinc-200">{shiftInfo(group.turno)?.label ?? 'Ranking geral'} <span className="font-medium text-zinc-500">· mínimo de {NUMBER_FORMAT.format(group.minimo_corridas)} corridas</span></p>
+                                <ul className="mt-2 space-y-1.5 text-sm text-zinc-300">
+                                  {group.premios.map((prize) => {
+                                    const position = prize.posicao != null
+                                      ? `${NUMBER_FORMAT.format(prize.posicao)}º lugar`
+                                      : `${NUMBER_FORMAT.format(prize.posicao_inicio ?? 0)}º–${NUMBER_FORMAT.format(prize.posicao_fim ?? 0)}º lugares`
+                                    return <li key={prize.id} className="flex flex-wrap items-baseline gap-x-2"><span>{position}: <strong className="text-white">{BRL_FORMAT.format(prize.valor)}</strong></span>{prize.descricao?.trim() && <span className="text-xs text-zinc-500">{prize.descricao.trim()}</span>}</li>
+                                  })}
+                                </ul>
+                              </section>
+                            ))}
+                            {format === 'metas' && <p className="text-sm text-zinc-200">Cada participante que alcançar <strong className="text-white">{metric === 'faturamento_taxas' ? BRL_FORMAT.format(minimumGoal) : `${NUMBER_FORMAT.format(minimumGoal)} ${metric === 'pontos' ? 'pontos' : metric === 'pedidos_aceitos_e_concluidos' ? 'pedidos' : 'corridas'}`}</strong> recebe <strong className="text-white">{BRL_FORMAT.format(goalPrize)}</strong>.</p>}
+                            {format === 'niveis' && <ol className="space-y-2 text-sm text-zinc-200">{[...levels].sort((a, b) => a.nivel - b.nivel).map((level) => <li key={level.id}><strong className="text-white">Nível {level.nivel}</strong> · meta {metric === 'faturamento_taxas' ? BRL_FORMAT.format(level.meta) : `${NUMBER_FORMAT.format(level.meta)} ${metric === 'pontos' ? 'pontos' : metric === 'pedidos_aceitos_e_concluidos' ? 'pedidos' : 'corridas'}`} · prêmio {BRL_FORMAT.format(level.premio)}</li>)}</ol>}
+                          </div>
+                        </div>
                         {rulesText.some((rule) => rule.trim()) && <div className="mt-5 border-t border-white/[.08] pt-4"><p className="text-xs font-bold uppercase tracking-wider text-zinc-400">Regras públicas</p><ul className="mt-2 space-y-1.5 text-sm leading-5 text-zinc-300">{rulesText.filter((rule) => rule.trim()).map((rule, index) => <li key={index} className="flex gap-2"><span className="text-lime-200">•</span><span>{rule}</span></li>)}</ul></div>}
                       </div>
                       <div className="mt-6 rounded-xl border border-lime-300/20 bg-lime-300/[.05] p-4">
@@ -646,8 +680,6 @@ export default function CreatePromotionWizard() {
               </div>
             </aside>
           </div>
-
-          {stepError && <p role="alert" className="mx-auto mt-5 max-w-4xl rounded-lg border border-rose-300/20 bg-rose-300/[.07] px-4 py-3 text-sm text-rose-100">{stepError}</p>}
 
           <footer className="fixed inset-x-0 bottom-0 z-20 border-t border-white/10 bg-[#060808]/95 px-4 py-3 backdrop-blur-xl sm:px-6">
             <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-3 lg:px-4">

@@ -1,4 +1,18 @@
 /* Ninja Theme Custom Variables */
+@keyframes faixa-preta-poster-sweep {
+  0% { transform: translate3d(-100%, 0, 0) skewX(-20deg); opacity: 0; }
+  16% { opacity: 0.75; }
+  100% { transform: translate3d(460%, 0, 0) skewX(-20deg); opacity: 0; }
+}
+
+.faixa-preta-poster-sweep {
+  animation: faixa-preta-poster-sweep 850ms cubic-bezier(0.16, 1, 0.3, 1) 160ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .faixa-preta-poster-sweep { animation: none; }
+}
+
 body.tema-ninja {
   --ninja-bg: #030303;
   --ninja-primary: #18181b;

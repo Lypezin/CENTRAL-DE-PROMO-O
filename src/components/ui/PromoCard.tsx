@@ -19,6 +19,16 @@ function formatDate(value: string | null) {
   return Number.isNaN(date.getTime()) ? 'A definir' : date.toLocaleDateString('pt-BR')
 }
 
+function formatCreationDate(value: string) {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return 'Data indisponível'
+  return new Intl.DateTimeFormat('pt-BR', {
+    dateStyle: 'short',
+    timeStyle: 'medium',
+    timeZone: 'America/Sao_Paulo',
+  }).format(date)
+}
+
 function FaixaIcon({ className }: { className: string }) {
   return (
     <svg viewBox="0 0 40 40" className={className} fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
@@ -45,6 +55,13 @@ function PromoCardContent({ promo, showCreationDate = false }: { promo: Promocao
       : isRanking ? 'Ver ranking' : 'Ver campanha'
   const isCopa = promo.destaque_copa
   const isFaixaPreta = !isCopa && promo.config_regras?.tema_ninja === true
+  const competitionLabel = isFaixaPreta && isRanking
+    ? 'Disputa por posições'
+    : calculationType === 'metas'
+      ? 'Meta individual'
+      : calculationType === 'niveis'
+        ? 'Níveis progressivos'
+        : isCopa ? 'Copa' : isRanking ? 'Disputa por ranking' : 'Campanha especial'
   const theme = isCopa
     ? {
         bar: 'from-emerald-500 via-amber-300 to-emerald-500',
@@ -89,7 +106,7 @@ function PromoCardContent({ promo, showCreationDate = false }: { promo: Promocao
       <div className={`h-1.5 w-full shrink-0 bg-gradient-to-r ${theme.bar}`} aria-hidden="true" />
       <div className={`pointer-events-none absolute -right-14 -top-12 h-52 w-52 rounded-full blur-3xl ${theme.glow}`} aria-hidden="true" />
       <div className="pointer-events-none absolute -right-8 top-0 h-64 w-44 -skew-x-[18deg] bg-gradient-to-b from-white/[.035] via-transparent to-transparent [clip-path:polygon(36%_0,100%_0,63%_100%,0_100%)]" aria-hidden="true" />
-      <div className={`pointer-events-none absolute -left-1/3 top-0 z-20 h-full w-1/3 -skew-x-[20deg] bg-gradient-to-r from-transparent ${theme.sweep} to-transparent opacity-0 transition duration-1000 group-hover:translate-x-[460%] group-focus-visible:translate-x-[460%] group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:translate-x-0 motion-reduce:group-hover:opacity-0 motion-reduce:group-focus-visible:opacity-0 motion-reduce:transition-none`} aria-hidden="true" />
+      <div className={`pointer-events-none absolute -left-1/3 top-0 z-20 h-full w-1/3 -skew-x-[20deg] bg-gradient-to-r from-transparent ${theme.sweep} to-transparent opacity-0 transition duration-1000 group-hover:translate-x-[460%] group-focus-visible:translate-x-[460%] group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:translate-x-0 motion-reduce:group-hover:opacity-0 motion-reduce:group-focus-visible:opacity-0 motion-reduce:transition-none ${isFaixaPreta ? 'faixa-preta-poster-sweep' : ''}`} aria-hidden="true" />
 
       <div className="relative z-10 flex flex-1 flex-col p-5 sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-2.5">
@@ -110,7 +127,7 @@ function PromoCardContent({ promo, showCreationDate = false }: { promo: Promocao
         {promo.cidade && (
           <div className="relative mt-6 min-w-0 overflow-hidden border-l-[3px] border-white/20 py-2 pl-4">
             <span className={`absolute inset-y-0 left-[-3px] w-[3px] ${theme.cityRule}`} aria-hidden="true" />
-            <span className="block text-[11px] font-extrabold uppercase tracking-[.19em] text-zinc-300">Cidade da promoção</span>
+            <span className="block text-[11px] font-extrabold uppercase tracking-[.19em] text-zinc-300">A praça da rodada</span>
             <span className={`mt-1 block break-words [font-size:clamp(2.1rem,13cqi,3rem)] font-black uppercase italic leading-[.94] tracking-[-.07em] ${theme.city} transition-transform duration-300 group-hover:translate-x-1 group-focus-visible:translate-x-1 motion-reduce:transform-none motion-reduce:transition-none`}>
               {promo.cidade}
             </span>
@@ -119,7 +136,7 @@ function PromoCardContent({ promo, showCreationDate = false }: { promo: Promocao
 
         <div className="mt-5 flex items-center gap-2 text-[10px] font-black uppercase tracking-[.18em] text-zinc-300">
           <span className={`h-[2px] w-5 ${theme.cityRule}`} aria-hidden="true" />
-          {isFaixaPreta ? 'Faixa Preta' : isCopa ? 'Copa' : isRanking ? 'Disputa por ranking' : 'Campanha especial'}
+          {competitionLabel}
         </div>
         <h3 className="mt-2 line-clamp-2 text-xl font-black leading-tight tracking-[-.035em] text-white sm:text-2xl">
           {promo.nome}
@@ -154,7 +171,7 @@ function PromoCardContent({ promo, showCreationDate = false }: { promo: Promocao
             </p>
             {showCreationDate && (
               <p className="mt-1 text-xs font-medium text-zinc-400">
-                Criada em <time dateTime={promo.created_at}>{formatDate(promo.created_at)}</time>
+                Criada em <time dateTime={promo.created_at}>{formatCreationDate(promo.created_at)}</time>
               </p>
             )}
           </div>
@@ -189,6 +206,7 @@ export default function PromoCard({
     <Link
       href={`/promo/${promo.slug}`}
       className="group block h-full rounded-2xl focus-visible:outline-none"
+      aria-label={`Abrir campanha: ${promo.nome}`}
     >
       <PromoCardContent promo={promo} showCreationDate={showCreationDate} />
     </Link>
