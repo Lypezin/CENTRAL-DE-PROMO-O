@@ -1,11 +1,10 @@
 'use client'
 
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import {
   MAX_IMPORT_FILE_SIZE,
-  processExcelBuffer,
   type ParseResult,
-  type UnidadeMonetaria,
+  type ParseProgress,
 } from '@/lib/admin/excelParser'
 
 interface ExcelImportZoneProps {
@@ -14,16 +13,35 @@ interface ExcelImportZoneProps {
   title?: string
   description?: string
   compact?: boolean
-  resolvePromocaoId?: () => Promise<string>
+  resolvePromocaoId?: (signal: AbortSignal) => Promise<string>
 }
 
 interface ImportPreview {
   result: ParseResult
   promocaoId: string
-  currencyUnit: UnidadeMonetaria
   storageKey: string
   hasPendingImport: boolean
 }
+
+interface WorkerParseProgress {
+  type: 'progress'
+  jobId: string
+  progress: ParseProgress
+}
+
+interface WorkerParseResult {
+  type: 'result'
+  jobId: string
+  result: ParseResult
+}
+
+interface WorkerParseError {
+  type: 'error'
+  jobId: string
+  error: string
+}
+
+type WorkerParseMessage = WorkerParseProgress | WorkerParseResult | WorkerParseError
 
 interface UploadResult {
   success: boolean
@@ -44,10 +62,101 @@ const MAX_BATCH_SIZE = 500
 const VALID_IMPORT_PERIODS = new Set(['GERAL', 'CAFE_DA_MANHA', 'ALMOCO', 'TARDE', 'JANTAR', 'MADRUGADA'])
 const IMPORT_ID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
-async function getImportStorageKey(file: File, promotionId: string, currencyUnit: UnidadeMonetaria): Promise<string> {
+async function getImportStorageKey(file: File, promotionId: string): Promise<string> {
   const digest = await crypto.subtle.digest('SHA-256', await file.arrayBuffer())
   const fingerprint = Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('')
-  return `central-promocoes-import:${promotionId}:${currencyUnit}:${encodeURIComponent(file.name)}:${fingerprint}`
+  return `central-promocoes-import:auto-currency-v1:${promotionId}:${encodeURIComponent(file.name)}:${fingerprint}`
+}
+
+function parseFileInWorker(
+  file: File,
+  promocaoId: string,
+  signal: AbortSignal,
+  onProgress: (progress: ParseProgress) => void,
+  onWorker: (worker: Worker | null) => void,
+): Promise<ParseResult> {
+  return new Promise((resolve, reject) => {
+    const jobId = crypto.randomUUID()
+    let settled = false
+    const timer: { id?: ReturnType<typeof setTimeout> } = {}
+    let worker: Worker
+
+    const cleanup = () => {
+      clearTimeout(timer.id)
+      signal.removeEventListener('abort', handleAbort)
+      worker.terminate()
+      onWorker(null)
+    }
+    const finish = (callback: () => void) => {
+      if (settled) return
+      settled = true
+      cleanup()
+      callback()
+    }
+    const handleAbort = () => finish(() => reject(new Error('Validação da planilha cancelada.')))
+
+    if (signal.aborted) {
+      reject(new Error('Validação da planilha cancelada.'))
+      return
+    }
+
+    try {
+      worker = new Worker(new URL('../../lib/admin/excelImport.worker.ts', import.meta.url), { type: 'module' })
+    } catch {
+      reject(new Error('Não foi possível iniciar a leitura segura da planilha neste navegador.'))
+      return
+    }
+    onWorker(worker)
+
+    worker.onmessage = (event: MessageEvent<WorkerParseMessage>) => {
+      const message = event.data
+      if (!message || message.jobId !== jobId) return
+
+      if (message.type === 'progress') {
+        onProgress(message.progress)
+      } else if (message.type === 'result') {
+        finish(() => resolve(message.result))
+      } else {
+        finish(() => reject(new Error(message.error || 'Não foi possível validar a planilha.')))
+      }
+    }
+    worker.onerror = (event) => {
+      event.preventDefault()
+      finish(() => reject(new Error('Falha ao ler a planilha. Confira se o arquivo .xlsx está íntegro e tente novamente.')))
+    }
+    worker.onmessageerror = () => {
+      finish(() => reject(new Error('A planilha gerou uma resposta inválida durante a leitura.')))
+    }
+    signal.addEventListener('abort', handleAbort, { once: true })
+    timer.id = setTimeout(() => {
+      finish(() => reject(new Error('A validação excedeu 90 segundos. Confira se o arquivo está íntegro e tente novamente.')))
+    }, 90_000)
+
+    file.arrayBuffer()
+      .then((buffer) => {
+        if (!settled) worker.postMessage({ type: 'parse', jobId, promocaoId, file: buffer }, [buffer])
+      })
+      .catch(() => finish(() => reject(new Error('Não foi possível abrir o arquivo da planilha.'))))
+  })
+}
+
+function runWithTimeout<T>(
+  operation: () => Promise<T>,
+  controller: AbortController,
+  timeoutMs: number,
+  timeoutMessage: string,
+): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      controller.abort()
+      reject(new Error(timeoutMessage))
+    }, timeoutMs)
+
+    Promise.resolve()
+      .then(operation)
+      .then(resolve, reject)
+      .finally(() => clearTimeout(timer))
+  })
 }
 
 function getSavedImportId(key: string): string | null {
@@ -91,7 +200,6 @@ export default function ExcelImportZone({
   resolvePromocaoId,
 }: ExcelImportZoneProps) {
   const [arquivo, setArquivo] = useState<File | null>(null)
-  const [currencyUnit, setCurrencyUnit] = useState<UnidadeMonetaria | ''>('')
   const [preview, setPreview] = useState<ImportPreview | null>(null)
   const [confirmed, setConfirmed] = useState(false)
   const [uploadLoading, setUploadLoading] = useState(false)
@@ -99,9 +207,17 @@ export default function ExcelImportZone({
   const [uploadResult, setUploadResult] = useState<UploadResult | null>(null)
   const [importId, setImportId] = useState<string | null>(null)
   const [progresso, setProgresso] = useState(0)
+  const [validationProgress, setValidationProgress] = useState<ParseProgress>({ stage: 'reading', percent: 0 })
   const [dragOver, setDragOver] = useState(false)
   const [fileError, setFileError] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const validationAbortRef = useRef<AbortController | null>(null)
+  const parserWorkerRef = useRef<Worker | null>(null)
+
+  useEffect(() => () => {
+    validationAbortRef.current?.abort()
+    parserWorkerRef.current?.terminate()
+  }, [])
 
   const selectFile = (file: File | undefined) => {
     if (!file) return
@@ -115,30 +231,41 @@ export default function ExcelImportZone({
     setProgresso(0)
   }
 
-  const handleCurrencyUnitChange = (unit: UnidadeMonetaria) => {
-    setCurrencyUnit(unit)
-    setPreview(null)
-    setConfirmed(false)
-    setUploadResult(null)
-    setImportId(null)
-  }
-
   const handlePreparePreview = async () => {
-    if (!arquivo || !currencyUnit) return
+    if (!arquivo) return
+    const controller = new AbortController()
+    validationAbortRef.current = controller
     setPreviewLoading(true)
     setPreview(null)
     setConfirmed(false)
     setUploadResult(null)
     setImportId(null)
+    setValidationProgress({ stage: 'reading', percent: 0 })
 
     try {
-      const resolvedPromocaoId = promocaoId || (resolvePromocaoId ? await resolvePromocaoId() : '')
+      const resolvedPromocaoId = promocaoId || (resolvePromocaoId
+        ? await runWithTimeout(
+          () => resolvePromocaoId(controller.signal),
+          controller,
+          30_000,
+          'A preparação da base do ELITE excedeu 30 segundos. Tente novamente.',
+        )
+        : '')
       if (!resolvedPromocaoId) {
         throw new Error('Não foi possível preparar a base de dados para importar a planilha.')
       }
 
-      const result = await processExcelBuffer(arquivo, resolvedPromocaoId, currencyUnit)
-      const storageKey = await getImportStorageKey(arquivo, resolvedPromocaoId, currencyUnit)
+      if (controller.signal.aborted) return
+      const result = await parseFileInWorker(
+        arquivo,
+        resolvedPromocaoId,
+        controller.signal,
+        setValidationProgress,
+        (worker) => { parserWorkerRef.current = worker },
+      )
+      parserWorkerRef.current = null
+      const storageKey = await getImportStorageKey(arquivo, resolvedPromocaoId)
+      if (controller.signal.aborted) return
       const hasPendingImport = getSavedImportId(storageKey) !== null
       const unsupportedPeriods = Array.from(new Set(
         result.registrosUnicos
@@ -148,19 +275,30 @@ export default function ExcelImportZone({
       if (unsupportedPeriods.length > 0) {
         throw new Error(`Período não reconhecido na planilha: ${unsupportedPeriods.slice(0, 5).join(', ')}. Use GERAL ou um dos turnos cadastrados.`)
       }
-      setPreview({ result, promocaoId: resolvedPromocaoId, currencyUnit, storageKey, hasPendingImport })
+      setPreview({ result, promocaoId: resolvedPromocaoId, storageKey, hasPendingImport })
     } catch (error) {
+      parserWorkerRef.current = null
       setUploadResult({
         success: false,
         error: error instanceof Error ? error.message : 'Erro ao ler a planilha.',
       })
     } finally {
+      if (validationAbortRef.current === controller) validationAbortRef.current = null
       setPreviewLoading(false)
     }
   }
 
+  const cancelValidation = () => {
+    validationAbortRef.current?.abort()
+    parserWorkerRef.current?.terminate()
+    parserWorkerRef.current = null
+    setPreviewLoading(false)
+    setValidationProgress({ stage: 'reading', percent: 0 })
+    setUploadResult({ success: false, error: 'Validação da planilha cancelada.' })
+  }
+
   const handleUpload = async () => {
-    if (!arquivo || !preview || !confirmed || preview.currencyUnit !== currencyUnit) return
+    if (!arquivo || !preview || !confirmed) return
 
     const { registrosUnicos } = preview.result
     if (registrosUnicos.length === 0) {
@@ -310,29 +448,31 @@ export default function ExcelImportZone({
 
       {fileError && <p className="rounded-lg border border-red-500/20 bg-red-500/5 p-3 text-xs text-red-300" role="alert">{fileError}</p>}
 
-      <fieldset className="space-y-2 rounded-xl border border-white/[0.08] bg-[#0a0a0c] p-3" disabled={busy}>
-        <legend className="px-1 text-[10px] font-bold uppercase tracking-wider text-zinc-400">Unidade dos valores de taxas</legend>
-        <p className="text-xs text-zinc-500">Escolha como os valores da coluna soma_das_taxas_das_corridas_aceitas estão gravados na planilha.</p>
-        <div className="grid gap-2 sm:grid-cols-2">
-          <label className={`flex cursor-pointer items-start gap-2 rounded-lg border p-3 text-xs ${currencyUnit === 'reais' ? 'border-sky-500/50 bg-sky-500/5 text-white' : 'border-white/10 text-zinc-400'}`}>
-            <input type="radio" name="currencyUnit" value="reais" checked={currencyUnit === 'reais'} onChange={() => handleCurrencyUnitChange('reais')} className="mt-0.5 accent-sky-500" />
-            <span><strong className="block">Reais (R$)</strong><span className="text-zinc-500">Exemplo: 12,34 significa R$ 12,34.</span></span>
-          </label>
-          <label className={`flex cursor-pointer items-start gap-2 rounded-lg border p-3 text-xs ${currencyUnit === 'centavos' ? 'border-sky-500/50 bg-sky-500/5 text-white' : 'border-white/10 text-zinc-400'}`}>
-            <input type="radio" name="currencyUnit" value="centavos" checked={currencyUnit === 'centavos'} onChange={() => handleCurrencyUnitChange('centavos')} className="mt-0.5 accent-sky-500" />
-            <span><strong className="block">Centavos</strong><span className="text-zinc-500">Exemplo: 1234 significa R$ 12,34.</span></span>
-          </label>
-        </div>
-      </fieldset>
-
       <button
         type="button"
         onClick={handlePreparePreview}
-        disabled={!arquivo || !currencyUnit || busy || importId !== null}
+        disabled={!arquivo || busy || importId !== null}
         className="admin-btn-secondary w-full !py-2.5 text-[11px] disabled:cursor-not-allowed disabled:opacity-50"
       >
         {previewLoading ? 'Validando planilha...' : 'Validar e preparar prévia'}
       </button>
+
+      {previewLoading && (
+        <div className="space-y-2 rounded-lg border border-sky-500/15 bg-sky-500/[0.04] p-3" aria-live="polite">
+          <div className="flex items-center justify-between gap-3 text-xs text-sky-100">
+            <span>{validationProgress.stage === 'reading' ? 'Lendo o arquivo em segundo plano...' : validationProgress.stage === 'validating' ? 'Validando os registros...' : 'Mesclando registros duplicados...'}</span>
+            {validationProgress.stage !== 'reading' && <span className="shrink-0 font-mono text-sky-300">{validationProgress.percent}%</span>}
+          </div>
+          {validationProgress.stage !== 'reading' && (
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/[0.05]">
+              <div className="h-full rounded-full bg-sky-500 transition-all duration-200" style={{ width: `${validationProgress.percent}%` }} />
+            </div>
+          )}
+          <button type="button" onClick={cancelValidation} className="text-xs font-semibold text-zinc-400 underline decoration-zinc-600 underline-offset-2 hover:text-white">
+            Cancelar validação
+          </button>
+        </div>
+      )}
 
       {preview && (
         <div className="space-y-3 rounded-xl border border-white/[0.08] bg-[#0a0a0c] p-4" aria-live="polite">
@@ -347,7 +487,7 @@ export default function ExcelImportZone({
               {validCount.toLocaleString('pt-BR')} registro(s) válidos; {rejectedCount.toLocaleString('pt-BR')} linha(s) rejeitada(s); {preview.result.registrosMesclados.toLocaleString('pt-BR')} linha(s) duplicada(s) serão mescladas.
             </p>
             <p className="mt-1 text-xs text-zinc-500">
-              Valores em {preview.currencyUnit === 'reais' ? 'reais' : 'centavos'}, normalizados para reais antes do envio.
+              Na coluna de taxas, números inteiros são interpretados como centavos e valores decimais como reais, seguindo o padrão anterior.
               {preview.result.colunasNaoMapeadas.length > 0 ? ` Colunas ignoradas: ${preview.result.colunasNaoMapeadas.join(', ')}.` : ''}
             </p>
           </div>
@@ -377,7 +517,7 @@ export default function ExcelImportZone({
                 disabled={busy}
                 className="mt-0.5 accent-sky-500"
               />
-              <span>Confirmo a unidade monetária selecionada e autorizo importar os registros válidos. Linhas rejeitadas serão ignoradas.</span>
+              <span>Autorizo importar os registros válidos. Linhas rejeitadas serão ignoradas.</span>
             </label>
           )}
         </div>

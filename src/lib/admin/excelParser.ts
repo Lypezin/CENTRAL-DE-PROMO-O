@@ -1,8 +1,11 @@
-import { readSheet } from 'read-excel-file/browser'
+import { readSheet } from 'read-excel-file/web-worker'
 import { normalizarPeriodo } from '@/lib/config'
 
-export type UnidadeMonetaria = 'reais' | 'centavos'
 export type ImportRecord = Record<string, string | number | null>
+export type ParseProgress = {
+  stage: 'reading' | 'validating' | 'merging'
+  percent: number
+}
 
 export interface RejectedRow {
   linha: number
@@ -124,7 +127,7 @@ export function parseExcelDate(value: unknown): string {
   return ''
 }
 
-function parseNumeric(value: unknown, field: string, currencyUnit: UnidadeMonetaria): number | null {
+function parseNumeric(value: unknown, field: string): number | null {
   if (value === null || value === undefined || (typeof value === 'string' && value.trim() === '')) return null
 
   let number: number
@@ -150,10 +153,9 @@ function parseNumeric(value: unknown, field: string, currencyUnit: UnidadeMoneta
   }
 
   if (field === 'soma_das_taxas_das_corridas_aceitas') {
-    if (currencyUnit === 'centavos') {
-      if (!Number.isInteger(number)) throw new Error('valor em centavos deve ser inteiro')
-      return number / 100
-    }
+    // Mantém a interpretação anterior da planilha: inteiros estão em centavos;
+    // valores com casas decimais já estão em reais.
+    if (Number.isInteger(number)) return number / 100
   }
 
   return number
@@ -166,9 +168,21 @@ function readCell(row: unknown[], columnIndex: number): unknown {
 export async function processExcelBuffer(
   input: File | ArrayBuffer,
   promocaoId: string,
-  currencyUnit: UnidadeMonetaria,
+  onProgress?: (progress: ParseProgress) => void,
+  signal?: AbortSignal,
 ): Promise<ParseResult> {
+  const reportProgress = (stage: ParseProgress['stage'], percent: number) => {
+    onProgress?.({ stage, percent: Math.max(0, Math.min(100, Math.round(percent))) })
+  }
+  const throwIfAborted = () => {
+    if (signal?.aborted) throw new Error('Validação da planilha cancelada.')
+  }
+  const yieldToBrowser = () => new Promise<void>((resolve) => setTimeout(resolve, 0))
+
+  throwIfAborted()
+  reportProgress('reading', 0)
   const rawData = await readSheet(input)
+  throwIfAborted()
   if (rawData.length < 2) throw new Error('Planilha vazia ou sem dados.')
   if (rawData.length - 1 > MAX_IMPORT_ROWS) throw new Error(`A planilha excede o limite de ${MAX_IMPORT_ROWS.toLocaleString('pt-BR')} linhas.`)
 
@@ -195,68 +209,88 @@ export async function processExcelBuffer(
     throw new Error('A planilha precisa conter as colunas “data_do_periodo” e “id_da_pessoa_entregadora”.')
   }
 
-  const nonEmptyRows = rawData.slice(1).map((row, index) => ({
-    row: Array.isArray(row) ? row : [],
-    excelLine: index + 2,
-  })).filter(({ row }) => row.some((cell) => cell !== null && cell !== undefined && cell !== ''))
-
   const validRecords: ImportRecord[] = []
   const rejectedRows: RejectedRow[] = []
+  const mappedColumns = Object.entries(colMap).map(([indexText, field]) => [Number(indexText), field] as const)
+  const totalRows = rawData.length - 1
+  const validationYieldEvery = Math.max(250, Math.ceil(totalRows / 100))
   let totalLinhasRejeitadas = 0
 
-  for (const { row, excelLine } of nonEmptyRows) {
-    try {
-      const record: ImportRecord = {}
-      Object.entries(colMap).forEach(([indexText, field]) => {
-        const value = readCell(row, Number(indexText))
-        if (field === 'data_do_periodo') {
-          record[field] = parseExcelDate(value)
-        } else if (field === 'periodo') {
-          const rawPeriod = value === null || value === undefined ? '' : String(value).trim()
-          record[field] = rawPeriod ? normalizarPeriodo(rawPeriod) ?? rawPeriod : 'GERAL'
-        } else if (NUMERIC_COLUMNS.has(field)) {
-          record[field] = parseNumeric(value, field, currencyUnit)
-        } else {
-          record[field] = value === null || value === undefined ? null : String(value).trim()
+  reportProgress('validating', 10)
+  for (let index = 1; index < rawData.length; index += 1) {
+    throwIfAborted()
+    const row = Array.isArray(rawData[index]) ? rawData[index] : []
+    const isEmpty = !row.some((cell) => cell !== null && cell !== undefined && cell !== '')
+
+    if (!isEmpty) {
+      try {
+        const record: ImportRecord = {}
+        for (const [columnIndex, field] of mappedColumns) {
+          const value = readCell(row, columnIndex)
+          if (field === 'data_do_periodo') {
+            record[field] = parseExcelDate(value)
+          } else if (field === 'periodo') {
+            const rawPeriod = value === null || value === undefined ? '' : String(value).trim()
+            record[field] = rawPeriod ? normalizarPeriodo(rawPeriod) ?? rawPeriod : 'GERAL'
+          } else if (NUMERIC_COLUMNS.has(field)) {
+            record[field] = parseNumeric(value, field)
+          } else {
+            record[field] = value === null || value === undefined ? null : String(value).trim()
+          }
         }
-      })
 
-      if (!record.data_do_periodo) throw new Error('data_do_periodo ausente ou inválida')
-      if (typeof record.id_da_pessoa_entregadora !== 'string' || !record.id_da_pessoa_entregadora) {
-        throw new Error('id_da_pessoa_entregadora ausente')
-      }
+        if (!record.data_do_periodo) throw new Error('data_do_periodo ausente ou inválida')
+        if (typeof record.id_da_pessoa_entregadora !== 'string' || !record.id_da_pessoa_entregadora) {
+          throw new Error('id_da_pessoa_entregadora ausente')
+        }
 
-      record.promocao_id = promocaoId
-      record.periodo ||= 'GERAL'
-      validRecords.push(record)
-    } catch (error) {
-      totalLinhasRejeitadas += 1
-      if (rejectedRows.length < MAX_REJEITADAS_EXIBIDAS) {
-        rejectedRows.push({
-          linha: excelLine,
-          motivo: error instanceof Error ? error.message : 'Dados inválidos',
-        })
+        record.promocao_id = promocaoId
+        record.periodo ||= 'GERAL'
+        validRecords.push(record)
+      } catch (error) {
+        totalLinhasRejeitadas += 1
+        if (rejectedRows.length < MAX_REJEITADAS_EXIBIDAS) {
+          rejectedRows.push({
+            linha: index + 1,
+            motivo: error instanceof Error ? error.message : 'Dados inválidos',
+          })
+        }
       }
+    }
+
+    if (index % validationYieldEvery === 0 || index === rawData.length - 1) {
+      reportProgress('validating', 10 + (index / totalRows) * 70)
+      await yieldToBrowser()
     }
   }
 
   const deduplicated = new Map<string, ImportRecord>()
-  for (const record of validRecords) {
+  const mergeYieldEvery = Math.max(250, Math.ceil(validRecords.length / 100))
+  reportProgress('merging', 80)
+  for (let index = 0; index < validRecords.length; index += 1) {
+    throwIfAborted()
+    const record = validRecords[index]
     const key = `${record.data_do_periodo}|${record.periodo}|${record.id_da_pessoa_entregadora}`
     const existing = deduplicated.get(key)
     if (!existing) {
       deduplicated.set(key, { ...record })
-      continue
+    } else {
+      for (const field of NUMERIC_COLUMNS_TO_SUM) {
+        const previous = existing[field]
+        const incoming = record[field]
+        if (previous === null && incoming === null) continue
+        existing[field] = (typeof previous === 'number' ? previous : 0) + (typeof incoming === 'number' ? incoming : 0)
+      }
     }
 
-    for (const field of NUMERIC_COLUMNS_TO_SUM) {
-      const previous = existing[field]
-      const incoming = record[field]
-      if (previous === null && incoming === null) continue
-      existing[field] = (typeof previous === 'number' ? previous : 0) + (typeof incoming === 'number' ? incoming : 0)
+    if ((index + 1) % mergeYieldEvery === 0 || index === validRecords.length - 1) {
+      reportProgress('merging', 80 + ((index + 1) / validRecords.length) * 19)
+      await yieldToBrowser()
     }
   }
 
+  throwIfAborted()
+  reportProgress('merging', 100)
   const registrosUnicos = Array.from(deduplicated.values())
   return {
     registrosUnicos,

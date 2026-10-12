@@ -81,7 +81,7 @@ export default function AdminElitePage() {
     }
   }
 
-  const ensureEliteDataPromoId = async () => {
+  const ensureEliteDataPromoId = async (signal: AbortSignal) => {
     if (config.data_promocao_id) {
       return config.data_promocao_id
     }
@@ -90,6 +90,7 @@ export default function AdminElitePage() {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ config }),
+      signal,
     })
 
     const data = (await res.json()) as EliteConfigResponse
