@@ -45,7 +45,7 @@ export default function Navbar() {
   ]
 
   return (
-    <nav className="fixed top-0 w-full z-50 bg-[#2c67ea]/95 backdrop-blur-md border-b border-white/20 transition-all">
+    <nav className="fixed top-0 w-full z-50 bg-[#2458bd]/95 backdrop-blur-md border-b border-white/20 transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 group">
           <span className="font-extrabold text-sm sm:text-base tracking-tight text-white flex items-center gap-1.5">
@@ -109,7 +109,7 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-[#2257cb]/98 backdrop-blur-2xl border-b border-white/20 animate-fade-in shadow-2xl">
+        <div className="md:hidden bg-[#204fa9]/98 backdrop-blur-2xl border-b border-white/20 animate-fade-in shadow-2xl">
           <div className="px-4 py-4 flex flex-col gap-2">
             {links.map(link => {
               const isActive = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href))

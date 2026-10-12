@@ -97,23 +97,23 @@ export default function PromotionCreationCompletion({
               <p className="inline-flex items-center gap-2 rounded-full border border-blue-300/25 bg-blue-300/[.08] px-3 py-1.5 text-[11px] font-black uppercase tracking-[.14em] text-blue-100">
                 <span className="h-2 w-2 rounded-full bg-blue-300" aria-hidden="true" /> Etapa final · campanha criada
               </p>
-              <h1 className="mt-4 text-3xl font-black tracking-tight sm:text-4xl">Finalize a competição</h1>
-              <p className="mt-2 text-sm leading-6 text-slate-300">{promo.nome} está salva como rascunho. Importe os resultados, confira as regras e publique quando estiver pronta.</p>
+              <h1 className="mt-4 text-3xl font-black tracking-tight sm:text-4xl">Rascunho criado. Próximo: planilha.</h1>
+              <p className="mt-2 text-sm leading-6 text-slate-300"><strong className="text-white">{promo.nome}</strong> foi salva. Confira os dados da planilha antes de ativar a promoção.</p>
             </div>
 
             <div className="flex flex-wrap gap-2">
               <button type="button" onClick={onCreateAnother} className="min-h-11 rounded-lg border border-blue-300/25 px-4 text-sm font-bold text-blue-100 transition-colors hover:bg-blue-300/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">Nova campanha</button>
-              <Link href={'/promo/' + promo.slug} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-white px-4 text-sm font-black text-slate-950 transition-colors hover:bg-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">
+              <Link href={'/promo/' + promo.slug} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-white/15 px-4 text-sm font-bold text-slate-100 transition-colors hover:bg-white/[.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">
                 Ver página pública
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
               </Link>
             </div>
           </div>
 
-          <nav aria-label="Etapas desta campanha" className="mt-6 grid grid-cols-3 gap-2 text-center text-[11px] font-bold uppercase tracking-[.08em] sm:max-w-2xl">
-            <a href="#importacao" className="rounded-lg border border-blue-300/30 bg-blue-300/[.08] px-2 py-3 text-blue-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">1. Planilha</a>
-            <a href="#configuracao" className="rounded-lg border border-white/10 bg-white/[.03] px-2 py-3 text-slate-300 transition-colors hover:bg-white/[.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">2. Configuração</a>
-            <a href="#publicacao" className="rounded-lg border border-white/10 bg-white/[.03] px-2 py-3 text-slate-300 transition-colors hover:bg-white/[.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">3. Publicação</a>
+          <nav aria-label="Próximas etapas" className="mt-6 grid grid-cols-3 gap-2 text-center text-xs font-bold sm:max-w-2xl">
+            <a href="#importacao" className="rounded-lg border border-blue-300/30 bg-blue-300/[.08] px-2 py-3 text-blue-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">01 · Importar</a>
+            <a href="#conferencia" className="rounded-lg border border-white/10 bg-white/[.03] px-2 py-3 text-slate-300 transition-colors hover:bg-white/[.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">02 · Conferir</a>
+            <a href="#publicacao" className="rounded-lg border border-white/10 bg-white/[.03] px-2 py-3 text-slate-300 transition-colors hover:bg-white/[.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">03 · Publicar</a>
           </nav>
         </header>
 
@@ -127,17 +127,21 @@ export default function PromotionCreationCompletion({
         <section id="importacao" aria-labelledby="import-title" className="mb-7 scroll-mt-6 rounded-2xl border border-blue-300/25 bg-[#0d2350]/95 p-4 shadow-[0_24px_70px_-45px_rgba(56,189,248,.35)] sm:p-6">
           <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[.16em] text-blue-200">Próxima ação recomendada</p>
-              <h2 id="import-title" className="mt-1 text-xl font-black text-white sm:text-2xl">Importe a planilha da campanha</h2>
-              <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-400">Envie os dados em .xlsx, confira a prévia e confirme a importação aqui mesmo. Esta etapa faz parte da criação da campanha.</p>
+              <p className="text-[10px] font-black uppercase tracking-[.16em] text-blue-200">01 / Dados</p>
+              <h2 id="import-title" className="mt-1 text-xl font-black text-white sm:text-2xl">Importar resultados</h2>
+              <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-300">Selecione o arquivo .xlsx, revise a prévia e confirme. A importação acontece nesta tela.</p>
             </div>
             <span className="rounded-full border border-blue-300/20 bg-blue-300/[.07] px-3 py-1.5 text-xs font-bold text-blue-100">{promo.nome}</span>
           </div>
           <ExcelImportZone promocaoId={promo.id} onUploadSuccess={() => void carregarPromo()} />
         </section>
 
-        <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(0,1.45fr)_minmax(320px,.8fr)]">
+        <div id="conferencia" className="grid scroll-mt-6 grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(0,1.45fr)_minmax(320px,.8fr)]">
           <div className="space-y-6">
+            <div className="rounded-2xl border border-white/10 bg-[#0d2350]/90 p-5"><p className="text-[10px] font-black uppercase tracking-[.16em] text-blue-200">02 / Conferência</p><h2 className="mt-1 text-xl font-black text-white">Revise antes de publicar</h2><p className="mt-1 text-sm leading-6 text-slate-300">Confira os resultados e a prévia. Se precisar corrigir algo, abra os ajustes abaixo.</p></div>
+            <details className="group rounded-2xl border border-white/10 bg-[#0d2350]/90">
+              <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-3 px-5 text-sm font-bold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 [&::-webkit-details-marker]:hidden"><span>Ajustar dados da campanha</span><span className="text-xs text-blue-200 group-open:hidden">Abrir ajustes ↓</span><span className="hidden text-xs text-blue-200 group-open:inline">Fechar ajustes ↑</span></summary>
+              <div className="space-y-6 border-t border-white/10 p-4 sm:p-6">
             <section id="configuracao" aria-labelledby="settings-title" className="scroll-mt-6 rounded-2xl border border-white/10 bg-[#0d2350]/90 p-4 sm:p-6">
               <div className="mb-5">
                 <p className="text-[10px] font-black uppercase tracking-[.16em] text-blue-200">Detalhes da disputa</p>
@@ -153,16 +157,18 @@ export default function PromotionCreationCompletion({
               </div>
               <TurnoPrizesConfigurator promo={promo} localPremios={localPremios} setLocalPremios={setLocalPremios} turnoEditorAtivo={turnoEditorAtivo} setTurnoEditorAtivo={setTurnoEditorAtivo} activeTurnos={activeTurnos} setActiveTurnos={setActiveTurnos} onSave={handleUpdate} saving={saving} handleUpdate={handleUpdate} />
             </section>
+              </div>
+            </details>
           </div>
 
           <aside className="space-y-5 xl:sticky xl:top-5">
             <div className="rounded-2xl border border-white/10 bg-[#0d2350]/90 p-4 sm:p-5">
-              <h2 className="mb-4 text-sm font-black uppercase tracking-[.1em] text-slate-200">Prévia pública</h2>
+              <h2 className="mb-4 text-sm font-black uppercase tracking-[.1em] text-slate-200">Como o card vai aparecer</h2>
               <PromoPreviewCard promo={promo} />
             </div>
 
             <section aria-labelledby="results-title" className="rounded-2xl border border-white/10 bg-[#0d2350]/90 p-4 sm:p-5">
-              <h2 id="results-title" className="mb-4 text-sm font-black uppercase tracking-[.1em] text-slate-200">Resultados importados</h2>
+              <h2 id="results-title" className="mb-4 text-sm font-black uppercase tracking-[.1em] text-slate-200">Dados recebidos</h2>
               <StatsOverview stats={stats} />
               <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
                 <button type="button" onClick={() => void handleExportRanking()} disabled={exporting} className="min-h-10 rounded-lg border border-white/10 px-3 py-2 text-xs font-bold text-slate-200 transition-colors hover:bg-white/[.06] disabled:cursor-wait disabled:opacity-60">{exporting ? 'Exportando…' : 'Exportar ranking'}</button>
@@ -171,9 +177,9 @@ export default function PromotionCreationCompletion({
             </section>
 
             <section id="publicacao" aria-labelledby="publish-title" className="scroll-mt-6 rounded-2xl border border-blue-300/20 bg-blue-300/[.04] p-4 sm:p-5">
-              <p className="text-[10px] font-black uppercase tracking-[.16em] text-blue-200">Última etapa</p>
+              <p className="text-[10px] font-black uppercase tracking-[.16em] text-blue-200">03 / Publicação</p>
               <h2 id="publish-title" className="mt-1 text-lg font-black text-white">Publicação</h2>
-              <p className="mt-1 text-xs leading-5 text-slate-400">Ative a campanha quando os dados e as regras estiverem conferidos.</p>
+              <p className="mt-1 text-sm leading-6 text-slate-300">Confira a prévia, os resultados e as regras. O status só muda ao clicar no botão abaixo.</p>
               <button type="button" onClick={() => { void handleUpdate({ status: promo.status === 'ativa' ? 'encerrada' : 'ativa' }).catch(() => undefined) }} disabled={saving} className="mt-4 min-h-11 w-full rounded-lg bg-blue-400 px-4 text-sm font-black text-slate-950 transition-colors hover:bg-blue-300 disabled:cursor-wait disabled:opacity-60">
                 {saving ? 'Salvando…' : promo.status === 'ativa' ? 'Encerrar campanha' : 'Ativar campanha'}
               </button>
@@ -182,8 +188,8 @@ export default function PromotionCreationCompletion({
           </aside>
         </div>
 
-        <section aria-labelledby="danger-title" className="mt-7 rounded-2xl border border-rose-300/15 bg-[#0d2350]/90 p-4 sm:p-5">
-          <h2 id="danger-title" className="text-xs font-black uppercase tracking-[.12em] text-rose-200">Ações de risco</h2>
+        <details className="group mt-7 rounded-2xl border border-rose-300/15 bg-[#0d2350]/90 p-4 sm:p-5">
+          <summary className="cursor-pointer list-none text-xs font-black uppercase tracking-[.12em] text-rose-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300 [&::-webkit-details-marker]:hidden">Ações de risco <span className="ml-2 font-semibold normal-case tracking-normal text-slate-400 group-open:hidden">Mostrar ↓</span></summary>
           <p className="mt-1 text-xs leading-5 text-slate-400">Estas ações são permanentes. Confirme cada uma clicando novamente.</p>
           <div className="mt-4 flex flex-col gap-2 sm:flex-row">
             <button type="button" onClick={() => void handleClearData()} onBlur={() => setConfirmClearData(false)} disabled={clearingData} className="min-h-10 rounded-lg border border-rose-300/20 px-4 py-2 text-left text-xs font-bold text-rose-200 transition-colors hover:bg-rose-300/10 disabled:opacity-60 sm:min-w-64">
@@ -193,7 +199,7 @@ export default function PromotionCreationCompletion({
               {deleting ? 'Excluindo…' : confirmDelete ? 'Clique novamente para excluir a campanha' : 'Excluir campanha'}
             </button>
           </div>
-        </section>
+        </details>
       </div>
     </main>
   )

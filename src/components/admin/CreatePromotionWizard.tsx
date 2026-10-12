@@ -684,24 +684,27 @@ export default function CreatePromotionWizard() {
   return (
     <main className="relative min-h-[calc(100vh-3rem)] overflow-hidden bg-[#07132c] text-white">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_12%_0%,rgba(37,99,235,.12),transparent_34%),radial-gradient(ellipse_at_90%_12%,rgba(14,165,233,.08),transparent_28%)]" />
-      <div className="relative mx-auto max-w-[1440px] px-4 pb-32 pt-6 sm:px-6 lg:px-10 lg:pt-10">
-        <header className="mb-8 flex flex-wrap items-end justify-between gap-5 border-b border-white/10 pb-6">
+      <div className="relative mx-auto max-w-[1280px] px-4 pb-32 pt-6 sm:px-6 lg:px-10 lg:pt-10">
+        <header className="mb-7 flex flex-wrap items-end justify-between gap-5 border-b border-white/10 pb-6">
           <div>
             <Link href="/admin" className="mb-4 inline-flex min-h-10 items-center gap-2 rounded-lg pr-3 text-sm font-semibold text-slate-400 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">
               <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="m12 4-6 6 6 6" /></svg>
               Voltar às campanhas
             </Link>
-            <h1 className="max-w-3xl text-3xl font-black tracking-tight sm:text-4xl">Monte a próxima competição</h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">Defina a campanha, confira a prévia e crie um rascunho pronto para receber os dados.</p>
+            <p className="mb-2 text-xs font-black uppercase tracking-[.2em] text-blue-200">Central de Promoções / nova campanha</p>
+            <h1 className="max-w-3xl text-3xl font-black tracking-tight sm:text-4xl">Criar promoção</h1>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300">Configure a disputa em quatro passos. Depois de salvar, importe a planilha e publique aqui mesmo.</p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             {hasUserEnteredData && <span className="rounded-full border border-blue-300/20 bg-blue-300/[.06] px-3 py-1.5 text-xs font-semibold text-blue-100">{hasRecoveredDraft ? 'Progresso recuperado' : 'Progresso salvo'} nesta aba</span>}
             {hasUserEnteredData && <button type="button" onClick={() => resetWizard()} className="min-h-9 rounded-lg px-2 text-xs font-semibold text-slate-400 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">Descartar progresso</button>}
-            <p className="rounded-full border border-blue-300/20 bg-blue-300/[.07] px-3 py-1.5 text-xs font-bold text-blue-200">O rascunho só é criado na revisão final</p>
+            <p className="rounded-full border border-white/10 bg-white/[.04] px-3 py-1.5 text-xs font-bold text-slate-200">Nada é publicado automaticamente</p>
           </div>
         </header>
 
-        <ol aria-label="Etapas da criação" className="mb-8 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
+        <div className="mb-4 flex items-center justify-between gap-3 text-xs font-bold text-slate-300"><span>Passo {step + 1} de 4</span><span>{STEP_LABELS[step]}</span></div>
+        <div className="mb-5 h-1 overflow-hidden rounded-full bg-white/10" role="progressbar" aria-label="Progresso da criação" aria-valuenow={step + 1} aria-valuemin={1} aria-valuemax={4}><div className="h-full rounded-full bg-blue-300 transition-all duration-300 motion-reduce:transition-none" style={{ width: `${(step + 1) * 25}%` }} /></div>
+        <ol aria-label="Etapas da criação" className="mb-8 grid grid-cols-4 gap-1.5 sm:gap-3">
           {STEP_LABELS.map((label, index) => {
             const isCurrent = step === index
             const isComplete = step > index
@@ -712,14 +715,14 @@ export default function CreatePromotionWizard() {
                   onClick={() => index < step && goToStep(index as WizardStep)}
                   disabled={index > step || saving}
                   aria-current={isCurrent ? 'step' : undefined}
-                  className={`flex min-h-14 w-full items-center gap-2.5 rounded-xl border px-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 ${
+                  className={`flex min-h-14 w-full items-center justify-center gap-2 rounded-xl border px-1 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 sm:justify-start sm:px-3 ${
                     isCurrent ? 'border-blue-300/45 bg-blue-300/[.09] text-white' : isComplete ? 'border-white/10 bg-white/[.035] text-slate-200 hover:border-white/20' : 'border-white/[.06] bg-black/20 text-slate-400'
                   }`}
                 >
                   <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-full border text-[11px] font-black ${isCurrent ? 'border-blue-200 bg-blue-200 text-slate-950' : isComplete ? 'border-blue-300/30 bg-blue-300/10 text-blue-200' : 'border-white/15 text-slate-400'}`}>
                     {isComplete ? <Icon name="check" className="h-3.5 w-3.5" /> : `0${index + 1}`}
                   </span>
-                  <span className="text-xs font-bold sm:text-sm">{label}</span>
+                  <span className="hidden text-xs font-bold sm:inline sm:text-sm">{label}</span><span className="sr-only sm:hidden">{label}</span>
                 </button>
               </li>
             )
@@ -727,15 +730,15 @@ export default function CreatePromotionWizard() {
         </ol>
 
         <form onSubmit={createPromotion} noValidate>
-          <details className="group mb-5 rounded-xl border border-white/10 bg-[#0d2350]/90 lg:hidden">
+          {step === 3 && <details className="group mb-5 rounded-xl border border-white/10 bg-[#0d2350]/90 lg:hidden">
             <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 text-sm font-bold text-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 [&::-webkit-details-marker]:hidden">
               <span className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-blue-400" aria-hidden="true" />Prévia ao vivo do card público</span>
               <span className="text-xs font-semibold text-blue-200 group-open:hidden">Mostrar</span>
               <span className="hidden text-xs font-semibold text-slate-400 group-open:block">Ocultar</span>
             </summary>
             <div className="border-t border-white/[.08] p-3"><PromoPreviewCard promo={previewPromo} /></div>
-          </details>
-          <div className="grid items-start gap-7 lg:grid-cols-[minmax(0,1fr)_minmax(340px,420px)] lg:gap-10">
+          </details>}
+          <div className={`grid items-start gap-7 ${step === 3 ? 'lg:grid-cols-[minmax(0,1fr)_minmax(340px,420px)] lg:gap-10' : 'lg:grid-cols-[minmax(0,1fr)_280px] lg:gap-10'}`}>
             <div className="min-w-0">
               <AnimatePresence mode="wait" initial={false}>
                 <motion.section
@@ -746,7 +749,7 @@ export default function CreatePromotionWizard() {
                   transition={{ duration: reduceMotion ? 0 : 0.2, ease: 'easeOut' }}
                   aria-labelledby="wizard-step-title"
                   ref={stepSectionRef}
-                  className="min-h-[440px] rounded-2xl border border-white/10 bg-[#0d2350]/90 p-5 shadow-[0_18px_60px_rgba(0,0,0,.25)] sm:p-7"
+                  className="min-h-[440px] rounded-2xl border border-white/10 bg-[#0d2350]/90 p-5 shadow-[0_18px_60px_rgba(0,0,0,.25)] sm:p-7 lg:p-9"
                 >
                   {stepError && (
                     <div ref={stepErrorRef} tabIndex={-1} role="alert" aria-live="assertive" className="mb-5 rounded-lg border border-rose-300/20 bg-rose-300/[.07] px-4 py-3 text-sm text-rose-100 focus:outline-none focus:ring-2 focus:ring-rose-300/60">
@@ -757,13 +760,13 @@ export default function CreatePromotionWizard() {
                     <>
                       <StepHeading icon="flag" title="Dados da campanha" description="As informações que os entregadores vão reconhecer no cartão da promoção." />
                       <div className="mt-7 grid gap-5 sm:grid-cols-2">
-                        <Field label="Nome da campanha" required hint="Até 120 caracteres" className="sm:col-span-2">
+                          <Field label="Nome da promoção" required hint="Até 120 caracteres" className="sm:col-span-2">
                           <input id="campaign-name" autoFocus maxLength={120} value={nome} onChange={(event) => setNome(event.target.value)} placeholder="Ex.: Desafio de outubro" className="wizard-input text-lg font-semibold" />
                         </Field>
                         <Field label="Cidade ou praça" hint="Opcional · aparece em destaque no card">
                           <input id="campaign-city" maxLength={120} value={cidade} onChange={(event) => setCidade(event.target.value)} placeholder="Ex.: São Paulo" className="wizard-input" />
                         </Field>
-          <fieldset className="sm:col-span-2">
+                        <fieldset className="sm:col-span-2">
                           <legend className="mb-2 text-xs font-bold text-slate-300">Tipo de campanha</legend>
                           <div className="grid gap-2 md:grid-cols-3">
                             {FORMATS.map((option) => (
@@ -995,21 +998,17 @@ export default function CreatePromotionWizard() {
             </div>
 
             <aside className="order-2 hidden lg:sticky lg:top-20 lg:block">
-              <PromoPreviewCard promo={previewPromo} />
-              <div className="mt-4 rounded-xl border border-white/[.08] bg-[#0d2350]/80 p-4">
-                <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Estado da campanha</p>
-                <div className="mt-2 flex items-center gap-2 text-sm font-semibold text-slate-100"><span className="h-2 w-2 rounded-full bg-blue-300" /> Rascunho · não publicado</div>
-                <p className="mt-2 text-xs leading-5 text-slate-400">O progresso é salvo nesta aba enquanto você preenche; o rascunho só vai para o sistema ao concluir.</p>
-              </div>
+              {step === 3 ? <PromoPreviewCard promo={previewPromo} /> : <div className="rounded-2xl border border-white/10 bg-[#0d2350]/80 p-5"><p className="text-xs font-black uppercase tracking-[.16em] text-blue-200">Seu caminho até publicar</p><ol className="mt-5 space-y-5 text-sm leading-6 text-slate-300"><li><strong className="text-white">1. Configure</strong><br />Nome, formato, regras e prêmios.</li><li><strong className="text-white">2. Revise</strong><br />Confira o resumo e crie o rascunho.</li><li><strong className="text-white">3. Importe</strong><br />Envie a planilha nesta página.</li><li><strong className="text-white">4. Publique</strong><br />Ative quando tudo estiver pronto.</li></ol></div>}
+              {step === 3 && <div className="mt-4 rounded-xl border border-white/[.08] bg-[#0d2350]/80 p-4"><p className="text-xs font-bold uppercase tracking-wider text-slate-400">Estado da campanha</p><div className="mt-2 flex items-center gap-2 text-sm font-semibold text-slate-100"><span className="h-2 w-2 rounded-full bg-blue-300" /> Rascunho · não publicado</div><p className="mt-2 text-xs leading-5 text-slate-400">Depois de criar, a planilha e a publicação aparecem nesta página.</p></div>}
             </aside>
           </div>
 
           <footer className="fixed inset-x-0 bottom-0 z-20 border-t border-white/10 bg-[#0a1d3e]/95 px-4 py-3 backdrop-blur-xl sm:px-6">
-            <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-3 lg:px-4">
+            <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-3 lg:px-4">
               <p className="hidden text-xs text-slate-400 sm:block">Etapa {step + 1} de {STEP_LABELS.length}</p>
               <div className="ml-auto flex items-center gap-2 sm:gap-3">
                 {step === 0 ? <Link href="/admin" className="inline-flex min-h-11 items-center rounded-lg px-4 text-sm font-semibold text-slate-400 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">Cancelar</Link> : <button type="button" disabled={saving} onClick={() => goToStep((step - 1) as WizardStep)} className="min-h-11 rounded-lg border border-white/10 px-4 text-sm font-semibold text-slate-200 transition-colors hover:bg-white/[.05] disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">Voltar</button>}
-                {step < 3 ? <button type="button" onClick={handleNext} className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-blue-300 px-4 text-sm font-black text-slate-950 transition-colors hover:bg-blue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:px-5">Continuar <Icon name="arrow" className="h-4 w-4" /></button> : <button type="submit" disabled={saving} className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-blue-300 px-4 text-sm font-black text-slate-950 transition-colors hover:bg-blue-200 disabled:cursor-wait disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:px-5">{saving ? <><span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-950/30 border-t-slate-950" /> Criando rascunho…</> : <>Criar rascunho <Icon name="check" className="h-4 w-4" /></>}</button>}
+                {step < 3 ? <button type="button" onClick={handleNext} className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-blue-300 px-4 text-sm font-black text-slate-950 transition-colors hover:bg-blue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:px-5">{step === 2 ? 'Revisar promoção' : 'Próximo passo'} <Icon name="arrow" className="h-4 w-4" /></button> : <button type="submit" disabled={saving} className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-blue-300 px-4 text-sm font-black text-slate-950 transition-colors hover:bg-blue-200 disabled:cursor-wait disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:px-5">{saving ? <><span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-950/30 border-t-slate-950" /> Criando rascunho…</> : <>Criar e importar planilha <Icon name="check" className="h-4 w-4" /></>}</button>}
               </div>
             </div>
           </footer>
@@ -1018,7 +1017,7 @@ export default function CreatePromotionWizard() {
       <style jsx global>{`
         .wizard-input { width: 100%; min-height: 46px; border: 1px solid rgba(255,255,255,.11); border-radius: 10px; background: rgba(0,0,0,.28); padding: 10px 13px; color: #f4f4f5; font-size: 14px; outline: none; transition: border-color .16s ease, background-color .16s ease, box-shadow .16s ease; }
         .wizard-input::placeholder { color: #71717a; }
-        .wizard-input:focus { border-color: rgba(190,242,100,.7); background: rgba(0,0,0,.4); box-shadow: 0 0 0 3px rgba(190,242,100,.12); }
+        .wizard-input:focus { border-color: rgba(147,197,253,.75); background: rgba(0,0,0,.4); box-shadow: 0 0 0 3px rgba(147,197,253,.14); }
         .wizard-input:disabled { cursor: not-allowed; opacity: .55; }
         @media (prefers-reduced-motion: reduce) { .wizard-input { transition: none; } }
       `}</style>
