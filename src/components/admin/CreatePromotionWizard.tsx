@@ -14,6 +14,31 @@ type Metric = 'corridas_completadas' | 'pedidos_aceitos_e_concluidos' | 'faturam
 type WizardStep = 0 | 1 | 2 | 3
 type DraftPrizeGroup = TurnoPrizeConfig & { turno: string; premios: PrizeEntry[] }
 type DraftLevel = { id: string; nivel: number; meta: number; premio: number }
+type ValidationIssue = { step: WizardStep; message: string; field?: string; shift?: string }
+type WizardDraft = {
+  version: 1
+  step: WizardStep
+  nome: string
+  descricao: string
+  cidade: string
+  dataInicio: string
+  dataFim: string
+  format: CompetitionFormat
+  metric: Metric
+  grouping: 'turno' | 'geral'
+  activeShifts: string[]
+  activeShift: string
+  limitRanking: number
+  minimumGoal: number
+  goalPrize: number
+  levels: DraftLevel[]
+  rulesText: string[]
+  destaqueCopa: boolean
+  temaNinja: boolean
+  prizeGroups: DraftPrizeGroup[]
+}
+
+const WIZARD_DRAFT_KEY = 'central-promocoes:create-wizard:v1'
 
 const SHIFTS = [
   { key: 'CAFE_DA_MANHA', label: 'Café da manhã', short: 'Café' },
@@ -68,6 +93,73 @@ function defaultPrizeGroups(): DraftPrizeGroup[] {
   ]
 }
 
+function defaultLevels(): DraftLevel[] {
+  return [
+    { id: 'level-1', nivel: 1, meta: 50, premio: 100 },
+    { id: 'level-2', nivel: 2, meta: 100, premio: 250 },
+  ]
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function isFiniteNumber(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value)
+}
+
+function parseWizardDraft(value: unknown): WizardDraft | null {
+  if (!isRecord(value) || value.version !== 1 || typeof value.step !== 'number' || ![0, 1, 2, 3].includes(value.step)) return null
+
+  const validFormats: CompetitionFormat[] = ['ranking', 'metas', 'niveis']
+  const validMetrics: Metric[] = ['corridas_completadas', 'pedidos_aceitos_e_concluidos', 'faturamento_taxas', 'pontos']
+  const validShifts = [...SHIFTS.map(({ key }) => key), 'GERAL']
+  const campaignShifts = SHIFTS.map(({ key }) => key)
+  if (typeof value.nome !== 'string' || typeof value.descricao !== 'string' || typeof value.cidade !== 'string'
+    || typeof value.dataInicio !== 'string' || typeof value.dataFim !== 'string'
+    || !validFormats.includes(value.format as CompetitionFormat) || !validMetrics.includes(value.metric as Metric)
+    || (value.grouping !== 'turno' && value.grouping !== 'geral')
+    || !Array.isArray(value.activeShifts) || value.activeShifts.length === 0 || value.activeShifts.some((shift) => typeof shift !== 'string' || !campaignShifts.includes(shift))
+    || typeof value.activeShift !== 'string' || !validShifts.includes(value.activeShift)
+    || !isFiniteNumber(value.limitRanking) || !isFiniteNumber(value.minimumGoal) || !isFiniteNumber(value.goalPrize)
+    || !Array.isArray(value.levels) || value.levels.length === 0 || value.levels.length > 100
+    || !value.levels.every((level) => isRecord(level) && typeof level.id === 'string' && isFiniteNumber(level.nivel) && isFiniteNumber(level.meta) && isFiniteNumber(level.premio))
+    || !Array.isArray(value.rulesText) || value.rulesText.length === 0 || value.rulesText.length > 100 || !value.rulesText.every((rule) => typeof rule === 'string')
+    || typeof value.destaqueCopa !== 'boolean' || typeof value.temaNinja !== 'boolean'
+    || !Array.isArray(value.prizeGroups) || value.prizeGroups.length > validShifts.length
+    || !value.prizeGroups.every((group) => isRecord(group) && typeof group.turno === 'string' && validShifts.includes(group.turno)
+      && isFiniteNumber(group.minimo_corridas) && Array.isArray(group.premios) && group.premios.length <= 100
+      && group.premios.every((prize) => isRecord(prize) && (typeof prize.id === 'string' || typeof prize.id === 'number')
+        && isFiniteNumber(prize.valor) && (prize.descricao === undefined || typeof prize.descricao === 'string')
+        && (prize.posicao === undefined || isFiniteNumber(prize.posicao))
+        && (prize.posicao_inicio === undefined || isFiniteNumber(prize.posicao_inicio))
+        && (prize.posicao_fim === undefined || isFiniteNumber(prize.posicao_fim))))) return null
+
+  return value as unknown as WizardDraft
+}
+
+function firstFreePosition(prizes: PrizeEntry[], length = 1, ignoredIndex = -1) {
+  for (let candidate = 1; candidate <= 100_000 - length + 1; candidate += 1) {
+    const end = candidate + length - 1
+    const overlaps = prizes.some((prize, index) => {
+      if (index === ignoredIndex) return false
+      const start = prize.posicao ?? prize.posicao_inicio ?? 0
+      const prizeEnd = prize.posicao ?? prize.posicao_fim ?? 0
+      return candidate <= prizeEnd && end >= start
+    })
+    if (!overlaps) return candidate
+  }
+  return null
+}
+
+function firstFreeLevelNumber(levels: DraftLevel[]) {
+  const used = new Set(levels.map(({ nivel }) => nivel))
+  for (let level = 1; level <= 100; level += 1) {
+    if (!used.has(level)) return level
+  }
+  return null
+}
+
 function formatDate(value: string | null) {
   if (!value) return 'A definir'
   const [year, month, day] = value.split('-')
@@ -105,23 +197,122 @@ export default function CreatePromotionWizard() {
   const [limitRanking, setLimitRanking] = useState(15)
   const [minimumGoal, setMinimumGoal] = useState(50)
   const [goalPrize, setGoalPrize] = useState(150)
-  const [levels, setLevels] = useState<DraftLevel[]>([
-    { id: 'level-1', nivel: 1, meta: 50, premio: 100 },
-    { id: 'level-2', nivel: 2, meta: 100, premio: 250 },
-  ])
+  const [levels, setLevels] = useState<DraftLevel[]>(defaultLevels)
   const [rulesText, setRulesText] = useState<string[]>([''])
   const [destaqueCopa, setDestaqueCopa] = useState(false)
   const [temaNinja, setTemaNinja] = useState(false)
   const [prizeGroups, setPrizeGroups] = useState(defaultPrizeGroups)
   const [saving, setSaving] = useState(false)
   const [stepError, setStepError] = useState('')
+  const [draftHydrated, setDraftHydrated] = useState(false)
+  const [hasRecoveredDraft, setHasRecoveredDraft] = useState(false)
+  const [focusRevision, setFocusRevision] = useState(0)
   const stepErrorRef = useRef<HTMLDivElement>(null)
+  const stepSectionRef = useRef<HTMLElement>(null)
+  const pendingFocusFieldRef = useRef<string | null>(null)
+  const hasUserEnteredData = useMemo(() => (
+    step > 0 || Boolean(nome.trim() || descricao.trim() || cidade.trim() || dataInicio || dataFim)
+    || format !== 'ranking' || metric !== 'corridas_completadas' || grouping !== 'turno'
+    || JSON.stringify(activeShifts) !== JSON.stringify(SHIFTS.map(({ key }) => key))
+    || limitRanking !== 15 || minimumGoal !== 50 || goalPrize !== 150
+    || JSON.stringify(levels) !== JSON.stringify(defaultLevels())
+    || rulesText.some((rule) => rule.trim()) || destaqueCopa || temaNinja
+    || JSON.stringify(prizeGroups) !== JSON.stringify(defaultPrizeGroups())
+  ), [activeShifts, cidade, dataFim, dataInicio, descricao, destaqueCopa, format, goalPrize, grouping, levels, limitRanking, metric, minimumGoal, nome, prizeGroups, rulesText, step, temaNinja])
 
   useEffect(() => {
-    if (!stepError) return
-    stepErrorRef.current?.focus()
-    stepErrorRef.current?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' })
-  }, [reduceMotion, stepError])
+    const frame = window.requestAnimationFrame(() => {
+      try {
+        const storedDraft = window.sessionStorage.getItem(WIZARD_DRAFT_KEY)
+        if (storedDraft) {
+          const draft = parseWizardDraft(JSON.parse(storedDraft) as unknown)
+          if (draft) {
+            setStep(draft.step)
+            setNome(draft.nome)
+            setDescricao(draft.descricao)
+            setCidade(draft.cidade)
+            setDataInicio(draft.dataInicio)
+            setDataFim(draft.dataFim)
+            setFormat(draft.format)
+            setMetric(draft.metric)
+            setGrouping(draft.grouping)
+            setActiveShifts(draft.activeShifts)
+            setActiveShift(draft.grouping === 'geral' ? 'GERAL' : draft.activeShifts.includes(draft.activeShift) ? draft.activeShift : draft.activeShifts[0])
+            setLimitRanking(draft.limitRanking)
+            setMinimumGoal(draft.minimumGoal)
+            setGoalPrize(draft.goalPrize)
+            setLevels(draft.levels)
+            setRulesText(draft.rulesText)
+            setDestaqueCopa(draft.destaqueCopa)
+            setTemaNinja(draft.temaNinja)
+            setPrizeGroups(draft.prizeGroups)
+            setHasRecoveredDraft(true)
+          } else {
+            window.sessionStorage.removeItem(WIZARD_DRAFT_KEY)
+          }
+        }
+      } catch {
+        // A indisponibilidade do armazenamento da aba não deve impedir a criação.
+      } finally {
+        setDraftHydrated(true)
+      }
+    })
+    return () => window.cancelAnimationFrame(frame)
+  }, [])
+
+  useEffect(() => {
+    if (!draftHydrated) return
+    const draft: WizardDraft = {
+      version: 1,
+      step,
+      nome,
+      descricao,
+      cidade,
+      dataInicio,
+      dataFim,
+      format,
+      metric,
+      grouping,
+      activeShifts,
+      activeShift,
+      limitRanking,
+      minimumGoal,
+      goalPrize,
+      levels,
+      rulesText,
+      destaqueCopa,
+      temaNinja,
+      prizeGroups,
+    }
+    try {
+      if (!hasUserEnteredData) {
+        window.sessionStorage.removeItem(WIZARD_DRAFT_KEY)
+        return
+      }
+      window.sessionStorage.setItem(WIZARD_DRAFT_KEY, JSON.stringify(draft))
+    } catch {
+      // O wizard continua funcional mesmo se o navegador bloquear o armazenamento.
+    }
+  }, [activeShift, activeShifts, cidade, dataFim, dataInicio, descricao, destaqueCopa, draftHydrated, format, goalPrize, grouping, hasUserEnteredData, levels, limitRanking, metric, minimumGoal, nome, prizeGroups, rulesText, step, temaNinja])
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      const fieldId = pendingFocusFieldRef.current
+      pendingFocusFieldRef.current = null
+      const target = fieldId ? document.getElementById(fieldId) : null
+      if (target instanceof HTMLElement) {
+        target.focus()
+        target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' })
+      } else if (stepError) {
+        stepErrorRef.current?.focus()
+        stepErrorRef.current?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' })
+      } else {
+        const heading = stepSectionRef.current?.querySelector<HTMLElement>('#wizard-step-title')
+        heading?.focus()
+      }
+    })
+    return () => window.cancelAnimationFrame(frame)
+  }, [focusRevision, reduceMotion, step, stepError])
 
   const configTurnos = useMemo(
     () => format !== 'ranking' || grouping === 'geral' ? ['GERAL'] : activeShifts,
@@ -190,13 +381,17 @@ export default function CreatePromotionWizard() {
       const current = { ...premios[index] }
       if (field === 'tipo') {
         if (value === 'single') {
+          const nextPosition = firstFreePosition(premios, 1, index)
+          if (nextPosition === null) return group
           delete current.posicao_inicio
           delete current.posicao_fim
-          current.posicao = 1
+          current.posicao = nextPosition
         } else {
+          const nextPosition = firstFreePosition(premios, 3, index)
+          if (nextPosition === null) return group
           delete current.posicao
-          current.posicao_inicio = 3
-          current.posicao_fim = 5
+          current.posicao_inicio = nextPosition
+          current.posicao_fim = nextPosition + 2
         }
       } else if (field === 'descricao') current.descricao = String(value)
       else if (field === 'valor') current.valor = value === '' ? 0 : Number(value)
@@ -210,7 +405,11 @@ export default function CreatePromotionWizard() {
 
   const addPrize = () => {
     setPrizeGroups((groups) => groups.map((group) => group.turno === activeShift
-      ? { ...group, premios: [...group.premios, { id: `${activeShift}-${Date.now()}`, posicao: group.premios.length + 1, valor: 100, descricao: '' }] }
+      ? (() => {
+        const position = firstFreePosition(group.premios)
+        if (position === null) return group
+        return { ...group, premios: [...group.premios, { id: `${activeShift}-${Date.now()}-${group.premios.length}`, posicao: position, valor: 100, descricao: '' }] }
+      })()
       : group))
   }
 
@@ -251,68 +450,94 @@ export default function CreatePromotionWizard() {
     setActiveShift(nextGrouping === 'geral' ? 'GERAL' : activeShifts[0] || 'CAFE_DA_MANHA')
   }
 
-  const validateStep = (currentStep: WizardStep) => {
+  const validateStep = (currentStep: WizardStep): ValidationIssue | null => {
     if (currentStep === 0) {
-      if (!nome.trim()) return 'Informe o nome da campanha para continuar.'
-      if (nome.trim().length > 120) return 'Use até 120 caracteres no nome da campanha.'
-      if (descricao.length > 10_000) return 'A descrição pode ter até 10.000 caracteres.'
-      if (cidade.length > 120) return 'A cidade pode ter até 120 caracteres.'
-      if (dataInicio && dataFim && dataInicio > dataFim) return 'A data de início precisa ser anterior à data de término.'
+      if (!nome.trim()) return { step: 0, field: 'campaign-name', message: 'Informe o nome da campanha para continuar.' }
+      if (nome.trim().length > 120) return { step: 0, field: 'campaign-name', message: 'Use até 120 caracteres no nome da campanha.' }
+      if (descricao.length > 10_000) return { step: 0, field: 'campaign-description', message: 'A descrição pode ter até 10.000 caracteres.' }
+      if (cidade.length > 120) return { step: 0, field: 'campaign-city', message: 'A cidade pode ter até 120 caracteres.' }
+      if (dataInicio && dataFim && dataInicio > dataFim) return { step: 0, field: 'campaign-end', message: 'A data de início precisa ser anterior à data de término.' }
     }
     if (currentStep === 1) {
-      if (rulesText.length > 100 || rulesText.some((rule) => rule.length > 2_000)) return 'Cada regra deve ter até 2.000 caracteres.'
-      if (!Number.isInteger(limitRanking) || limitRanking < 1 || limitRanking > 500) return 'O limite do ranking deve ficar entre 1 e 500.'
+      if (rulesText.length > 100) return { step: 1, field: 'add-campaign-rule', message: 'A campanha pode ter até 100 regras.' }
+      const longRuleIndex = rulesText.findIndex((rule) => rule.length > 2_000)
+      if (longRuleIndex >= 0) return { step: 1, field: `campaign-rule-${longRuleIndex}`, message: 'Cada regra deve ter até 2.000 caracteres.' }
+      if (!Number.isInteger(limitRanking) || limitRanking < 1 || limitRanking > 500) return { step: 1, field: 'ranking-limit', message: 'O limite do ranking deve ficar entre 1 e 500.' }
     }
     if (currentStep === 2 && format === 'ranking') {
-      if (grouping === 'turno' && activeShifts.length === 0) return 'Ative pelo menos um turno.'
+      if (grouping === 'turno' && activeShifts.length === 0) return { step: 2, field: 'shift-selection', message: 'Ative pelo menos um turno.' }
       const groups = configPremios
-      const allPrizes = groups.flatMap((group) => group.premios.map((prize) => ({ ...prize, turno: group.turno })))
-      if (allPrizes.length === 0) return 'Adicione ao menos uma faixa de premiação.'
+      const allPrizes = groups.flatMap((group) => group.premios.map((prize, index) => ({ ...prize, index, turno: group.turno })))
+      if (allPrizes.length === 0) return { step: 2, field: 'add-prize', shift: activeShift, message: 'Adicione ao menos uma faixa de premiação.' }
       for (const prize of allPrizes) {
         const single = Number.isInteger(prize.posicao) && Number(prize.posicao) >= 1
           && Number(prize.posicao) <= 100_000
         const range = Number.isInteger(prize.posicao_inicio) && Number(prize.posicao_inicio) >= 1
           && Number.isInteger(prize.posicao_fim) && Number(prize.posicao_fim) >= Number(prize.posicao_inicio)
           && Number(prize.posicao_fim) <= 100_000
-        if (single === range) return 'Confira as posições dos prêmios: cada item precisa ter uma posição ou uma faixa válida.'
-        if (!Number.isFinite(Number(prize.valor)) || Number(prize.valor) < 0 || Number(prize.valor) > 100_000_000) return 'Os valores dos prêmios devem ficar entre R$ 0 e R$ 100.000.000.'
-        if ((prize.descricao?.length ?? 0) > 500) return 'A descrição de cada prêmio pode ter até 500 caracteres.'
+        const prefix = `prize-${prize.turno}-${prize.index}`
+        if (single === range) return { step: 2, field: `${prefix}-type`, shift: prize.turno, message: 'Confira as posições dos prêmios: cada item precisa ter uma posição ou uma faixa válida.' }
+        if (!Number.isFinite(Number(prize.valor)) || Number(prize.valor) < 0 || Number(prize.valor) > 100_000_000) return { step: 2, field: `${prefix}-value`, shift: prize.turno, message: 'Os valores dos prêmios devem ficar entre R$ 0 e R$ 100.000.000.' }
+        if ((prize.descricao?.length ?? 0) > 500) return { step: 2, field: `${prefix}-description`, shift: prize.turno, message: 'A descrição de cada prêmio pode ter até 500 caracteres.' }
       }
       for (const group of groups) {
-        const intervals = group.premios.map((prize) => ({
+        const intervals = group.premios.map((prize, index) => ({
           start: prize.posicao ?? prize.posicao_inicio ?? 0,
           end: prize.posicao ?? prize.posicao_fim ?? 0,
+          index,
+          prize,
         })).sort((a, b) => a.start - b.start)
-        if (intervals.some((range, index) => index > 0 && range.start <= intervals[index - 1].end)) {
-          return `Há posições premiadas repetidas em ${group.turno === 'GERAL' ? 'Geral' : SHIFTS.find((shift) => shift.key === group.turno)?.label || group.turno}. Ajuste as faixas para não se sobreporem.`
+        const overlapIndex = intervals.findIndex((range, index) => index > 0 && range.start <= intervals[index - 1].end)
+        if (overlapIndex > 0) {
+          const overlappingPrize = intervals[overlapIndex]
+          const field = `prize-${group.turno}-${overlappingPrize.index}-${overlappingPrize.prize.posicao != null ? 'position' : 'position-start'}`
+          return { step: 2, field, shift: group.turno, message: `Há posições premiadas repetidas em ${group.turno === 'GERAL' ? 'Geral' : SHIFTS.find((shift) => shift.key === group.turno)?.label || group.turno}. Ajuste as faixas para não se sobreporem.` }
         }
       }
-      if (groups.some((group) => !Number.isInteger(Number(group.minimo_corridas)) || Number(group.minimo_corridas) < 0 || Number(group.minimo_corridas) > 1_000_000)) return 'O mínimo de corridas deve ficar entre 0 e 1.000.000.'
+      const invalidMinimum = groups.find((group) => !Number.isInteger(Number(group.minimo_corridas)) || Number(group.minimo_corridas) < 0 || Number(group.minimo_corridas) > 1_000_000)
+      if (invalidMinimum) return { step: 2, field: `minimum-runs-${invalidMinimum.turno}`, shift: invalidMinimum.turno, message: 'O mínimo de corridas deve ficar entre 0 e 1.000.000.' }
     }
     if (currentStep === 2 && format === 'metas') {
-      if (!Number.isFinite(minimumGoal) || minimumGoal <= 0 || minimumGoal > 100_000_000) return 'A meta deve ficar entre 0 e 100.000.000, com valor maior que zero.'
-      if (!Number.isFinite(goalPrize) || goalPrize < 0 || goalPrize > 100_000_000) return 'O prêmio deve ficar entre R$ 0 e R$ 100.000.000.'
+      if (!Number.isFinite(minimumGoal) || minimumGoal <= 0 || minimumGoal > 100_000_000) return { step: 2, field: 'goal-value', message: 'A meta deve ficar entre 0 e 100.000.000, com valor maior que zero.' }
+      if (!Number.isFinite(goalPrize) || goalPrize < 0 || goalPrize > 100_000_000) return { step: 2, field: 'goal-prize', message: 'O prêmio deve ficar entre R$ 0 e R$ 100.000.000.' }
     }
     if (currentStep === 2 && format === 'niveis') {
-      if (levels.length === 0 || levels.length > 100) return 'A campanha precisa ter entre 1 e 100 níveis.'
+      if (levels.length === 0 || levels.length > 100) return { step: 2, field: 'add-level', message: 'A campanha precisa ter entre 1 e 100 níveis.' }
       const sorted = [...levels].sort((a, b) => a.nivel - b.nivel)
-      if (new Set(sorted.map((level) => level.nivel)).size !== sorted.length || sorted.some((level, index) => !Number.isInteger(level.nivel) || level.nivel < 1 || level.nivel > 100 || !Number.isFinite(level.meta) || level.meta <= 0 || level.meta > 100_000_000 || !Number.isFinite(level.premio) || level.premio < 0 || level.premio > 100_000_000 || (index > 0 && level.meta <= sorted[index - 1].meta))) {
-        return 'Confira os níveis: números devem ser únicos e as metas precisam crescer a cada etapa.'
+      for (let index = 0; index < sorted.length; index += 1) {
+        const level = sorted[index]
+        if (!Number.isInteger(level.nivel) || level.nivel < 1 || level.nivel > 100) return { step: 2, field: `level-${level.id}-number`, message: 'O número de cada nível deve ficar entre 1 e 100.' }
+        if (index > 0 && level.nivel === sorted[index - 1].nivel) return { step: 2, field: `level-${level.id}-number`, message: 'Cada nível precisa ter um número único.' }
+        if (!Number.isFinite(level.meta) || level.meta <= 0 || level.meta > 100_000_000) return { step: 2, field: `level-${level.id}-goal`, message: 'A meta deve ser maior que zero e não passar de 100.000.000.' }
+        if (index > 0 && level.meta <= sorted[index - 1].meta) return { step: 2, field: `level-${level.id}-goal`, message: 'A meta de cada nível deve ser maior que a meta do nível anterior.' }
+        if (!Number.isFinite(level.premio) || level.premio < 0 || level.premio > 100_000_000) return { step: 2, field: `level-${level.id}-prize`, message: 'O prêmio deve ficar entre R$ 0 e R$ 100.000.000.' }
       }
     }
-    return ''
+    return null
+  }
+
+  const showValidationIssue = (issue: ValidationIssue) => {
+    pendingFocusFieldRef.current = issue.field ?? null
+    setFocusRevision((revision) => revision + 1)
+    if (issue.shift) setActiveShift(issue.shift)
+    if (issue.step !== step) {
+      setStep(issue.step)
+      window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' })
+    }
+    setStepError(issue.message)
   }
 
   const goToStep = (nextStep: WizardStep) => {
+    pendingFocusFieldRef.current = null
     setStepError('')
     setStep(nextStep)
     window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' })
   }
 
   const handleNext = () => {
-    const error = validateStep(step)
-    if (error) {
-      setStepError(error)
+    const issue = validateStep(step)
+    if (issue) {
+      showValidationIssue(issue)
       return
     }
     goToStep(Math.min(step + 1, 3) as WizardStep)
@@ -325,9 +550,9 @@ export default function CreatePromotionWizard() {
       return
     }
 
-    const error = validateStep(0) || validateStep(1) || validateStep(2)
-    if (error) {
-      setStepError(error)
+    const issue = validateStep(0) || validateStep(1) || validateStep(2)
+    if (issue) {
+      showValidationIssue(issue)
       return
     }
 
@@ -359,11 +584,18 @@ export default function CreatePromotionWizard() {
       const result = await response.json().catch(() => null) as { id?: string; error?: string } | null
       if (!response.ok || !result?.id) throw new Error(result?.error || 'Não foi possível criar a campanha. Tente novamente.')
 
+      try {
+        window.sessionStorage.removeItem(WIZARD_DRAFT_KEY)
+      } catch {
+        // O salvamento da campanha já foi concluído; falha ao limpar o cache local não altera o resultado.
+      }
       toast.success('Rascunho criado. Você já pode importar os dados da campanha.')
       router.push(`/admin/promo/${result.id}`)
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Falha de conexão ao criar a campanha.'
+      pendingFocusFieldRef.current = null
       setStepError(message)
+      setFocusRevision((revision) => revision + 1)
       toast.error(message)
     } finally {
       setSaving(false)
@@ -375,6 +607,38 @@ export default function CreatePromotionWizard() {
     turno: activeShift,
     minimo_corridas: 0,
     premios: [],
+  }
+
+  const resetWizard = () => {
+    if (!window.confirm('Descartar o progresso desta campanha e começar novamente?')) return
+    pendingFocusFieldRef.current = null
+    setFocusRevision((revision) => revision + 1)
+    setStep(0)
+    setNome('')
+    setDescricao('')
+    setCidade('')
+    setDataInicio('')
+    setDataFim('')
+    setFormat('ranking')
+    setMetric('corridas_completadas')
+    setGrouping('turno')
+    setActiveShifts(SHIFTS.map(({ key }) => key))
+    setActiveShift('CAFE_DA_MANHA')
+    setLimitRanking(15)
+    setMinimumGoal(50)
+    setGoalPrize(150)
+    setLevels(defaultLevels())
+    setRulesText([''])
+    setDestaqueCopa(false)
+    setTemaNinja(false)
+    setPrizeGroups(defaultPrizeGroups())
+    setStepError('')
+    setHasRecoveredDraft(false)
+    try {
+      window.sessionStorage.removeItem(WIZARD_DRAFT_KEY)
+    } catch {
+      // Limpar o armazenamento não é necessário para continuar após redefinir o formulário.
+    }
   }
 
   return (
@@ -390,7 +654,11 @@ export default function CreatePromotionWizard() {
             <h1 className="max-w-3xl text-3xl font-black tracking-tight sm:text-4xl">Monte a próxima competição</h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-400">Defina a campanha, confira a prévia e crie um rascunho pronto para receber os dados.</p>
           </div>
-          <p className="rounded-full border border-lime-300/20 bg-lime-300/[.07] px-3 py-1.5 text-xs font-bold text-lime-200">O rascunho só é criado na revisão final</p>
+          <div className="flex flex-wrap items-center gap-2">
+            {hasUserEnteredData && <span className="rounded-full border border-sky-300/20 bg-sky-300/[.06] px-3 py-1.5 text-xs font-semibold text-sky-100">{hasRecoveredDraft ? 'Progresso recuperado' : 'Progresso salvo'} nesta aba</span>}
+            {hasUserEnteredData && <button type="button" onClick={resetWizard} className="min-h-9 rounded-lg px-2 text-xs font-semibold text-zinc-400 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-300">Descartar progresso</button>}
+            <p className="rounded-full border border-lime-300/20 bg-lime-300/[.07] px-3 py-1.5 text-xs font-bold text-lime-200">O rascunho só é criado na revisão final</p>
+          </div>
         </header>
 
         <ol aria-label="Etapas da criação" className="mb-8 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
@@ -419,6 +687,14 @@ export default function CreatePromotionWizard() {
         </ol>
 
         <form onSubmit={createPromotion} noValidate>
+          <details className="group mb-5 rounded-xl border border-white/10 bg-[#0a0c0c]/90 lg:hidden">
+            <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 text-sm font-bold text-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-300 [&::-webkit-details-marker]:hidden">
+              <span className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-rose-400" aria-hidden="true" />Prévia ao vivo do card público</span>
+              <span className="text-xs font-semibold text-lime-200 group-open:hidden">Mostrar</span>
+              <span className="hidden text-xs font-semibold text-zinc-400 group-open:block">Ocultar</span>
+            </summary>
+            <div className="border-t border-white/[.08] p-3"><PromoPreviewCard promo={previewPromo} /></div>
+          </details>
           <div className="grid items-start gap-7 lg:grid-cols-[minmax(0,1fr)_minmax(340px,420px)] lg:gap-10">
             <div className="min-w-0">
               <AnimatePresence mode="wait" initial={false}>
@@ -429,6 +705,7 @@ export default function CreatePromotionWizard() {
                   exit={reduceMotion ? undefined : { opacity: 0, y: -6 }}
                   transition={{ duration: reduceMotion ? 0 : 0.2, ease: 'easeOut' }}
                   aria-labelledby="wizard-step-title"
+                  ref={stepSectionRef}
                   className="min-h-[440px] rounded-2xl border border-white/10 bg-[#0a0c0c]/90 p-5 shadow-[0_18px_60px_rgba(0,0,0,.25)] sm:p-7"
                 >
                   {stepError && (
@@ -444,9 +721,9 @@ export default function CreatePromotionWizard() {
                           <input id="campaign-name" autoFocus maxLength={120} value={nome} onChange={(event) => setNome(event.target.value)} placeholder="Ex.: Desafio de outubro" className="wizard-input text-lg font-semibold" />
                         </Field>
                         <Field label="Cidade ou praça" hint="Opcional · aparece em destaque no card">
-                          <input maxLength={120} value={cidade} onChange={(event) => setCidade(event.target.value)} placeholder="Ex.: São Paulo" className="wizard-input" />
+                          <input id="campaign-city" maxLength={120} value={cidade} onChange={(event) => setCidade(event.target.value)} placeholder="Ex.: São Paulo" className="wizard-input" />
                         </Field>
-                        <fieldset className="sm:col-span-2">
+          <fieldset className="sm:col-span-2">
                           <legend className="mb-2 text-xs font-bold text-zinc-300">Tipo de campanha</legend>
                           <div className="grid gap-2 md:grid-cols-3">
                             {FORMATS.map((option) => (
@@ -459,16 +736,16 @@ export default function CreatePromotionWizard() {
                           <p className="mt-2 text-xs text-zinc-500">O site publica esses três formatos usando a estrutura de competição de entregas.</p>
                         </fieldset>
                         <Field label="Descrição" hint={`${descricao.length}/280 caracteres no card`} className="sm:col-span-2">
-                          <textarea maxLength={280} rows={3} value={descricao} onChange={(event) => setDescricao(event.target.value)} placeholder="Explique rapidamente o que está em disputa." className="wizard-input min-h-24 resize-y leading-6" />
+                          <textarea id="campaign-description" maxLength={280} rows={3} value={descricao} onChange={(event) => setDescricao(event.target.value)} placeholder="Explique rapidamente o que está em disputa." className="wizard-input min-h-24 resize-y leading-6" />
                         </Field>
                         <div className="sm:col-span-2">
                           <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-zinc-200"><Icon name="calendar" className="h-4 w-4 text-lime-200" /> Período da campanha</div>
                           <div className="grid gap-4 sm:grid-cols-2">
                             <Field label="Data de início">
-                              <input type="date" value={dataInicio} onChange={(event) => setDataInicio(event.target.value)} className="wizard-input [color-scheme:dark]" />
+                              <input id="campaign-start" type="date" value={dataInicio} onChange={(event) => setDataInicio(event.target.value)} className="wizard-input [color-scheme:dark]" />
                             </Field>
                             <Field label="Data de término">
-                              <input type="date" value={dataFim} onChange={(event) => setDataFim(event.target.value)} className="wizard-input [color-scheme:dark]" />
+                              <input id="campaign-end" type="date" value={dataFim} onChange={(event) => setDataFim(event.target.value)} className="wizard-input [color-scheme:dark]" />
                             </Field>
                           </div>
                           <p className="mt-2 text-xs text-zinc-500">As datas podem ficar em aberto e ser adicionadas depois no painel.</p>
@@ -550,7 +827,7 @@ export default function CreatePromotionWizard() {
                             </div>
                           ))}
                         </div>
-                        <button type="button" disabled={rulesText.length >= 100} onClick={() => setRulesText((current) => [...current, ''])} className="mt-2 min-h-10 rounded-lg px-2 text-xs font-bold text-lime-200 transition-colors hover:text-white disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-300">+ Adicionar regra</button>
+                        <button id="add-campaign-rule" type="button" disabled={rulesText.length >= 100} onClick={() => setRulesText((current) => [...current, ''])} className="mt-2 min-h-10 rounded-lg px-2 text-xs font-bold text-lime-200 transition-colors hover:text-white disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-300">+ Adicionar regra</button>
                       </div>
                     </>
                   )}
@@ -561,7 +838,7 @@ export default function CreatePromotionWizard() {
                       {format === 'ranking' ? (
                         <div className="mt-7 space-y-6">
                           {grouping === 'turno' ? (
-                            <fieldset>
+                            <fieldset id="shift-selection" tabIndex={-1}>
                               <legend className="mb-3 text-sm font-bold text-zinc-200">Turnos participantes</legend>
                               <div className="flex flex-wrap gap-2">
                                 {SHIFTS.map((shift) => {
@@ -587,36 +864,42 @@ export default function CreatePromotionWizard() {
 
                             <div className="mt-4 flex flex-col gap-4 rounded-xl border border-white/[.08] bg-black/20 p-4 sm:flex-row sm:items-end sm:justify-between">
                               <div><p className="text-sm font-bold text-zinc-100">{shiftInfo(activeShift)?.label ?? 'Ranking geral'}</p><p className="mt-1 text-xs text-zinc-500">Mínimo de corridas para ser elegível</p></div>
-                              <label className="flex items-center gap-2 text-xs text-zinc-300"><span className="sr-only">Mínimo de corridas para {shiftInfo(activeShift)?.label ?? 'ranking geral'}</span><input type="number" min="0" max="1000000" step="1" value={visiblePrizeGroup.minimo_corridas ?? 0} onChange={(event) => updateMinimumRuns(event.target.value)} className="wizard-input w-28 !py-2 text-center tabular-nums" /> corridas</label>
+                              <label className="flex items-center gap-2 text-xs text-zinc-300"><span className="sr-only">Mínimo de corridas para {shiftInfo(activeShift)?.label ?? 'ranking geral'}</span><input id={`minimum-runs-${activeShift}`} type="number" min="0" max="1000000" step="1" value={visiblePrizeGroup.minimo_corridas ?? 0} onChange={(event) => updateMinimumRuns(event.target.value)} className="wizard-input w-28 !py-2 text-center tabular-nums" /> corridas</label>
                             </div>
 
                             <div className="mt-4 space-y-2">
-                              <div className="flex items-end justify-between gap-3"><div><h3 className="text-sm font-bold text-zinc-200">Prêmios por posição</h3><p className="mt-1 text-xs text-zinc-500">Valores em reais; faixas não podem se sobrepor.</p></div><button type="button" disabled={visiblePrizeGroup.premios.length >= 100} onClick={addPrize} className="min-h-10 shrink-0 rounded-lg border border-lime-300/20 px-3 text-xs font-bold text-lime-100 transition-colors hover:bg-lime-300/[.08] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-300">+ Adicionar</button></div>
+                              <div className="flex items-end justify-between gap-3"><div><h3 className="text-sm font-bold text-zinc-200">Prêmios por posição</h3><p className="mt-1 text-xs text-zinc-500">Valores em reais; faixas não podem se sobrepor.</p></div><button id="add-prize" type="button" disabled={visiblePrizeGroup.premios.length >= 100 || firstFreePosition(visiblePrizeGroup.premios) === null} onClick={addPrize} className="min-h-10 shrink-0 rounded-lg border border-lime-300/20 px-3 text-xs font-bold text-lime-100 transition-colors hover:bg-lime-300/[.08] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-300">+ Adicionar</button></div>
                               {visiblePrizeGroup.premios.map((prize, index) => (
-                                <TurnoPrizeRow key={prize.id || `${activeShift}-${index}`} premio={prize} idx={index} isFirst={index === 0} isLast={index === visiblePrizeGroup.premios.length - 1} onUpdate={updatePrize} onRemove={removePrize} onMoveUp={(itemIndex) => movePrize(itemIndex, -1)} onMoveDown={(itemIndex) => movePrize(itemIndex, 1)} />
+                                <TurnoPrizeRow key={prize.id || `${activeShift}-${index}`} idPrefix={`prize-${activeShift}-${index}`} premio={prize} idx={index} isFirst={index === 0} isLast={index === visiblePrizeGroup.premios.length - 1} onUpdate={updatePrize} onRemove={removePrize} onMoveUp={(itemIndex) => movePrize(itemIndex, -1)} onMoveDown={(itemIndex) => movePrize(itemIndex, 1)} />
                               ))}
                               {visiblePrizeGroup.premios.length === 0 && <div className="rounded-lg border border-dashed border-white/15 px-4 py-8 text-center text-sm text-zinc-500">Nenhuma faixa neste turno. Adicione o primeiro prêmio acima.</div>}
                             </div>
                           </div>
-                          <label className="block max-w-xs"><span className="mb-1.5 block text-xs font-semibold text-zinc-300">Limite de posições exibidas no ranking</span><input type="number" min="1" max="500" value={limitRanking} onChange={(event) => setLimitRanking(Number(event.target.value) || 1)} className="wizard-input w-36 tabular-nums" /></label>
+                          <label className="block max-w-xs"><span className="mb-1.5 block text-xs font-semibold text-zinc-300">Limite de posições exibidas no ranking</span><input id="ranking-limit" type="number" min="1" max="500" value={limitRanking} onChange={(event) => setLimitRanking(Number(event.target.value) || 1)} className="wizard-input w-36 tabular-nums" /></label>
                         </div>
                       ) : format === 'metas' ? (
                         <div className="mt-7 grid gap-5 rounded-xl border border-white/[.08] bg-black/20 p-5 sm:grid-cols-2">
                           <Field label={metric === 'faturamento_taxas' ? 'Valor da meta (R$)' : 'Valor da meta'} required hint="Quanto cada entregador precisa alcançar">
-                            <input type="number" min="0.01" max="100000000" step={metric === 'faturamento_taxas' ? '0.01' : '1'} value={minimumGoal} onChange={(event) => setMinimumGoal(Number(event.target.value))} className="wizard-input tabular-nums" />
+                            <input id="goal-value" type="number" min="0.01" max="100000000" step={metric === 'faturamento_taxas' ? '0.01' : '1'} value={minimumGoal} onChange={(event) => setMinimumGoal(Number(event.target.value))} className="wizard-input tabular-nums" />
                           </Field>
                           <Field label="Prêmio por pessoa" required hint="Valor em reais">
-                            <div className="relative"><span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-500">R$</span><input type="number" min="0" max="100000000" step="0.01" value={goalPrize} onChange={(event) => setGoalPrize(Number(event.target.value))} className="wizard-input pl-10 tabular-nums" /></div>
+                            <div className="relative"><span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-500">R$</span><input id="goal-prize" type="number" min="0" max="100000000" step="0.01" value={goalPrize} onChange={(event) => setGoalPrize(Number(event.target.value))} className="wizard-input pl-10 tabular-nums" /></div>
                           </Field>
                         </div>
                       ) : (
                         <div className="mt-7 space-y-3">
-                          <div className="flex items-end justify-between gap-3"><div><h2 className="text-sm font-bold text-zinc-200">Níveis de produtividade</h2><p className="mt-1 text-xs text-zinc-500">Cada meta deve ser maior que a anterior. Até 100 níveis.</p></div><button type="button" disabled={levels.length >= 100} onClick={() => setLevels((current) => [...current, { id: `level-${Date.now()}`, nivel: current.length + 1, meta: (current.at(-1)?.meta ?? 0) + 50, premio: (current.at(-1)?.premio ?? 0) + 100 }])} className="min-h-10 rounded-lg border border-lime-300/20 px-3 text-xs font-bold text-lime-100 transition-colors hover:bg-lime-300/[.08] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-300">+ Adicionar nível</button></div>
+                          <div className="flex items-end justify-between gap-3"><div><h2 className="text-sm font-bold text-zinc-200">Níveis de produtividade</h2><p className="mt-1 text-xs text-zinc-500">Cada meta deve ser maior que a anterior. Até 100 níveis.</p></div><button id="add-level" type="button" disabled={levels.length >= 100 || firstFreeLevelNumber(levels) === null} onClick={() => setLevels((current) => {
+                            const nivel = firstFreeLevelNumber(current)
+                            if (nivel === null) return current
+                            const maxMeta = Math.max(0, ...current.map((level) => level.meta))
+                            const maxPrize = Math.max(0, ...current.map((level) => level.premio))
+                            return [...current, { id: `level-${Date.now()}-${current.length}`, nivel, meta: maxMeta + 50, premio: maxPrize + 100 }]
+                          })} className="min-h-10 rounded-lg border border-lime-300/20 px-3 text-xs font-bold text-lime-100 transition-colors hover:bg-lime-300/[.08] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-300">+ Adicionar nível</button></div>
                           {levels.map((level, index) => (
                             <div key={level.id} className="grid gap-3 rounded-xl border border-white/[.08] bg-black/20 p-4 sm:grid-cols-[100px_minmax(0,1fr)_minmax(0,1fr)_44px] sm:items-end">
-                              <Field label="Nível"><input type="number" min="1" max="100" value={level.nivel} onChange={(event) => setLevels((current) => current.map((item) => item.id === level.id ? { ...item, nivel: Number(event.target.value) } : item))} className="wizard-input tabular-nums" /></Field>
-                              <Field label={metric === 'faturamento_taxas' ? 'Meta em taxas (R$)' : 'Meta'}><input type="number" min="0.01" max="100000000" step={metric === 'faturamento_taxas' ? '0.01' : '1'} value={level.meta} onChange={(event) => setLevels((current) => current.map((item) => item.id === level.id ? { ...item, meta: Number(event.target.value) } : item))} className="wizard-input tabular-nums" /></Field>
-                              <Field label="Prêmio (R$)"><input type="number" min="0" max="100000000" step="0.01" value={level.premio} onChange={(event) => setLevels((current) => current.map((item) => item.id === level.id ? { ...item, premio: Number(event.target.value) } : item))} className="wizard-input tabular-nums" /></Field>
+                              <Field label="Nível"><input id={`level-${level.id}-number`} type="number" min="1" max="100" value={level.nivel} onChange={(event) => setLevels((current) => current.map((item) => item.id === level.id ? { ...item, nivel: Number(event.target.value) } : item))} className="wizard-input tabular-nums" /></Field>
+                              <Field label={metric === 'faturamento_taxas' ? 'Meta em taxas (R$)' : 'Meta'}><input id={`level-${level.id}-goal`} type="number" min="0.01" max="100000000" step={metric === 'faturamento_taxas' ? '0.01' : '1'} value={level.meta} onChange={(event) => setLevels((current) => current.map((item) => item.id === level.id ? { ...item, meta: Number(event.target.value) } : item))} className="wizard-input tabular-nums" /></Field>
+                              <Field label="Prêmio (R$)"><input id={`level-${level.id}-prize`} type="number" min="0" max="100000000" step="0.01" value={level.premio} onChange={(event) => setLevels((current) => current.map((item) => item.id === level.id ? { ...item, premio: Number(event.target.value) } : item))} className="wizard-input tabular-nums" /></Field>
                               <button type="button" disabled={levels.length <= 1} onClick={() => setLevels((current) => current.filter((item) => item.id !== level.id))} aria-label={`Remover nível ${index + 1}`} className="grid min-h-11 min-w-11 place-items-center rounded-lg text-zinc-400 transition-colors hover:bg-rose-300/10 hover:text-rose-200 disabled:opacity-30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300">×</button>
                             </div>
                           ))}
@@ -671,12 +954,12 @@ export default function CreatePromotionWizard() {
               </AnimatePresence>
             </div>
 
-            <aside className="order-2 lg:sticky lg:top-20">
+            <aside className="order-2 hidden lg:sticky lg:top-20 lg:block">
               <PromoPreviewCard promo={previewPromo} />
               <div className="mt-4 rounded-xl border border-white/[.08] bg-[#0a0c0c]/80 p-4">
                 <p className="text-xs font-bold uppercase tracking-wider text-zinc-400">Estado da campanha</p>
                 <div className="mt-2 flex items-center gap-2 text-sm font-semibold text-zinc-100"><span className="h-2 w-2 rounded-full bg-amber-300" /> Rascunho · não publicado</div>
-                <p className="mt-2 text-xs leading-5 text-zinc-500">As alterações nesta etapa ficam somente na tela até você criar o rascunho.</p>
+                <p className="mt-2 text-xs leading-5 text-zinc-500">O progresso é salvo nesta aba enquanto você preenche; o rascunho só vai para o sistema ao concluir.</p>
               </div>
             </aside>
           </div>
@@ -704,7 +987,7 @@ export default function CreatePromotionWizard() {
 }
 
 function StepHeading({ icon, title, description }: { icon: 'flag' | 'calendar' | 'spark' | 'medal' | 'check'; title: string; description: string }) {
-  return <div className="border-b border-white/[.08] pb-5"><div className="mb-3 grid h-9 w-9 place-items-center rounded-lg border border-lime-300/20 bg-lime-300/[.07] text-lime-200"><Icon name={icon} className="h-4.5 w-4.5" /></div><h2 id="wizard-step-title" className="text-xl font-black tracking-tight text-white sm:text-2xl">{title}</h2><p className="mt-1.5 max-w-2xl text-sm leading-6 text-zinc-400">{description}</p></div>
+  return <div className="border-b border-white/[.08] pb-5"><div className="mb-3 grid h-9 w-9 place-items-center rounded-lg border border-lime-300/20 bg-lime-300/[.07] text-lime-200"><Icon name={icon} className="h-4.5 w-4.5" /></div><h2 id="wizard-step-title" tabIndex={-1} className="text-xl font-black tracking-tight text-white focus:outline-none sm:text-2xl">{title}</h2><p className="mt-1.5 max-w-2xl text-sm leading-6 text-zinc-400">{description}</p></div>
 }
 
 function Field({ label, required, hint, className = '', children }: { label: string; required?: boolean; hint?: string; className?: string; children: ReactNode }) {

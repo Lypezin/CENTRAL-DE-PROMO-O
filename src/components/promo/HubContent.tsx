@@ -46,7 +46,7 @@ export default function HubContent({
     })
 
     if (activeTab === 'encerradas') {
-      promotions.sort((a, b) => b.created_at.localeCompare(a.created_at))
+      promotions.sort((a, b) => b.created_at.localeCompare(a.created_at) || b.id.localeCompare(a.id))
     }
 
     return promotions

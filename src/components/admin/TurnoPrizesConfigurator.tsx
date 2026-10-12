@@ -309,6 +309,7 @@ export default function TurnoPrizesConfigurator({
             return (
               <TurnoPrizeRow
                 key={p.id || `${turnoEditorAtivo}_${idx}`}
+                idPrefix={`turno-${turnoEditorAtivo}-prize-${idx}`}
                 premio={p}
                 idx={idx}
                 isFirst={idx === 0}

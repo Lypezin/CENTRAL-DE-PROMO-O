@@ -8,6 +8,7 @@ export type PrizeEditorField = 'tipo' | 'posicao' | 'posicao_inicio' | 'posicao_
 
 interface TurnoPrizeRowProps {
   premio: PrizeEntry
+  idPrefix?: string
   idx: number
   isFirst: boolean
   isLast: boolean
@@ -20,6 +21,7 @@ interface TurnoPrizeRowProps {
 
 export default function TurnoPrizeRow({
   premio,
+  idPrefix,
   idx,
   isFirst,
   isLast,
@@ -30,11 +32,13 @@ export default function TurnoPrizeRow({
   onMoveDown
 }: TurnoPrizeRowProps) {
   const isSingle = 'posicao' in premio
+  const fieldIdPrefix = idPrefix ?? `turno-prize-${idx}`
 
   return (
     <div className="flex flex-wrap items-center gap-2 bg-[#0a0a0c] border border-white/[0.04] p-2.5 rounded-lg">
       {/* Type */}
       <select
+        id={`${fieldIdPrefix}-type`}
         aria-label={`Tipo de faixa de premiação do item ${idx + 1}`}
         value={isSingle ? 'single' : 'range'}
         onChange={e => onUpdate(idx, 'tipo', e.target.value)}
@@ -48,6 +52,7 @@ export default function TurnoPrizeRow({
       {isSingle ? (
         <div className="flex items-center gap-1">
           <input
+            id={`${fieldIdPrefix}-position`}
             aria-label={`Posição do prêmio ${idx + 1}`}
             type="number"
             value={premio.posicao ?? 1}
@@ -60,6 +65,7 @@ export default function TurnoPrizeRow({
       ) : (
         <div className="flex items-center gap-1">
           <input
+            id={`${fieldIdPrefix}-position-start`}
             aria-label={`Posição inicial da faixa de prêmios ${idx + 1}`}
             type="number"
             value={premio.posicao_inicio ?? 3}
@@ -69,6 +75,7 @@ export default function TurnoPrizeRow({
           />
           <span className="text-[10px] text-zinc-500">a</span>
           <input
+            id={`${fieldIdPrefix}-position-end`}
             aria-label={`Posição final da faixa de prêmios ${idx + 1}`}
             type="number"
             value={premio.posicao_fim ?? 5}
@@ -85,6 +92,7 @@ export default function TurnoPrizeRow({
         <div className="flex items-center gap-1 ml-auto sm:ml-0">
           <span className="text-[9px] text-zinc-600 font-mono">R$</span>
           <input
+            id={`${fieldIdPrefix}-value`}
             aria-label={`Valor do prêmio ${idx + 1} em reais`}
             type="number"
             value={premio.valor ?? 0}
@@ -97,6 +105,7 @@ export default function TurnoPrizeRow({
 
       {/* Description */}
       <input
+        id={`${fieldIdPrefix}-description`}
         aria-label={`Descrição do prêmio ${idx + 1}`}
         type="text"
         value={premio.descricao || ''}
