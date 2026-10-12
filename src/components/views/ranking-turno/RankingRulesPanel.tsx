@@ -30,15 +30,20 @@ function RankingRulesPanelComponent({
 }: RankingRulesPanelProps) {
   return (
     <div
-      className="obsidian-card p-4 md:p-6 shadow-xl cursor-pointer active:scale-[0.995] relative overflow-hidden select-none"
+      className="obsidian-card min-w-0 p-4 md:p-6 shadow-xl cursor-pointer relative select-none"
       onClick={() => setPainelAberto(!painelAberto)}
+      onKeyDown={(event) => { if (event.target === event.currentTarget && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); setPainelAberto(!painelAberto) } }}
+      role="button"
+      tabIndex={0}
+      aria-expanded={painelAberto}
+      aria-label="Regras e prêmios da promoção"
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center items-start w-full">
         <h2 className="text-xs xs:text-sm md:text-base font-extrabold text-white flex items-center gap-2 flex-1 min-w-0 pr-2">
           <span className="text-base sm:text-lg transition-transform duration-300 shrink-0">
             {isMetas ? '🎯' : isNiveis ? '📈' : activeTurnoDisplay.emoji}
           </span>
-          <span className="tracking-tight text-gradient truncate max-w-full sm:whitespace-normal">
+          <span className="tracking-tight text-gradient break-words [overflow-wrap:anywhere]">
             {isMetas
               ? 'Desafio de Meta Individual'
               : isNiveis
@@ -72,13 +77,13 @@ function RankingRulesPanelComponent({
                 )}
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="grid grid-cols-1 min-[480px]:grid-cols-2 sm:grid-cols-4 gap-3">
                 {activeTurnoConfig?.premios?.map((p, idx) => (
                   <div key={idx} className="bg-slate-900/30 border border-slate-800/80 rounded-xl p-3.5 text-center font-mono hover:bg-[#14356f] hover:border-white/10 transition-all duration-300 shadow-inner copa-prize-badge">
                     <div className="text-[9px] text-slate-400 uppercase font-bold tracking-wider mb-1">
                       {p.posicao ? `${p.posicao}º Lugar` : `${p.posicao_inicio}º ao ${p.posicao_fim}º`}
                     </div>
-                    <div className={`font-extrabold text-sm ${p.descricao && !p.valor ? 'text-blue-400' : 'text-blue-400'}`}>
+                    <div className="font-extrabold text-sm text-blue-300 break-words [overflow-wrap:anywhere]">
                       {p.descricao && !p.valor ? `🎁 ${p.descricao}` : formatCurrency(p.valor ?? 0)}
                     </div>
                   </div>
@@ -124,7 +129,7 @@ function RankingRulesPanelComponent({
               <p className="text-xs text-slate-400 leading-relaxed font-sans">
                 Suba os degraus de produtividade e multiplique seu frete! Acumule pontos e garanta prêmios maiores a cada nível alcançado:
               </p>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="grid grid-cols-1 min-[480px]:grid-cols-2 sm:grid-cols-4 gap-3">
                 {(mecanica.niveis || []).map((n, idx) => (
                   <div key={idx} className="bg-slate-900/30 border border-slate-800/80 rounded-xl p-3 text-center font-mono hover:border-white/10 transition-all duration-300 copa-prize-badge">
                     <div className="text-[9px] text-slate-400 uppercase font-bold tracking-wider mb-1">Nível {n.nivel}</div>

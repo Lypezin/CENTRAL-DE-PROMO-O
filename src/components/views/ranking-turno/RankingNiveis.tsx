@@ -66,12 +66,12 @@ function RankingNiveisComponent({
                   key={item.id_da_pessoa_entregadora}
                   className="bg-[#0d2350] border border-white/[0.04] p-5 rounded-2xl space-y-5 shadow-xl hover:border-white/[0.08] transition-all duration-300"
                 >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h4 className="font-extrabold text-white text-sm md:text-base tracking-tight">{item.pessoa_entregadora}</h4>
-                      {!isCopa && <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5 font-mono">📍 {item.praca}</p>}
+                  <div className="flex flex-wrap justify-between items-start gap-3">
+                    <div className="min-w-0">
+                      <h4 className="font-extrabold text-white text-base tracking-tight break-words [overflow-wrap:anywhere]">{item.pessoa_entregadora}</h4>
+                      {!isCopa && <p className="text-xs text-slate-300 mt-1 break-words [overflow-wrap:anywhere]">{item.praca}</p>}
                     </div>
-                    <div className="text-right">
+                    <div className="min-w-0 text-left sm:text-right">
                       <div className="text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-0.5 font-mono font-bold">VALOR ACUMULADO</div>
                       <div className="text-sm font-bold text-white font-mono">{formatScoreValue(score)}</div>
                     </div>
@@ -80,13 +80,13 @@ function RankingNiveisComponent({
                   {/* Niveis horizontal crystals row (horizontal scroll bar hidden) */}
                   <div className="space-y-2.5">
                     <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wider font-mono select-none">Progresso na Régua de Níveis:</div>
-                    <div className="flex overflow-x-auto gap-3 pb-2.5 scrollbar-none snap-x">
+                    <div className="grid grid-cols-1 min-[480px]:grid-cols-2 sm:grid-cols-3 gap-3">
                       {niveis.map((n) => {
                         const concluido = score >= n.meta
                         return (
                           <div
                             key={n.nivel}
-                            className={`shrink-0 min-w-[135px] flex-1 p-3.5 rounded-xl border text-center transition-all duration-300 snap-center shadow-inner ${
+                            className={`min-w-0 p-3.5 rounded-xl border text-center transition-colors duration-300 shadow-inner ${
                               concluido
                                 ? 'bg-blue-500/5 border-blue-500/25 text-blue-400 shadow-blue-950/5'
                                 : 'bg-slate-900/10 border-white/[0.02] text-slate-600'
@@ -180,18 +180,18 @@ function RankingNiveisComponent({
               {driversWithLevels.map(({ item, maxNivel, premio }) => (
                 <div
                   key={item.id_da_pessoa_entregadora}
-                  className="flex items-center gap-3 bg-slate-900/30 border border-white/[0.02] p-3.5 rounded-xl hover:border-blue-400/30 transition-all duration-300 shadow-sm"
+                  className="flex min-w-0 flex-wrap items-center gap-3 bg-slate-900/30 border border-white/[0.02] p-3.5 rounded-xl hover:border-blue-400/30 transition-all duration-300 shadow-sm"
                 >
                   <div className="w-10 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 text-[10px] font-mono font-black select-none">
                     NIV {maxNivel}
                   </div>
-                  <div className="truncate">
-                    <div className="font-bold text-white text-xs truncate">{item.pessoa_entregadora}</div>
-                    <div className="text-[9px] text-slate-400 uppercase tracking-wider font-mono mt-0.5">
+                  <div className="min-w-0 flex-1">
+                    <div className="font-bold text-white text-sm break-words [overflow-wrap:anywhere]">{item.pessoa_entregadora}</div>
+                    <div className="text-xs text-slate-300 mt-1 break-words [overflow-wrap:anywhere]">
                       {!isCopa && `📍 ${item.praca} • `}{formatScoreValue(getScore(item))}
                     </div>
                   </div>
-                  <div className="ml-auto bg-blue-500/15 text-blue-300 border border-blue-500/20 px-2.5 py-1 rounded-lg text-[10px] font-black font-mono">
+                  <div className="ml-auto bg-blue-500/15 text-blue-300 border border-blue-500/20 px-2.5 py-1 rounded-lg text-xs font-black font-mono">
                     +{formatCurrency(premio)}
                   </div>
                 </div>

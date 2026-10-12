@@ -312,7 +312,7 @@ export default function RankingTurno({
   }, [filtroAtivoEfetivo])
 
   return (
-    <div className="w-full max-w-5xl mx-auto flex flex-col gap-6 font-sans">
+    <div className="min-w-0 w-full max-w-5xl mx-auto flex flex-col gap-5 sm:gap-6 font-sans">
 
       {/* Search and Filters Bar */}
       <RankingFilters
@@ -342,7 +342,7 @@ export default function RankingTurno({
       />
 
       {/* Main Content Listings based on Rules Model */}
-      <div className="bg-[#0d2350] border border-white/[0.04] rounded-2xl p-4 md:p-6 shadow-xl min-h-[300px]">
+      <div className="min-w-0 bg-[#0d2350] border border-white/[0.04] rounded-2xl p-3 sm:p-4 md:p-6 shadow-xl min-h-[300px]">
         {loading ? (
           /* Loading skeleton shell */
           <div className="space-y-3">
