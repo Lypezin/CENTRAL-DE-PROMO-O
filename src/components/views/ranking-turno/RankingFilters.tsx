@@ -30,13 +30,13 @@ function RankingFiltersComponent({
       {/* Search Input with Neon Accent */}
       <div className="relative w-full md:w-96 group">
         <label htmlFor="ranking-search" className="sr-only">Buscar entregador pelo nome</label>
-        <input 
+        <input
           id="ranking-search"
-          type="text" 
+          type="text"
           placeholder={isMetas || isNiveis ? "Pesquise seu nome para ver seu progresso..." : "Buscar entregador por nome..."}
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
-          className="w-full bg-[#08080a] border border-white/[0.04] focus:border-sky-500/80 rounded-xl py-2.5 pl-10 pr-10 text-xs text-white focus:outline-none focus:ring-1 focus:ring-sky-500/40 transition-all placeholder-zinc-600 font-sans shadow-lg shadow-black/40"
+          className="w-full bg-[#0b1a2d] border border-white/[0.04] focus:border-sky-500/80 rounded-xl py-2.5 pl-10 pr-10 text-xs text-white focus:outline-none focus:ring-1 focus:ring-sky-500/40 transition-all placeholder-zinc-600 font-sans shadow-lg shadow-black/40"
         />
         <svg className="w-4 h-4 text-zinc-600 group-focus-within:text-sky-400 absolute left-3.5 top-3 transition-colors duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -68,7 +68,7 @@ function RankingFiltersComponent({
                 aria-pressed={isSelected}
                 onClick={() => setFiltroAtivo(turno)}
                 className={`snap-center flex-grow md:flex-initial px-5 py-3 sm:py-2 min-h-[44px] rounded-lg text-xs font-black uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-2 active:scale-95 cursor-pointer whitespace-nowrap ${
-                  isSelected 
+                  isSelected
                     ? 'bg-zinc-900 text-white shadow-md border border-white/[0.04]'
                     : 'text-zinc-500 hover:text-zinc-300'
                 }`}

@@ -80,14 +80,14 @@
 .group:hover .faixa-preta-ninja-art,
 .group:focus-visible .faixa-preta-ninja-art {
   opacity: .7;
-  filter: brightness(1.22) drop-shadow(0 0 18px rgba(244, 63, 94, .25));
+  filter: brightness(1.22) drop-shadow(0 0 18px rgba(96, 165, 250, .25));
 }
 
 .faixa-preta-strike {
   width: 32%;
   left: 42%;
   right: auto;
-  background: linear-gradient(90deg, transparent, rgba(225, 29, 72, .05) 12%, rgba(244, 63, 94, .32) 49%, rgba(255, 255, 255, .17) 53%, transparent 82%);
+  background: linear-gradient(90deg, transparent, rgba(37, 99, 235, .05) 12%, rgba(96, 165, 250, .32) 49%, rgba(255, 255, 255, .17) 53%, transparent 82%);
   filter: blur(2px);
   opacity: 0;
   transform: translate3d(-95%, 0, 0) skewX(-24deg);
@@ -107,8 +107,8 @@
   content: attr(data-city);
   position: absolute;
   inset: 0;
-  color: #fff7f7;
-  text-shadow: 0 0 8px rgba(251, 113, 133, .95), 0 0 22px rgba(225, 29, 72, .65);
+  color: #eff6ff;
+  text-shadow: 0 0 8px rgba(96, 165, 250, .95), 0 0 22px rgba(37, 99, 235, .65);
   pointer-events: none;
   clip-path: inset(0 100% 0 0);
   opacity: 0;
@@ -121,7 +121,7 @@
   right: 1rem;
   bottom: 0;
   height: 2px;
-  background: linear-gradient(90deg, #fb7185, rgba(225, 29, 72, .55), transparent);
+  background: linear-gradient(90deg, #60a5fa, rgba(37, 99, 235, .55), transparent);
   transform: scaleX(0);
   transform-origin: left;
   pointer-events: none;
@@ -170,13 +170,13 @@ html[data-motion='eco'] .faixa-preta-motion-active .faixa-preta-strike {
 }
 
 body.tema-ninja {
-  --ninja-bg: #030303;
-  --ninja-primary: #18181b;
-  --ninja-accent: #e11d48; /* Crimson / Vermelho faixa preta */
-  --ninja-glow: rgba(228, 228, 231, 0.05);
-  background-image: 
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(228, 228, 231, 0.05), transparent),
-    radial-gradient(ellipse 50% 50% at 50% 100%, rgba(225, 29, 72, 0.03), transparent);
+  --ninja-bg: #06101e;
+  --ninja-primary: #102a4d;
+  --ninja-accent: #2563eb;
+  --ninja-glow: rgba(96, 165, 250, 0.08);
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(37, 99, 235, 0.14), transparent),
+    radial-gradient(ellipse 50% 50% at 50% 100%, rgba(6, 182, 212, 0.06), transparent);
 }
 
 /* Gradients */
@@ -196,7 +196,7 @@ body.tema-ninja .obsidian-card {
 
 body.tema-ninja .obsidian-card:hover {
   border-color: rgba(228, 228, 231, 0.15);
-  box-shadow: 
+  box-shadow:
     0 12px 40px -10px rgba(0, 0, 0, 0.8),
     0 0 25px -5px rgba(228, 228, 231, 0.08);
 }
@@ -205,26 +205,26 @@ body.tema-ninja .obsidian-card:hover {
 /* 1st Place - Elite Black Belt style (Carbon background with red/white borders) */
 body.tema-ninja .copa-podium-1 {
   background: linear-gradient(135deg, #09090b 0%, #18181b 60%, #030303 100%) !important;
-  border: 1px solid rgba(225, 29, 72, 0.35) !important;
-  box-shadow: 
+  border: 1px solid rgba(37, 99, 235, 0.35) !important;
+  box-shadow:
     0 20px 40px -15px rgba(0, 0, 0, 0.9),
-    0 0 25px -3px rgba(225, 29, 72, 0.12),
+    0 0 25px -3px rgba(37, 99, 235, 0.12),
     inset 0 1px 1px rgba(255, 255, 255, 0.02) !important;
 }
 
 body.tema-ninja .copa-podium-1:hover {
-  border-color: #e11d48 !important;
-  box-shadow: 
+  border-color: #2563eb !important;
+  box-shadow:
     0 25px 50px -12px rgba(0, 0, 0, 0.95),
-    0 0 35px -2px rgba(225, 29, 72, 0.25),
+    0 0 35px -2px rgba(37, 99, 235, 0.25),
     inset 0 1px 1px rgba(255, 255, 255, 0.05) !important;
 }
 
 body.tema-ninja .copa-podium-1 .podium-sparkle {
   color: #f4f4f5 !important;
-  background-color: rgba(225, 29, 72, 0.15) !important;
-  border-color: rgba(225, 29, 72, 0.35) !important;
-  box-shadow: 0 0 12px rgba(225, 29, 72, 0.25) !important;
+  background-color: rgba(37, 99, 235, 0.15) !important;
+  border-color: rgba(37, 99, 235, 0.35) !important;
+  box-shadow: 0 0 12px rgba(37, 99, 235, 0.25) !important;
   font-family: monospace;
 }
 
@@ -236,7 +236,7 @@ body.tema-ninja .copa-podium-1::after {
   top: 12px;
   font-size: 1.5rem;
   opacity: 0.22;
-  filter: drop-shadow(0 0 8px #e11d48);
+  filter: drop-shadow(0 0 8px #2563eb);
 }
 
 /* 2nd Place - Brushed Titanium/Silver */
@@ -262,9 +262,9 @@ body.tema-ninja .copa-podium-3:hover {
 }
 
 /* Progress micro-tracks inside cards and leaderboards */
-body.tema-ninja .copa-podium-1 .bg-yellow-400 {
-  background-color: #e11d48 !important;
-  box-shadow: 0 0 12px rgba(225, 29, 72, 0.6) !important;
+body.tema-ninja .copa-podium-1 .bg-cyan-400 {
+  background-color: #2563eb !important;
+  box-shadow: 0 0 12px rgba(37, 99, 235, 0.6) !important;
 }
 
 body.tema-ninja .copa-podium-2 .bg-slate-400 {
@@ -291,12 +291,12 @@ body.tema-ninja .copa-leaderboard-table > div:first-child {
 
 /* Rows styling in table */
 body.tema-ninja .copa-leaderboard-table .hover\:border-sky-500\/40:hover {
-  border-left-color: rgba(225, 29, 72, 0.45) !important;
+  border-left-color: rgba(37, 99, 235, 0.45) !important;
   background-color: rgba(228, 228, 231, 0.015) !important;
 }
 
-body.tema-ninja .copa-leaderboard-table .bg-yellow-500\/\[0\.02\] {
-  background-color: rgba(225, 29, 72, 0.02) !important;
+body.tema-ninja .copa-leaderboard-table .bg-cyan-500\/\[0\.02\] {
+  background-color: rgba(37, 99, 235, 0.02) !important;
 }
 
 body.tema-ninja .copa-leaderboard-table .bg-slate-500\/\[0\.02\] {
@@ -304,15 +304,15 @@ body.tema-ninja .copa-leaderboard-table .bg-slate-500\/\[0\.02\] {
 }
 
 /* Table micro-bar progress */
-body.tema-ninja .copa-leaderboard-table .bg-yellow-500 {
-  background-color: #e11d48 !important;
+body.tema-ninja .copa-leaderboard-table .bg-cyan-500 {
+  background-color: #2563eb !important;
 }
 
 body.tema-ninja .copa-leaderboard-table .bg-slate-400 {
   background-color: #a1a1aa !important;
 }
 
-body.tema-ninja .copa-leaderboard-table .bg-amber-600 {
+body.tema-ninja .copa-leaderboard-table .bg-blue-600 {
   background-color: #71717a !important;
 }
 
@@ -327,17 +327,17 @@ body.tema-ninja .copa-leaderboard-table .text-sky-400 {
   border-color: rgba(255, 255, 255, 0.12) !important;
 }
 
-body.tema-ninja .copa-leaderboard-table .text-emerald-400 {
-  color: #ef4444 !important;
-  background-color: rgba(239, 68, 68, 0.06) !important;
-  border-color: rgba(239, 68, 68, 0.2) !important;
+body.tema-ninja .copa-leaderboard-table .text-cyan-400 {
+  color: #3b82f6 !important;
+  background-color: rgba(59, 130, 246, 0.06) !important;
+  border-color: rgba(59, 130, 246, 0.2) !important;
 }
 
 /* Position badges in table */
-body.tema-ninja .copa-leaderboard-table .text-yellow-400 {
-  color: #ef4444 !important;
-  background-color: rgba(239, 68, 68, 0.1) !important;
-  border-color: rgba(239, 68, 68, 0.25) !important;
+body.tema-ninja .copa-leaderboard-table .text-cyan-400 {
+  color: #3b82f6 !important;
+  background-color: rgba(59, 130, 246, 0.1) !important;
+  border-color: rgba(59, 130, 246, 0.25) !important;
 }
 
 body.tema-ninja .copa-leaderboard-table .text-slate-300 {
@@ -346,7 +346,7 @@ body.tema-ninja .copa-leaderboard-table .text-slate-300 {
   border-color: rgba(228, 228, 231, 0.15) !important;
 }
 
-body.tema-ninja .copa-leaderboard-table .text-amber-500 {
+body.tema-ninja .copa-leaderboard-table .text-blue-500 {
   color: #a1a1aa !important;
   background-color: rgba(161, 161, 170, 0.08) !important;
   border-color: rgba(161, 161, 170, 0.15) !important;
@@ -361,7 +361,7 @@ body.tema-ninja .copa-leaderboard-table .group-hover\:text-sky-300 {
   color: #ffffff !important;
 }
 body.tema-ninja .copa-leaderboard-table .group:hover .group-hover\:text-sky-300 {
-  color: #ef4444 !important;
+  color: #3b82f6 !important;
 }
 
 /* Filter components style */
@@ -378,7 +378,7 @@ body.tema-ninja .hub-filter-btn[class*="text-white"] {
 }
 
 body.tema-ninja .hub-filter-btn:not([class*="text-white"]):hover {
-  color: #ef4444 !important;
+  color: #3b82f6 !important;
 }
 
 body.tema-ninja .hub-search-input {
@@ -387,13 +387,13 @@ body.tema-ninja .hub-search-input {
 }
 
 body.tema-ninja .hub-search-input:focus {
-  border-color: #ef4444 !important;
-  box-shadow: 0 0 15px rgba(239, 68, 68, 0.1) !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.1) !important;
 }
 
 /* Ninja Hero Header custom gradients */
 body.tema-ninja .ninja-hero-banner {
-  background: linear-gradient(180deg, rgba(239, 68, 68, 0.05) 0%, rgba(5, 5, 5, 0) 100%) !important;
+  background: linear-gradient(180deg, rgba(59, 130, 246, 0.05) 0%, rgba(5, 5, 5, 0) 100%) !important;
   border: 1px solid rgba(228, 228, 231, 0.05) !important;
   border-radius: 24px;
   padding: 3rem 2rem;
@@ -409,5 +409,5 @@ body.tema-ninja .ninja-hero-banner::before {
   left: 0;
   width: 100%;
   height: 4px;
-  background: linear-gradient(90deg, #000000 0%, #ef4444 35%, #000000 70%, #ef4444 100%);
+  background: linear-gradient(90deg, #000000 0%, #3b82f6 35%, #000000 70%, #3b82f6 100%);
 }

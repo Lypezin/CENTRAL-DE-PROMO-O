@@ -72,45 +72,45 @@ function PromoCardContent({ promo, preloadNinjaImage = false }: { promo: Promoca
         : isCopa ? 'Copa' : isRanking ? 'Disputa por ranking' : 'Campanha especial'
   const theme = isCopa
     ? {
-        bar: 'from-emerald-500 via-amber-300 to-emerald-500',
-        surface: 'from-[#17221b] via-[#101411] to-[#0a0d0b]',
-        glow: 'bg-amber-300/[.12]',
-        stamp: 'border-amber-200/30 bg-amber-200/10 text-amber-100',
-        city: 'text-emerald-50',
-        cityRule: 'bg-amber-300',
-        type: 'text-amber-100',
-        focusRing: 'group-focus-visible:ring-amber-200',
-        action: 'border-amber-200/25 bg-amber-200/10 text-amber-100 group-hover:bg-amber-200/20',
-        sweep: 'via-amber-100/[.12]',
+        bar: 'from-cyan-500 via-blue-300 to-cyan-500',
+        surface: 'from-[#142a40] via-[#0d1e31] to-[#081522]',
+        glow: 'bg-blue-300/[.12]',
+        stamp: 'border-blue-200/30 bg-blue-200/10 text-blue-100',
+        city: 'text-cyan-50',
+        cityRule: 'bg-blue-300',
+        type: 'text-blue-100',
+        focusRing: 'group-focus-visible:ring-blue-200',
+        action: 'border-blue-200/25 bg-blue-200/10 text-blue-100 group-hover:bg-blue-200/20',
+        sweep: 'via-blue-100/[.12]',
       }
     : isFaixaPreta
       ? {
-          bar: 'from-zinc-950 via-rose-500 to-red-700',
-          surface: 'from-[#1a1113] via-[#100e0f] to-[#0a090a]',
-          glow: 'bg-rose-500/[.15]',
-          stamp: 'border-rose-200/25 bg-rose-400/10 text-rose-100',
+          bar: 'from-slate-950 via-blue-400 to-cyan-500',
+          surface: 'from-[#102a4d] via-[#0a1c33] to-[#071321]',
+          glow: 'bg-blue-500/[.15]',
+          stamp: 'border-blue-200/25 bg-blue-400/10 text-blue-100',
           city: 'text-white',
-          cityRule: 'bg-rose-500',
-          type: 'text-rose-100',
-          focusRing: 'group-focus-visible:ring-rose-300',
-          action: 'border-rose-300/30 bg-rose-500/10 text-rose-100 group-hover:bg-rose-500/20',
-          sweep: 'via-rose-100/[.14]',
+          cityRule: 'bg-blue-500',
+          type: 'text-blue-100',
+          focusRing: 'group-focus-visible:ring-blue-300',
+          action: 'border-blue-300/30 bg-blue-500/10 text-blue-100 group-hover:bg-blue-500/20',
+          sweep: 'via-blue-100/[.14]',
         }
       : {
-          bar: 'from-lime-700 via-lime-300 to-emerald-500',
-          surface: 'from-[#132019] via-[#0f1310] to-[#090d0b]',
-          glow: 'bg-lime-300/[.11]',
-          stamp: 'border-lime-200/20 bg-lime-300/10 text-lime-100',
+          bar: 'from-sky-700 via-sky-300 to-cyan-500',
+          surface: 'from-[#11283d] via-[#0b1c2d] to-[#071421]',
+          glow: 'bg-sky-300/[.11]',
+          stamp: 'border-sky-200/20 bg-sky-300/10 text-sky-100',
           city: 'text-white',
-          cityRule: 'bg-lime-300',
-          type: 'text-lime-100',
-          focusRing: 'group-focus-visible:ring-lime-300',
-          action: 'border-lime-200/25 bg-lime-300/10 text-lime-100 group-hover:bg-lime-300/20',
-          sweep: 'via-lime-100/[.12]',
+          cityRule: 'bg-sky-300',
+          type: 'text-sky-100',
+          focusRing: 'group-focus-visible:ring-sky-300',
+          action: 'border-sky-200/25 bg-sky-300/10 text-sky-100 group-hover:bg-sky-300/20',
+          sweep: 'via-sky-100/[.12]',
         }
 
   return (
-    <article ref={cardRef} className={`promo-card-shell @container/card relative isolate flex h-full min-h-[380px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br ${theme.surface} shadow-[0_18px_44px_-28px_rgba(0,0,0,0.95)] transition duration-300 group-hover:-translate-y-1 group-focus-visible:-translate-y-1 group-hover:border-white/20 group-focus-visible:border-white/20 group-hover:shadow-[0_24px_50px_-25px_rgba(0,0,0,0.95)] group-focus-visible:shadow-[0_24px_50px_-25px_rgba(0,0,0,0.95)] group-focus-visible:ring-2 group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-[#090d0d] ${theme.focusRing} motion-reduce:transform-none motion-reduce:transition-none ${isFaixaPreta ? 'faixa-preta-card' : ''} ${motionActive ? 'faixa-preta-motion-active' : ''}`}>
+    <article ref={cardRef} className={`promo-card-shell @container/card relative isolate flex h-full min-h-[380px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br ${theme.surface} shadow-[0_18px_44px_-28px_rgba(0,0,0,0.95)] transition duration-300 group-hover:-translate-y-1 group-focus-visible:-translate-y-1 group-hover:border-white/20 group-focus-visible:border-white/20 group-hover:shadow-[0_24px_50px_-25px_rgba(0,0,0,0.95)] group-focus-visible:shadow-[0_24px_50px_-25px_rgba(0,0,0,0.95)] group-focus-visible:ring-2 group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-[#0b1b2c] ${theme.focusRing} motion-reduce:transform-none motion-reduce:transition-none ${isFaixaPreta ? 'faixa-preta-card' : ''} ${motionActive ? 'faixa-preta-motion-active' : ''}`}>
       <div className={`h-1.5 w-full shrink-0 bg-gradient-to-r ${theme.bar}`} aria-hidden="true" />
       <div className="promo-card-glint pointer-events-none absolute left-0 top-0 z-30 h-1.5 w-[34%]" aria-hidden="true" />
       <div className={`pointer-events-none absolute -right-14 -top-12 h-52 w-52 rounded-full blur-3xl ${theme.glow}`} aria-hidden="true" />
@@ -120,7 +120,7 @@ function PromoCardContent({ promo, preloadNinjaImage = false }: { promo: Promoca
       {isFaixaPreta && (
         <div className="faixa-preta-ninja-art pointer-events-none absolute right-0 top-6 z-0 h-[270px] w-[58%] overflow-hidden sm:h-[300px]" aria-hidden="true">
           <Image
-            src="/images/faixa-preta-ninja.webp"
+            src="/images/faixa-preta-ninja-blue.webp"
             alt=""
             width={800}
             height={1200}

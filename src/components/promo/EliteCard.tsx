@@ -102,22 +102,22 @@ export default function EliteCard({ config }: { config: EliteConfig }) {
 
   return (
     <section className="animate-slide-up">
-      <div className="overflow-hidden rounded-[22px] border border-amber-500/15 bg-[linear-gradient(180deg,rgba(10,10,12,0.98),rgba(7,7,8,0.98))] shadow-[0_24px_80px_rgba(0,0,0,0.35)]">
-        <div className="h-[5px] bg-gradient-to-r from-amber-500 via-yellow-300 to-amber-500" />
+      <div className="overflow-hidden rounded-[22px] border border-blue-500/15 bg-[linear-gradient(180deg,rgba(10,10,12,0.98),rgba(7,7,8,0.98))] shadow-[0_24px_80px_rgba(0,0,0,0.35)]">
+        <div className="h-[5px] bg-gradient-to-r from-blue-500 via-cyan-300 to-blue-500" />
 
         <div className="border-b border-white/[0.04] p-5 md:p-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
-              <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-amber-300">
-                <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+              <div className="inline-flex items-center gap-2 rounded-full border border-blue-500/20 bg-blue-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-blue-300">
+                <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
                 ELITE
               </div>
               <h2 className="mt-4 text-2xl font-black tracking-tight text-white md:text-3xl">{config.page_title}</h2>
               <p className="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-400">{config.page_description}</p>
             </div>
 
-            <div className="rounded-2xl border border-amber-500/20 bg-amber-500/10 p-4 lg:min-w-[220px]">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-amber-300">Meta mensal</div>
+            <div className="rounded-2xl border border-blue-500/20 bg-blue-500/10 p-4 lg:min-w-[220px]">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-blue-300">Meta mensal</div>
               <div className="mt-2 text-3xl font-black text-white">{config.target}</div>
               <div className="text-[11px] text-zinc-400">pedidos aceitos e concluidos</div>
             </div>
@@ -147,7 +147,7 @@ export default function EliteCard({ config }: { config: EliteConfig }) {
                         }}
                         className={`whitespace-nowrap rounded-xl border px-3 py-2 text-[11px] font-bold capitalize transition-all ${
                           selectedMonth === month.value
-                            ? 'border-amber-400/40 bg-amber-500/12 text-amber-200'
+                            ? 'border-blue-400/40 bg-blue-500/12 text-blue-200'
                             : 'border-zinc-800 bg-zinc-950/80 text-zinc-500 hover:border-zinc-700 hover:text-zinc-300'
                         }`}
                       >
@@ -155,7 +155,7 @@ export default function EliteCard({ config }: { config: EliteConfig }) {
                       </button>
                     ))
                   ) : (
-                    <div role="status" className="max-w-lg rounded-xl border border-amber-400/20 bg-amber-400/5 px-4 py-3 text-sm leading-6 text-zinc-300">
+                    <div role="status" className="max-w-lg rounded-xl border border-blue-400/20 bg-blue-400/5 px-4 py-3 text-sm leading-6 text-zinc-300">
                       Ainda não há dados ELITE para consulta. A equipe de gestão precisa importar a planilha mensal; tente novamente depois da atualização.
                     </div>
                   )}
@@ -179,13 +179,13 @@ export default function EliteCard({ config }: { config: EliteConfig }) {
                       }
                     }}
                     placeholder="Digite o nome"
-                    className="w-full rounded-xl border border-zinc-800 bg-black/30 px-3 py-3 text-sm text-white outline-none transition-all placeholder:text-zinc-600 focus:border-amber-400/50 focus:ring-2 focus:ring-amber-400/10"
+                    className="w-full rounded-xl border border-zinc-800 bg-black/30 px-3 py-3 text-sm text-white outline-none transition-all placeholder:text-zinc-600 focus:border-blue-400/50 focus:ring-2 focus:ring-blue-400/10"
                   />
                   <button
                     type="button"
                     onClick={handleLookup}
                     disabled={loadingMonths || loadingResults || !selectedMonth}
-                    className="inline-flex items-center justify-center rounded-xl border border-amber-400/25 bg-amber-500/12 px-4 py-3 text-[11px] font-black uppercase tracking-[0.18em] text-amber-200 transition-all hover:bg-amber-500/18 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="inline-flex items-center justify-center rounded-xl border border-blue-400/25 bg-blue-500/12 px-4 py-3 text-[11px] font-black uppercase tracking-[0.18em] text-blue-200 transition-all hover:bg-blue-500/18 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {loadingResults ? 'Consultando...' : 'Pesquisar'}
                   </button>
@@ -227,14 +227,14 @@ export default function EliteCard({ config }: { config: EliteConfig }) {
                     <div key={`${result.entregadorId}:${result.nome}:${result.praca}`} className="px-4 py-4 md:px-5">
                       <div className="flex flex-col gap-3 md:grid md:grid-cols-[minmax(0,1.6fr)_140px_180px] md:items-center md:gap-4">
                         <div className="min-w-0">
-                          <div className={`truncate text-sm font-black ${result.isElite ? 'text-amber-200' : 'text-white'}`}>
+                          <div className={`truncate text-sm font-black ${result.isElite ? 'text-blue-200' : 'text-white'}`}>
                             {result.nome}
                           </div>
                           <div className="mt-1 truncate text-[11px] text-zinc-500">{result.praca}</div>
                           <div className="mt-3 h-2 overflow-hidden rounded-full bg-zinc-900">
                             <div
                               className={`h-full rounded-full transition-all duration-500 ${
-                                result.isElite ? 'bg-[linear-gradient(90deg,#facc15,#f59e0b,#fde68a)]' : 'bg-zinc-500'
+                                result.isElite ? 'bg-[linear-gradient(90deg,#38bdf8,#2563eb,#bae6fd)]' : 'bg-zinc-500'
                               }`}
                               style={{ width: `${progress}%` }}
                             />
@@ -249,7 +249,7 @@ export default function EliteCard({ config }: { config: EliteConfig }) {
                         <div className="flex items-center justify-between md:block md:text-right">
                           <div className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 md:hidden">Status</div>
                           {result.isElite ? (
-                            <div className="inline-flex rounded-full border border-amber-400/30 bg-amber-500/10 px-3 py-1 text-[11px] font-black uppercase tracking-[0.16em] text-amber-200">
+                            <div className="inline-flex rounded-full border border-blue-400/30 bg-blue-500/10 px-3 py-1 text-[11px] font-black uppercase tracking-[0.16em] text-blue-200">
                               Elite
                             </div>
                           ) : (

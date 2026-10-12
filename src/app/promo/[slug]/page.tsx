@@ -14,7 +14,7 @@ export default async function PromoPage({ params }: { params: Promise<{ slug: st
     .eq('slug', slug)
     .in('status', ['ativa', 'encerrada'])
     .maybeSingle()
-  
+
   if (error || !promo || promo.config_regras?.elite_internal) {
     notFound()
   }
@@ -75,20 +75,20 @@ export default async function PromoPage({ params }: { params: Promise<{ slug: st
           <span className="absolute text-zinc-600/20 text-2xl animate-[spin_8s_linear_infinite] select-none pointer-events-none" style={{ top: '15%', left: '8%' }}>✦</span>
           <span className="absolute text-zinc-500/15 text-3xl animate-[spin_5s_linear_infinite_reverse] select-none pointer-events-none" style={{ bottom: '20%', right: '10%' }}>✦</span>
           <span className="absolute text-zinc-400/10 text-xl filter drop-shadow-[0_0_8px_rgba(255,255,255,0.2)] select-none pointer-events-none" style={{ top: '55%', left: '85%' }}>🗡️</span>
-          
+
           <div className="flex flex-col items-center gap-4 relative z-10 w-full">
-            <div className="text-xs sm:text-sm md:text-base mb-2 text-rose-500 font-extrabold tracking-widest uppercase drop-shadow-[0_0_12px_rgba(225,29,72,0.3)]">🥋 Edição Especial Faixa Preta</div>
-            
+            <div className="text-xs sm:text-sm md:text-base mb-2 text-blue-500 font-extrabold tracking-widest uppercase drop-shadow-[0_0_12px_rgba(37,99,235,0.3)]">🥋 Edição Especial Faixa Preta</div>
+
             {promo.cidade && (
-              <span className="inline-flex items-center text-[10px] sm:text-xs font-bold tracking-wider uppercase border px-3 py-1.5 rounded-md font-mono bg-zinc-950/80 border-rose-950/40 text-zinc-300 shadow-[0_0_15px_rgba(225,29,72,0.08)]">
+              <span className="inline-flex items-center text-[10px] sm:text-xs font-bold tracking-wider uppercase border px-3 py-1.5 rounded-md font-mono bg-zinc-950/80 border-blue-950/40 text-zinc-300 shadow-[0_0_15px_rgba(37,99,235,0.08)]">
                 Praça: {promo.cidade}
               </span>
             )}
-            
+
             <h1 className="text-[28px] leading-8 sm:text-4xl md:text-6xl font-black text-white sm:leading-tight tracking-tight mt-1 mb-1 text-gradient-ninja">
               {promo.nome}
             </h1>
-            
+
             <p className="text-zinc-400 max-w-2xl text-[13px] sm:text-sm md:text-base leading-relaxed mt-1 mb-6 font-medium">
               {promo.descricao || 'Sem descrição.'}
             </p>
@@ -115,7 +115,7 @@ export default async function PromoPage({ params }: { params: Promise<{ slug: st
                   </svg>
                   <span className="font-mono text-[11px] sm:text-xs md:text-sm font-black tracking-tight whitespace-nowrap drop-shadow-md">
                     {minData && maxData ? (
-                      minData === maxData 
+                      minData === maxData
                         ? `Dia ${formatData(minData)}`
                         : `${formatData(minData)} — ${formatData(maxData)}`
                     ) : (
@@ -133,7 +133,7 @@ export default async function PromoPage({ params }: { params: Promise<{ slug: st
           <span className="copa-hero-ball" style={{ top: '12%', left: '5%' }}>⚽</span>
           <span className="copa-hero-ball" style={{ bottom: '15%', right: '8%' }}>⚽</span>
           <span className="copa-hero-ball" style={{ top: '60%', left: '85%' }}>⚽</span>
-          
+
           {/* Estrelas ★ decorativas */}
           <span className="copa-hero-star text-[10px]" style={{ top: '18%', right: '15%' }}>★</span>
           <span className="copa-hero-star text-[8px]" style={{ top: '70%', left: '12%' }}>★</span>
@@ -141,17 +141,17 @@ export default async function PromoPage({ params }: { params: Promise<{ slug: st
 
           <div className="flex flex-col items-center gap-4 relative z-10 w-full">
             <div className="copa-hero-subtitle text-xs sm:text-sm md:text-base mb-2">🏆 Edição Especial Copa do Mundo</div>
-            
+
             {promo.cidade && (
-              <span className="inline-flex items-center text-[10px] sm:text-xs font-bold tracking-wider uppercase border px-3 py-1.5 rounded-md font-mono backdrop-blur-sm bg-emerald-950/60 border-emerald-500/60 text-emerald-100 shadow-[0_0_15px_rgba(16,185,129,0.4)]">
+              <span className="inline-flex items-center text-[10px] sm:text-xs font-bold tracking-wider uppercase border px-3 py-1.5 rounded-md font-mono backdrop-blur-sm bg-cyan-950/60 border-cyan-500/60 text-cyan-100 shadow-[0_0_15px_rgba(6,182,212,0.4)]">
                 Praça: {promo.cidade}
               </span>
             )}
-            
+
             <h1 className="text-[28px] leading-8 sm:text-4xl md:text-6xl font-black text-white sm:leading-tight tracking-tight text-gradient-neon gold-text-glow mt-1 mb-1">
               {promo.nome}
             </h1>
-            
+
             <p className="text-zinc-300 max-w-2xl text-[13px] sm:text-sm md:text-base leading-relaxed mt-1 mb-6 font-medium">
               {promo.descricao || 'Sem descrição.'}
             </p>
@@ -159,7 +159,7 @@ export default async function PromoPage({ params }: { params: Promise<{ slug: st
             {/* Slider de Datas Mobile (Swipe UX) / Grid no Desktop */}
             <div className="flex flex-row overflow-x-auto sm:overflow-visible snap-x snap-mandatory pb-4 sm:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none w-[calc(100%+32px)] sm:w-full max-w-3xl gap-3 sm:gap-4">
               <div className="snap-center min-w-[85%] sm:min-w-0 copa-date-card p-3.5 sm:p-4 md:p-5 shadow-lg flex-1 text-left relative overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <div className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider font-mono mb-1.5 sm:mb-2 copa-date-label relative z-10">Período de Validade</div>
                 <div className="text-zinc-100 flex items-center gap-2 relative z-10">
                   <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 copa-date-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -170,15 +170,15 @@ export default async function PromoPage({ params }: { params: Promise<{ slug: st
               </div>
 
               <div className="snap-center min-w-[85%] sm:min-w-0 copa-date-card p-3.5 sm:p-4 md:p-5 shadow-lg flex-1 text-left relative overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <div className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider font-mono mb-1.5 sm:mb-2 copa-date-label relative z-10">Período dos Dados</div>
-                <div className="flex items-center gap-2 text-emerald-300 relative z-10">
+                <div className="flex items-center gap-2 text-cyan-300 relative z-10">
                   <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-pulse shrink-0 copa-date-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   <span className="font-mono text-[11px] sm:text-xs md:text-sm font-black tracking-tight whitespace-nowrap drop-shadow-md">
                     {minData && maxData ? (
-                      minData === maxData 
+                      minData === maxData
                         ? `Dia ${formatData(minData)}`
                         : `${formatData(minData)} — ${formatData(maxData)}`
                     ) : (
@@ -215,7 +215,7 @@ export default async function PromoPage({ params }: { params: Promise<{ slug: st
               {promo.descricao || 'Sem descrição.'}
             </p>
           </div>
-          
+
           <div className="flex flex-col sm:flex-row lg:flex-col lg:w-auto lg:min-w-[280px] gap-3.5 shrink-0 w-full">
             <div className="obsidian-card p-4 md:p-5 shadow-lg flex-1">
               <div className="text-[9px] font-bold uppercase tracking-wider font-mono mb-2 text-zinc-500">Período de Validade</div>
@@ -229,13 +229,13 @@ export default async function PromoPage({ params }: { params: Promise<{ slug: st
 
             <div className="obsidian-card p-4 md:p-5 shadow-lg flex-1">
               <div className="text-[9px] font-bold uppercase tracking-wider font-mono mb-2 text-zinc-500">Período dos Dados</div>
-              <div className="flex items-center gap-2 text-emerald-400">
-                <svg className="w-4 h-4 animate-pulse shrink-0 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="flex items-center gap-2 text-cyan-400">
+                <svg className="w-4 h-4 animate-pulse shrink-0 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <span className="font-mono text-[11px] sm:text-xs md:text-sm font-bold tracking-tight whitespace-nowrap">
                   {minData && maxData ? (
-                    minData === maxData 
+                    minData === maxData
                       ? `Dia ${formatData(minData)}`
                       : `${formatData(minData)} — ${formatData(maxData)}`
                   ) : (
@@ -252,16 +252,16 @@ export default async function PromoPage({ params }: { params: Promise<{ slug: st
       {/* Main Campaign Data Grid */}
       <div className="mb-12">
         {promo.tipo === 'ranking_turno' ? (
-          <RankingTurno 
+          <RankingTurno
             promocaoSlug={promo.slug}
-            configPremios={configPremios} 
-            configTurnos={configTurnos} 
+            configPremios={configPremios}
+            configTurnos={configTurnos}
             configRegras={configRegrasPublicas}
             isCopa={promo.destaque_copa}
             isNinja={isNinja}
           />
         ) : (
-          <div className="text-center p-12 bg-[#08080a] border border-white/[0.04] rounded-2xl text-zinc-500 text-xs font-mono">
+          <div className="text-center p-12 bg-[#0b1a2d] border border-white/[0.04] rounded-2xl text-zinc-500 text-xs font-mono">
             Este tipo de promoção ainda não é suportado pela interface.
           </div>
         )}

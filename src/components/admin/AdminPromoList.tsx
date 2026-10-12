@@ -137,7 +137,7 @@ export default function AdminPromoList({ promocoes, loading, onReorder, elitePro
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Buscar promocao por nome, cidade ou slug..."
-          className="w-full rounded-xl border border-white/10 bg-[#0a0a0c] py-2.5 pl-10 pr-4 text-sm text-white placeholder-zinc-500 transition-all focus:border-sky-500/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0c]"
+          className="w-full rounded-xl border border-white/10 bg-[#0a1829] py-2.5 pl-10 pr-4 text-sm text-white placeholder-zinc-500 transition-all focus:border-sky-500/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1829]"
           aria-label="Buscar promocoes"
         />
         {searchQuery && (
@@ -162,17 +162,17 @@ export default function AdminPromoList({ promocoes, loading, onReorder, elitePro
       )}
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-        <article className="obsidian-card group relative flex flex-col overflow-hidden rounded-2xl border border-amber-500/20 bg-[linear-gradient(135deg,rgba(23,18,10,0.96),rgba(8,8,8,0.98))] shadow-xl shadow-black/40 transition-all duration-300 hover:border-amber-400/35">
-          <div className="h-1 w-full bg-gradient-to-r from-amber-500 via-yellow-300 to-amber-500 shadow-[0_2px_15px_rgba(251,191,36,0.25)]"></div>
+        <article className="obsidian-card group relative flex flex-col overflow-hidden rounded-2xl border border-blue-500/20 bg-[linear-gradient(135deg,rgba(23,18,10,0.96),rgba(8,8,8,0.98))] shadow-xl shadow-black/40 transition-all duration-300 hover:border-blue-400/35">
+          <div className="h-1 w-full bg-gradient-to-r from-blue-500 via-cyan-300 to-blue-500 shadow-[0_2px_15px_rgba(251,191,36,0.25)]"></div>
           <div className="flex flex-grow flex-col p-5">
             <div className="mb-4 flex items-start justify-between">
               <StatusBadge status="ativa" />
-              <span className="rounded px-2 py-1 font-mono text-[9px] font-black uppercase tracking-wider text-amber-200 border border-amber-500/30 bg-amber-950/30 shadow-inner">
+              <span className="rounded px-2 py-1 font-mono text-[9px] font-black uppercase tracking-wider text-blue-200 border border-blue-500/30 bg-blue-950/30 shadow-inner">
                 ELITE
               </span>
             </div>
 
-            <h3 className="mb-1 text-lg font-black leading-tight text-white transition-colors group-hover:text-amber-200">Consulta ELITE</h3>
+            <h3 className="mb-1 text-lg font-black leading-tight text-white transition-colors group-hover:text-blue-200">Consulta ELITE</h3>
             <p className="mb-4 font-mono text-xs text-zinc-500 opacity-70">{elitePromoId ? `/admin/promo/${elitePromoId}` : '/admin/elite'}</p>
 
             <p className="mb-5 text-sm leading-relaxed text-zinc-400">
@@ -188,12 +188,12 @@ export default function AdminPromoList({ promocoes, loading, onReorder, elitePro
               <div className="flex items-center gap-2">
                 <Link
                   href="/admin/elite"
-                  className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-[11px] font-bold text-zinc-200 transition-all hover:border-amber-400/40 hover:text-white"
+                  className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-[11px] font-bold text-zinc-200 transition-all hover:border-blue-400/40 hover:text-white"
                 >
                   Layout
                 </Link>
                 <Tooltip content="Abrir base do ELITE">
-                  <Link href={elitePromoId ? `/admin/promo/${elitePromoId}` : '/admin/elite'} className="flex items-center gap-1.5 rounded-lg border border-amber-500/20 bg-amber-950/25 px-4 py-2 text-xs font-bold text-amber-200 transition-all hover:border-amber-400 hover:bg-amber-500 hover:text-black active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300">
+                  <Link href={elitePromoId ? `/admin/promo/${elitePromoId}` : '/admin/elite'} className="flex items-center gap-1.5 rounded-lg border border-blue-500/20 bg-blue-950/25 px-4 py-2 text-xs font-bold text-blue-200 transition-all hover:border-blue-400 hover:bg-blue-500 hover:text-black active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">
                     Planilha
                     <svg className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
@@ -240,7 +240,7 @@ export default function AdminPromoList({ promocoes, loading, onReorder, elitePro
                 <div
                   role="note"
                   aria-label={`Aviso: prazo encerrado em ${formatDeadline(promo.data_fim)}`}
-                  className="mb-4 flex items-start gap-2 rounded-lg border border-amber-400/60 bg-amber-950/70 px-3 py-2 text-sm leading-5 text-amber-100"
+                  className="mb-4 flex items-start gap-2 rounded-lg border border-blue-400/60 bg-blue-950/70 px-3 py-2 text-sm leading-5 text-blue-100"
                 >
                   <svg className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3.75m0 3h.008v.008H12v-.008zM10.29 3.86 1.82 18.14A2 2 0 0 0 3.54 21h16.92a2 2 0 0 0 1.72-2.86L13.71 3.86a2 2 0 0 0-3.42 0z" />

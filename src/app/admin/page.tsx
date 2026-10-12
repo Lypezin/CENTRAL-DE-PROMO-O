@@ -29,7 +29,7 @@ export default function AdminPage() {
   const router = useRouter()
   const toast = useToast()
   const { session, retrying, setAuthenticated, setUnauthenticated, retrySession } = useAdminSession()
-  
+
   const [promocoes, setPromocoes] = useState<Promocao[]>([])
   const [loading, setLoading] = useState(true)
   const [elitePromoId, setElitePromoId] = useState('')
@@ -142,7 +142,7 @@ export default function AdminPage() {
   const handleReorder = async (newOrder: Promocao[]) => {
     const previousOrder = promocoes
     setPromocoes(newOrder)
-    
+
     try {
       const updates = newOrder.map((promo) => ({
         id: promo.id,
@@ -168,7 +168,7 @@ export default function AdminPage() {
 
   if (session.status === 'checking') {
     return (
-      <main className="flex min-h-[60vh] items-center justify-center bg-[#030303] text-center">
+      <main className="flex min-h-[60vh] items-center justify-center bg-[#06101e] text-center">
         <div>
           <span className="mx-auto block h-5 w-5 animate-spin rounded-full border-2 border-sky-300/25 border-t-sky-300" aria-hidden="true" />
           <p className="mt-3 text-sm text-zinc-400">Verificando acesso administrativo…</p>
@@ -179,11 +179,11 @@ export default function AdminPage() {
 
   if (session.status === 'unavailable') {
     return (
-      <main className="flex min-h-[60vh] items-center justify-center bg-[#030303] px-5 text-center text-white">
-        <section className="max-w-md rounded-2xl border border-amber-300/20 bg-[#0a0c0c] p-6 shadow-xl">
-          <p className="text-lg font-black text-amber-200">Não foi possível verificar o acesso</p>
+      <main className="flex min-h-[60vh] items-center justify-center bg-[#06101e] px-5 text-center text-white">
+        <section className="max-w-md rounded-2xl border border-rose-300/20 bg-[#0b1b2c] p-6 shadow-xl">
+          <p className="text-lg font-black text-rose-200">Não foi possível verificar o acesso</p>
           <p role="alert" className="mt-2 text-sm leading-6 text-zinc-400">O serviço de sessão está temporariamente indisponível. Sua sessão não foi encerrada; tente verificar novamente.</p>
-          <button type="button" onClick={() => void retrySession()} disabled={retrying} className="mt-5 min-h-11 rounded-lg bg-lime-300 px-4 text-sm font-black text-zinc-950 transition-colors hover:bg-lime-200 disabled:cursor-wait disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white">
+          <button type="button" onClick={() => void retrySession()} disabled={retrying} className="mt-5 min-h-11 rounded-lg bg-sky-300 px-4 text-sm font-black text-zinc-950 transition-colors hover:bg-sky-200 disabled:cursor-wait disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white">
             {retrying ? 'Verificando…' : 'Tentar novamente'}
           </button>
         </section>
@@ -199,7 +199,7 @@ export default function AdminPage() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="min-h-screen pb-16 relative overflow-hidden bg-[#030303]"
+      className="min-h-screen pb-16 relative overflow-hidden bg-[#06101e]"
     >
       <div className="tech-grid opacity-30 pointer-events-none"></div>
       <div className="absolute top-0 inset-x-0 h-[300px] bg-gradient-to-b from-sky-500/5 to-transparent pointer-events-none"></div>
@@ -219,12 +219,12 @@ export default function AdminPage() {
             <h1 className="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">Painel Administrativo</h1>
             <p className="text-zinc-400 text-sm md:text-base">Gerenciamento central de promoções e relatórios. Bem-vindo, <span className="text-white font-medium">{session.name}</span>.</p>
           </div>
-          
+
           <div className="flex flex-wrap justify-center md:justify-end gap-3 w-full md:w-auto">
             <motion.button
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
-              onClick={handleLogout} 
+              onClick={handleLogout}
               className="bg-zinc-900 hover:bg-red-950/40 text-zinc-400 hover:text-red-400 border border-white/[0.04] hover:border-red-500/30 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all"
               aria-label="Encerrar sessão"
             >
@@ -258,17 +258,17 @@ export default function AdminPage() {
         <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
           <motion.div
             whileHover={{ scale: 1.02 }}
-            className="obsidian-card p-6 rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-[#050806] to-emerald-950/20 relative overflow-hidden group flex items-center justify-between transition-all hover:border-emerald-500/40"
+            className="obsidian-card p-6 rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-[#081725] to-cyan-950/20 relative overflow-hidden group flex items-center justify-between transition-all hover:border-cyan-500/40"
           >
-            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-emerald-500/10 blur-[30px] rounded-full group-hover:bg-emerald-500/20 transition-colors"></div>
+            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-cyan-500/10 blur-[30px] rounded-full group-hover:bg-cyan-500/20 transition-colors"></div>
             <div className="relative z-10">
-              <div className="text-[10px] font-bold text-emerald-500/80 uppercase tracking-wider font-mono mb-2 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+              <div className="text-[10px] font-bold text-cyan-500/80 uppercase tracking-wider font-mono mb-2 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-cyan-500 animate-ping"></span>
                 Pessoas Conectadas Agora
               </div>
               <div className="text-4xl font-black text-white font-mono tracking-tighter">{onlineCount}</div>
             </div>
-            <div className="text-emerald-400 bg-emerald-500/10 p-4 rounded-2xl border border-emerald-500/20 relative z-10">
+            <div className="text-cyan-400 bg-cyan-500/10 p-4 rounded-2xl border border-cyan-500/20 relative z-10">
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
               </svg>
@@ -277,7 +277,7 @@ export default function AdminPage() {
 
           <motion.div
             whileHover={{ scale: 1.02 }}
-            className="obsidian-card p-6 rounded-2xl border border-sky-500/20 bg-gradient-to-br from-[#050608] to-sky-950/20 relative overflow-hidden group flex items-center justify-between transition-all hover:border-sky-500/40"
+            className="obsidian-card p-6 rounded-2xl border border-sky-500/20 bg-gradient-to-br from-[#081725] to-sky-950/20 relative overflow-hidden group flex items-center justify-between transition-all hover:border-sky-500/40"
           >
             <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-sky-500/10 blur-[30px] rounded-full group-hover:bg-sky-500/20 transition-colors"></div>
             <div className="relative z-10">

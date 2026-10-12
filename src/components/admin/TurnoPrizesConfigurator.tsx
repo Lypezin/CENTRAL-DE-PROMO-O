@@ -45,17 +45,17 @@ export default function TurnoPrizesConfigurator({
     const novosTurnos = activeTurnos.includes(turno)
       ? activeTurnos.filter(t => t !== turno)
       : [...activeTurnos, turno]
-      
+
     if (novosTurnos.length === 0) {
       toast.warning('Pelo menos um turno deve estar ativo!')
       return
     }
-    
+
     if (turnoEditorAtivo === turno && activeTurnos.includes(turno)) {
       const remainingActive = novosTurnos.filter(t => t !== turno)
       setTurnoEditorAtivo(remainingActive[0] || novosTurnos[0])
     }
-    
+
     setActiveTurnos(novosTurnos)
     await handleUpdate({ config_turnos: novosTurnos })
   }
@@ -120,7 +120,7 @@ export default function TurnoPrizesConfigurator({
       const gruposAtuais = prev ?? []
       const exists = gruposAtuais.some(t => t.turno === turnoEditorAtivo)
       const novoId = Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
-      
+
       if (!exists) {
         return [...gruposAtuais, {
           turno: turnoEditorAtivo,
@@ -128,7 +128,7 @@ export default function TurnoPrizesConfigurator({
           premios: [{ id: novoId, posicao: 1, valor: 100 }]
         }]
       }
-      
+
       return gruposAtuais.map(t => {
         if (t.turno === turnoEditorAtivo) {
           const premiosAtuais = t.premios || []
@@ -203,7 +203,7 @@ export default function TurnoPrizesConfigurator({
   const isGeral = promo.config_regras?.mecanica?.agrupamento === 'geral'
 
   return (
-    <div className="rounded-xl border border-white/[0.04] bg-[#08080a] p-5 space-y-4">
+    <div className="rounded-xl border border-white/[0.04] bg-[#0b1a2d] p-5 space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-xs font-bold text-zinc-400 uppercase tracking-wider font-mono flex items-center gap-2">
@@ -226,8 +226,8 @@ export default function TurnoPrizesConfigurator({
                   onClick={() => handleToggleTurno(t.key)}
                   aria-pressed={isChecked}
                   className={`flex min-h-11 items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 ${
-                    isChecked 
-                      ? 'bg-sky-500/10 border-sky-500/30 text-white' 
+                    isChecked
+                      ? 'bg-sky-500/10 border-sky-500/30 text-white'
                       : 'border-white/[0.04] text-zinc-500 hover:text-zinc-300 hover:border-white/10'
                   }`}
                 >
@@ -248,7 +248,7 @@ export default function TurnoPrizesConfigurator({
       )}
 
       {/* Tab selector */}
-      <div role="group" aria-label="Selecionar turno para editar prêmios" className="flex bg-[#0a0a0c] p-0.5 rounded-lg border border-white/[0.04] gap-0.5 overflow-x-auto scrollbar-none">
+      <div role="group" aria-label="Selecionar turno para editar prêmios" className="flex bg-[#0a1829] p-0.5 rounded-lg border border-white/[0.04] gap-0.5 overflow-x-auto scrollbar-none">
         {isGeral ? (
           <span className="inline-flex min-h-11 items-center rounded-md bg-sky-600 px-3 py-1.5 text-xs font-bold text-white">
             Geral
@@ -261,8 +261,8 @@ export default function TurnoPrizesConfigurator({
               onClick={() => setTurnoEditorAtivo(t.key)}
               aria-pressed={turnoEditorAtivo === t.key}
               className={`flex min-h-11 flex-1 min-w-[80px] items-center justify-center px-2.5 py-1.5 rounded-md text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 ${
-                turnoEditorAtivo === t.key 
-                  ? 'bg-sky-600 text-white' 
+                turnoEditorAtivo === t.key
+                  ? 'bg-sky-600 text-white'
                   : 'text-zinc-500 hover:text-white hover:bg-white/5'
               }`}
             >
@@ -273,7 +273,7 @@ export default function TurnoPrizesConfigurator({
       </div>
 
       {/* Eligibility rule */}
-      <div className="bg-[#0a0a0c] border border-white/[0.04] rounded-lg p-3 space-y-2">
+      <div className="bg-[#0a1829] border border-white/[0.04] rounded-lg p-3 space-y-2">
         <label htmlFor="turno-minimo" className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono">
           Mínimo de corridas no turno
         </label>
@@ -283,7 +283,7 @@ export default function TurnoPrizesConfigurator({
             type="number"
             value={turnoConfigObj.minimo_corridas ?? 0}
             onChange={e => handleUpdateMinimo(Number(e.target.value))}
-            className="admin-input !py-2 !px-3 w-24 bg-[#08080a]"
+            className="admin-input !py-2 !px-3 w-24 bg-[#0b1a2d]"
             min="0"
           />
           <span className="text-[10px] text-zinc-500">corridas para ser elegível. Defina 0 para sem meta.</span>

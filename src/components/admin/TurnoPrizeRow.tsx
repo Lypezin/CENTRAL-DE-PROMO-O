@@ -35,14 +35,14 @@ export default function TurnoPrizeRow({
   const fieldIdPrefix = idPrefix ?? `turno-prize-${idx}`
 
   return (
-    <div className="flex flex-wrap items-center gap-2 bg-[#0a0a0c] border border-white/[0.04] p-2.5 rounded-lg">
+    <div className="flex flex-wrap items-center gap-2 bg-[#0a1829] border border-white/[0.04] p-2.5 rounded-lg">
       {/* Type */}
       <select
         id={`${fieldIdPrefix}-type`}
         aria-label={`Tipo de faixa de premiação do item ${idx + 1}`}
         value={isSingle ? 'single' : 'range'}
         onChange={e => onUpdate(idx, 'tipo', e.target.value)}
-        className="min-h-11 bg-[#08080a] border border-white/[0.06] rounded-md text-xs text-zinc-200 px-3 py-1.5 focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-400"
+        className="min-h-11 bg-[#0b1a2d] border border-white/[0.06] rounded-md text-xs text-zinc-200 px-3 py-1.5 focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-400"
       >
         <option value="single">Único</option>
         <option value="range">Faixa</option>
@@ -57,7 +57,7 @@ export default function TurnoPrizeRow({
             type="number"
             value={premio.posicao ?? 1}
             onChange={e => onUpdate(idx, 'posicao', e.target.value)}
-            className="min-h-11 w-14 bg-[#08080a] border border-white/[0.06] rounded-md text-sm text-center text-white px-1 py-1.5 focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-400"
+            className="min-h-11 w-14 bg-[#0b1a2d] border border-white/[0.06] rounded-md text-sm text-center text-white px-1 py-1.5 focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-400"
             min="1"
           />
           <span className="text-[10px] text-zinc-500">º</span>
@@ -70,7 +70,7 @@ export default function TurnoPrizeRow({
             type="number"
             value={premio.posicao_inicio ?? 3}
             onChange={e => onUpdate(idx, 'posicao_inicio', e.target.value)}
-            className="min-h-11 w-14 bg-[#08080a] border border-white/[0.06] rounded-md text-sm text-center text-white px-1 py-1.5 focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-400"
+            className="min-h-11 w-14 bg-[#0b1a2d] border border-white/[0.06] rounded-md text-sm text-center text-white px-1 py-1.5 focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-400"
             min="1"
           />
           <span className="text-[10px] text-zinc-500">a</span>
@@ -80,7 +80,7 @@ export default function TurnoPrizeRow({
             type="number"
             value={premio.posicao_fim ?? 5}
             onChange={e => onUpdate(idx, 'posicao_fim', e.target.value)}
-            className="min-h-11 w-14 bg-[#08080a] border border-white/[0.06] rounded-md text-sm text-center text-white px-1 py-1.5 focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-400"
+            className="min-h-11 w-14 bg-[#0b1a2d] border border-white/[0.06] rounded-md text-sm text-center text-white px-1 py-1.5 focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-400"
             min="1"
           />
           <span className="text-[10px] text-zinc-500">º</span>
@@ -97,7 +97,7 @@ export default function TurnoPrizeRow({
             type="number"
             value={premio.valor ?? 0}
             onChange={e => onUpdate(idx, 'valor', e.target.value)}
-            className="min-h-11 w-24 bg-[#08080a] border border-white/[0.06] rounded-md text-sm text-white px-2 py-1.5 focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-400"
+            className="min-h-11 w-24 bg-[#0b1a2d] border border-white/[0.06] rounded-md text-sm text-white px-2 py-1.5 focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-400"
             min="0"
           />
         </div>
@@ -111,7 +111,7 @@ export default function TurnoPrizeRow({
         value={premio.descricao || ''}
         onChange={e => onUpdate(idx, 'descricao', e.target.value)}
         placeholder="Descrição"
-        className="min-h-11 flex-1 min-w-[100px] bg-[#08080a] border border-white/[0.06] rounded-md text-sm text-zinc-200 px-3 py-1.5 focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-400 placeholder:text-zinc-500"
+        className="min-h-11 flex-1 min-w-[100px] bg-[#0b1a2d] border border-white/[0.06] rounded-md text-sm text-zinc-200 px-3 py-1.5 focus:outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-400 placeholder:text-zinc-500"
       />
 
       {/* Actions */}

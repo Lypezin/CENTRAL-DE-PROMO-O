@@ -15,8 +15,8 @@ import { RankingNiveis } from '../views/ranking-turno/RankingNiveis'
 const TURNO_DISPLAY: Record<string, { label: string; emoji: string; cor: string; corGradiente: string }> = {
   'CAFE_DA_MANHA': { label: 'Café da Manhã', emoji: '☀️', cor: '#38bdf8', corGradiente: 'linear-gradient(135deg, #0284c7, #38bdf8)' },
   'ALMOCO': { label: 'Almoço', emoji: '🌤️', cor: '#3b82f6', corGradiente: 'linear-gradient(135deg, #1d4ed8, #3b82f6)' },
-  'TARDE': { label: 'Tarde', emoji: '🌅', cor: '#f97316', corGradiente: 'linear-gradient(135deg, #c2410c, #f97316)' },
-  'JANTAR': { label: 'Jantar', emoji: '🌙', cor: '#8b5cf6', corGradiente: 'linear-gradient(135deg, #6d28d9, #8b5cf6)' },
+  'TARDE': { label: 'Tarde', emoji: '🌅', cor: '#60a5fa', corGradiente: 'linear-gradient(135deg, #1e40af, #60a5fa)' },
+  'JANTAR': { label: 'Jantar', emoji: '🌙', cor: '#818cf8', corGradiente: 'linear-gradient(135deg, #3730a3, #818cf8)' },
   'MADRUGADA': { label: 'Madrugada', emoji: '⭐', cor: '#06b6d4', corGradiente: 'linear-gradient(135deg, #0891b2, #06b6d4)' },
   'GERAL': { label: 'Geral', emoji: '🏆', cor: '#e4e4e7', corGradiente: 'linear-gradient(135deg, #71717a, #e4e4e7)' }
 }
@@ -50,11 +50,11 @@ export default function RankingTurno({
   const isMetas = mecanica.tipo_calculo === 'metas'
   const isNiveis = mecanica.tipo_calculo === 'niveis'
   const resolvedMetric = useMemo(() => resolveRankingMetric(mecanica, isNinja), [mecanica, isNinja])
-  
+
   const turnosDisponiveis = useMemo(() => {
     return isGeral ? ['GERAL'] : configTurnos
   }, [isGeral, configTurnos])
-  
+
   const [filtroAtivo, setFiltroAtivo] = useState(isGeral ? 'GERAL' : (turnosDisponiveis[0] || 'CAFE_DA_MANHA'))
   const filtroAtivoEfetivo = isGeral
     ? 'GERAL'
@@ -274,9 +274,9 @@ export default function RankingTurno({
   const filteredRanking = useMemo(() => {
     const query = debouncedSearchQuery.toLowerCase().trim()
     if (!query) return rankingData
-    
+
     // Prevenção contra injeção de Regex (Busca por includes simples e segura)
-    return rankingData.filter(item => 
+    return rankingData.filter(item =>
       item.pessoa_entregadora.toLowerCase().includes(query)
     )
   }, [rankingData, debouncedSearchQuery])
@@ -289,7 +289,7 @@ export default function RankingTurno({
   const rankingToDisplay = useMemo(() => {
     return filteredRanking.slice(0, displayLimit)
   }, [filteredRanking, displayLimit])
-  
+
   const getScore = useCallback((item: EntregaRanking) => {
     return getRankingMetricValue(item, resolvedMetric)
   }, [resolvedMetric])
@@ -313,9 +313,9 @@ export default function RankingTurno({
 
   return (
     <div className="w-full max-w-5xl mx-auto flex flex-col gap-6 font-sans">
-      
+
       {/* Search and Filters Bar */}
-      <RankingFilters 
+      <RankingFilters
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         filtroAtivo={filtroAtivoEfetivo}
@@ -328,7 +328,7 @@ export default function RankingTurno({
       />
 
       {/* Header and Rules/Prizes Explanatory Panel */}
-      <RankingRulesPanel 
+      <RankingRulesPanel
         painelAberto={painelAberto}
         setPainelAberto={setPainelAberto}
         activeTurnoDisplay={activeTurnoDisplay}
@@ -342,7 +342,7 @@ export default function RankingTurno({
       />
 
       {/* Main Content Listings based on Rules Model */}
-      <div className="bg-[#08080a] border border-white/[0.04] rounded-2xl p-4 md:p-6 shadow-xl min-h-[300px]">
+      <div className="bg-[#0b1a2d] border border-white/[0.04] rounded-2xl p-4 md:p-6 shadow-xl min-h-[300px]">
         {loading ? (
           /* Loading skeleton shell */
           <div className="space-y-3">
@@ -381,7 +381,7 @@ export default function RankingTurno({
           <div>
             {/* RENDER MODE A: RANKING LEADERBOARD (Top X) */}
             {!isMetas && !isNiveis && (
-              <RankingLeaderboard 
+              <RankingLeaderboard
                 searchQuery={debouncedSearchQuery}
                 rankingToDisplay={rankingToDisplay}
                 activeTurnoConfig={activeTurnoConfig}
@@ -399,7 +399,7 @@ export default function RankingTurno({
 
             {/* RENDER MODE B: META INDIVIDUAL E PROGRESSO */}
             {isMetas && (
-              <RankingMetas 
+              <RankingMetas
                 searchQuery={debouncedSearchQuery}
                 filteredRanking={filteredRanking}
                 rankingData={rankingData}
@@ -413,7 +413,7 @@ export default function RankingTurno({
 
             {/* RENDER MODE C: NÍVEIS PROGRESSIVOS */}
             {isNiveis && (
-              <RankingNiveis 
+              <RankingNiveis
                 searchQuery={debouncedSearchQuery}
                 filteredRanking={filteredRanking}
                 rankingData={rankingData}
@@ -426,7 +426,7 @@ export default function RankingTurno({
             )}
 
             {muralLoadError && (
-              <div className="mt-6 rounded-xl border border-amber-400/25 bg-amber-400/[.06] p-4 text-sm text-amber-100" role="alert">
+              <div className="mt-6 rounded-xl border border-blue-400/25 bg-blue-400/[.06] p-4 text-sm text-blue-100" role="alert">
                 <p>O mural pode estar incompleto: carregamos {rankingData.length.toLocaleString('pt-BR')} de {totalResultados.toLocaleString('pt-BR')} participantes. {muralLoadError}</p>
                 <button
                   type="button"
@@ -434,7 +434,7 @@ export default function RankingTurno({
                     rankingCache.current.delete(`${promocaoSlug}:${filtroAtivoEfetivo}:`)
                     setReloadSequence((value) => value + 1)
                   }}
-                  className="mt-3 min-h-10 rounded-lg border border-amber-300/30 px-3 font-semibold text-amber-100 underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
+                  className="mt-3 min-h-10 rounded-lg border border-blue-300/30 px-3 font-semibold text-blue-100 underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
                 >
                   Tentar completar o mural novamente
                 </button>
@@ -451,7 +451,7 @@ export default function RankingTurno({
                   type="button"
                   onClick={carregarMaisResultados}
                   disabled={carregandoMais}
-                  className="min-h-11 rounded-xl border border-white/10 px-5 text-sm font-semibold text-white transition hover:border-amber-300/50 hover:bg-white/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 disabled:cursor-wait disabled:opacity-60"
+                  className="min-h-11 rounded-xl border border-white/10 px-5 text-sm font-semibold text-white transition hover:border-blue-300/50 hover:bg-white/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 disabled:cursor-wait disabled:opacity-60"
                 >
                   {carregandoMais ? 'Carregando...' : 'Carregar mais participantes'}
                 </button>

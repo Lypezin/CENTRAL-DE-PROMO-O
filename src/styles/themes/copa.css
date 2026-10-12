@@ -1,44 +1,44 @@
 /* Copa CSS Custom Properties */
 body.tema-copa {
-  --copa-primary: #1a6b37;
-  --copa-accent: #d4a425;
-  --copa-glow: #fbbf24;
-  --copa-bg: #041a0a;
-  background-image: 
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(26, 107, 55, 0.12), transparent),
-    radial-gradient(ellipse 50% 50% at 50% 100%, rgba(212, 164, 37, 0.06), transparent);
+  --copa-primary: #0c4a6e;
+  --copa-accent: #2563eb;
+  --copa-glow: #60a5fa;
+  --copa-bg: #071525;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(12, 74, 110, 0.12), transparent),
+    radial-gradient(ellipse 50% 50% at 50% 100%, rgba(59, 130, 246, 0.06), transparent);
 }
 
 /* Copa grid overlay - green tinted */
 body.tema-copa .tech-grid {
-  background-image: linear-gradient(rgba(26, 107, 55, 0.015) 1px, transparent 1px),
-                    linear-gradient(90deg, rgba(26, 107, 55, 0.015) 1px, transparent 1px);
+  background-image: linear-gradient(rgba(12, 74, 110, 0.015) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(12, 74, 110, 0.015) 1px, transparent 1px);
 }
 
 /* Copa card styling - gold shimmer border */
 body.tema-copa .obsidian-card {
-  border-color: rgba(212, 164, 37, 0.08);
+  border-color: rgba(59, 130, 246, 0.08);
 }
 body.tema-copa .obsidian-card:hover {
-  border-color: rgba(212, 164, 37, 0.18);
-  box-shadow: 
+  border-color: rgba(59, 130, 246, 0.18);
+  box-shadow:
     0 12px 40px -10px rgba(0, 0, 0, 0.8),
-    0 0 25px -5px rgba(212, 164, 37, 0.08);
+    0 0 25px -5px rgba(59, 130, 246, 0.08);
 }
 
 /* Copa glow overrides */
 body.tema-copa .glow-sky-neon {
-  box-shadow: 0 0 15px -3px rgba(212, 164, 37, 0.25);
+  box-shadow: 0 0 15px -3px rgba(59, 130, 246, 0.25);
 }
 
 body.tema-copa .tab-active-indicator {
-  background: #d4a425;
-  box-shadow: 0 0 10px rgba(212, 164, 37, 0.5);
+  background: #2563eb;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
 }
 
 /* Copa text gradient override */
 body.tema-copa .text-gradient-neon {
-  background: linear-gradient(135deg, #22c55e 0%, #d4a425 100%);
+  background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -77,14 +77,14 @@ body.tema-copa .text-gradient-neon {
 /* Gold Shimmer for Copa cards */
 @keyframes shimmerGold {
   0% {
-    border-color: rgba(212, 164, 37, 0.06);
+    border-color: rgba(59, 130, 246, 0.06);
   }
   50% {
-    border-color: rgba(212, 164, 37, 0.18);
-    box-shadow: 0 0 20px -5px rgba(212, 164, 37, 0.06);
+    border-color: rgba(59, 130, 246, 0.18);
+    box-shadow: 0 0 20px -5px rgba(59, 130, 246, 0.06);
   }
   100% {
-    border-color: rgba(212, 164, 37, 0.06);
+    border-color: rgba(59, 130, 246, 0.06);
   }
 }
 
@@ -99,45 +99,45 @@ body.tema-copa.animations-paused * {
 
 /* Copa theme overrides for new class hooks */
 body.tema-copa .brand-dot {
-  background-color: #22c55e !important;
-  box-shadow: 0 0 8px rgba(34, 197, 94, 0.8) !important;
+  background-color: #38bdf8 !important;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.8) !important;
 }
 
 body.tema-copa .nav-active-line {
-  background: linear-gradient(90deg, #22c55e, #d4a425) !important;
+  background: linear-gradient(90deg, #38bdf8, #2563eb) !important;
 }
 
 body.tema-copa .promo-card-top-bar {
-  background: linear-gradient(90deg, #166534 0%, #d4a425 50%, #22c55e 100%) !important;
+  background: linear-gradient(90deg, #164e63 0%, #2563eb 50%, #38bdf8 100%) !important;
 }
 
 body.tema-copa .obsidian-card:hover .promo-card-title {
-  color: #fbbf24 !important;
+  color: #60a5fa !important;
 }
 
 body.tema-copa .promo-card-tag {
-  color: #fbbf24 !important;
-  background-color: rgba(212, 164, 37, 0.08) !important;
-  border-color: rgba(212, 164, 37, 0.2) !important;
+  color: #60a5fa !important;
+  background-color: rgba(59, 130, 246, 0.08) !important;
+  border-color: rgba(59, 130, 246, 0.2) !important;
 }
 
 body.tema-copa .promo-card-action {
-  color: #22c55e !important;
+  color: #38bdf8 !important;
 }
 body.tema-copa .obsidian-card:hover .promo-card-action {
-  color: #fbbf24 !important;
+  color: #60a5fa !important;
 }
 
 body.tema-copa .hub-filter-bar {
   background-color: rgba(4, 26, 10, 0.6) !important;
-  border-color: rgba(26, 107, 55, 0.3) !important;
+  border-color: rgba(12, 74, 110, 0.3) !important;
 }
 
 body.tema-copa .hub-filter-btn {
   transition: all 0.3s ease;
 }
 body.tema-copa .hub-filter-btn[class*="text-white"] {
-  background-color: #166534 !important;
+  background-color: #164e63 !important;
   color: #ffffff !important;
   box-shadow: 0 0 12px rgba(22, 101, 52, 0.4) !important;
 }
@@ -145,29 +145,29 @@ body.tema-copa .hub-filter-btn:not([class*="text-white"]) {
   color: rgba(255, 255, 255, 0.4) !important;
 }
 body.tema-copa .hub-filter-btn:not([class*="text-white"]):hover {
-  color: #22c55e !important;
+  color: #38bdf8 !important;
 }
 
 body.tema-copa .hub-search-input {
   background-color: rgba(4, 26, 10, 0.5) !important;
-  border-color: rgba(26, 107, 55, 0.3) !important;
+  border-color: rgba(12, 74, 110, 0.3) !important;
 }
 body.tema-copa .hub-search-input:focus {
-  border-color: #22c55e !important;
-  box-shadow: 0 0 15px rgba(34, 197, 150, 0.15) !important;
+  border-color: #38bdf8 !important;
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.15) !important;
 }
 
 /* Premium Stat Card styles for Copa theme */
 body.tema-copa .hub-stat-card {
   background: linear-gradient(135deg, rgba(4, 26, 10, 0.7), rgba(8, 8, 10, 0.8)) !important;
-  border-color: rgba(212, 164, 37, 0.12) !important;
+  border-color: rgba(59, 130, 246, 0.12) !important;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 body.tema-copa .hub-stat-card:hover {
-  border-color: rgba(212, 164, 37, 0.35) !important;
-  box-shadow: 
+  border-color: rgba(59, 130, 246, 0.35) !important;
+  box-shadow:
     0 12px 30px -10px rgba(0, 0, 0, 0.9),
-    0 0 20px -3px rgba(212, 164, 37, 0.12) !important;
+    0 0 20px -3px rgba(59, 130, 246, 0.12) !important;
   transform: translateY(-2px);
 }
 
@@ -194,12 +194,12 @@ body.tema-copa .copa-badge-glow {
 
 /* Copa premium polish: restrained, performant overrides */
 body.tema-copa {
-  --copa-primary: #16a34a;
-  --copa-accent: #f59e0b;
-  --copa-glow: #fbbf24;
-  --copa-bg: #020804;
+  --copa-primary: #0284c7;
+  --copa-accent: #3b82f6;
+  --copa-glow: #60a5fa;
+  --copa-bg: #06101e;
   --copa-blue: #1e3a8a;
-  --copa-red: #ef4444;
+  --copa-red: #2563eb;
   background-color: var(--copa-bg);
   background-image: none; /* Handled entirely by WorldCupBackground now for better performance and depth */
 }
@@ -255,12 +255,12 @@ body.tema-copa .obsidian-card:hover::after,
 }
 
 body.tema-copa .tab-active-indicator {
-  background: #d7a928;
+  background: #3b82f6;
   box-shadow: 0 0 10px rgba(215, 169, 40, 0.5);
 }
 
 body.tema-copa .text-gradient-neon {
-  background: linear-gradient(135deg, #eefdf4 0%, #f4d66a 52%, #2dd27e 100%);
+  background: linear-gradient(135deg, #eff6ff 0%, #93c5fd 52%, #38bdf8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -271,40 +271,40 @@ body.tema-copa .copa-shimmer {
 }
 
 body.tema-copa .brand-dot {
-  background-color: #2dd27e !important;
+  background-color: #38bdf8 !important;
   box-shadow: 0 0 10px rgba(45, 210, 126, 0.72) !important;
 }
 
 body.tema-copa .nav-active-line {
-  background: linear-gradient(90deg, #10b981, #fbbf24) !important;
+  background: linear-gradient(90deg, #06b6d4, #60a5fa) !important;
 }
 
 body.tema-copa .promo-card-top-bar,
 .card-tema-copa .promo-card-top-bar {
-  background: linear-gradient(90deg, #052e16 0%, #10b981 50%, #fbbf24 100%) !important;
-  box-shadow: 0 0 12px rgba(16, 185, 129, 0.1) !important;
+  background: linear-gradient(90deg, #082f49 0%, #06b6d4 50%, #60a5fa 100%) !important;
+  box-shadow: 0 0 12px rgba(6, 182, 212, 0.1) !important;
 }
 
 body.tema-copa .obsidian-card:hover .promo-card-title,
 .card-tema-copa:hover .promo-card-title {
-  color: #f4d66a !important;
+  color: #93c5fd !important;
 }
 
 body.tema-copa .promo-card-tag,
 .card-tema-copa .promo-card-tag {
-  color: #f4d66a !important;
+  color: #93c5fd !important;
   background-color: rgba(215, 169, 40, 0.08) !important;
   border-color: rgba(244, 214, 106, 0.2) !important;
 }
 
 body.tema-copa .promo-card-action,
 .card-tema-copa .promo-card-action {
-  color: #2dd27e !important;
+  color: #38bdf8 !important;
 }
 
 body.tema-copa .obsidian-card:hover .promo-card-action,
 .card-tema-copa:hover .promo-card-action {
-  color: #f4d66a !important;
+  color: #93c5fd !important;
 }
 
 body.tema-copa .hub-filter-bar {
@@ -330,7 +330,7 @@ body.tema-copa .hub-filter-btn:not([class*="text-white"]) {
 }
 
 body.tema-copa .hub-filter-btn:not([class*="text-white"]):hover {
-  color: #f4d66a !important;
+  color: #93c5fd !important;
   background-color: rgba(244, 214, 106, 0.05) !important;
 }
 
@@ -340,7 +340,7 @@ body.tema-copa .hub-search-input {
 }
 
 body.tema-copa .hub-search-input:focus {
-  border-color: #2dd27e !important;
+  border-color: #38bdf8 !important;
   box-shadow: 0 0 0 1px rgba(45, 210, 126, 0.22), 0 0 18px rgba(45, 210, 126, 0.12) !important;
 }
 
@@ -387,7 +387,7 @@ body.tema-copa .copa-hero-panel::before {
 body.tema-copa .copa-edition-badge {
   background: linear-gradient(135deg, rgba(244, 214, 106, 0.14), rgba(15, 138, 75, 0.09)) !important;
   border-color: rgba(244, 214, 106, 0.28) !important;
-  color: #f4d66a !important;
+  color: #93c5fd !important;
 }
 
 body.tema-copa nav {
@@ -419,14 +419,14 @@ body.tema-copa .obsidian-card span[class*="border-emerald"],
 body.tema-copa .glass span[class*="border-emerald"] {
   background-color: rgba(15, 138, 75, 0.12) !important;
   border-color: rgba(45, 210, 126, 0.28) !important;
-  color: #58e69a !important;
+  color: #67e8f9 !important;
 }
 
 body.tema-copa .obsidian-card span[class*="border-red"],
 body.tema-copa .glass span[class*="border-red"] {
   background-color: rgba(211, 59, 59, 0.1) !important;
   border-color: rgba(211, 59, 59, 0.28) !important;
-  color: #ff8a8a !important;
+  color: #93c5fd !important;
 }
 
 body.tema-copa .obsidian-card span[class*="border-zinc"],
@@ -443,7 +443,7 @@ body.tema-copa footer {
 body.tema-copa footer span.text-white,
 body.tema-copa footer button:hover,
 body.tema-copa footer span:hover {
-  color: #f4d66a !important;
+  color: #93c5fd !important;
 }
 
 @keyframes copaSheen {
@@ -558,7 +558,7 @@ body.tema-copa span.animate-pulse {
 
 /* Gold title gradient */
 .text-gradient-copa {
-  background: linear-gradient(135deg, #ffffff 0%, #f4d66a 50%, #eab308 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #93c5fd 50%, #60a5fa 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -578,7 +578,7 @@ body.tema-copa span.animate-pulse {
   content: "";
   position: absolute;
   inset: 4px;
-  border: 1px dashed rgba(16, 185, 129, 0.28);
+  border: 1px dashed rgba(6, 182, 212, 0.28);
   border-radius: 12px;
   pointer-events: none;
   z-index: 1;
@@ -592,16 +592,16 @@ body.tema-copa span.animate-pulse {
 @keyframes cardCopaGlow {
   0%, 100% {
     border-color: rgba(251, 191, 36, 0.25);
-    box-shadow: 
+    box-shadow:
       0 20px 45px -15px rgba(0, 0, 0, 0.95),
       0 0 15px -3px rgba(251, 191, 36, 0.12),
       inset 0 1px 1px rgba(255, 255, 255, 0.05);
   }
   50% {
-    border-color: rgba(16, 185, 129, 0.55);
-    box-shadow: 
+    border-color: rgba(6, 182, 212, 0.55);
+    box-shadow:
       0 20px 45px -15px rgba(0, 0, 0, 0.95),
-      0 0 25px 3px rgba(16, 185, 129, 0.28),
+      0 0 25px 3px rgba(6, 182, 212, 0.28),
       inset 0 1px 1px rgba(255, 255, 255, 0.08);
   }
 }
@@ -609,7 +609,7 @@ body.tema-copa span.animate-pulse {
 .obsidian-card.card-tema-copa:hover {
   background: linear-gradient(135deg, rgba(6, 36, 17, 0.82) 0%, rgba(3, 12, 6, 0.96) 100%) !important;
   border-color: rgba(251, 191, 36, 0.65) !important;
-  box-shadow: 
+  box-shadow:
     0 25px 50px -12px rgba(0, 0, 0, 0.95),
     0 0 35px -5px rgba(251, 191, 36, 0.45),
     inset 0 1px 1px rgba(255, 255, 255, 0.1) !important;
@@ -625,54 +625,54 @@ body.tema-copa span.animate-pulse {
 .promo-page-copa .bg-zinc-950\/20,
 .promo-page-copa .bg-zinc-900\/30 {
   background: rgba(3, 20, 8, 0.95) !important;
-  border: 1px solid rgba(212, 164, 37, 0.22) !important;
-  box-shadow: 
+  border: 1px solid rgba(59, 130, 246, 0.22) !important;
+  box-shadow:
     0 15px 35px -10px rgba(0, 0, 0, 0.85),
     inset 0 1px 0 rgba(255, 255, 255, 0.04),
-    0 0 25px -5px rgba(26, 107, 55, 0.2) !important;
+    0 0 25px -5px rgba(12, 74, 110, 0.2) !important;
 }
 
 /* Efeito Hover nos cards da Copa */
 .promo-page-copa .bg-\[\#08080a\]:hover {
-  border-color: rgba(212, 164, 37, 0.4) !important;
-  box-shadow: 
+  border-color: rgba(59, 130, 246, 0.4) !important;
+  box-shadow:
     0 20px 45px -10px rgba(0, 0, 0, 0.9),
     inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 0 35px -3px rgba(212, 164, 37, 0.15) !important;
+    0 0 35px -3px rgba(59, 130, 246, 0.15) !important;
 }
 
 /* Título principal e subtítulo da página de promoção */
 .promo-page-copa h1 {
-  background: linear-gradient(135deg, #ffffff 15%, #fbbf24 60%, #d4a425 100%) !important;
+  background: linear-gradient(135deg, #ffffff 15%, #60a5fa 60%, #2563eb 100%) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   background-clip: text !important;
-  text-shadow: 0 0 30px rgba(212, 164, 37, 0.15) !important;
+  text-shadow: 0 0 30px rgba(59, 130, 246, 0.15) !important;
 }
 
 /* Badges e tags da copa */
 .promo-page-copa .bg-sky-950\/20 {
-  background: rgba(212, 164, 37, 0.08) !important;
-  border-color: rgba(212, 164, 37, 0.25) !important;
-  color: #fbbf24 !important;
+  background: rgba(59, 130, 246, 0.08) !important;
+  border-color: rgba(59, 130, 246, 0.25) !important;
+  color: #60a5fa !important;
 }
 
 .promo-page-copa .text-sky-400 {
-  color: #fbbf24 !important;
+  color: #60a5fa !important;
 }
 
 .promo-page-copa .text-sky-500 {
-  color: #d4a425 !important;
+  color: #2563eb !important;
 }
 
 /* Botão voltar e links */
 .promo-page-copa .text-zinc-500:hover {
-  color: #fbbf24 !important;
+  color: #60a5fa !important;
 }
 
 /* Widgets de período de validade e dados */
 .promo-page-copa .text-sky-400.shrink-0 {
-  color: #fbbf24 !important;
+  color: #60a5fa !important;
 }
 
 .promo-page-copa .text-zinc-300 span {
@@ -685,72 +685,72 @@ body.tema-copa span.animate-pulse {
 }
 
 .promo-page-copa button.border-white\/10 {
-  border-color: rgba(212, 164, 37, 0.15) !important;
+  border-color: rgba(59, 130, 246, 0.15) !important;
 }
 
 .promo-page-copa button.border-white\/10:hover {
-  background: rgba(212, 164, 37, 0.08) !important;
-  border-color: rgba(212, 164, 37, 0.4) !important;
-  color: #fbbf24 !important;
+  background: rgba(59, 130, 246, 0.08) !important;
+  border-color: rgba(59, 130, 246, 0.4) !important;
+  color: #60a5fa !important;
 }
 
 /* Mudar estilo dos botões ativos de turno */
 .promo-page-copa .bg-white\/10 {
-  background: linear-gradient(135deg, #15803d 0%, #166534 100%) !important;
-  border: 1px solid rgba(212, 164, 37, 0.5) !important;
+  background: linear-gradient(135deg, #0369a1 0%, #164e63 100%) !important;
+  border: 1px solid rgba(59, 130, 246, 0.5) !important;
   color: #ffffff !important;
-  box-shadow: 
+  box-shadow:
     0 0 15px rgba(22, 101, 52, 0.35),
     0 4px 12px rgba(0, 0, 0, 0.3) !important;
 }
 
 /* Customização dos pódios internos */
 /* Primeiro lugar (Líder / Gold) */
-.promo-page-copa .border-yellow-600\/30,
-.promo-page-copa .border-yellow-600\/35 {
+.promo-page-copa .border-cyan-600\/30,
+.promo-page-copa .border-cyan-600\/35 {
   background: linear-gradient(135deg, rgba(28, 22, 5, 0.85) 0%, rgba(6, 20, 10, 0.95) 100%) !important;
-  border: 1.5px solid rgba(212, 164, 37, 0.6) !important;
-  box-shadow: 
+  border: 1.5px solid rgba(59, 130, 246, 0.6) !important;
+  box-shadow:
     0 20px 45px -10px rgba(0, 0, 0, 0.95),
-    0 0 30px rgba(212, 164, 37, 0.25),
+    0 0 30px rgba(59, 130, 246, 0.25),
     inset 0 1px 1px rgba(255, 255, 255, 0.08) !important;
 }
 
 /* Segundo e terceiro lugares (Prata e Bronze no pódio) */
 .promo-page-copa .border-slate-500\/10,
-.promo-page-copa .border-amber-800\/20,
+.promo-page-copa .border-blue-800\/20,
 .promo-page-copa .border-slate-500\/15 {
   background: linear-gradient(135deg, rgba(6, 20, 10, 0.75) 0%, rgba(3, 10, 5, 0.9) 100%) !important;
-  border: 1px solid rgba(212, 164, 37, 0.25) !important;
-  box-shadow: 
+  border: 1px solid rgba(59, 130, 246, 0.25) !important;
+  box-shadow:
     0 15px 35px -10px rgba(0, 0, 0, 0.9),
-    0 0 20px rgba(26, 107, 55, 0.15) !important;
+    0 0 20px rgba(12, 74, 110, 0.15) !important;
 }
 
 /* Leaderboard - Linhas da Tabela */
 .promo-page-copa .divide-y > div {
-  border-bottom: 1px solid rgba(212, 164, 37, 0.08) !important;
+  border-bottom: 1px solid rgba(59, 130, 246, 0.08) !important;
 }
 
 .promo-page-copa .hover\:bg-white\/\[0\.01\]:hover {
-  background: rgba(26, 107, 55, 0.08) !important;
-  border-left-color: rgba(212, 164, 37, 0.6) !important;
+  background: rgba(12, 74, 110, 0.08) !important;
+  border-left-color: rgba(59, 130, 246, 0.6) !important;
 }
 
 /* Mudar a cor de hover do nome do entregador de sky para amarelo da copa */
 .promo-page-copa .group:hover .group-hover\:text-sky-300 {
-  color: #fbbf24 !important;
+  color: #60a5fa !important;
 }
 
 /* Barras de progresso da Copa no Leaderboard */
 .promo-page-copa .bg-sky-500 {
-  background: linear-gradient(90deg, #15803d, #d4a425) !important;
-  box-shadow: 0 0 8px rgba(34, 197, 94, 0.4) !important;
+  background: linear-gradient(90deg, #0369a1, #2563eb) !important;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.4) !important;
 }
 
-.promo-page-copa .bg-yellow-500 {
-  background: linear-gradient(90deg, #d4a425, #fbbf24) !important;
-  box-shadow: 0 0 10px rgba(234, 179, 8, 0.5) !important;
+.promo-page-copa .bg-cyan-500 {
+  background: linear-gradient(90deg, #2563eb, #60a5fa) !important;
+  box-shadow: 0 0 10px rgba(96, 165, 250, 0.5) !important;
 }
 
 .promo-page-copa .bg-slate-400 {
@@ -758,42 +758,42 @@ body.tema-copa span.animate-pulse {
   box-shadow: 0 0 8px rgba(148, 163, 184, 0.3) !important;
 }
 
-.promo-page-copa .bg-amber-600 {
-  background: linear-gradient(90deg, #b45309, #d97706) !important;
+.promo-page-copa .bg-blue-600 {
+  background: linear-gradient(90deg, #1e40af, #1d4ed8) !important;
   box-shadow: 0 0 8px rgba(180, 83, 9, 0.3) !important;
 }
 
 /* Badge de prêmio no Leaderboard */
-.promo-page-copa .bg-emerald-500\/5 {
-  background: rgba(26, 107, 55, 0.12) !important;
-  border-color: rgba(34, 197, 94, 0.3) !important;
-  color: #22c55e !important;
+.promo-page-copa .bg-cyan-500\/5 {
+  background: rgba(12, 74, 110, 0.12) !important;
+  border-color: rgba(56, 189, 248, 0.3) !important;
+  color: #38bdf8 !important;
 }
 
-.promo-page-copa .text-emerald-400 {
-  color: #22c55e !important;
+.promo-page-copa .text-cyan-400 {
+  color: #38bdf8 !important;
 }
 
 /* Marcador de falta corridas */
-.promo-page-copa .bg-amber-500\/5,
-.promo-page-copa .bg-amber-500\/10 {
+.promo-page-copa .bg-blue-500\/5,
+.promo-page-copa .bg-blue-500\/10 {
   background: rgba(217, 119, 6, 0.1) !important;
   border-color: rgba(217, 119, 6, 0.3) !important;
-  color: #f59e0b !important;
+  color: #3b82f6 !important;
 }
 
-.promo-page-copa .text-amber-500 {
-  color: #f59e0b !important;
+.promo-page-copa .text-blue-500 {
+  color: #3b82f6 !important;
 }
 
 /* Painel de Regras (RankingRulesPanel) */
 .promo-page-copa .border-white\/\[0\.04\] {
-  border-color: rgba(212, 164, 37, 0.15) !important;
+  border-color: rgba(59, 130, 246, 0.15) !important;
 }
 
 /* Regulamento e texto */
 .promo-page-copa .pl-1 li span.text-sky-500 {
-  color: #d4a425 !important;
+  color: #2563eb !important;
 }
 
 .promo-page-copa .pl-1 li span.leading-relaxed {
@@ -806,27 +806,27 @@ body.tema-copa span.animate-pulse {
 
 /* Validade e ícones */
 .promo-page-copa .val-icon {
-  color: #f59e0b !important; /* amber-500 */
+  color: #3b82f6 !important; /* blue-500 */
 }
 
 .promo-page-copa .bullet-indicator {
-  color: #f59e0b !important; /* amber-500 */
+  color: #3b82f6 !important; /* blue-500 */
 }
 
 /* Cards do Podium na Copa */
 .promo-page-copa .copa-podium-card {
   background: rgba(4, 20, 11, 0.75) !important;
-  border: 1px solid rgba(245, 158, 11, 0.25) !important;
-  box-shadow: 
+  border: 1px solid rgba(59, 130, 246, 0.25) !important;
+  box-shadow:
     0 15px 45px -10px rgba(0, 0, 0, 0.9),
-    0 0 25px -10px rgba(245, 158, 11, 0.15) !important;
+    0 0 25px -10px rgba(59, 130, 246, 0.15) !important;
 }
 
 /* 1º Lugar - Ouro Brilhante */
 .promo-page-copa .copa-podium-1 {
   background: linear-gradient(135deg, rgba(8, 38, 18, 0.95), rgba(4, 20, 11, 0.98)) !important;
   border: 1px solid rgba(251, 191, 36, 0.8) !important;
-  box-shadow: 
+  box-shadow:
     0 25px 60px -12px rgba(0, 0, 0, 0.95),
     0 0 40px -8px rgba(251, 191, 36, 0.5),
     inset 0 0 20px rgba(251, 191, 36, 0.15) !important;
@@ -846,7 +846,7 @@ body.tema-copa span.animate-pulse {
 .promo-page-copa .copa-podium-2 {
   background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(2, 6, 23, 0.95)) !important;
   border: 1px solid rgba(226, 232, 240, 0.6) !important;
-  box-shadow: 
+  box-shadow:
     0 20px 45px -10px rgba(0, 0, 0, 0.9),
     0 0 30px -10px rgba(226, 232, 240, 0.3),
     inset 0 0 20px rgba(226, 232, 240, 0.1) !important;
@@ -865,7 +865,7 @@ body.tema-copa span.animate-pulse {
 .promo-page-copa .copa-podium-3 {
   background: linear-gradient(135deg, rgba(67, 30, 15, 0.9), rgba(28, 10, 4, 0.95)) !important;
   border: 1px solid rgba(217, 119, 6, 0.6) !important;
-  box-shadow: 
+  box-shadow:
     0 20px 45px -10px rgba(0, 0, 0, 0.9),
     0 0 30px -10px rgba(217, 119, 6, 0.3),
     inset 0 0 20px rgba(217, 119, 6, 0.15) !important;
@@ -900,30 +900,30 @@ body.tema-copa span.animate-pulse {
 
 /* Tabela de Ranking da Copa */
 .promo-page-copa .copa-leaderboard-table {
-  border-color: rgba(245, 158, 11, 0.22) !important;
+  border-color: rgba(59, 130, 246, 0.22) !important;
   background: rgba(4, 20, 11, 0.55) !important;
 }
 
 .promo-page-copa .copa-leaderboard-table .divide-zinc-900\/60 > div {
-  border-bottom-color: rgba(245, 158, 11, 0.08) !important;
+  border-bottom-color: rgba(59, 130, 246, 0.08) !important;
 }
 
 .promo-page-copa .copa-leaderboard-table .divide-zinc-900\/60 > div:hover {
-  background-color: rgba(245, 158, 11, 0.02) !important;
-  border-left-color: rgba(245, 158, 11, 0.4) !important;
+  background-color: rgba(59, 130, 246, 0.02) !important;
+  border-left-color: rgba(59, 130, 246, 0.4) !important;
 }
 
 /* Badges de Prêmio Internos */
 .promo-page-copa .copa-prize-badge {
   background: rgba(6, 28, 14, 0.6) !important;
-  border-color: rgba(245, 158, 11, 0.18) !important;
+  border-color: rgba(59, 130, 246, 0.18) !important;
   box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3) !important;
   transition: all 0.25s ease !important;
 }
 
 .promo-page-copa .copa-prize-badge:hover {
   background: rgba(8, 38, 18, 0.75) !important;
-  border-color: rgba(245, 158, 11, 0.35) !important;
+  border-color: rgba(59, 130, 246, 0.35) !important;
   transform: translateY(-1px) !important;
 }
 
@@ -938,14 +938,14 @@ body.tema-copa span.animate-pulse {
   overflow: hidden;
   background:
     radial-gradient(ellipse 120% 80% at 50% 0%, rgba(22, 101, 52, 0.25), transparent 55%),
-    radial-gradient(ellipse 80% 60% at 80% 100%, rgba(245, 158, 11, 0.08), transparent 50%),
+    radial-gradient(ellipse 80% 60% at 80% 100%, rgba(59, 130, 246, 0.08), transparent 50%),
     linear-gradient(135deg, rgba(2, 12, 6, 0.95) 0%, rgba(4, 25, 12, 0.9) 40%, rgba(8, 8, 10, 0.95) 100%);
   border: 1px solid rgba(251, 191, 36, 0.2);
   border-radius: 20px;
   padding: 2rem 2.5rem;
   box-shadow:
     0 25px 60px -15px rgba(0, 0, 0, 0.95),
-    0 0 40px -10px rgba(16, 185, 129, 0.12),
+    0 0 40px -10px rgba(6, 182, 212, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
   isolation: isolate;
 }
@@ -957,13 +957,13 @@ body.tema-copa span.animate-pulse {
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, 
+  background: linear-gradient(90deg,
     transparent 0%,
-    #166534 15%, 
-    #fbbf24 35%,
-    #166534 50%,
+    #164e63 15%,
+    #60a5fa 35%,
+    #164e63 50%,
     #1e3a8a 65%,
-    #fbbf24 85%,
+    #60a5fa 85%,
     transparent 100%
   );
   opacity: 0.9;
@@ -1006,7 +1006,7 @@ body.tema-copa span.animate-pulse {
 
 /* ── Título "Edição Especial" ── */
 .copa-hero-title {
-  background: linear-gradient(135deg, #ffffff 0%, #f4d66a 40%, #d4a425 60%, #f4d66a 80%, #ffffff 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #93c5fd 40%, #2563eb 60%, #93c5fd 80%, #ffffff 100%);
   background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -1022,11 +1022,11 @@ body.tema-copa span.animate-pulse {
 
 /* ── Sub-badge da Copa ── */
 .copa-hero-subtitle {
-  background: linear-gradient(135deg, rgba(22, 101, 52, 0.3), rgba(16, 185, 129, 0.12));
-  border: 1px solid rgba(16, 185, 129, 0.25);
+  background: linear-gradient(135deg, rgba(22, 101, 52, 0.3), rgba(6, 182, 212, 0.12));
+  border: 1px solid rgba(6, 182, 212, 0.25);
   border-radius: 999px;
   padding: 0.25rem 1rem;
-  color: #6ee7b7;
+  color: #a5f3fc;
   font-size: 0.6rem;
   font-weight: 800;
   letter-spacing: 0.15em;
@@ -1064,7 +1064,7 @@ body.tema-copa span.animate-pulse {
 /* ── Stars decorativas ── */
 .copa-hero-star {
   position: absolute;
-  color: #fbbf24;
+  color: #60a5fa;
   pointer-events: none;
   z-index: 0;
   animation: copaStarTwinkle 3s ease-in-out infinite;
@@ -1086,7 +1086,7 @@ body.tema-copa span.animate-pulse {
   border: 1px solid rgba(251, 191, 36, 0.2) !important;
   box-shadow:
     0 15px 40px -12px rgba(0, 0, 0, 0.9),
-    0 0 20px -8px rgba(16, 185, 129, 0.1),
+    0 0 20px -8px rgba(6, 182, 212, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
   position: relative;
   overflow: hidden;
@@ -1114,12 +1114,12 @@ body.tema-copa span.animate-pulse {
 }
 
 .copa-date-icon {
-  color: #f59e0b !important;
-  filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.4));
+  color: #3b82f6 !important;
+  filter: drop-shadow(0 0 6px rgba(59, 130, 246, 0.4));
 }
 
 .copa-date-label {
-  color: #d4a425 !important;
+  color: #2563eb !important;
 }
 
 /* ── Busca Temática Copa ── */
@@ -1130,8 +1130,8 @@ body.tema-copa span.animate-pulse {
 }
 
 .promo-page-copa input[type="text"]:focus {
-  border-color: rgba(16, 185, 129, 0.5) !important;
-  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.2), 0 0 20px rgba(16, 185, 129, 0.08) !important;
+  border-color: rgba(6, 182, 212, 0.5) !important;
+  box-shadow: 0 0 0 1px rgba(6, 182, 212, 0.2), 0 0 20px rgba(6, 182, 212, 0.08) !important;
 }
 
 .promo-page-copa input[type="text"]::placeholder {
@@ -1140,37 +1140,37 @@ body.tema-copa span.animate-pulse {
 
 /* ── Pódio — Efeitos mais Dramáticos ── */
 .promo-page-copa .copa-podium-1 {
-  background: 
+  background:
     radial-gradient(ellipse 80% 60% at 50% 0%, rgba(251, 191, 36, 0.18), transparent 55%),
     linear-gradient(135deg, rgba(8, 38, 18, 0.85), rgba(4, 20, 11, 0.9)) !important;
-  border: 1.5px solid rgba(245, 158, 11, 0.5) !important;
-  box-shadow: 
+  border: 1.5px solid rgba(59, 130, 246, 0.5) !important;
+  box-shadow:
     0 25px 60px -12px rgba(0, 0, 0, 0.95),
-    0 0 45px -8px rgba(245, 158, 11, 0.3),
+    0 0 45px -8px rgba(59, 130, 246, 0.3),
     inset 0 1px 1px rgba(255, 255, 255, 0.1) !important;
   animation: copaPodiumGold 4s ease-in-out infinite;
 }
 
 @keyframes copaPodiumGold {
   0%, 100% {
-    border-color: rgba(245, 158, 11, 0.45);
+    border-color: rgba(59, 130, 246, 0.45);
     box-shadow:
       0 25px 60px -12px rgba(0, 0, 0, 0.95),
-      0 0 35px -8px rgba(245, 158, 11, 0.25),
+      0 0 35px -8px rgba(59, 130, 246, 0.25),
       inset 0 1px 1px rgba(255, 255, 255, 0.08);
   }
   50% {
-    border-color: rgba(16, 185, 129, 0.55);
+    border-color: rgba(6, 182, 212, 0.55);
     box-shadow:
       0 25px 60px -12px rgba(0, 0, 0, 0.95),
-      0 0 45px -5px rgba(16, 185, 129, 0.3),
+      0 0 45px -5px rgba(6, 182, 212, 0.3),
       inset 0 1px 1px rgba(255, 255, 255, 0.12);
   }
 }
 
 /* ── Ranking Header Copa ── */
 .promo-page-copa .obsidian-card h3 {
-  color: #f4d66a !important;
+  color: #93c5fd !important;
 }
 
 /* ── Responsive adjustments ── */

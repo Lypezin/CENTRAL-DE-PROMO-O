@@ -24,14 +24,14 @@ function RankingNiveisComponent({
   formatCurrency,
   isCopa
 }: RankingNiveisProps) {
-  
+
   const niveis = useMemo(() => {
     return mecanica.niveis || []
   }, [mecanica.niveis])
 
   return (
     <div className="space-y-6 animate-fade-in">
-      
+
       {/* 🔍 INDIVIDUAL PROGRESS CARDS */}
       {searchQuery ? (
         <div className="space-y-4">
@@ -41,13 +41,13 @@ function RankingNiveisComponent({
           ) : (
             filteredRanking.map(item => {
               const score = getScore(item)
-              
+
               // Calculate current level and next level milestone
               let nivelAtingido = null
               let premioAtual = 0
               let proximaMeta = null
               let proximoPremio = 0
-              
+
               for (let i = 0; i < niveis.length; i++) {
                 if (score >= niveis[i].meta) {
                   nivelAtingido = niveis[i]
@@ -62,9 +62,9 @@ function RankingNiveisComponent({
               const nivelMaximo = niveis.length > 0 && score >= niveis[niveis.length - 1].meta
 
               return (
-                <div 
-                  key={item.id_da_pessoa_entregadora} 
-                  className="bg-[#08080a] border border-white/[0.04] p-5 rounded-2xl space-y-5 shadow-xl hover:border-white/[0.08] transition-all duration-300"
+                <div
+                  key={item.id_da_pessoa_entregadora}
+                  className="bg-[#0b1a2d] border border-white/[0.04] p-5 rounded-2xl space-y-5 shadow-xl hover:border-white/[0.08] transition-all duration-300"
                 >
                   <div className="flex justify-between items-start">
                     <div>
@@ -84,17 +84,17 @@ function RankingNiveisComponent({
                       {niveis.map((n) => {
                         const concluido = score >= n.meta
                         return (
-                          <div 
-                            key={n.nivel} 
+                          <div
+                            key={n.nivel}
                             className={`shrink-0 min-w-[135px] flex-1 p-3.5 rounded-xl border text-center transition-all duration-300 snap-center shadow-inner ${
-                              concluido 
-                                ? 'bg-emerald-500/5 border-emerald-500/25 text-emerald-400 shadow-emerald-950/5' 
+                              concluido
+                                ? 'bg-cyan-500/5 border-cyan-500/25 text-cyan-400 shadow-cyan-950/5'
                                 : 'bg-zinc-900/10 border-white/[0.02] text-zinc-600'
                             }`}
                           >
                             <div className="text-[8px] uppercase font-bold tracking-wider opacity-70 font-mono">Nível {n.nivel}</div>
                             <div className="text-xs font-black pt-1.5 font-mono">{formatScoreValue(n.meta)}</div>
-                            <div className={`text-[10px] font-bold pt-0.5 font-mono ${concluido ? 'text-emerald-300' : 'text-zinc-500'}`}>{formatCurrency(n.premio)}</div>
+                            <div className={`text-[10px] font-bold pt-0.5 font-mono ${concluido ? 'text-cyan-300' : 'text-zinc-500'}`}>{formatCurrency(n.premio)}</div>
                             <div className="text-[7px] uppercase font-bold tracking-widest mt-2 font-mono">
                               {concluido ? '✓ Conquistado' : '🔒 Bloqueado'}
                             </div>
@@ -107,7 +107,7 @@ function RankingNiveisComponent({
                   {/* Bottom descriptive status metrics */}
                   <div className="pt-3.5 border-t border-white/[0.02] flex flex-wrap items-center justify-between gap-3 text-xs">
                     {nivelAtingido ? (
-                      <div className="inline-flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[9px] font-extrabold px-3 py-1 rounded-lg uppercase tracking-wider font-mono shadow-sm">
+                      <div className="inline-flex items-center gap-1.5 bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[9px] font-extrabold px-3 py-1 rounded-lg uppercase tracking-wider font-mono shadow-sm">
                         <span>🚀</span> Nível {nivelAtingido.nivel} Alcançado
                       </div>
                     ) : (
@@ -117,7 +117,7 @@ function RankingNiveisComponent({
                     )}
 
                     {nivelMaximo ? (
-                      <div className="text-[9px] bg-yellow-500/15 border border-yellow-500/20 text-yellow-400 font-extrabold px-3 py-1 rounded-lg uppercase tracking-wider font-mono shadow-md animate-pulse">
+                      <div className="text-[9px] bg-cyan-500/15 border border-cyan-500/20 text-cyan-400 font-extrabold px-3 py-1 rounded-lg uppercase tracking-wider font-mono shadow-md animate-pulse">
                         👑 Nível Máximo Atingido!
                       </div>
                     ) : proximaMeta !== null ? (
@@ -128,7 +128,7 @@ function RankingNiveisComponent({
 
                     <div className="text-[10px] text-zinc-400 font-mono">
                       Prêmio Estimado:{' '}
-                      <strong className={premioAtual > 0 ? 'text-emerald-400 font-extrabold' : 'text-zinc-600'}>
+                      <strong className={premioAtual > 0 ? 'text-cyan-400 font-extrabold' : 'text-zinc-600'}>
                         {formatCurrency(premioAtual)}
                       </strong>
                     </div>
@@ -150,14 +150,14 @@ function RankingNiveisComponent({
           <span className="w-1.5 h-1.5 bg-sky-500 rounded-full animate-pulse"></span>
           Painel de Produtividade (Níveis Conquistados)
         </h3>
-        
+
         {(() => {
           // Map drivers to their highest reached level
           const driversWithLevels = rankingData.map(item => {
             const score = getScore(item)
             let maxNivel = 0
             let premio = 0
-            
+
             for (const n of niveis) {
               if (score >= n.meta) {
                 maxNivel = n.nivel
@@ -178,8 +178,8 @@ function RankingNiveisComponent({
           return (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               {driversWithLevels.map(({ item, maxNivel, premio }) => (
-                <div 
-                  key={item.id_da_pessoa_entregadora} 
+                <div
+                  key={item.id_da_pessoa_entregadora}
                   className="flex items-center gap-3 bg-zinc-900/30 border border-white/[0.02] p-3.5 rounded-xl hover:border-sky-400/30 transition-all duration-300 shadow-sm"
                 >
                   <div className="w-10 h-8 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 text-[10px] font-mono font-black select-none">
@@ -191,7 +191,7 @@ function RankingNiveisComponent({
                       {!isCopa && `📍 ${item.praca} • `}{formatScoreValue(getScore(item))}
                     </div>
                   </div>
-                  <div className="ml-auto bg-emerald-500/15 text-emerald-300 border border-emerald-500/20 px-2.5 py-1 rounded-lg text-[10px] font-black font-mono">
+                  <div className="ml-auto bg-cyan-500/15 text-cyan-300 border border-cyan-500/20 px-2.5 py-1 rounded-lg text-[10px] font-black font-mono">
                     +{formatCurrency(premio)}
                   </div>
                 </div>

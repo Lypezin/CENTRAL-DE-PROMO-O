@@ -13,10 +13,10 @@ interface GeneralSettingsFormProps {
   setTurnoEditorAtivo?: React.Dispatch<React.SetStateAction<string>>
 }
 
-export default function GeneralSettingsForm({ 
-  promo, 
-  setPromo, 
-  onSave, 
+export default function GeneralSettingsForm({
+  promo,
+  setPromo,
+  onSave,
   saving,
   setTurnoEditorAtivo
 }: GeneralSettingsFormProps) {
@@ -59,21 +59,21 @@ export default function GeneralSettingsForm({
   )
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-xl border border-white/[0.04] bg-[#08080a] p-5 space-y-5">
+    <form onSubmit={handleSubmit} className="rounded-xl border border-white/[0.04] bg-[#0b1a2d] p-5 space-y-5">
       <div className="flex items-center justify-between">
         <h2 className="text-xs font-bold text-zinc-400 uppercase tracking-wider font-mono flex items-center gap-2">
           <svg className="w-3.5 h-3.5 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
           Configurações Gerais
         </h2>
       </div>
-      
+
       {/* Row 1: Name + City + Metric */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <div>
           <label htmlFor="geral-nome" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Nome</label>
-          <input 
+          <input
             id="geral-nome"
-            type="text" 
+            type="text"
             value={promo.nome}
             onChange={e => setPromo({ ...promo, nome: e.target.value })}
             className="admin-input !py-2.5"
@@ -82,9 +82,9 @@ export default function GeneralSettingsForm({
         </div>
         <div>
           <label htmlFor="geral-cidade" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Cidade</label>
-          <input 
+          <input
             id="geral-cidade"
-            type="text" 
+            type="text"
             value={promo.cidade || ''}
             placeholder="Ex: São Paulo"
             onChange={e => setPromo({ ...promo, cidade: e.target.value })}
@@ -100,7 +100,7 @@ export default function GeneralSettingsForm({
               const val = e.target.value
               const updates: Record<string, string> = { metrica: val }
               let novosTurnos = promo.config_turnos
-              
+
               if (val === 'pontos') {
                 updates.agrupamento = 'geral'
                 novosTurnos = ['GERAL']
@@ -110,7 +110,7 @@ export default function GeneralSettingsForm({
                 novosTurnos = ['CAFE_DA_MANHA', 'ALMOCO', 'TARDE', 'JANTAR', 'MADRUGADA']
                 if (setTurnoEditorAtivo) setTurnoEditorAtivo('CAFE_DA_MANHA')
               }
-              
+
               setPromo({
                 ...promo,
                 config_turnos: novosTurnos,
@@ -123,7 +123,7 @@ export default function GeneralSettingsForm({
                 }
               })
             }}
-            className="admin-input !py-2.5 bg-[#0a0a0c]"
+            className="admin-input !py-2.5 bg-[#0a1829]"
           >
             <option value="corridas_completadas">Quantidade de Corridas</option>
             <option value="pedidos_aceitos_e_concluidos">Pedidos Aceitos e Concluídos</option>
@@ -154,40 +154,40 @@ export default function GeneralSettingsForm({
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <div>
           <label htmlFor="geral-inicio" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Início</label>
-          <input 
+          <input
             id="geral-inicio"
-            type="date" 
+            type="date"
             value={promo.data_inicio || ''}
             onChange={e => setPromo({ ...promo, data_inicio: e.target.value })}
-            className="admin-input !py-2.5 bg-[#0a0a0c]"
+            className="admin-input !py-2.5 bg-[#0a1829]"
           />
         </div>
         <div>
           <label htmlFor="geral-fim" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Término</label>
-          <input 
+          <input
             id="geral-fim"
-            type="date" 
+            type="date"
             value={promo.data_fim || ''}
             onChange={e => setPromo({ ...promo, data_fim: e.target.value })}
-            className="admin-input !py-2.5 bg-[#0a0a0c]"
+            className="admin-input !py-2.5 bg-[#0a1829]"
           />
         </div>
         <div>
           <label htmlFor="geral-limite" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Limite Ranking</label>
-          <input 
+          <input
             id="geral-limite"
-            type="number" 
+            type="number"
             min="1"
             max="500"
             value={promo.config_regras?.limite_ranking ?? 15}
-            onChange={e => setPromo({ 
-              ...promo, 
-              config_regras: { 
-                ...(promo.config_regras || {}), 
-                limite_ranking: parseInt(e.target.value) || 15 
-              } 
+            onChange={e => setPromo({
+              ...promo,
+              config_regras: {
+                ...(promo.config_regras || {}),
+                limite_ranking: parseInt(e.target.value) || 15
+              }
             })}
-            className="admin-input !py-2.5 bg-[#0a0a0c]"
+            className="admin-input !py-2.5 bg-[#0a1829]"
           />
         </div>
         <div>
@@ -196,7 +196,7 @@ export default function GeneralSettingsForm({
             id="geral-status"
             value={promo.status}
             onChange={e => setPromo({ ...promo, status: e.target.value as 'rascunho' | 'ativa' | 'encerrada' })}
-            className="admin-input !py-2.5 bg-[#0a0a0c]"
+            className="admin-input !py-2.5 bg-[#0a1829]"
           >
             <option value="rascunho">Rascunho</option>
             <option value="ativa">Ativa</option>
@@ -213,12 +213,12 @@ export default function GeneralSettingsForm({
             onClick={() => setPromo({ ...promo, destaque_copa: !promo.destaque_copa })}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[11px] font-bold transition-all ${
               promo.destaque_copa
-                ? 'bg-amber-500/10 border-amber-500/30 text-amber-400'
+                ? 'bg-blue-500/10 border-blue-500/30 text-blue-400'
                 : 'border-white/[0.04] text-zinc-500 hover:text-zinc-300 hover:border-white/10'
             }`}
           >
             <div className={`w-3 h-3 rounded-sm border flex items-center justify-center transition-all ${
-              promo.destaque_copa ? 'bg-amber-500 border-amber-400' : 'border-zinc-600'
+              promo.destaque_copa ? 'bg-blue-500 border-blue-400' : 'border-zinc-600'
             }`}>
               {promo.destaque_copa && (
                 <svg className="w-2 h-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M5 13l4 4L19 7" /></svg>
@@ -262,7 +262,7 @@ export default function GeneralSettingsForm({
           </button>
         </div>
 
-        <button 
+        <button
           type="submit"
           disabled={saving}
           className="admin-btn-primary !py-2 !px-5 text-[11px] flex items-center gap-2 w-full sm:w-auto justify-center"

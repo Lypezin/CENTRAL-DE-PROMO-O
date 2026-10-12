@@ -682,12 +682,12 @@ export default function CreatePromotionWizard() {
   }
 
   return (
-    <main className="relative min-h-[calc(100vh-3rem)] overflow-hidden bg-[#050607] text-white">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_12%_0%,rgba(132,204,22,.10),transparent_34%),radial-gradient(ellipse_at_90%_12%,rgba(14,165,233,.08),transparent_28%)]" />
+    <main className="relative min-h-[calc(100vh-3rem)] overflow-hidden bg-[#071423] text-white">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_12%_0%,rgba(37,99,235,.12),transparent_34%),radial-gradient(ellipse_at_90%_12%,rgba(14,165,233,.08),transparent_28%)]" />
       <div className="relative mx-auto max-w-[1440px] px-4 pb-32 pt-6 sm:px-6 lg:px-10 lg:pt-10">
         <header className="mb-8 flex flex-wrap items-end justify-between gap-5 border-b border-white/10 pb-6">
           <div>
-            <Link href="/admin" className="mb-4 inline-flex min-h-10 items-center gap-2 rounded-lg pr-3 text-sm font-semibold text-zinc-400 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-300">
+            <Link href="/admin" className="mb-4 inline-flex min-h-10 items-center gap-2 rounded-lg pr-3 text-sm font-semibold text-zinc-400 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300">
               <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="m12 4-6 6 6 6" /></svg>
               Voltar às campanhas
             </Link>
@@ -696,8 +696,8 @@ export default function CreatePromotionWizard() {
           </div>
           <div className="flex flex-wrap items-center gap-2">
             {hasUserEnteredData && <span className="rounded-full border border-sky-300/20 bg-sky-300/[.06] px-3 py-1.5 text-xs font-semibold text-sky-100">{hasRecoveredDraft ? 'Progresso recuperado' : 'Progresso salvo'} nesta aba</span>}
-            {hasUserEnteredData && <button type="button" onClick={() => resetWizard()} className="min-h-9 rounded-lg px-2 text-xs font-semibold text-zinc-400 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-300">Descartar progresso</button>}
-            <p className="rounded-full border border-lime-300/20 bg-lime-300/[.07] px-3 py-1.5 text-xs font-bold text-lime-200">O rascunho só é criado na revisão final</p>
+            {hasUserEnteredData && <button type="button" onClick={() => resetWizard()} className="min-h-9 rounded-lg px-2 text-xs font-semibold text-zinc-400 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300">Descartar progresso</button>}
+            <p className="rounded-full border border-sky-300/20 bg-sky-300/[.07] px-3 py-1.5 text-xs font-bold text-sky-200">O rascunho só é criado na revisão final</p>
           </div>
         </header>
 
@@ -712,11 +712,11 @@ export default function CreatePromotionWizard() {
                   onClick={() => index < step && goToStep(index as WizardStep)}
                   disabled={index > step || saving}
                   aria-current={isCurrent ? 'step' : undefined}
-                  className={`flex min-h-14 w-full items-center gap-2.5 rounded-xl border px-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-300 ${
-                    isCurrent ? 'border-lime-300/45 bg-lime-300/[.09] text-white' : isComplete ? 'border-white/10 bg-white/[.035] text-zinc-200 hover:border-white/20' : 'border-white/[.06] bg-black/20 text-zinc-500'
+                  className={`flex min-h-14 w-full items-center gap-2.5 rounded-xl border px-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 ${
+                    isCurrent ? 'border-sky-300/45 bg-sky-300/[.09] text-white' : isComplete ? 'border-white/10 bg-white/[.035] text-zinc-200 hover:border-white/20' : 'border-white/[.06] bg-black/20 text-zinc-500'
                   }`}
                 >
-                  <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-full border text-[11px] font-black ${isCurrent ? 'border-lime-200 bg-lime-200 text-zinc-950' : isComplete ? 'border-lime-300/30 bg-lime-300/10 text-lime-200' : 'border-white/15 text-zinc-500'}`}>
+                  <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-full border text-[11px] font-black ${isCurrent ? 'border-sky-200 bg-sky-200 text-zinc-950' : isComplete ? 'border-sky-300/30 bg-sky-300/10 text-sky-200' : 'border-white/15 text-zinc-500'}`}>
                     {isComplete ? <Icon name="check" className="h-3.5 w-3.5" /> : `0${index + 1}`}
                   </span>
                   <span className="text-xs font-bold sm:text-sm">{label}</span>
@@ -727,10 +727,10 @@ export default function CreatePromotionWizard() {
         </ol>
 
         <form onSubmit={createPromotion} noValidate>
-          <details className="group mb-5 rounded-xl border border-white/10 bg-[#0a0c0c]/90 lg:hidden">
-            <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 text-sm font-bold text-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-300 [&::-webkit-details-marker]:hidden">
-              <span className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-rose-400" aria-hidden="true" />Prévia ao vivo do card público</span>
-              <span className="text-xs font-semibold text-lime-200 group-open:hidden">Mostrar</span>
+          <details className="group mb-5 rounded-xl border border-white/10 bg-[#0b1b2c]/90 lg:hidden">
+            <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 text-sm font-bold text-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 [&::-webkit-details-marker]:hidden">
+              <span className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-blue-400" aria-hidden="true" />Prévia ao vivo do card público</span>
+              <span className="text-xs font-semibold text-sky-200 group-open:hidden">Mostrar</span>
               <span className="hidden text-xs font-semibold text-zinc-400 group-open:block">Ocultar</span>
             </summary>
             <div className="border-t border-white/[.08] p-3"><PromoPreviewCard promo={previewPromo} /></div>
@@ -746,7 +746,7 @@ export default function CreatePromotionWizard() {
                   transition={{ duration: reduceMotion ? 0 : 0.2, ease: 'easeOut' }}
                   aria-labelledby="wizard-step-title"
                   ref={stepSectionRef}
-                  className="min-h-[440px] rounded-2xl border border-white/10 bg-[#0a0c0c]/90 p-5 shadow-[0_18px_60px_rgba(0,0,0,.25)] sm:p-7"
+                  className="min-h-[440px] rounded-2xl border border-white/10 bg-[#0b1b2c]/90 p-5 shadow-[0_18px_60px_rgba(0,0,0,.25)] sm:p-7"
                 >
                   {stepError && (
                     <div ref={stepErrorRef} tabIndex={-1} role="alert" aria-live="assertive" className="mb-5 rounded-lg border border-rose-300/20 bg-rose-300/[.07] px-4 py-3 text-sm text-rose-100 focus:outline-none focus:ring-2 focus:ring-rose-300/60">
@@ -767,8 +767,8 @@ export default function CreatePromotionWizard() {
                           <legend className="mb-2 text-xs font-bold text-zinc-300">Tipo de campanha</legend>
                           <div className="grid gap-2 md:grid-cols-3">
                             {FORMATS.map((option) => (
-                              <button key={option.value} type="button" onClick={() => setFormat(option.value)} aria-pressed={format === option.value} className={`min-h-24 rounded-xl border p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-300 ${format === option.value ? 'border-lime-300/50 bg-lime-300/[.07]' : 'border-white/10 bg-black/20 hover:border-white/20'}`}>
-                                <span className="flex items-center justify-between gap-2"><span className="text-sm font-bold text-white">{option.label}</span>{format === option.value && <Icon name="check" className="h-4 w-4 shrink-0 text-lime-200" />}</span>
+                              <button key={option.value} type="button" onClick={() => setFormat(option.value)} aria-pressed={format === option.value} className={`min-h-24 rounded-xl border p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 ${format === option.value ? 'border-sky-300/50 bg-sky-300/[.07]' : 'border-white/10 bg-black/20 hover:border-white/20'}`}>
+                                <span className="flex items-center justify-between gap-2"><span className="text-sm font-bold text-white">{option.label}</span>{format === option.value && <Icon name="check" className="h-4 w-4 shrink-0 text-sky-200" />}</span>
                                 <span className="mt-1 block text-xs leading-5 text-zinc-400">{option.detail}</span>
                               </button>
                             ))}
@@ -779,7 +779,7 @@ export default function CreatePromotionWizard() {
                           <textarea id="campaign-description" maxLength={280} rows={3} value={descricao} onChange={(event) => setDescricao(event.target.value)} placeholder="Explique rapidamente o que está em disputa." className="wizard-input min-h-24 resize-y leading-6" />
                         </Field>
                         <div className="sm:col-span-2">
-                          <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-zinc-200"><Icon name="calendar" className="h-4 w-4 text-lime-200" /> Período da campanha</div>
+                          <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-zinc-200"><Icon name="calendar" className="h-4 w-4 text-sky-200" /> Período da campanha</div>
                           <div className="grid gap-4 sm:grid-cols-2">
                             <Field label="Data de início">
                               <input id="campaign-start" type="date" value={dataInicio} onChange={(event) => setDataInicio(event.target.value)} className="wizard-input [color-scheme:dark]" />
@@ -806,8 +806,8 @@ export default function CreatePromotionWizard() {
                               <button key={option.value} type="button" disabled={temaNinja && option.value !== 'faturamento_taxas'} onClick={() => {
                                 setMetric(option.value)
                                 if (option.value === 'pontos') changeGrouping('geral')
-                              }} aria-pressed={selected} className={`flex min-h-16 items-start gap-3 rounded-lg border p-3 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-300 ${selected ? 'border-sky-300/40 bg-sky-300/[.07]' : 'border-white/[.08] bg-black/15 hover:border-white/20'}`}>
-                                <span className={`mt-0.5 h-4 w-4 shrink-0 rounded-full border ${selected ? 'border-sky-200 bg-sky-200 shadow-[inset_0_0_0_3px_#0a0c0c]' : 'border-zinc-500'}`} />
+                              }} aria-pressed={selected} className={`flex min-h-16 items-start gap-3 rounded-lg border p-3 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 ${selected ? 'border-sky-300/40 bg-sky-300/[.07]' : 'border-white/[.08] bg-black/15 hover:border-white/20'}`}>
+                                <span className={`mt-0.5 h-4 w-4 shrink-0 rounded-full border ${selected ? 'border-sky-200 bg-sky-200 shadow-[inset_0_0_0_3px_#0b1b2c]' : 'border-zinc-500'}`} />
                                 <span><span className="block text-sm font-semibold text-zinc-100">{option.label}</span><span className="mt-0.5 block text-xs text-zinc-500">{option.detail}</span></span>
                               </button>
                             )
@@ -863,11 +863,11 @@ export default function CreatePromotionWizard() {
                             <div key={`rule-${index}`} className="flex items-start gap-2">
                               <label className="sr-only" htmlFor={`campaign-rule-${index}`}>Regra {index + 1}</label>
                               <textarea id={`campaign-rule-${index}`} rows={2} maxLength={2000} value={rule} onChange={(event) => setRulesText((current) => current.map((item, itemIndex) => itemIndex === index ? event.target.value : item))} placeholder={`Regra ${index + 1}`} className="wizard-input min-h-14 resize-y leading-5" />
-                              {rulesText.length > 1 && <button type="button" onClick={() => setRulesText((current) => current.filter((_, itemIndex) => itemIndex !== index))} aria-label={`Remover regra ${index + 1}`} className="grid min-h-11 min-w-11 place-items-center rounded-lg text-zinc-500 transition-colors hover:bg-white/[.06] hover:text-rose-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300">×</button>}
+                              {rulesText.length > 1 && <button type="button" onClick={() => setRulesText((current) => current.filter((_, itemIndex) => itemIndex !== index))} aria-label={`Remover regra ${index + 1}`} className="grid min-h-11 min-w-11 place-items-center rounded-lg text-zinc-500 transition-colors hover:bg-white/[.06] hover:text-blue-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">×</button>}
                             </div>
                           ))}
                         </div>
-                        <button id="add-campaign-rule" type="button" disabled={rulesText.length >= 100} onClick={() => setRulesText((current) => [...current, ''])} className="mt-2 min-h-10 rounded-lg px-2 text-xs font-bold text-lime-200 transition-colors hover:text-white disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-300">+ Adicionar regra</button>
+                        <button id="add-campaign-rule" type="button" disabled={rulesText.length >= 100} onClick={() => setRulesText((current) => [...current, ''])} className="mt-2 min-h-10 rounded-lg px-2 text-xs font-bold text-sky-200 transition-colors hover:text-white disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300">+ Adicionar regra</button>
                       </div>
                     </>
                   )}
@@ -883,13 +883,13 @@ export default function CreatePromotionWizard() {
                               <div className="flex flex-wrap gap-2">
                                 {SHIFTS.map((shift) => {
                                   const selected = activeShifts.includes(shift.key)
-                                  return <button key={shift.key} type="button" onClick={() => toggleShift(shift.key)} aria-pressed={selected} className={`min-h-11 rounded-lg border px-3 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-300 ${selected ? 'border-lime-300/40 bg-lime-300/[.08] text-lime-100' : 'border-white/10 text-zinc-500 hover:border-white/20 hover:text-zinc-200'}`}>{shift.label}</button>
+                                  return <button key={shift.key} type="button" onClick={() => toggleShift(shift.key)} aria-pressed={selected} className={`min-h-11 rounded-lg border px-3 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 ${selected ? 'border-sky-300/40 bg-sky-300/[.08] text-sky-100' : 'border-white/10 text-zinc-500 hover:border-white/20 hover:text-zinc-200'}`}>{shift.label}</button>
                                 })}
                               </div>
                               <p className="mt-2 text-xs text-zinc-500">Ative um ou mais turnos. Cada um terá a própria premiação.</p>
                             </fieldset>
                           ) : (
-                            <div className="rounded-xl border border-lime-300/20 bg-lime-300/[.05] px-4 py-3"><p className="text-sm font-bold text-lime-100">Premiação do ranking geral</p><p className="mt-1 text-xs text-zinc-400">O mesmo ranking considera o período completo da campanha.</p></div>
+                            <div className="rounded-xl border border-sky-300/20 bg-sky-300/[.05] px-4 py-3"><p className="text-sm font-bold text-sky-100">Premiação do ranking geral</p><p className="mt-1 text-xs text-zinc-400">O mesmo ranking considera o período completo da campanha.</p></div>
                           )}
 
                           <div>
@@ -898,7 +898,7 @@ export default function CreatePromotionWizard() {
                                 const info = shiftInfo(shift)
                                 const selected = activeShift === shift
                                 const count = prizeGroups.find((group) => group.turno === shift)?.premios.length ?? 0
-                                return <button key={shift} type="button" aria-pressed={selected} onClick={() => setActiveShift(shift)} className={`shrink-0 rounded-t-lg px-3 py-2 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-300 ${selected ? 'border-b-2 border-lime-300 text-white' : 'text-zinc-500 hover:text-zinc-200'}`}>{info?.short ?? 'Geral'} <span className="ml-1 text-[10px] text-zinc-500">{count}</span></button>
+                                return <button key={shift} type="button" aria-pressed={selected} onClick={() => setActiveShift(shift)} className={`shrink-0 rounded-t-lg px-3 py-2 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 ${selected ? 'border-b-2 border-sky-300 text-white' : 'text-zinc-500 hover:text-zinc-200'}`}>{info?.short ?? 'Geral'} <span className="ml-1 text-[10px] text-zinc-500">{count}</span></button>
                               })}
                             </div>
 
@@ -908,7 +908,7 @@ export default function CreatePromotionWizard() {
                             </div>
 
                             <div className="mt-4 space-y-2">
-                              <div className="flex items-end justify-between gap-3"><div><h3 className="text-sm font-bold text-zinc-200">Prêmios por posição</h3><p className="mt-1 text-xs text-zinc-500">Valores em reais; faixas não podem se sobrepor.</p></div><button id="add-prize" type="button" disabled={visiblePrizeGroup.premios.length >= 100 || firstFreePosition(visiblePrizeGroup.premios) === null} onClick={addPrize} className="min-h-10 shrink-0 rounded-lg border border-lime-300/20 px-3 text-xs font-bold text-lime-100 transition-colors hover:bg-lime-300/[.08] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-300">+ Adicionar</button></div>
+                              <div className="flex items-end justify-between gap-3"><div><h3 className="text-sm font-bold text-zinc-200">Prêmios por posição</h3><p className="mt-1 text-xs text-zinc-500">Valores em reais; faixas não podem se sobrepor.</p></div><button id="add-prize" type="button" disabled={visiblePrizeGroup.premios.length >= 100 || firstFreePosition(visiblePrizeGroup.premios) === null} onClick={addPrize} className="min-h-10 shrink-0 rounded-lg border border-sky-300/20 px-3 text-xs font-bold text-sky-100 transition-colors hover:bg-sky-300/[.08] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300">+ Adicionar</button></div>
                               {visiblePrizeGroup.premios.map((prize, index) => (
                                 <TurnoPrizeRow key={prize.id || `${activeShift}-${index}`} idPrefix={`prize-${activeShift}-${index}`} premio={prize} idx={index} isFirst={index === 0} isLast={index === visiblePrizeGroup.premios.length - 1} onUpdate={updatePrize} onRemove={removePrize} onMoveUp={(itemIndex) => movePrize(itemIndex, -1)} onMoveDown={(itemIndex) => movePrize(itemIndex, 1)} />
                               ))}
@@ -934,13 +934,13 @@ export default function CreatePromotionWizard() {
                             const maxMeta = Math.max(0, ...current.map((level) => level.meta))
                             const maxPrize = Math.max(0, ...current.map((level) => level.premio))
                             return [...current, { id: `level-${Date.now()}-${current.length}`, nivel, meta: maxMeta + 50, premio: maxPrize + 100 }]
-                          })} className="min-h-10 rounded-lg border border-lime-300/20 px-3 text-xs font-bold text-lime-100 transition-colors hover:bg-lime-300/[.08] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-300">+ Adicionar nível</button></div>
+                          })} className="min-h-10 rounded-lg border border-sky-300/20 px-3 text-xs font-bold text-sky-100 transition-colors hover:bg-sky-300/[.08] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300">+ Adicionar nível</button></div>
                           {levels.map((level, index) => (
                             <div key={level.id} className="grid gap-3 rounded-xl border border-white/[.08] bg-black/20 p-4 sm:grid-cols-[100px_minmax(0,1fr)_minmax(0,1fr)_44px] sm:items-end">
                               <Field label="Nível"><input id={`level-${level.id}-number`} type="number" min="1" max="100" value={level.nivel} onChange={(event) => setLevels((current) => current.map((item) => item.id === level.id ? { ...item, nivel: Number(event.target.value) } : item))} className="wizard-input tabular-nums" /></Field>
                               <Field label={metric === 'faturamento_taxas' ? 'Meta em taxas (R$)' : 'Meta'}><input id={`level-${level.id}-goal`} type="number" min="0.01" max="100000000" step={metric === 'faturamento_taxas' ? '0.01' : '1'} value={level.meta} onChange={(event) => setLevels((current) => current.map((item) => item.id === level.id ? { ...item, meta: Number(event.target.value) } : item))} className="wizard-input tabular-nums" /></Field>
                               <Field label="Prêmio (R$)"><input id={`level-${level.id}-prize`} type="number" min="0" max="100000000" step="0.01" value={level.premio} onChange={(event) => setLevels((current) => current.map((item) => item.id === level.id ? { ...item, premio: Number(event.target.value) } : item))} className="wizard-input tabular-nums" /></Field>
-                              <button type="button" disabled={levels.length <= 1} onClick={() => setLevels((current) => current.filter((item) => item.id !== level.id))} aria-label={`Remover nível ${index + 1}`} className="grid min-h-11 min-w-11 place-items-center rounded-lg text-zinc-400 transition-colors hover:bg-rose-300/10 hover:text-rose-200 disabled:opacity-30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300">×</button>
+                              <button type="button" disabled={levels.length <= 1} onClick={() => setLevels((current) => current.filter((item) => item.id !== level.id))} aria-label={`Remover nível ${index + 1}`} className="grid min-h-11 min-w-11 place-items-center rounded-lg text-zinc-400 transition-colors hover:bg-blue-300/10 hover:text-blue-200 disabled:opacity-30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">×</button>
                             </div>
                           ))}
                         </div>
@@ -982,10 +982,10 @@ export default function CreatePromotionWizard() {
                             {format === 'niveis' && <ol className="space-y-2 text-sm text-zinc-200">{[...levels].sort((a, b) => a.nivel - b.nivel).map((level) => <li key={level.id}><strong className="text-white">Nível {level.nivel}</strong> · meta {metric === 'faturamento_taxas' ? BRL_FORMAT.format(level.meta) : `${NUMBER_FORMAT.format(level.meta)} ${metric === 'pontos' ? 'pontos' : metric === 'pedidos_aceitos_e_concluidos' ? 'pedidos' : 'corridas'}`} · prêmio {BRL_FORMAT.format(level.premio)}</li>)}</ol>}
                           </div>
                         </div>
-                        {rulesText.some((rule) => rule.trim()) && <div className="mt-5 border-t border-white/[.08] pt-4"><p className="text-xs font-bold uppercase tracking-wider text-zinc-400">Regras públicas</p><ul className="mt-2 space-y-1.5 text-sm leading-5 text-zinc-300">{rulesText.filter((rule) => rule.trim()).map((rule, index) => <li key={index} className="flex gap-2"><span className="text-lime-200">•</span><span>{rule}</span></li>)}</ul></div>}
+                        {rulesText.some((rule) => rule.trim()) && <div className="mt-5 border-t border-white/[.08] pt-4"><p className="text-xs font-bold uppercase tracking-wider text-zinc-400">Regras públicas</p><ul className="mt-2 space-y-1.5 text-sm leading-5 text-zinc-300">{rulesText.filter((rule) => rule.trim()).map((rule, index) => <li key={index} className="flex gap-2"><span className="text-sky-200">•</span><span>{rule}</span></li>)}</ul></div>}
                       </div>
-                      <div className="mt-6 rounded-xl border border-lime-300/20 bg-lime-300/[.05] p-4">
-                        <p className="text-sm font-bold text-lime-100">Esta etapa não publica a campanha</p>
+                      <div className="mt-6 rounded-xl border border-sky-300/20 bg-sky-300/[.05] p-4">
+                        <p className="text-sm font-bold text-sky-100">Esta etapa não publica a campanha</p>
                         <p className="mt-1 text-xs leading-5 text-zinc-400">Ao concluir, o site cria um único rascunho. Você poderá importar os dados e ativar a publicação depois.</p>
                       </div>
                     </>
@@ -996,20 +996,20 @@ export default function CreatePromotionWizard() {
 
             <aside className="order-2 hidden lg:sticky lg:top-20 lg:block">
               <PromoPreviewCard promo={previewPromo} />
-              <div className="mt-4 rounded-xl border border-white/[.08] bg-[#0a0c0c]/80 p-4">
+              <div className="mt-4 rounded-xl border border-white/[.08] bg-[#0b1b2c]/80 p-4">
                 <p className="text-xs font-bold uppercase tracking-wider text-zinc-400">Estado da campanha</p>
-                <div className="mt-2 flex items-center gap-2 text-sm font-semibold text-zinc-100"><span className="h-2 w-2 rounded-full bg-amber-300" /> Rascunho · não publicado</div>
+                <div className="mt-2 flex items-center gap-2 text-sm font-semibold text-zinc-100"><span className="h-2 w-2 rounded-full bg-blue-300" /> Rascunho · não publicado</div>
                 <p className="mt-2 text-xs leading-5 text-zinc-500">O progresso é salvo nesta aba enquanto você preenche; o rascunho só vai para o sistema ao concluir.</p>
               </div>
             </aside>
           </div>
 
-          <footer className="fixed inset-x-0 bottom-0 z-20 border-t border-white/10 bg-[#060808]/95 px-4 py-3 backdrop-blur-xl sm:px-6">
+          <footer className="fixed inset-x-0 bottom-0 z-20 border-t border-white/10 bg-[#081725]/95 px-4 py-3 backdrop-blur-xl sm:px-6">
             <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-3 lg:px-4">
               <p className="hidden text-xs text-zinc-500 sm:block">Etapa {step + 1} de {STEP_LABELS.length}</p>
               <div className="ml-auto flex items-center gap-2 sm:gap-3">
-                {step === 0 ? <Link href="/admin" className="inline-flex min-h-11 items-center rounded-lg px-4 text-sm font-semibold text-zinc-400 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-300">Cancelar</Link> : <button type="button" disabled={saving} onClick={() => goToStep((step - 1) as WizardStep)} className="min-h-11 rounded-lg border border-white/10 px-4 text-sm font-semibold text-zinc-200 transition-colors hover:bg-white/[.05] disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-300">Voltar</button>}
-                {step < 3 ? <button type="button" onClick={handleNext} className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-lime-300 px-4 text-sm font-black text-zinc-950 transition-colors hover:bg-lime-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:px-5">Continuar <Icon name="arrow" className="h-4 w-4" /></button> : <button type="submit" disabled={saving} className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-lime-300 px-4 text-sm font-black text-zinc-950 transition-colors hover:bg-lime-200 disabled:cursor-wait disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:px-5">{saving ? <><span className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-950/30 border-t-zinc-950" /> Criando rascunho…</> : <>Criar rascunho <Icon name="check" className="h-4 w-4" /></>}</button>}
+                {step === 0 ? <Link href="/admin" className="inline-flex min-h-11 items-center rounded-lg px-4 text-sm font-semibold text-zinc-400 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300">Cancelar</Link> : <button type="button" disabled={saving} onClick={() => goToStep((step - 1) as WizardStep)} className="min-h-11 rounded-lg border border-white/10 px-4 text-sm font-semibold text-zinc-200 transition-colors hover:bg-white/[.05] disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300">Voltar</button>}
+                {step < 3 ? <button type="button" onClick={handleNext} className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-sky-300 px-4 text-sm font-black text-zinc-950 transition-colors hover:bg-sky-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:px-5">Continuar <Icon name="arrow" className="h-4 w-4" /></button> : <button type="submit" disabled={saving} className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-sky-300 px-4 text-sm font-black text-zinc-950 transition-colors hover:bg-sky-200 disabled:cursor-wait disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:px-5">{saving ? <><span className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-950/30 border-t-zinc-950" /> Criando rascunho…</> : <>Criar rascunho <Icon name="check" className="h-4 w-4" /></>}</button>}
               </div>
             </div>
           </footer>
@@ -1027,20 +1027,20 @@ export default function CreatePromotionWizard() {
 }
 
 function StepHeading({ icon, title, description }: { icon: 'flag' | 'calendar' | 'spark' | 'medal' | 'check'; title: string; description: string }) {
-  return <div className="border-b border-white/[.08] pb-5"><div className="mb-3 grid h-9 w-9 place-items-center rounded-lg border border-lime-300/20 bg-lime-300/[.07] text-lime-200"><Icon name={icon} className="h-4.5 w-4.5" /></div><h2 id="wizard-step-title" tabIndex={-1} className="text-xl font-black tracking-tight text-white focus:outline-none sm:text-2xl">{title}</h2><p className="mt-1.5 max-w-2xl text-sm leading-6 text-zinc-400">{description}</p></div>
+  return <div className="border-b border-white/[.08] pb-5"><div className="mb-3 grid h-9 w-9 place-items-center rounded-lg border border-sky-300/20 bg-sky-300/[.07] text-sky-200"><Icon name={icon} className="h-4.5 w-4.5" /></div><h2 id="wizard-step-title" tabIndex={-1} className="text-xl font-black tracking-tight text-white focus:outline-none sm:text-2xl">{title}</h2><p className="mt-1.5 max-w-2xl text-sm leading-6 text-zinc-400">{description}</p></div>
 }
 
 function Field({ label, required, hint, className = '', children }: { label: string; required?: boolean; hint?: string; className?: string; children: ReactNode }) {
-  return <label className={`block ${className}`}><span className="mb-1.5 flex items-center justify-between gap-2 text-xs font-bold text-zinc-300"><span>{label}{required && <span className="ml-1 text-lime-200" aria-label="obrigatório">*</span>}</span>{hint && <span className="text-[10px] font-medium text-zinc-500">{hint}</span>}</span>{children}</label>
+  return <label className={`block ${className}`}><span className="mb-1.5 flex items-center justify-between gap-2 text-xs font-bold text-zinc-300"><span>{label}{required && <span className="ml-1 text-sky-200" aria-label="obrigatório">*</span>}</span>{hint && <span className="text-[10px] font-medium text-zinc-500">{hint}</span>}</span>{children}</label>
 }
 
 function ChoiceButton({ selected, onClick, children }: { selected: boolean; onClick: () => void; children: React.ReactNode }) {
-  return <button type="button" aria-pressed={selected} onClick={onClick} className={`min-h-11 rounded-lg border px-4 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-300 ${selected ? 'border-lime-300/45 bg-lime-300/[.08] text-lime-100' : 'border-white/10 text-zinc-400 hover:border-white/20 hover:text-zinc-100'}`}>{children}</button>
+  return <button type="button" aria-pressed={selected} onClick={onClick} className={`min-h-11 rounded-lg border px-4 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 ${selected ? 'border-sky-300/45 bg-sky-300/[.08] text-sky-100' : 'border-white/10 text-zinc-400 hover:border-white/20 hover:text-zinc-100'}`}>{children}</button>
 }
 
 function ThemeButton({ label, active, color, onClick }: { label: string; active: boolean; color: 'amber' | 'zinc'; onClick: () => void }) {
-  const activeClasses = color === 'amber' ? 'border-amber-300/50 bg-amber-300/[.08] text-amber-100' : 'border-rose-300/40 bg-rose-300/[.07] text-zinc-100'
-  return <button type="button" onClick={onClick} aria-pressed={active} className={`inline-flex min-h-11 items-center gap-2 rounded-lg border px-3.5 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-300 ${active ? activeClasses : 'border-white/10 bg-black/20 text-zinc-400 hover:border-white/20 hover:text-zinc-100'}`}><span className={`h-2 w-2 rounded-full ${active ? color === 'amber' ? 'bg-amber-200' : 'bg-rose-200' : 'bg-zinc-600'}`} />{label}{active && <Icon name="check" className="h-3.5 w-3.5" />}</button>
+  const activeClasses = color === 'amber' ? 'border-blue-300/50 bg-blue-300/[.08] text-blue-100' : 'border-blue-300/40 bg-blue-300/[.07] text-zinc-100'
+  return <button type="button" onClick={onClick} aria-pressed={active} className={`inline-flex min-h-11 items-center gap-2 rounded-lg border px-3.5 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 ${active ? activeClasses : 'border-white/10 bg-black/20 text-zinc-400 hover:border-white/20 hover:text-zinc-100'}`}><span className={`h-2 w-2 rounded-full ${active ? color === 'amber' ? 'bg-blue-200' : 'bg-blue-200' : 'bg-zinc-600'}`} />{label}{active && <Icon name="check" className="h-3.5 w-3.5" />}</button>
 }
 
 function SummaryItem({ label, value }: { label: string; value: string }) {

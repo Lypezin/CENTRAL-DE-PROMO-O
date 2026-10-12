@@ -81,10 +81,10 @@ export default function AdminLoginScreen({ onSuccess }: AdminLoginScreenProps) {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-[#030303]">
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-[#06101e]">
       {/* Ambient tech grid */}
       <div className="tech-grid opacity-60"></div>
-      
+
       {/* Ambient Glows */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-sky-500/10 rounded-full blur-[100px] pointer-events-none"></div>
 
@@ -92,9 +92,9 @@ export default function AdminLoginScreen({ onSuccess }: AdminLoginScreenProps) {
         {setupRequired === null ? (
           setupError ? (
             <div className="text-center py-10 flex min-h-[300px] flex-col items-center justify-center">
-              <p className="text-lg font-black text-amber-200">Acesso temporariamente indisponível</p>
+              <p className="text-lg font-black text-blue-200">Acesso temporariamente indisponível</p>
               <p role="alert" className="mt-2 max-w-sm text-sm leading-6 text-zinc-400">{setupError}</p>
-              <button type="button" onClick={() => { setSetupError(''); setSetupRetryCount((count) => count + 1) }} className="mt-5 min-h-11 rounded-lg bg-lime-300 px-4 text-sm font-black text-zinc-950 transition-colors hover:bg-lime-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white">Tentar novamente</button>
+              <button type="button" onClick={() => { setSetupError(''); setSetupRetryCount((count) => count + 1) }} className="mt-5 min-h-11 rounded-lg bg-sky-300 px-4 text-sm font-black text-zinc-950 transition-colors hover:bg-sky-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white">Tentar novamente</button>
             </div>
           ) : (
             <div className="text-center py-10 flex flex-col items-center justify-center min-h-[300px]">
@@ -105,13 +105,13 @@ export default function AdminLoginScreen({ onSuccess }: AdminLoginScreenProps) {
         ) : setupRequired ? (
           <div className="w-full animate-fade-in">
             <div className="text-center mb-10">
-              <div className="w-16 h-16 bg-gradient-to-br from-emerald-400/20 to-teal-500/5 rounded-2xl border border-emerald-500/20 flex items-center justify-center mx-auto mb-5 shadow-lg shadow-emerald-500/10">
+              <div className="w-16 h-16 bg-gradient-to-br from-cyan-400/20 to-teal-500/5 rounded-2xl border border-cyan-500/20 flex items-center justify-center mx-auto mb-5 shadow-lg shadow-cyan-500/10">
                 <span className="text-3xl">🏆</span>
               </div>
               <h1 className="text-2xl font-black text-white tracking-tight mb-2">Setup Inicial</h1>
               <p className="text-zinc-400 text-sm">Registre o perfil Mestre para ativar o sistema</p>
             </div>
-            
+
             <form onSubmit={handleRegister} className="space-y-5">
               <div className="space-y-1.5">
                 <label htmlFor="admin-register-name" className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono px-1">Nome Completo</label>
@@ -119,7 +119,7 @@ export default function AdminLoginScreen({ onSuccess }: AdminLoginScreenProps) {
                   id="admin-register-name"
                   type="text"
                   autoComplete="name"
-                  className="w-full bg-[#0a0a0c] border border-white/[0.04] focus:border-sky-500/50 rounded-xl py-3 px-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 transition-all font-sans placeholder-zinc-700 shadow-inner"
+                  className="w-full bg-[#0a1829] border border-white/[0.04] focus:border-sky-500/50 rounded-xl py-3 px-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 transition-all font-sans placeholder-zinc-700 shadow-inner"
                   placeholder="Ex: Luiz Fernando"
                   value={nomeAdmin}
                   onChange={e => setNomeAdmin(e.target.value)}
@@ -133,21 +133,21 @@ export default function AdminLoginScreen({ onSuccess }: AdminLoginScreenProps) {
                   id="admin-register-email"
                   type="email"
                   autoComplete="email"
-                  className="w-full bg-[#0a0a0c] border border-white/[0.04] focus:border-sky-500/50 rounded-xl py-3 px-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 transition-all font-sans placeholder-zinc-700 shadow-inner"
+                  className="w-full bg-[#0a1829] border border-white/[0.04] focus:border-sky-500/50 rounded-xl py-3 px-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 transition-all font-sans placeholder-zinc-700 shadow-inner"
                   placeholder="seu@email.com"
                   value={usuario}
                   onChange={e => setUsuario(e.target.value)}
                   required
                 />
               </div>
-              
+
               <div className="space-y-1.5">
                 <label htmlFor="admin-register-password" className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono px-1">Senha</label>
                 <input
                   id="admin-register-password"
                   type="password"
                   autoComplete="new-password"
-                  className="w-full bg-[#0a0a0c] border border-white/[0.04] focus:border-sky-500/50 rounded-xl py-3 px-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 transition-all font-sans placeholder-zinc-700 shadow-inner"
+                  className="w-full bg-[#0a1829] border border-white/[0.04] focus:border-sky-500/50 rounded-xl py-3 px-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 transition-all font-sans placeholder-zinc-700 shadow-inner"
                   placeholder="••••••••"
                   value={senha}
                   onChange={e => setSenha(e.target.value)}
@@ -163,7 +163,7 @@ export default function AdminLoginScreen({ onSuccess }: AdminLoginScreenProps) {
                 </div>
               )}
 
-              <button type="submit" aria-busy={loading} className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-emerald-500/25 transition-all active:scale-[0.98] mt-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950" disabled={loading}>
+              <button type="submit" aria-busy={loading} className="w-full bg-gradient-to-r from-cyan-500 to-teal-600 hover:from-cyan-400 hover:to-teal-500 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-cyan-500/25 transition-all active:scale-[0.98] mt-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950" disabled={loading}>
                 {loading ? 'Sincronizando...' : 'Ativar Portal'}
               </button>
             </form>
@@ -177,7 +177,7 @@ export default function AdminLoginScreen({ onSuccess }: AdminLoginScreenProps) {
               <h1 className="text-2xl font-black text-white tracking-tight mb-2">Nível Autorizado</h1>
               <p className="text-zinc-400 text-sm">Insira credenciais para gerenciar a central</p>
             </div>
-            
+
             <form onSubmit={handleLogin} className="space-y-5">
               <div className="space-y-1.5">
                 <label htmlFor="admin-login-email" className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono px-1">E-mail Administrativo</label>
@@ -185,21 +185,21 @@ export default function AdminLoginScreen({ onSuccess }: AdminLoginScreenProps) {
                   id="admin-login-email"
                   type="email"
                   autoComplete="username"
-                  className="w-full bg-[#0a0a0c] border border-white/[0.04] focus:border-sky-500/50 rounded-xl py-3 px-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 transition-all font-sans placeholder-zinc-700 shadow-inner"
+                  className="w-full bg-[#0a1829] border border-white/[0.04] focus:border-sky-500/50 rounded-xl py-3 px-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 transition-all font-sans placeholder-zinc-700 shadow-inner"
                   placeholder="admin@central.com"
                   value={usuario}
                   onChange={e => setUsuario(e.target.value)}
                   required
                 />
               </div>
-              
+
               <div className="space-y-1.5">
                 <label htmlFor="admin-login-password" className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono px-1">Senha</label>
                 <input
                   id="admin-login-password"
                   type="password"
                   autoComplete="current-password"
-                  className="w-full bg-[#0a0a0c] border border-white/[0.04] focus:border-sky-500/50 rounded-xl py-3 px-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 transition-all font-sans placeholder-zinc-700 shadow-inner"
+                  className="w-full bg-[#0a1829] border border-white/[0.04] focus:border-sky-500/50 rounded-xl py-3 px-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 transition-all font-sans placeholder-zinc-700 shadow-inner"
                   placeholder="••••••••"
                   value={senha}
                   onChange={e => setSenha(e.target.value)}

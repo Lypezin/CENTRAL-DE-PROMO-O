@@ -381,7 +381,7 @@ export default function ExcelImportZone({
   const rejectedCount = preview?.result.totalLinhasRejeitadas ?? 0
 
   return (
-    <div className={`rounded-xl border border-white/[0.05] bg-[#08080a] ${compact ? 'p-4' : 'p-5'} space-y-4`}>
+    <div className={`rounded-xl border border-white/[0.05] bg-[#0b1a2d] ${compact ? 'p-4' : 'p-5'} space-y-4`}>
       <div className="space-y-1">
         <h3 className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-zinc-400 font-mono">
           <svg className="h-3 w-3 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -400,12 +400,12 @@ export default function ExcelImportZone({
         onChange={(event) => selectFile(event.target.files?.[0])}
         disabled={busy}
         aria-describedby="xlsx-import-help"
-        className="block w-full rounded-xl border border-white/10 bg-[#0a0a0c] px-3 py-2.5 text-sm text-zinc-300 file:mr-4 file:rounded-lg file:border-0 file:bg-sky-500 file:px-3 file:py-1.5 file:text-[11px] file:font-bold file:uppercase file:tracking-wider file:text-white hover:border-white/15 focus:border-sky-500/50 focus:outline-none disabled:opacity-60"
+        className="block w-full rounded-xl border border-white/10 bg-[#0a1829] px-3 py-2.5 text-sm text-zinc-300 file:mr-4 file:rounded-lg file:border-0 file:bg-sky-500 file:px-3 file:py-1.5 file:text-[11px] file:font-bold file:uppercase file:tracking-wider file:text-white hover:border-white/15 focus:border-sky-500/50 focus:outline-none disabled:opacity-60"
       />
 
       <div
         className={`rounded-xl border border-dashed p-4 transition-all ${
-          dragOver ? 'border-sky-500 bg-sky-500/5' : 'border-white/[0.08] bg-[#0a0a0c] hover:border-white/15'
+          dragOver ? 'border-sky-500 bg-sky-500/5' : 'border-white/[0.08] bg-[#0a1829] hover:border-white/15'
         }`}
         onDragOver={(event) => {
           event.preventDefault()
@@ -466,7 +466,7 @@ export default function ExcelImportZone({
       )}
 
       {preview && (
-        <div className="space-y-3 rounded-xl border border-white/[0.08] bg-[#0a0a0c] p-4" aria-live="polite">
+        <div className="space-y-3 rounded-xl border border-white/[0.08] bg-[#0a1829] p-4" aria-live="polite">
           <div>
             <h4 className="text-sm font-bold text-white">Prévia da importação</h4>
             {preview.hasPendingImport && (
@@ -484,25 +484,25 @@ export default function ExcelImportZone({
           </div>
 
           {rejectedCount > 0 && (
-            <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-3">
-              <h5 className="text-xs font-bold text-amber-200">Linhas que não serão importadas</h5>
+            <div className="rounded-lg border border-blue-500/20 bg-blue-500/5 p-3">
+              <h5 className="text-xs font-bold text-blue-200">Linhas que não serão importadas</h5>
               {preview.result.motivosRejeicao.length > 0 && (
                 <>
-                  <p className="mt-2 text-xs font-semibold text-amber-100/90">Problemas encontrados em todas as linhas:</p>
-                  <ul className="mt-1 space-y-1 text-xs text-amber-100/80">
+                  <p className="mt-2 text-xs font-semibold text-blue-100/90">Problemas encontrados em todas as linhas:</p>
+                  <ul className="mt-1 space-y-1 text-xs text-blue-100/80">
                     {preview.result.motivosRejeicao.map(({ motivo, total }) => (
                       <li key={motivo}>{motivo}: {total.toLocaleString('pt-BR')} ocorrência(s)</li>
                     ))}
                   </ul>
                 </>
               )}
-              <ul className="mt-2 max-h-40 space-y-1 overflow-auto text-xs text-amber-100/80">
+              <ul className="mt-2 max-h-40 space-y-1 overflow-auto text-xs text-blue-100/80">
                 {preview.result.linhasRejeitadas.map((item) => (
                   <li key={`${item.linha}-${item.motivo}`}>Linha {item.linha}: {item.motivo}</li>
                 ))}
               </ul>
               {rejectedCount > preview.result.linhasRejeitadas.length && (
-                <p className="mt-2 text-xs text-amber-100/70">Mais {rejectedCount - preview.result.linhasRejeitadas.length} linha(s) rejeitada(s); a prévia lista as primeiras {preview.result.linhasRejeitadas.length}.</p>
+                <p className="mt-2 text-xs text-blue-100/70">Mais {rejectedCount - preview.result.linhasRejeitadas.length} linha(s) rejeitada(s); a prévia lista as primeiras {preview.result.linhasRejeitadas.length}.</p>
               )}
             </div>
           )}
@@ -540,7 +540,7 @@ export default function ExcelImportZone({
         <div
           role={uploadResult.success ? 'status' : 'alert'}
           className={`rounded-lg border p-3 text-[11px] font-bold ${
-            uploadResult.success ? 'border-emerald-500/20 bg-emerald-500/5 text-emerald-400' : 'border-red-500/20 bg-red-500/5 text-red-400'
+            uploadResult.success ? 'border-cyan-500/20 bg-cyan-500/5 text-cyan-400' : 'border-red-500/20 bg-red-500/5 text-red-400'
           }`}
         >
           {uploadResult.success ? `OK ${uploadResult.message || ''}` : `Erro: ${uploadResult.error}`}

@@ -150,7 +150,7 @@ export default function AdminElitePage() {
       <div className="mx-auto max-w-6xl px-4 pt-6 md:px-6">
         <div className="flex min-h-[50vh] items-center justify-center">
           <div className="space-y-3 text-center">
-            <div className="mx-auto h-5 w-5 animate-spin rounded-full border-2 border-amber-400 border-t-transparent" />
+            <div className="mx-auto h-5 w-5 animate-spin rounded-full border-2 border-blue-400 border-t-transparent" />
             <p className="font-mono text-xs uppercase tracking-wider text-zinc-500">Carregando configuracao ELITE...</p>
           </div>
         </div>
@@ -165,15 +165,15 @@ export default function AdminElitePage() {
           <div>
             <Link
               href="/admin"
-              className="mb-5 inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider text-zinc-500 transition-colors hover:text-amber-300"
+              className="mb-5 inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider text-zinc-500 transition-colors hover:text-blue-300"
             >
               <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
               </svg>
               Voltar ao painel
             </Link>
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-amber-300">
-              <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-500/20 bg-blue-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-blue-300">
+              <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
               ELITE
             </div>
             <h1 className="text-3xl font-black tracking-tight text-white md:text-4xl">Gestao do ELITE</h1>
@@ -186,7 +186,7 @@ export default function AdminElitePage() {
             type="button"
             onClick={handleSave}
             disabled={saving}
-            className="inline-flex min-w-[190px] items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 px-5 py-3 text-xs font-black uppercase tracking-wider text-black shadow-lg shadow-amber-500/20 transition-all hover:from-amber-400 hover:to-yellow-400 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex min-w-[190px] items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 px-5 py-3 text-xs font-black uppercase tracking-wider text-black shadow-lg shadow-blue-500/20 transition-all hover:from-blue-400 hover:to-cyan-400 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {saving ? (
               <>
@@ -201,12 +201,12 @@ export default function AdminElitePage() {
 
         <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
           <div className="space-y-5">
-            <section className="overflow-hidden rounded-2xl border border-amber-500/15 bg-[linear-gradient(180deg,rgba(10,10,12,0.98),rgba(7,7,8,0.98))]">
-              <div className="h-[5px] bg-gradient-to-r from-amber-500 via-yellow-300 to-amber-500" />
+            <section className="overflow-hidden rounded-2xl border border-blue-500/15 bg-[linear-gradient(180deg,rgba(10,10,12,0.98),rgba(7,7,8,0.98))]">
+              <div className="h-[5px] bg-gradient-to-r from-blue-500 via-cyan-300 to-blue-500" />
               <div className="p-5 md:p-6">
                 <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
                   <div>
-                    <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-300">Planilha mensal</div>
+                    <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-300">Planilha mensal</div>
                     <h2 className="mt-2 text-2xl font-black tracking-tight text-white">Base de pedidos</h2>
                     <p className="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-400">
                       Os meses aparecem para consulta somente quando existem dados importados.
@@ -281,7 +281,7 @@ export default function AdminElitePage() {
                     min="1"
                     value={config.target}
                     onChange={(e) => updateConfig('target', Math.max(1, Number(e.target.value) || 1))}
-                    className="admin-input !bg-[#0a0a0c] !py-2.5"
+                    className="admin-input !bg-[#0a1829] !py-2.5"
                   />
                 </div>
 
@@ -308,23 +308,23 @@ export default function AdminElitePage() {
             </section>
           </div>
 
-          <aside className="h-fit overflow-hidden rounded-2xl border border-amber-500/15 bg-[linear-gradient(180deg,rgba(10,10,12,0.98),rgba(7,7,8,0.98))]">
-            <div className="h-[5px] bg-gradient-to-r from-amber-500 via-yellow-300 to-amber-500" />
+          <aside className="h-fit overflow-hidden rounded-2xl border border-blue-500/15 bg-[linear-gradient(180deg,rgba(10,10,12,0.98),rgba(7,7,8,0.98))]">
+            <div className="h-[5px] bg-gradient-to-r from-blue-500 via-cyan-300 to-blue-500" />
             <div className="p-5">
-              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-amber-300">
-                <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-blue-500/20 bg-blue-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-blue-300">
+                <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
                 Previa
               </div>
 
               <div className="rounded-2xl border border-white/[0.06] bg-black/20 p-4">
-                <div className="mb-3 inline-flex w-fit rounded-md border border-amber-500/25 bg-amber-950/35 px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-wider text-amber-100">
+                <div className="mb-3 inline-flex w-fit rounded-md border border-blue-500/25 bg-blue-950/35 px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-wider text-blue-100">
                   {config.tag_label}
                 </div>
                 <h3 className="text-xl font-black tracking-tight text-white">{config.card_title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-zinc-400">{config.card_description}</p>
                 <div className="mt-5 border-t border-white/[0.05] pt-4">
                   <div className="font-mono text-[9px] font-bold uppercase tracking-wider text-zinc-500">Meta mensal</div>
-                  <div className="mt-1 text-lg font-black text-amber-100">{config.target} pedidos</div>
+                  <div className="mt-1 text-lg font-black text-blue-100">{config.target} pedidos</div>
                 </div>
               </div>
 

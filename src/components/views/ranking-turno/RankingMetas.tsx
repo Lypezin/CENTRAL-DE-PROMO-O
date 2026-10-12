@@ -24,7 +24,7 @@ function RankingMetasComponent({
   formatCurrency,
   isCopa
 }: RankingMetasProps) {
-  
+
   const target = useMemo(() => {
     return mecanica.metas_predefinidas?.[0]?.meta ?? 50
   }, [mecanica.metas_predefinidas])
@@ -40,7 +40,7 @@ function RankingMetasComponent({
 
   return (
     <div className="space-y-6 animate-fade-in">
-      
+
       {/* 🔍 INDIVIDUAL SEARCH CARD RESULT */}
       {searchQuery ? (
         <div className="space-y-3">
@@ -54,9 +54,9 @@ function RankingMetasComponent({
               const pct = Math.min((score / target) * 100, 100)
 
               return (
-                <div 
-                  key={item.id_da_pessoa_entregadora} 
-                  className="bg-[#08080a] border border-white/[0.04] p-5 rounded-2xl space-y-4 shadow-xl hover:border-white/[0.08] transition-all duration-300"
+                <div
+                  key={item.id_da_pessoa_entregadora}
+                  className="bg-[#0b1a2d] border border-white/[0.04] p-5 rounded-2xl space-y-4 shadow-xl hover:border-white/[0.08] transition-all duration-300"
                 >
                   <div className="flex justify-between items-start">
                     <div>
@@ -75,10 +75,10 @@ function RankingMetasComponent({
                   <div className="space-y-2">
                     {/* Glowing thin progress track */}
                     <div className="h-[4px] w-full bg-white/[0.01] border border-white/[0.04] rounded-full overflow-hidden">
-                      <div 
+                      <div
                         className={`h-full rounded-full transition-all duration-1000 ${
-                          atingido 
-                            ? 'bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.3)]' 
+                          atingido
+                            ? 'bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.3)]'
                             : 'bg-sky-500 shadow-[0_0_8px_rgba(56,189,248,0.2)]'
                         }`}
                         style={{ width: `${pct}%` }}
@@ -86,25 +86,25 @@ function RankingMetasComponent({
                     </div>
                     <div className="flex justify-between text-[8px] text-zinc-500 font-bold uppercase tracking-wider font-mono">
                       <span>0%</span>
-                      <span className={atingido ? 'text-emerald-400' : 'text-sky-400'}>{pct.toFixed(0)}% concluído</span>
+                      <span className={atingido ? 'text-cyan-400' : 'text-sky-400'}>{pct.toFixed(0)}% concluído</span>
                       <span>100%</span>
                     </div>
                   </div>
 
                   <div className="pt-3.5 flex flex-wrap items-center justify-between gap-3 border-t border-white/[0.02]">
                     {atingido ? (
-                      <div className="inline-flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[9px] font-extrabold px-3 py-1 rounded-lg uppercase tracking-wider font-mono shadow-sm">
+                      <div className="inline-flex items-center gap-1.5 bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[9px] font-extrabold px-3 py-1 rounded-lg uppercase tracking-wider font-mono shadow-sm">
                         <span>✅</span> Concluído!
                       </div>
                     ) : (
-                      <div className="inline-flex items-center gap-1.5 bg-amber-500/5 border border-amber-500/20 text-amber-400 text-[9px] font-extrabold px-3 py-1 rounded-lg uppercase tracking-wider font-mono shadow-sm">
+                      <div className="inline-flex items-center gap-1.5 bg-blue-500/5 border border-blue-500/20 text-blue-400 text-[9px] font-extrabold px-3 py-1 rounded-lg uppercase tracking-wider font-mono shadow-sm">
                         <span>⏳</span> Faltam {formatScoreValue(target - score)}
                       </div>
                     )}
 
                     <div className="text-[10px] text-zinc-400 font-mono">
                       Prêmio Garantido:{' '}
-                      <strong className={atingido ? 'text-emerald-400 font-extrabold' : 'text-zinc-600'}>
+                      <strong className={atingido ? 'text-cyan-400 font-extrabold' : 'text-zinc-600'}>
                         {formatCurrency(prize)}
                       </strong>
                     </div>
@@ -122,11 +122,11 @@ function RankingMetasComponent({
 
       {/* 🏆 MURAL DOS CONQUISTADORES (Honor Board with clean cards) */}
       <div className="space-y-4 border-t border-white/[0.04] pt-6">
-        <h3 className="text-[10px] font-bold tracking-wider text-emerald-400 uppercase flex items-center gap-2 pl-1 font-mono">
-          <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+        <h3 className="text-[10px] font-bold tracking-wider text-cyan-400 uppercase flex items-center gap-2 pl-1 font-mono">
+          <span className="w-1.5 h-1.5 bg-cyan-500 rounded-full animate-pulse"></span>
           Mural dos Conquistadores (Objetivo Atingido)
         </h3>
-        
+
         {winners.length === 0 ? (
           <p className="text-xs text-zinc-600 pl-1 italic font-sans">
             Ninguém atingiu o objetivo desta semana ainda. Seja o primeiro!
@@ -134,11 +134,11 @@ function RankingMetasComponent({
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             {winners.map((item, idx) => (
-              <div 
-                key={item.id_da_pessoa_entregadora} 
-                className="flex items-center gap-3 bg-emerald-500/5 border border-emerald-500/10 p-3.5 rounded-xl hover:border-emerald-400/30 transition-all duration-300 shadow-sm"
+              <div
+                key={item.id_da_pessoa_entregadora}
+                className="flex items-center gap-3 bg-cyan-500/5 border border-cyan-500/10 p-3.5 rounded-xl hover:border-cyan-400/30 transition-all duration-300 shadow-sm"
               >
-                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 text-xs font-mono font-bold select-none">
+                <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 text-xs font-mono font-bold select-none">
                   {idx + 1 < 10 ? `0${idx + 1}` : idx + 1}
                 </div>
                 <div className="truncate">
@@ -147,7 +147,7 @@ function RankingMetasComponent({
                     {!isCopa && `📍 ${item.praca} • `}{formatScoreValue(getScore(item))}
                   </div>
                 </div>
-                <div className="ml-auto bg-emerald-500/15 text-emerald-300 border border-emerald-500/20 px-2.5 py-1 rounded-lg text-[10px] font-black font-mono">
+                <div className="ml-auto bg-cyan-500/15 text-cyan-300 border border-cyan-500/20 px-2.5 py-1 rounded-lg text-[10px] font-black font-mono">
                   +{formatCurrency(prize)}
                 </div>
               </div>

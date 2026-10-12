@@ -81,7 +81,7 @@ export default function SiteConfigPanel() {
         <div className="grid grid-cols-2 gap-2 bg-black/45 p-1 rounded-xl border border-white/5 select-none">
           {[
             { key: 'raios', label: 'Raios', emoji: '⚡', color: 'hover:text-sky-400', activeBg: 'bg-sky-500/10 border-sky-500/30 text-sky-400 shadow-[0_0_12px_rgba(14,165,233,0.12)]' },
-            { key: 'ninja', label: 'Ninja', emoji: '🥋', color: 'hover:text-rose-500', activeBg: 'bg-rose-500/10 border-rose-500/30 text-rose-400 shadow-[0_0_12px_rgba(225,29,72,0.12)]' }
+            { key: 'ninja', label: 'Ninja', emoji: '🥋', color: 'hover:text-blue-500', activeBg: 'bg-blue-500/10 border-blue-500/30 text-blue-400 shadow-[0_0_12px_rgba(37,99,235,0.12)]' }
           ].map(opt => {
             const isActive = tema === opt.key
             return (
@@ -90,7 +90,7 @@ export default function SiteConfigPanel() {
                 disabled={loading || saving}
                 onClick={() => handleSelectTema(opt.key as Tema)}
                 className={`flex flex-col items-center justify-center py-2.5 px-2 rounded-lg border text-[11px] font-extrabold uppercase tracking-wider transition-all duration-200 cursor-pointer active:scale-[0.97] ${
-                  isActive 
+                  isActive
                     ? opt.activeBg
                     : 'bg-transparent border-transparent text-zinc-500 ' + opt.color
                 }`}
