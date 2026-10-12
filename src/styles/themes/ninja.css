@@ -44,7 +44,7 @@
 
 @keyframes faixa-preta-city-letter {
   0%, 28%, 100% {
-    color: #d5e2ff;
+    color: #acc5ff;
     text-shadow: 0 1px 12px rgba(44, 103, 234, .2);
   }
   8%, 16% {
@@ -109,7 +109,7 @@
 
 .faixa-preta-city-letter {
   display: inline-block;
-  color: #d5e2ff;
+  color: #acc5ff;
   text-shadow: 0 1px 12px rgba(44, 103, 234, .2);
 }
 
