@@ -400,7 +400,7 @@ export default function ExcelImportZone({
         onChange={(event) => selectFile(event.target.files?.[0])}
         disabled={busy}
         aria-describedby="xlsx-import-help"
-        className="block w-full rounded-xl border border-white/10 bg-[#0a1d3e] px-3 py-2.5 text-sm text-slate-300 file:mr-4 file:rounded-lg file:border-0 file:bg-blue-500 file:px-3 file:py-1.5 file:text-[11px] file:font-bold file:uppercase file:tracking-wider file:text-white hover:border-white/15 focus:border-blue-500/50 focus:outline-none disabled:opacity-60"
+        className="hidden"
       />
 
       <div

@@ -65,7 +65,7 @@ export default async function RootLayout({
           
           <Navbar />
           <VisitorTracker />
-          <main className="pt-16 min-h-screen">
+          <main className="relative z-10 pt-16 min-h-screen">
             {children}
           </main>
         </ToastProvider>

@@ -14,7 +14,7 @@ function ThemeBackground({ theme }: { theme: SiteTheme }) {
     : 'radial-gradient(ellipse at 76% 8%, rgba(78,128,237,0.12), transparent 68%)'
 
   return (
-    <div className="fixed inset-0 z-[-2] pointer-events-none overflow-hidden bg-[#07132c]">
+    <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden bg-[#07132c]" aria-hidden="true">
       <div className="absolute inset-0 opacity-40" style={{ background: gradient }} />
       <div className="site-backdrop-glow site-backdrop-glow-left" aria-hidden="true" />
       <div className="site-backdrop-glow site-backdrop-glow-right" aria-hidden="true" />

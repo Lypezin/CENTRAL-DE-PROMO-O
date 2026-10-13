@@ -11,6 +11,7 @@ interface GeneralSettingsFormProps {
   onSave: (fields: Partial<Promocao>) => Promise<void>
   saving: boolean
   setTurnoEditorAtivo?: React.Dispatch<React.SetStateAction<string>>
+  hideStatus?: boolean
 }
 
 export default function GeneralSettingsForm({
@@ -18,7 +19,8 @@ export default function GeneralSettingsForm({
   setPromo,
   onSave,
   saving,
-  setTurnoEditorAtivo
+  setTurnoEditorAtivo,
+  hideStatus = false
 }: GeneralSettingsFormProps) {
   const toast = useToast()
 
@@ -70,7 +72,7 @@ export default function GeneralSettingsForm({
       </div>
 
       {/* Row 1: Name + City + Metric */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
         <div>
           <label htmlFor="geral-nome" className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono mb-1.5">Nome</label>
           <input
@@ -153,7 +155,7 @@ export default function GeneralSettingsForm({
       </div>
 
       {/* Row 2: Dates + Limit + Status */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
         <div>
           <label htmlFor="geral-inicio" className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono mb-1.5">Início</label>
           <input
@@ -192,7 +194,7 @@ export default function GeneralSettingsForm({
             className="admin-input !py-2.5 bg-[#0a1d3e]"
           />
         </div>
-        <div>
+        {!hideStatus && <div>
           <label htmlFor="geral-status" className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono mb-1.5">Status</label>
           <select
             id="geral-status"
@@ -204,7 +206,7 @@ export default function GeneralSettingsForm({
             <option value="ativa">Ativa</option>
             <option value="encerrada">Encerrada</option>
           </select>
-        </div>
+        </div>}
       </div>
 
       {/* Toggles + Save */}

@@ -1,9 +1,9 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import StatusBadge from '@/components/ui/StatusBadge'
-import Tooltip from '@/components/ui/Tooltip'
 import { usePromoEditor } from '@/hooks/usePromoEditor'
 import StatsOverview from '@/components/admin/StatsOverview'
 import ExcelImportZone from '@/components/admin/ExcelImportZone'
@@ -32,6 +32,7 @@ export default function PromotionManagementWorkspace({
   onReturnToCampaigns,
   onCreateAnother,
 }: PromotionManagementWorkspaceProps) {
+  const [activeSection, setActiveSection] = useState<'dados' | 'premios' | 'planilha'>('dados')
   const {
     promo,
     setPromo,
@@ -120,26 +121,15 @@ export default function PromotionManagementWorkspace({
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              <Tooltip content="Exportar ranking em Excel">
-                <button type="button" onClick={handleExportRanking} disabled={exporting} className="admin-btn-secondary flex min-h-10 items-center gap-1.5 !px-3.5 !py-2 text-[11px] disabled:cursor-wait disabled:opacity-60">
-                  {exporting ? <span className="h-3 w-3 animate-spin rounded-full border-[1.5px] border-current border-t-transparent" aria-hidden="true" /> : <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>}
-                  <span>{exporting ? 'Exportando…' : 'Exportar ranking'}</span>
-                </button>
-              </Tooltip>
-              <Tooltip content="Exportar todos os dados de entregas">
-                <button type="button" onClick={handleExportBaseDados} disabled={exportingBD} className="admin-btn-secondary flex min-h-10 items-center gap-1.5 !px-3.5 !py-2 text-[11px] disabled:cursor-wait disabled:opacity-60">
-                  {exportingBD ? <span className="h-3 w-3 animate-spin rounded-full border-[1.5px] border-current border-t-transparent" aria-hidden="true" /> : <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v3h16v-3" /></svg>}
-                  <span>{exportingBD ? 'Exportando…' : 'Exportar dados'}</span>
-                </button>
-              </Tooltip>
-              <Link href={`/promo/${promo.slug}`} target="_blank" rel="noreferrer" className="admin-btn-secondary inline-flex min-h-10 items-center gap-1.5 !px-3.5 !py-2 text-[11px]">
-                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-                Página pública
-              </Link>
-              {promo.status !== 'ativa'
-                ? <button type="button" onClick={() => { void handleUpdate({ status: 'ativa' }).catch(() => undefined) }} disabled={saving} className="admin-btn-primary min-h-10 !bg-blue-600 !py-2 !text-[11px] !text-white hover:!bg-blue-500 disabled:opacity-60">{saving ? 'Salvando…' : 'Ativar'}</button>
-                : <button type="button" onClick={() => { void handleUpdate({ status: 'encerrada' }).catch(() => undefined) }} disabled={saving} className="admin-btn-danger min-h-10 !py-2 !text-[11px] disabled:opacity-60">{saving ? 'Salvando…' : 'Encerrar'}</button>}
-              {onCreateAnother && <button type="button" onClick={onCreateAnother} className="min-h-10 rounded-lg border border-blue-300/25 px-3 text-[11px] font-bold text-blue-100 transition-colors hover:bg-blue-300/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">Nova campanha</button>}
+              {promo.status !== 'rascunho' && <Link href={`/promo/${promo.slug}`} target="_blank" rel="noreferrer" className="admin-btn-secondary inline-flex min-h-10 items-center !px-3.5 !py-2 text-xs">Ver página pública ↗</Link>}
+              <details className="group relative">
+                <summary className="admin-btn-secondary inline-flex min-h-10 cursor-pointer list-none items-center !px-3.5 !py-2 text-xs [&::-webkit-details-marker]:hidden">Exportar dados <span className="ml-2 text-blue-300">⌄</span></summary>
+                <div className="absolute right-0 z-30 mt-2 flex w-52 flex-col gap-1 rounded-xl border border-blue-300/20 bg-[#10274f] p-2 shadow-2xl">
+                  <button type="button" onClick={handleExportRanking} disabled={exporting} className="min-h-10 rounded-lg px-3 text-left text-xs text-slate-100 hover:bg-white/10 disabled:opacity-50">{exporting ? 'Exportando…' : 'Ranking em Excel'}</button>
+                  <button type="button" onClick={handleExportBaseDados} disabled={exportingBD} className="min-h-10 rounded-lg px-3 text-left text-xs text-slate-100 hover:bg-white/10 disabled:opacity-50">{exportingBD ? 'Exportando…' : 'Base de entregas'}</button>
+                </div>
+              </details>
+              {onCreateAnother && <button type="button" onClick={onCreateAnother} className="min-h-10 rounded-lg border border-blue-300/25 px-3 text-xs font-bold text-blue-100 transition-colors hover:bg-blue-300/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">Nova campanha</button>}
             </div>
           </div>
         </motion.div>
@@ -151,24 +141,32 @@ export default function PromotionManagementWorkspace({
           </div>
         )}
 
-        <nav aria-label="Seções da promoção" className="mb-6 flex flex-wrap gap-2 border-b border-white/10 pb-5">
-          <a href="#dados" className="inline-flex min-h-10 items-center rounded-lg border border-white/10 px-4 text-sm font-semibold text-slate-200 transition-colors hover:border-blue-300/40 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">Dados e regras</a>
-          <a href="#premios" className="inline-flex min-h-10 items-center rounded-lg border border-white/10 px-4 text-sm font-semibold text-slate-200 transition-colors hover:border-blue-300/40 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">Premiação</a>
-          <a href="#planilha" className="inline-flex min-h-10 items-center rounded-lg border border-blue-300/30 bg-blue-300/[.08] px-4 text-sm font-semibold text-blue-100 transition-colors hover:bg-blue-300/[.14] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">Planilha</a>
-        </nav>
+        <div className="mb-5 flex flex-col gap-3 rounded-2xl border border-blue-300/15 bg-[#0c2043]/90 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[.14em] text-blue-200">Publicação</p>
+            <p className="mt-1 text-xs text-slate-400">O status é manual. Salve os dados antes de publicar.</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <label htmlFor="promo-publication-status" className="sr-only">Status da promoção</label>
+            <select id="promo-publication-status" value={promo.status} onChange={(event) => { void handleUpdate({ status: event.target.value as 'rascunho' | 'ativa' | 'encerrada' }).catch(() => undefined) }} disabled={saving} className="admin-input min-w-40 !py-2.5 bg-[#0a1d3e] text-sm disabled:opacity-50">
+              <option value="rascunho">Rascunho</option>
+              <option value="ativa">Ativa</option>
+              <option value="encerrada">Encerrada</option>
+            </select>
+          </div>
+        </div>
 
-        {promo.status === 'rascunho' && <div className="mb-6 rounded-xl border border-blue-300/25 bg-blue-300/[.07] px-5 py-4"><p className="text-sm font-bold text-white">Rascunho pronto para configurar</p><p className="mt-1 text-sm leading-6 text-slate-300">Ajuste os dados e prêmios, importe a planilha e ative a promoção quando estiver pronta.</p></div>}
-
-        <section id="planilha" aria-labelledby="planilha-title" className="mb-6 scroll-mt-20 rounded-2xl border border-blue-300/20 bg-[#102b56] p-4 sm:p-6">
-          <div className="mb-5"><h2 id="planilha-title" className="text-xl font-black text-white">Importar planilha</h2><p className="mt-1 text-sm text-slate-300">Envie o arquivo .xlsx, confira a prévia e confirme os dados desta promoção.</p></div>
-          <ExcelImportZone promocaoId={promo.id} onUploadSuccess={carregarPromo} />
-        </section>
-
-        <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
-          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.1 }} className="space-y-5 lg:col-span-2">
-            <section id="dados" aria-label="Dados e regras da promoção" className="scroll-mt-20"><GeneralSettingsForm promo={promo} setPromo={setPromo} onSave={handleUpdate} saving={saving} setTurnoEditorAtivo={setTurnoEditorAtivo} /></section>
-            <section id="premios" aria-label="Premiação da promoção" className="scroll-mt-20"><TurnoPrizesConfigurator promo={promo} localPremios={localPremios} setLocalPremios={setLocalPremios} turnoEditorAtivo={turnoEditorAtivo} setTurnoEditorAtivo={setTurnoEditorAtivo} activeTurnos={activeTurnos} setActiveTurnos={setActiveTurnos} onSave={handleUpdate} saving={saving} handleUpdate={handleUpdate} /></section>
-          </motion.div>
+        <div className="grid min-w-0 grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
+          <div className="min-w-0 space-y-4">
+            <div role="group" aria-label="Seções da promoção" className="grid grid-cols-3 gap-1 rounded-xl border border-blue-300/15 bg-[#0b1e3e] p-1">
+              {([['dados', 'Dados e regras'], ['premios', 'Premiação'], ['planilha', 'Planilha']] as const).map(([section, label]) => (
+                <button key={section} type="button" onClick={() => setActiveSection(section)} aria-pressed={activeSection === section} className={`min-h-11 min-w-0 rounded-lg px-1 text-center text-[11px] font-bold transition-colors sm:text-sm ${activeSection === section ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/40' : 'text-slate-300 hover:bg-white/5 hover:text-white'}`}>{label}</button>
+              ))}
+            </div>
+            <section id="dados" aria-label="Dados e regras da promoção" hidden={activeSection !== 'dados'}><GeneralSettingsForm promo={promo} setPromo={setPromo} onSave={handleUpdate} saving={saving} setTurnoEditorAtivo={setTurnoEditorAtivo} hideStatus /></section>
+            <section id="premios" aria-label="Premiação da promoção" hidden={activeSection !== 'premios'}><TurnoPrizesConfigurator promo={promo} localPremios={localPremios} setLocalPremios={setLocalPremios} turnoEditorAtivo={turnoEditorAtivo} setTurnoEditorAtivo={setTurnoEditorAtivo} activeTurnos={activeTurnos} setActiveTurnos={setActiveTurnos} onSave={handleUpdate} saving={saving} handleUpdate={handleUpdate} /></section>
+            <section id="planilha" aria-label="Importar planilha" hidden={activeSection !== 'planilha'}><ExcelImportZone promocaoId={promo.id} onUploadSuccess={carregarPromo} /></section>
+          </div>
 
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.15 }} className="space-y-5">
             <PromoPreviewCard promo={promo} />

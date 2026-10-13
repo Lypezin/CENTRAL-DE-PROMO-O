@@ -248,7 +248,7 @@ export default function TurnoPrizesConfigurator({
       )}
 
       {/* Tab selector */}
-      <div role="group" aria-label="Selecionar turno para editar prêmios" className="flex bg-[#0a1d3e] p-0.5 rounded-lg border border-white/[0.04] gap-0.5 overflow-x-auto scrollbar-none">
+      <div role="group" aria-label="Selecionar turno para editar prêmios" className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 bg-[#0a1d3e] p-1 rounded-lg border border-white/[0.04] gap-1">
         {isGeral ? (
           <span className="inline-flex min-h-11 items-center rounded-md bg-blue-600 px-3 py-1.5 text-xs font-bold text-white">
             Geral
@@ -260,7 +260,7 @@ export default function TurnoPrizesConfigurator({
               type="button"
               onClick={() => setTurnoEditorAtivo(t.key)}
               aria-pressed={turnoEditorAtivo === t.key}
-              className={`flex min-h-11 flex-1 min-w-[80px] items-center justify-center px-2.5 py-1.5 rounded-md text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 ${
+              className={`flex min-h-11 min-w-0 items-center justify-center px-1.5 py-1.5 rounded-md text-[11px] font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 ${
                 turnoEditorAtivo === t.key
                   ? 'bg-blue-600 text-white'
                   : 'text-slate-400 hover:text-white hover:bg-white/5'
