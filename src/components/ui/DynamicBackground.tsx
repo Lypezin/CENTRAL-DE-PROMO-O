@@ -18,6 +18,8 @@ function ThemeBackground({ theme }: { theme: SiteTheme }) {
       <div className="absolute inset-0 opacity-40" style={{ background: gradient }} />
       <div className="site-backdrop-glow site-backdrop-glow-left" aria-hidden="true" />
       <div className="site-backdrop-glow site-backdrop-glow-right" aria-hidden="true" />
+      <div className="site-backdrop-arena" aria-hidden="true" />
+      <div className="site-backdrop-beam" aria-hidden="true" />
       <div className="site-backdrop-light" aria-hidden="true" />
     </div>
   )

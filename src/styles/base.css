@@ -92,6 +92,58 @@ html { scrollbar-color: #3155a1 #07132c; }
   animation: backdrop-light-pass 30s ease-in-out infinite;
 }
 
+/* The arena lines stay visible between light passes and give the motion a clear reference. */
+@keyframes arena-breathe {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(-18deg) scale(.96); opacity: .48; }
+  50% { transform: translate3d(-3%, 2%, 0) rotate(-14deg) scale(1.04); opacity: .88; }
+}
+
+@keyframes arena-beam-pass {
+  0% { transform: translate3d(-85vw, 0, 0) skewX(-22deg); opacity: 0; }
+  12% { opacity: .48; }
+  75% { opacity: .48; }
+  100% { transform: translate3d(125vw, 0, 0) skewX(-22deg); opacity: 0; }
+}
+
+.site-backdrop-arena {
+  position: absolute;
+  top: 4%;
+  right: -15%;
+  width: min(86vw, 1100px);
+  aspect-ratio: 1;
+  border: 1px solid rgba(112, 162, 255, .31);
+  border-radius: 50%;
+  box-shadow: 0 0 80px rgba(44, 103, 234, .12), inset 0 0 70px rgba(44, 103, 234, .09);
+  background: radial-gradient(circle, transparent 43%, rgba(55, 109, 228, .09) 44%, transparent 45%, transparent 62%, rgba(113, 151, 242, .12) 62.2%, transparent 63.2%);
+  will-change: transform, opacity;
+  animation: arena-breathe 18s ease-in-out infinite;
+}
+
+.site-backdrop-arena::after {
+  content: '';
+  position: absolute;
+  inset: 12%;
+  border: 1px solid rgba(112, 162, 255, .19);
+  border-radius: 50%;
+}
+
+.site-backdrop-beam {
+  position: absolute;
+  inset-block: -25%;
+  left: 0;
+  width: min(24vw, 340px);
+  background: linear-gradient(90deg, transparent, rgba(66, 133, 255, .05) 18%, rgba(95, 158, 255, .25) 50%, rgba(66, 133, 255, .05) 82%, transparent);
+  border-inline: 1px solid rgba(141, 187, 255, .12);
+  filter: blur(12px);
+  will-change: transform, opacity;
+  animation: arena-beam-pass 16s linear infinite;
+}
+
+@media (max-width: 640px) {
+  .site-backdrop-arena { width: 125vw; right: -58%; top: 10%; }
+  .site-backdrop-beam { width: 42vw; }
+}
+
 /* Base Card Obsidian Layout */
 .obsidian-card {
   background: #0d2350;
