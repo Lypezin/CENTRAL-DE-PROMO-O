@@ -1,10 +1,10 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import StatusBadge from '@/components/ui/StatusBadge'
 import type { EliteConfig } from '@/lib/eliteConfig'
+import EliteBrandMark from './EliteBrandMark'
 
 export default function ElitePromoCard({ config }: { config: EliteConfig }) {
   const cardRef = useRef<HTMLElement>(null)
@@ -49,14 +49,7 @@ export default function ElitePromoCard({ config }: { config: EliteConfig }) {
 
           <div className="elite-brand-stage relative mt-5 flex flex-col items-center text-center">
             <p className="text-[11px] font-extrabold uppercase tracking-[.17em] text-amber-200">{config.tag_label}</p>
-            <div className="elite-brand-art relative mt-2 w-full max-w-[300px]" aria-label="Elite EntreGÔ" role="img">
-              <div className="elite-logo-crop relative aspect-[2.15] overflow-hidden">
-                <Image src="/images/entrego-elite-logo.png" alt="" width={1703} height={923} sizes="(max-width: 640px) 72vw, 300px" loading="eager" className="h-auto w-full" />
-                <span className="elite-logo-sheen" aria-hidden="true" />
-                <span className="elite-logo-spark" aria-hidden="true" />
-              </div>
-              <span className="elite-brand-signature -mt-1 block text-sm font-extrabold leading-none tracking-[-.03em] text-white">EntreGÔ</span>
-            </div>
+            <div className="elite-brand-art relative mt-2 w-full max-w-[320px]"><EliteBrandMark /></div>
             <h3 className={config.card_title.trim().toLocaleUpperCase('pt-BR') === 'ELITE' ? 'sr-only' : 'mt-3 text-lg font-black uppercase text-white'}>{config.card_title}</h3>
             <div className="elite-title-rule mt-3 h-[2px] w-36 bg-gradient-to-r from-transparent via-amber-300 to-transparent" aria-hidden="true" />
           </div>
