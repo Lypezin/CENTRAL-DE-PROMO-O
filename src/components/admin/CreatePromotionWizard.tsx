@@ -201,7 +201,6 @@ export default function CreatePromotionWizard() {
   const [goalPrize, setGoalPrize] = useState(150)
   const [levels, setLevels] = useState<DraftLevel[]>(defaultLevels)
   const [rulesText, setRulesText] = useState<string[]>([''])
-  const [destaqueCopa, setDestaqueCopa] = useState(false)
   const [temaNinja, setTemaNinja] = useState(false)
   const [prizeGroups, setPrizeGroups] = useState(defaultPrizeGroups)
   const [createdPromoId, setCreatedPromoId] = useState<string | null>(null)
@@ -219,9 +218,9 @@ export default function CreatePromotionWizard() {
     || JSON.stringify(activeShifts) !== JSON.stringify(SHIFTS.map(({ key }) => key))
     || limitRanking !== 15 || minimumGoal !== 50 || goalPrize !== 150
     || JSON.stringify(levels) !== JSON.stringify(defaultLevels())
-    || rulesText.some((rule) => rule.trim()) || destaqueCopa || temaNinja
+    || rulesText.some((rule) => rule.trim()) || temaNinja
     || JSON.stringify(prizeGroups) !== JSON.stringify(defaultPrizeGroups())
-  ), [activeShifts, cidade, dataFim, dataInicio, descricao, destaqueCopa, format, goalPrize, grouping, levels, limitRanking, metric, minimumGoal, nome, prizeGroups, rulesText, step, temaNinja])
+  ), [activeShifts, cidade, dataFim, dataInicio, descricao, format, goalPrize, grouping, levels, limitRanking, metric, minimumGoal, nome, prizeGroups, rulesText, step, temaNinja])
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
@@ -252,7 +251,6 @@ export default function CreatePromotionWizard() {
             setGoalPrize(draft.goalPrize)
             setLevels(draft.levels)
             setRulesText(draft.rulesText)
-            setDestaqueCopa(draft.destaqueCopa)
             setTemaNinja(draft.temaNinja)
             setPrizeGroups(draft.prizeGroups)
             setHasRecoveredDraft(true)
@@ -297,7 +295,7 @@ export default function CreatePromotionWizard() {
       goalPrize,
       levels,
       rulesText,
-      destaqueCopa,
+      destaqueCopa: false,
       temaNinja,
       prizeGroups,
     }
@@ -310,7 +308,7 @@ export default function CreatePromotionWizard() {
     } catch {
       // O wizard continua funcional mesmo se o navegador bloquear o armazenamento.
     }
-  }, [activeShift, activeShifts, cidade, createdPromoId, dataFim, dataInicio, descricao, destaqueCopa, draftHydrated, format, goalPrize, grouping, hasUserEnteredData, levels, limitRanking, metric, minimumGoal, nome, prizeGroups, rulesText, step, temaNinja])
+  }, [activeShift, activeShifts, cidade, createdPromoId, dataFim, dataInicio, descricao, draftHydrated, format, goalPrize, grouping, hasUserEnteredData, levels, limitRanking, metric, minimumGoal, nome, prizeGroups, rulesText, step, temaNinja])
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
@@ -378,14 +376,14 @@ export default function CreatePromotionWizard() {
       data_inicio: dataInicio || null,
       data_fim: dataFim || null,
       cidade: cidade.trim() || null,
-      destaque_copa: destaqueCopa,
+      destaque_copa: false,
       config_turnos: configTurnos,
       config_premios: configPremios,
       config_regras: configRegras,
       created_at: timestamp,
       updated_at: timestamp,
     }
-  }, [cidade, configPremios, configTurnos, dataFim, dataInicio, descricao, destaqueCopa, limitRanking, mechanic, nome, rulesText, temaNinja])
+  }, [cidade, configPremios, configTurnos, dataFim, dataInicio, descricao, limitRanking, mechanic, nome, rulesText, temaNinja])
 
   const totalRewards = format === 'ranking'
     ? configPremios.reduce((count, group) => count + (group.premios?.length ?? 0), 0)
@@ -585,7 +583,7 @@ export default function CreatePromotionWizard() {
         data_fim: dataFim || null,
         config_turnos: configTurnos,
         config_premios: configPremios,
-        destaque_copa: destaqueCopa,
+        destaque_copa: false,
         config_regras: {
           limite_ranking: limitRanking,
           tema_ninja: temaNinja,
@@ -647,7 +645,6 @@ export default function CreatePromotionWizard() {
     setGoalPrize(150)
     setLevels(defaultLevels())
     setRulesText([''])
-    setDestaqueCopa(false)
     setTemaNinja(false)
     setPrizeGroups(defaultPrizeGroups())
     setStepError('')
@@ -837,16 +834,10 @@ export default function CreatePromotionWizard() {
                         <legend className="mb-3 text-sm font-bold text-slate-200">Tema visual</legend>
                         <p className="mb-3 text-xs text-slate-400">A identidade escolhida aparece no card público e na página da campanha.</p>
                         <div className="flex flex-wrap gap-2">
-                          <ThemeButton label="Edição Copa" active={destaqueCopa} color="amber" onClick={() => setDestaqueCopa((value) => {
-                            const nextValue = !value
-                            if (nextValue) setTemaNinja(false)
-                            return nextValue
-                          })} />
                           <ThemeButton label="Faixa Preta" active={temaNinja} color="zinc" onClick={() => {
                             setTemaNinja((value) => {
                               const nextValue = !value
                               if (nextValue) {
-                                setDestaqueCopa(false)
                                 if (metric !== 'faturamento_taxas') setMetric('faturamento_taxas')
                               }
                               return nextValue
@@ -963,7 +954,7 @@ export default function CreatePromotionWizard() {
                           <SummaryItem label="Métrica" value={METRICS.find((option) => option.value === metric)?.label ?? 'Corridas concluídas'} />
                           <SummaryItem label="Turnos" value={configTurnos.map((shift) => shift === 'GERAL' ? 'Geral' : shiftInfo(shift)?.short ?? shift).join(', ')} />
                           <SummaryItem label="Premiações configuradas" value={`${totalRewards} item(ns)`} />
-                          <SummaryItem label="Tema" value={[destaqueCopa && 'Edição Copa', temaNinja && 'Faixa Preta'].filter(Boolean).join(' · ') || 'Esportivo padrão'} />
+                          <SummaryItem label="Tema" value={temaNinja ? 'Faixa Preta' : 'Esportivo padrão'} />
                         </dl>
                         <div className="mt-5 border-t border-white/[.08] pt-4">
                           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Detalhes das premiações</h3>

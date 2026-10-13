@@ -214,24 +214,6 @@ export default function GeneralSettingsForm({
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => setPromo({ ...promo, destaque_copa: !promo.destaque_copa })}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[11px] font-bold transition-all ${
-              promo.destaque_copa
-                ? 'bg-blue-500/10 border-blue-500/30 text-blue-400'
-                : 'border-white/[0.04] text-slate-400 hover:text-slate-300 hover:border-white/10'
-            }`}
-          >
-            <div className={`w-3 h-3 rounded-sm border flex items-center justify-center transition-all ${
-              promo.destaque_copa ? 'bg-blue-500 border-blue-400' : 'border-slate-600'
-            }`}>
-              {promo.destaque_copa && (
-                <svg className="w-2 h-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M5 13l4 4L19 7" /></svg>
-              )}
-            </div>
-            Copa
-          </button>
-          <button
-            type="button"
             onClick={() => {
               const nextTemaNinja = !promo.config_regras?.tema_ninja
               const currentMetric = promo.config_regras?.mecanica?.metrica
