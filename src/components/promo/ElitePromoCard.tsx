@@ -2,13 +2,15 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import StatusBadge from '@/components/ui/StatusBadge'
 import type { EliteConfig } from '@/lib/eliteConfig'
 
 export default function ElitePromoCard({ config }: { config: EliteConfig }) {
   const cardRef = useRef<HTMLElement>(null)
   const [motionActive, setMotionActive] = useState(false)
+  const titleLetters = Array.from(config.card_title)
+  const titleLetterStepMs = Math.min(360, 3400 / Math.max(titleLetters.length - 1, 1))
 
   useEffect(() => {
     const card = cardRef.current
@@ -62,7 +64,10 @@ export default function ElitePromoCard({ config }: { config: EliteConfig }) {
           <div className="relative mt-7 min-h-[160px] max-w-[65%]">
             <p className="text-[11px] font-extrabold uppercase tracking-[.17em] text-amber-200">{config.tag_label}</p>
             <h3 className="elite-title mt-2 break-words text-[clamp(2.2rem,12cqi,3.5rem)] font-black uppercase italic leading-[.9] tracking-[-.04em] text-white">
-              {config.card_title}
+              <span className="sr-only">{config.card_title}</span>
+              {titleLetters.map((letter, index) => letter === ' '
+                ? <span key={index} aria-hidden="true"> </span>
+                : <span key={index} aria-hidden="true" className="elite-title-letter" style={{ '--elite-letter-delay': `${450 + index * titleLetterStepMs}ms` } as CSSProperties}>{letter}</span>)}
             </h3>
             <div className="elite-title-rule mt-3 h-[2px] w-[80%] bg-gradient-to-r from-amber-200 via-amber-400 to-transparent" aria-hidden="true" />
           </div>

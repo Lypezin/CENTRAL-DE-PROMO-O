@@ -18,6 +18,16 @@
   to { transform: scaleX(1); opacity: 1; }
 }
 
+@keyframes elite-title-letter {
+  0%, 28%, 100% { color: #f8f1de; text-shadow: 0 1px 12px rgba(251, 191, 36, .18); }
+  8%, 16% { color: #fff; text-shadow: 0 0 7px rgba(255, 255, 255, .9), 0 0 22px rgba(251, 191, 36, .85); }
+}
+
+.elite-title-letter { display: inline-block; color: #f8f1de; }
+.elite-motion-active .elite-title-letter {
+  animation: elite-title-letter 7s ease-in-out var(--elite-letter-delay, 0ms) infinite;
+}
+
 @keyframes elite-light-sweep {
   0%, 8% { opacity: 0; transform: translate3d(-120%, 0, 0) skewX(-22deg); }
   18% { opacity: .65; }

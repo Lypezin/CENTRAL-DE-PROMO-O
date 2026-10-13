@@ -32,6 +32,7 @@ export default function AdminPage() {
 
   const [promocoes, setPromocoes] = useState<Promocao[]>([])
   const [loading, setLoading] = useState(true)
+  const [creating, setCreating] = useState(false)
   const [elitePromoId, setElitePromoId] = useState('')
 
   const [onlineCount, setOnlineCount] = useState<number>(0)
@@ -166,6 +167,47 @@ export default function AdminPage() {
     }
   }
 
+  const handleCriarPromocao = async () => {
+    if (creating) return
+    setCreating(true)
+    try {
+      const prizeRows = (turno: string, values: number[]) => ({
+        turno,
+        minimo_corridas: 0,
+        premios: values.map((valor, index) => ({ posicao: index + 1, valor })),
+      })
+      const response = await fetch('/api/promocoes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nome: `Nova promoção ${new Date().toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}`,
+          tipo: 'ranking_turno',
+          status: 'rascunho',
+          config_turnos: ['CAFE_DA_MANHA', 'ALMOCO', 'TARDE', 'JANTAR', 'MADRUGADA'],
+          config_premios: [
+            prizeRows('CAFE_DA_MANHA', [300, 200, 100]),
+            prizeRows('ALMOCO', [1500, 1000, 500]),
+            prizeRows('TARDE', [300, 200, 100]),
+            prizeRows('JANTAR', [1500, 1000, 500]),
+            prizeRows('MADRUGADA', [300, 200, 100]),
+          ],
+          config_regras: {
+            limite_ranking: 15,
+            mecanica: { metrica: 'corridas_completadas', tipo_calculo: 'ranking', agrupamento: 'turno' },
+          },
+        }),
+      })
+      const result = await response.json() as { id?: string; error?: string }
+      if (!response.ok || !result.id) throw new Error(result.error || 'Não foi possível criar a promoção.')
+      toast.success('Rascunho criado. Complete os dados na tela de gerenciamento.')
+      router.push(`/admin/promo/${result.id}`)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Não foi possível criar a promoção.')
+    } finally {
+      setCreating(false)
+    }
+  }
+
   if (session.status === 'checking') {
     return (
       <main className="flex min-h-[60vh] items-center justify-center bg-[#07132c] text-center">
@@ -199,7 +241,7 @@ export default function AdminPage() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="min-h-screen pb-16 relative overflow-hidden bg-[#07132c]"
+      className="min-h-screen pb-16 relative overflow-hidden"
     >
       <div className="tech-grid opacity-30 pointer-events-none"></div>
       <div className="absolute top-0 inset-x-0 h-[300px] bg-gradient-to-b from-blue-500/5 to-transparent pointer-events-none"></div>
@@ -233,12 +275,13 @@ export default function AdminPage() {
             <motion.button
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
-              onClick={() => router.push('/admin/promo/nova')}
+              onClick={() => void handleCriarPromocao()}
+              disabled={creating}
               className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 text-white border border-blue-400/50 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider shadow-lg shadow-blue-500/20 transition-all flex items-center gap-2"
               aria-label="Criar nova promoção"
             >
-              <span className="text-lg leading-none">+</span>
-              Nova Promoção
+              {creating ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" aria-hidden="true" /> : <span className="text-lg leading-none">+</span>}
+              {creating ? 'Criando rascunho…' : 'Nova Promoção'}
             </motion.button>
           </div>
         </motion.div>

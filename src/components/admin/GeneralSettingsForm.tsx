@@ -34,7 +34,9 @@ export default function GeneralSettingsForm({
       destaque_copa: promo.destaque_copa,
       config_regras: promo.config_regras,
       config_turnos: promo.config_turnos
-    }).then(() => toast.success('Alterações salvas!'))
+    }).then(() => toast.success('Alterações salvas!')).catch(() => {
+      // O editor já informa o erro; não mostre confirmação de salvamento.
+    })
   }
 
   const wrapFormat = (char: string) => {

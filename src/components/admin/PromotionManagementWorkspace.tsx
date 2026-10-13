@@ -84,7 +84,7 @@ export default function PromotionManagementWorkspace({
 
   return (
     <div className="min-h-screen pb-12">
-      <div className="mx-auto max-w-5xl px-4 pt-6 md:px-6">
+      <div className="mx-auto max-w-6xl px-4 pt-6 md:px-6">
         <motion.div
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -101,30 +101,21 @@ export default function PromotionManagementWorkspace({
                 Voltar ao painel
               </Link>}
 
-          {createdInWizard && (
-            <section role="status" className="mb-5 rounded-xl border border-blue-300/20 bg-blue-300/[.06] px-4 py-3">
-              <h2 className="text-sm font-black text-blue-100">Rascunho criado. Continue por aqui.</h2>
-              <p className="mt-1 text-xs leading-5 text-slate-300">Revise os detalhes, importe a planilha e ative a campanha quando estiver pronta. Esta etapa continua no fluxo novo.</p>
-            </section>
-          )}
-
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
             <div className="space-y-1.5">
+              <p className="text-xs font-bold uppercase tracking-[.16em] text-blue-200">Gerenciar promoção</p>
               <div className="flex flex-wrap items-center gap-2.5">
-                <h1 className="text-xl font-black tracking-tight text-white md:text-2xl">{promo.nome}</h1>
+                <h1 className="text-2xl font-black tracking-tight text-white md:text-3xl break-words">{promo.nome}</h1>
                 <StatusBadge status={promo.status} />
               </div>
-              <div className="flex flex-wrap items-center gap-3 text-[10px] font-mono text-slate-400">
+              <div className="flex flex-wrap items-center gap-3 text-xs text-slate-300">
                 {promo.cidade && (
                   <span className="flex items-center gap-1 text-blue-300">
                     <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                     {promo.cidade}
                   </span>
                 )}
-                <span aria-hidden="true" className="text-slate-600">·</span>
-                <span>ID {promo.id.slice(0, 8)}</span>
-                <span aria-hidden="true" className="text-slate-600">·</span>
-                <span>/{promo.slug}</span>
+                <span>{promo.status === 'rascunho' ? 'Visível apenas para administradores' : 'Página pública disponível'}</span>
               </div>
             </div>
 
@@ -160,19 +151,30 @@ export default function PromotionManagementWorkspace({
           </div>
         )}
 
+        <nav aria-label="Seções da promoção" className="mb-6 flex flex-wrap gap-2 border-b border-white/10 pb-5">
+          <a href="#dados" className="inline-flex min-h-10 items-center rounded-lg border border-white/10 px-4 text-sm font-semibold text-slate-200 transition-colors hover:border-blue-300/40 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">Dados e regras</a>
+          <a href="#premios" className="inline-flex min-h-10 items-center rounded-lg border border-white/10 px-4 text-sm font-semibold text-slate-200 transition-colors hover:border-blue-300/40 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">Premiação</a>
+          <a href="#planilha" className="inline-flex min-h-10 items-center rounded-lg border border-blue-300/30 bg-blue-300/[.08] px-4 text-sm font-semibold text-blue-100 transition-colors hover:bg-blue-300/[.14] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">Planilha</a>
+        </nav>
+
+        {promo.status === 'rascunho' && <div className="mb-6 rounded-xl border border-blue-300/25 bg-blue-300/[.07] px-5 py-4"><p className="text-sm font-bold text-white">Rascunho pronto para configurar</p><p className="mt-1 text-sm leading-6 text-slate-300">Ajuste os dados e prêmios, importe a planilha e ative a promoção quando estiver pronta.</p></div>}
+
+        <section id="planilha" aria-labelledby="planilha-title" className="mb-6 scroll-mt-20 rounded-2xl border border-blue-300/20 bg-[#102b56] p-4 sm:p-6">
+          <div className="mb-5"><h2 id="planilha-title" className="text-xl font-black text-white">Importar planilha</h2><p className="mt-1 text-sm text-slate-300">Envie o arquivo .xlsx, confira a prévia e confirme os dados desta promoção.</p></div>
+          <ExcelImportZone promocaoId={promo.id} onUploadSuccess={carregarPromo} />
+        </section>
+
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.1 }} className="space-y-5 lg:col-span-2">
-            <GeneralSettingsForm promo={promo} setPromo={setPromo} onSave={handleUpdate} saving={saving} setTurnoEditorAtivo={setTurnoEditorAtivo} />
-            <TurnoPrizesConfigurator promo={promo} localPremios={localPremios} setLocalPremios={setLocalPremios} turnoEditorAtivo={turnoEditorAtivo} setTurnoEditorAtivo={setTurnoEditorAtivo} activeTurnos={activeTurnos} setActiveTurnos={setActiveTurnos} onSave={handleUpdate} saving={saving} handleUpdate={handleUpdate} />
+            <section id="dados" aria-label="Dados e regras da promoção" className="scroll-mt-20"><GeneralSettingsForm promo={promo} setPromo={setPromo} onSave={handleUpdate} saving={saving} setTurnoEditorAtivo={setTurnoEditorAtivo} /></section>
+            <section id="premios" aria-label="Premiação da promoção" className="scroll-mt-20"><TurnoPrizesConfigurator promo={promo} localPremios={localPremios} setLocalPremios={setLocalPremios} turnoEditorAtivo={turnoEditorAtivo} setTurnoEditorAtivo={setTurnoEditorAtivo} activeTurnos={activeTurnos} setActiveTurnos={setActiveTurnos} onSave={handleUpdate} saving={saving} handleUpdate={handleUpdate} /></section>
           </motion.div>
 
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.15 }} className="space-y-5">
             <PromoPreviewCard promo={promo} />
             <StatsOverview stats={stats} />
-            <ExcelImportZone promocaoId={promo.id} onUploadSuccess={carregarPromo} />
-
-            <section className="space-y-3 rounded-xl border border-rose-300/20 bg-[#0d2350] p-4">
-              <h2 className="text-[11px] font-bold uppercase tracking-wider text-rose-200">Ações de risco</h2>
+            <details className="group space-y-3 rounded-xl border border-rose-300/20 bg-[#0d2350] p-4">
+              <summary className="cursor-pointer list-none text-sm font-bold text-rose-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300 [&::-webkit-details-marker]:hidden">Ações de risco <span className="text-xs text-slate-400 group-open:hidden">Mostrar ↓</span></summary>
               <p className="text-xs leading-5 text-slate-400">A limpeza remove os dados importados. A exclusão remove a campanha e os dados associados.</p>
               <div className="space-y-2">
                 <button type="button" onClick={() => void handleClearData()} onBlur={() => setConfirmClearData(false)} disabled={clearingData} className="min-h-10 w-full rounded-lg border border-rose-300/20 px-3 py-2 text-left text-[11px] font-bold text-rose-200 transition-colors hover:bg-rose-300/10 disabled:opacity-60">
@@ -182,7 +184,7 @@ export default function PromotionManagementWorkspace({
                   {deleting ? 'Excluindo…' : confirmDelete ? 'Clique novamente para excluir a campanha' : 'Excluir campanha'}
                 </button>
               </div>
-            </section>
+            </details>
           </motion.div>
         </div>
       </div>

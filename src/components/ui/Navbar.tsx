@@ -2,43 +2,19 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState, useEffect, useSyncExternalStore } from 'react'
-
-function subscribeToBrowserPreference(callback: () => void): () => void {
-  window.addEventListener('storage', callback)
-  window.addEventListener('performance_mode_change', callback)
-  return () => {
-    window.removeEventListener('storage', callback)
-    window.removeEventListener('performance_mode_change', callback)
-  }
-}
-
-function getEcoPreference(): boolean {
-  return localStorage.getItem('performance_mode') === 'eco'
-}
-
-function subscribeToMount(): () => void {
-  return () => {}
-}
+import { useState, useEffect } from 'react'
 
 export default function Navbar() {
   const pathname = usePathname()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const isEco = useSyncExternalStore(subscribeToBrowserPreference, getEcoPreference, () => false)
-  const mounted = useSyncExternalStore(subscribeToMount, () => true, () => false)
-
   useEffect(() => {
-    // Keep non-React browser effects separate from the preference subscription.
-    document.documentElement.dataset.motion = isEco ? 'eco' : 'normal'
-    window.dispatchEvent(new CustomEvent('performance_mode_change', { detail: { isEco } }))
-  }, [isEco])
-
-  const toggleEcoMode = () => {
-    const nextVal = !isEco
-    localStorage.setItem('performance_mode', nextVal ? 'eco' : 'normal')
-    document.documentElement.dataset.motion = nextVal ? 'eco' : 'normal'
-    window.dispatchEvent(new CustomEvent('performance_mode_change', { detail: { isEco: nextVal } }))
-  }
+    document.documentElement.dataset.motion = 'normal'
+    try {
+      localStorage.removeItem('performance_mode')
+    } catch {
+      // A animação permanece ativa mesmo se o navegador bloquear o armazenamento.
+    }
+  }, [])
 
   const links = [
     { href: '/', label: 'Promoções' },
@@ -74,21 +50,6 @@ export default function Navbar() {
             )
           })}
 
-          {mounted && (
-            <>
-              <span className="w-[1px] h-4 bg-white/25" />
-              <button
-                onClick={toggleEcoMode}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-extrabold uppercase tracking-wider transition-all duration-200 border cursor-pointer ${
-                  isEco
-                    ? 'bg-blue-950/25 border-white/25 text-blue-100 hover:bg-blue-950/35'
-                    : 'bg-white/15 border-white/30 text-white hover:bg-white/25'
-                }`}
-              >
-                <span>{isEco ? 'Efeitos pausados' : 'Efeitos ativos'}</span>
-              </button>
-            </>
-          )}
         </div>
 
         {/* Mobile Toggle */}
@@ -127,24 +88,6 @@ export default function Navbar() {
               )
             })}
 
-            {mounted && (
-              <div className="border-t border-white/[0.04] pt-2 mt-1">
-                <button
-                  onClick={() => {
-                    toggleEcoMode()
-                    setIsMobileMenuOpen(false)
-                  }}
-                  className={`w-full flex items-center justify-between px-3 py-3 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
-                    isEco
-                      ? 'bg-blue-950/25 border border-white/20 text-blue-100'
-                      : 'bg-white/15 border border-white/30 text-white'
-                  }`}
-                >
-                  <span>Animação dos cards</span>
-                  <span>{isEco ? 'PAUSADA' : 'ATIVA'}</span>
-                </button>
-              </div>
-            )}
           </div>
         </div>
       )}

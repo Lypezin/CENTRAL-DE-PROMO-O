@@ -53,6 +53,45 @@ html { scrollbar-color: #3155a1 #07132c; }
   opacity: 0.8;
 }
 
+@keyframes backdrop-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(4%, -3%, 0) scale(1.08); }
+}
+
+@keyframes backdrop-light-pass {
+  0%, 100% { transform: translate3d(-24%, 0, 0) rotate(-18deg); opacity: .12; }
+  50% { transform: translate3d(24%, 0, 0) rotate(-18deg); opacity: .27; }
+}
+
+.site-backdrop-glow {
+  position: absolute;
+  width: min(76vw, 920px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  filter: blur(64px);
+  opacity: .55;
+  will-change: transform;
+  animation: backdrop-drift 24s ease-in-out infinite;
+}
+.site-backdrop-glow-left {
+  top: -38%; left: -28%;
+  background: radial-gradient(circle, rgba(44, 103, 234, .23), rgba(44, 103, 234, 0) 68%);
+}
+.site-backdrop-glow-right {
+  right: -30%; bottom: -48%;
+  background: radial-gradient(circle, rgba(113, 151, 242, .17), rgba(113, 151, 242, 0) 70%);
+  animation-delay: -12s;
+}
+.site-backdrop-light {
+  position: absolute;
+  top: -30%; left: 30%;
+  width: 28%; height: 160%;
+  background: linear-gradient(90deg, transparent, rgba(95, 143, 248, .11), transparent);
+  filter: blur(56px);
+  will-change: transform, opacity;
+  animation: backdrop-light-pass 30s ease-in-out infinite;
+}
+
 /* Base Card Obsidian Layout */
 .obsidian-card {
   background: #0d2350;
