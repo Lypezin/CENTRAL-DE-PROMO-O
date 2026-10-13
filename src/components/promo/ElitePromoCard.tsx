@@ -36,23 +36,24 @@ export default function ElitePromoCard({ config }: { config: EliteConfig }) {
       aria-label={`Abrir ELITE: ${config.card_title}`}
     >
       <article ref={cardRef} className={`elite-promo-card relative isolate flex h-full min-h-[380px] flex-col overflow-hidden rounded-2xl border border-amber-200/20 bg-[linear-gradient(145deg,#19160f_0%,#11120e_55%,#080a09_100%)] shadow-[0_18px_44px_-28px_rgba(0,0,0,0.95)] transition-[border-color,transform,box-shadow] duration-300 group-hover:-translate-y-1 group-hover:border-amber-200/45 group-hover:shadow-[0_24px_50px_-25px_rgba(0,0,0,0.95)] group-focus-visible:-translate-y-1 group-focus-visible:border-amber-200/45 ${motionActive ? 'elite-motion-active' : ''}`}>
-        <div className="h-1.5 w-full shrink-0 bg-gradient-to-r from-amber-700 via-amber-200 to-amber-600" aria-hidden="true" />
+        <div className="h-1.5 w-full shrink-0 bg-gradient-to-r from-amber-700 via-[#36dcca] to-amber-200" aria-hidden="true" />
         <div className="elite-light-sweep pointer-events-none absolute inset-0 z-[1]" aria-hidden="true" />
 
         <div className="relative z-10 flex flex-1 flex-col p-5 sm:p-6">
           <div className="flex flex-wrap items-center justify-between gap-2.5">
             <div className="flex items-center gap-2">
               <StatusBadge status="ativa" />
-              <span className="rounded-md border border-amber-200/25 bg-amber-200/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-[.12em] text-amber-100">Programa Elite</span>
             </div>
             <span className="text-[11px] font-extrabold uppercase tracking-[.14em] text-amber-100/80">Apuração mensal</span>
           </div>
 
-          <div className="relative mt-5 flex flex-col items-center text-center">
+          <div className="elite-brand-stage relative mt-5 flex flex-col items-center text-center">
             <p className="text-[11px] font-extrabold uppercase tracking-[.17em] text-amber-200">{config.tag_label}</p>
             <div className="elite-brand-art relative mt-2 w-full max-w-[300px]" aria-label="Elite EntreGÔ" role="img">
-              <div className="aspect-[2.15] overflow-hidden">
+              <div className="elite-logo-crop relative aspect-[2.15] overflow-hidden">
                 <Image src="/images/entrego-elite-logo.png" alt="" width={1703} height={923} sizes="(max-width: 640px) 72vw, 300px" loading="eager" className="h-auto w-full" />
+                <span className="elite-logo-sheen" aria-hidden="true" />
+                <span className="elite-logo-spark" aria-hidden="true" />
               </div>
               <span className="elite-brand-signature -mt-1 block text-sm font-extrabold leading-none tracking-[-.03em] text-white">EntreGÔ</span>
             </div>
