@@ -2,15 +2,13 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import StatusBadge from '@/components/ui/StatusBadge'
 import type { EliteConfig } from '@/lib/eliteConfig'
 
 export default function ElitePromoCard({ config }: { config: EliteConfig }) {
   const cardRef = useRef<HTMLElement>(null)
   const [motionActive, setMotionActive] = useState(false)
-  const titleLetters = Array.from(config.card_title)
-  const titleLetterStepMs = Math.min(360, 3400 / Math.max(titleLetters.length - 1, 1))
 
   useEffect(() => {
     const card = cardRef.current
@@ -39,37 +37,27 @@ export default function ElitePromoCard({ config }: { config: EliteConfig }) {
     >
       <article ref={cardRef} className={`elite-promo-card relative isolate flex h-full min-h-[380px] flex-col overflow-hidden rounded-2xl border border-amber-200/20 bg-[linear-gradient(145deg,#19160f_0%,#11120e_55%,#080a09_100%)] shadow-[0_18px_44px_-28px_rgba(0,0,0,0.95)] transition-[border-color,transform,box-shadow] duration-300 group-hover:-translate-y-1 group-hover:border-amber-200/45 group-hover:shadow-[0_24px_50px_-25px_rgba(0,0,0,0.95)] group-focus-visible:-translate-y-1 group-focus-visible:border-amber-200/45 ${motionActive ? 'elite-motion-active' : ''}`}>
         <div className="h-1.5 w-full shrink-0 bg-gradient-to-r from-amber-700 via-amber-200 to-amber-600" aria-hidden="true" />
-        <div className="elite-trophy-art pointer-events-none absolute right-[-2%] top-10 z-0 h-[250px] w-[58%] sm:h-[275px]" aria-hidden="true">
-          <Image
-            src="/images/elite-trophy.png"
-            alt=""
-            width={1024}
-            height={1536}
-            sizes="(max-width: 640px) 55vw, 220px"
-            loading="eager"
-            className="h-full w-full object-contain object-right-top"
-          />
-        </div>
         <div className="elite-light-sweep pointer-events-none absolute inset-0 z-[1]" aria-hidden="true" />
 
         <div className="relative z-10 flex flex-1 flex-col p-5 sm:p-6">
           <div className="flex flex-wrap items-center justify-between gap-2.5">
             <div className="flex items-center gap-2">
               <StatusBadge status="ativa" />
-              <span className="rounded-md border border-amber-200/25 bg-amber-200/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-[.12em] text-amber-100">ELITE</span>
+              <span className="rounded-md border border-amber-200/25 bg-amber-200/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-[.12em] text-amber-100">Programa Elite</span>
             </div>
             <span className="text-[11px] font-extrabold uppercase tracking-[.14em] text-amber-100/80">Apuração mensal</span>
           </div>
 
-          <div className="relative mt-7 min-h-[160px] max-w-[65%]">
+          <div className="relative mt-5 flex flex-col items-center text-center">
             <p className="text-[11px] font-extrabold uppercase tracking-[.17em] text-amber-200">{config.tag_label}</p>
-            <h3 className="elite-title mt-2 break-words text-[clamp(2.2rem,12cqi,3.5rem)] font-black uppercase italic leading-[.9] tracking-[-.04em] text-white">
-              <span className="sr-only">{config.card_title}</span>
-              {titleLetters.map((letter, index) => letter === ' '
-                ? <span key={index} aria-hidden="true"> </span>
-                : <span key={index} aria-hidden="true" className="elite-title-letter" style={{ '--elite-letter-delay': `${450 + index * titleLetterStepMs}ms` } as CSSProperties}>{letter}</span>)}
-            </h3>
-            <div className="elite-title-rule mt-3 h-[2px] w-[80%] bg-gradient-to-r from-amber-200 via-amber-400 to-transparent" aria-hidden="true" />
+            <div className="elite-brand-art relative mt-2 w-full max-w-[300px]" aria-label="Elite EntreGÔ" role="img">
+              <div className="aspect-[2.15] overflow-hidden">
+                <Image src="/images/entrego-elite-logo.png" alt="" width={1703} height={923} sizes="(max-width: 640px) 72vw, 300px" loading="eager" className="h-auto w-full" />
+              </div>
+              <span className="elite-brand-signature -mt-1 block text-sm font-extrabold leading-none tracking-[-.03em] text-white">EntreGÔ</span>
+            </div>
+            <h3 className={config.card_title.trim().toLocaleUpperCase('pt-BR') === 'ELITE' ? 'sr-only' : 'mt-3 text-lg font-black uppercase text-white'}>{config.card_title}</h3>
+            <div className="elite-title-rule mt-3 h-[2px] w-36 bg-gradient-to-r from-transparent via-amber-300 to-transparent" aria-hidden="true" />
           </div>
 
           <p className="relative z-20 mt-1 max-w-[37ch] text-sm leading-6 text-zinc-200">{config.card_description}</p>
