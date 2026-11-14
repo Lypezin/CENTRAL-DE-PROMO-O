@@ -1,0 +1,195 @@
+.admin-theme {
+  min-height: 100%;
+  background: #f8fafc;
+  color: #0f172a;
+  color-scheme: light;
+}
+
+.admin-theme .obsidian-card,
+.admin-theme .glass {
+  border-color: #e2e8f0;
+  background-color: #ffffff;
+  color: #1e293b;
+  box-shadow: 0 1px 3px rgb(15 23 42 / 8%);
+  transition: none;
+}
+
+.admin-theme .obsidian-card:hover,
+.admin-theme .glass:hover {
+  transform: none;
+  border-color: #cbd5e1;
+  background-color: #ffffff;
+  box-shadow: 0 1px 3px rgb(15 23 42 / 8%);
+}
+
+.admin-theme .admin-input,
+.admin-theme input:not([type='checkbox']):not([type='radio']):not([type='file']),
+.admin-theme select,
+.admin-theme textarea {
+  min-height: 2.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.625rem;
+  background-color: #ffffff;
+  color: #0f172a;
+  padding: 0.625rem 0.75rem;
+  box-shadow: none;
+}
+
+.admin-theme input[type='checkbox'] {
+  accent-color: #1d4ed8;
+}
+
+.admin-theme .admin-input:focus,
+.admin-theme input:focus,
+.admin-theme select:focus,
+.admin-theme textarea:focus {
+  border-color: #2563eb;
+  outline: 2px solid rgb(37 99 235 / 25%);
+  outline-offset: 1px;
+}
+
+.admin-theme input::placeholder,
+.admin-theme textarea::placeholder {
+  color: #64748b;
+  opacity: 1;
+}
+
+.admin-theme .admin-btn-primary,
+.admin-theme .admin-btn-secondary {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.625rem;
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: background-color 120ms ease-out, border-color 120ms ease-out, color 120ms ease-out;
+}
+
+.admin-theme .admin-btn-primary {
+  border: 1px solid #1d4ed8;
+  background-color: #1d4ed8;
+  color: #ffffff;
+}
+
+.admin-theme .admin-btn-primary:hover:not(:disabled) {
+  border-color: #1e40af;
+  background-color: #1e40af;
+}
+
+.admin-theme .admin-btn-secondary {
+  border: 1px solid #cbd5e1;
+  background-color: #ffffff;
+  color: #334155;
+}
+
+.admin-theme .admin-btn-secondary:hover:not(:disabled) {
+  border-color: #94a3b8;
+  background-color: #f8fafc;
+}
+
+.admin-theme [class*='bg-[#07132c]'] {
+  background-color: #f8fafc;
+}
+
+.admin-theme [class*='bg-[#0a1d3e]'],
+.admin-theme [class*='bg-[#0b1e3e]'],
+.admin-theme [class*='bg-[#0d2350]'],
+.admin-theme [class*='bg-slate-900'],
+.admin-theme [class*='bg-slate-950/'] {
+  background-color: #ffffff;
+}
+
+.admin-theme [class*='bg-black/'] {
+  background-color: #f1f5f9;
+}
+
+.admin-theme [class*='border-white/'] {
+  border-color: #e2e8f0;
+}
+
+.admin-theme [class~='text-white'],
+.admin-theme [class*='text-slate-100'] {
+  color: #0f172a;
+}
+
+.admin-theme [class*='text-slate-200'] {
+  color: #1e293b;
+}
+
+.admin-theme [class*='text-slate-300'] {
+  color: #334155;
+}
+
+.admin-theme [class*='text-slate-400'] {
+  color: #475569;
+}
+
+.admin-theme [class*='text-slate-500'],
+.admin-theme [class*='text-slate-600'] {
+  color: #64748b;
+}
+
+.admin-theme [class*='text-blue-100'],
+.admin-theme [class*='text-blue-200'],
+.admin-theme [class*='text-blue-300'],
+.admin-theme [class*='text-blue-400'] {
+  color: #1d4ed8;
+}
+
+.admin-theme [class*='text-rose-200'],
+.admin-theme [class*='text-red-200'],
+.admin-theme [class*='text-red-300'] {
+  color: #b91c1c;
+}
+
+.admin-theme button[class*='bg-blue-'][class~='text-white'],
+.admin-theme a[class*='bg-blue-'][class~='text-white'],
+.admin-theme button[class*='bg-gradient-to-'][class~='text-white'] {
+  color: #ffffff;
+}
+
+.admin-theme button[class*='bg-blue-'][class~='text-white'] [class~='text-white'] {
+  color: #ffffff;
+}
+
+.admin-theme button[class*='bg-blue-'][class~='text-white'] [class*='text-blue-100'] {
+  color: #dbeafe;
+}
+
+.admin-theme .admin-public-preview {
+  border-color: rgb(15 23 42 / 14%);
+  background-color: #0d2350;
+  color: #f8fafc;
+}
+
+.admin-theme .admin-public-preview [class~='text-white'] {
+  color: #ffffff;
+}
+
+.admin-theme .admin-public-preview [class*='text-slate-'] {
+  color: #cbd5e1;
+}
+
+.admin-theme .admin-public-preview [class*='text-blue-100'],
+.admin-theme .admin-public-preview [class*='text-blue-200'],
+.admin-theme .admin-public-preview [class*='text-blue-300'],
+.admin-theme .admin-public-preview [class*='text-blue-400'] {
+  color: #bfdbfe;
+}
+
+.admin-confirm-dialog::backdrop {
+  background-color: rgb(15 23 42 / 45%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-theme *,
+  .admin-theme *::before,
+  .admin-theme *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0ms !important;
+    animation-duration: 0ms !important;
+  }
+}

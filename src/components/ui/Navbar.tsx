@@ -6,19 +6,23 @@ import { useState, useEffect } from 'react'
 
 export default function Navbar() {
   const pathname = usePathname()
+  const isAdminRoute = pathname.startsWith('/admin')
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   useEffect(() => {
+    if (isAdminRoute) return
     document.documentElement.dataset.motion = 'normal'
     try {
       localStorage.removeItem('performance_mode')
     } catch {
       // A animação permanece ativa mesmo se o navegador bloquear o armazenamento.
     }
-  }, [])
+  }, [isAdminRoute])
 
   const links = [
     { href: '/', label: 'Promoções' },
   ]
+
+  if (isAdminRoute) return null
 
   return (
     <nav className="fixed top-0 w-full z-50 bg-[#2458bd]/95 backdrop-blur-md border-b border-white/20 transition-all">

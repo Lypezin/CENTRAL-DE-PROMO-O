@@ -1,5 +1,5 @@
-import { redirect } from 'next/navigation'
+import CreatePromotionWizard from '@/components/admin/CreatePromotionWizard'
 
 export default function NewPromotionPage() {
-  redirect('/admin')
+  return <CreatePromotionWizard />
 }

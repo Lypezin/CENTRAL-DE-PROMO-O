@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "../styles/base.css";
+@import "../styles/admin.css";
 @import "../styles/themes/copa.css";
 @import "../styles/themes/ninja.css";
 @import "../styles/themes/elite.css";

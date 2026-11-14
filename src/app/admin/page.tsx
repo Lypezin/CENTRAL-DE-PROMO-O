@@ -1,109 +1,76 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
-import { motion } from 'framer-motion'
-import { Promocao } from '@/lib/supabase'
+import Link from 'next/link'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import type { Promocao } from '@/lib/supabase'
 import { useToast } from '@/components/ui/Toast'
 import { useAdminSession } from '@/components/admin/AdminSessionProvider'
-
-import AdminLoginScreen from '@/components/admin/AdminLoginScreen'
 import AdminPromoList from '@/components/admin/AdminPromoList'
 import SiteConfigPanel from '@/components/admin/SiteConfigPanel'
-import { EliteConfig } from '@/lib/eliteConfig'
+import { type EliteConfig } from '@/lib/eliteConfig'
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.08 }
-  }
-}
-
-const itemVariants = {
-  hidden: { y: 16, opacity: 0 },
-  visible: { y: 0, opacity: 1 }
-}
+const statusLabels = {
+  rascunho: 'Rascunhos',
+  ativa: 'Ativas',
+  encerrada: 'Encerradas',
+} as const
 
 export default function AdminPage() {
-  const router = useRouter()
   const toast = useToast()
-  const { session, retrying, setAuthenticated, setUnauthenticated, retrySession } = useAdminSession()
-
+  const { session } = useAdminSession()
   const [promocoes, setPromocoes] = useState<Promocao[]>([])
   const [loading, setLoading] = useState(true)
-  const [creating, setCreating] = useState(false)
+  const [loadError, setLoadError] = useState('')
   const [elitePromoId, setElitePromoId] = useState('')
+  const [onlineCount, setOnlineCount] = useState<number | null>(null)
+  const [totalVisits, setTotalVisits] = useState<number | null>(null)
 
-  const [onlineCount, setOnlineCount] = useState<number>(0)
-  const [totalVisits, setTotalVisits] = useState<number>(0)
+  const counts = useMemo(() => ({
+    total: promocoes.length,
+    rascunho: promocoes.filter((promo) => promo.status === 'rascunho').length,
+    ativa: promocoes.filter((promo) => promo.status === 'ativa').length,
+    encerrada: promocoes.filter((promo) => promo.status === 'encerrada').length,
+  }), [promocoes])
 
-  const handleAdminLoginSuccess = useCallback((name: string) => {
+  const carregarPromocoes = useCallback(async () => {
     setLoading(true)
-    setAuthenticated(name)
-  }, [setAuthenticated])
+    setLoadError('')
+    try {
+      const response = await fetch('/api/promocoes', { cache: 'no-store' })
+      if (!response.ok) throw new Error('Não foi possível carregar as campanhas.')
+      const data: unknown = await response.json()
+      if (!Array.isArray(data)) throw new Error('A resposta de campanhas está em formato inválido.')
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const appWindow = window as Window & { __onlineCount?: number }
-      const count = appWindow.__onlineCount
-      if (typeof count === 'number') {
-        queueMicrotask(() => setOnlineCount(count))
-      }
-    }
-
-    const handleUpdate = (e: Event) => {
-      const count = (e as CustomEvent<number>).detail
-      if (typeof count === 'number') setOnlineCount(count)
-    }
-    window.addEventListener('online_presence_update', handleUpdate)
-    return () => {
-      window.removeEventListener('online_presence_update', handleUpdate)
+      const sortedData = (data as Promocao[])
+        .filter((promo) => promo.config_regras?.elite_internal !== true)
+        .sort((a, b) => (a.config_regras?.ordem ?? 999) - (b.config_regras?.ordem ?? 999))
+      setPromocoes(sortedData)
+    } catch (error) {
+      setLoadError(error instanceof Error ? error.message : 'Não foi possível carregar as campanhas.')
+    } finally {
+      setLoading(false)
     }
   }, [])
 
   const carregarAnalytics = useCallback(async () => {
     try {
-      const res = await fetch('/api/admin/analytics')
-      if (res.ok) {
-        const data = await res.json()
-        setTotalVisits(data.total || 0)
-      }
-    } catch (e) {
-      console.error('Erro ao carregar analíticos:', e)
+      const response = await fetch('/api/admin/analytics', { cache: 'no-store' })
+      if (!response.ok) return
+      const data = await response.json() as { total?: number }
+      if (typeof data.total === 'number') setTotalVisits(data.total)
+    } catch {
+      // Métricas do site são secundárias e não bloqueiam a gestão de campanhas.
     }
   }, [])
 
-  const carregarPromocoes = useCallback(async () => {
-    try {
-      const res = await fetch('/api/promocoes')
-      if (!res.ok) throw new Error('Não foi possível carregar as campanhas.')
-      const data: Promocao[] = await res.json()
-      const visiblePromos = data.filter((promo) => promo.config_regras?.elite_internal !== true)
-      const sortedData = visiblePromos.sort((a, b) => {
-        const aOrdem = a.config_regras?.ordem ?? 999
-        const bOrdem = b.config_regras?.ordem ?? 999
-        return aOrdem - bOrdem
-      })
-      setPromocoes(sortedData)
-    } catch (e) {
-      console.error(e)
-      toast.error('Não foi possível carregar as campanhas. Atualize a página para tentar novamente.')
-    } finally {
-      setLoading(false)
-    }
-  }, [toast])
-
   const carregarEliteConfig = useCallback(async () => {
     try {
-      const res = await fetch('/api/admin/elite-config')
-      if (!res.ok) return
-      const data = (await res.json()) as { success?: boolean; config?: EliteConfig }
-      if (data.success && data.config?.data_promocao_id) {
-        setElitePromoId(data.config.data_promocao_id)
-      }
-    } catch (e) {
-      console.error('Erro ao carregar configuracao do ELITE:', e)
+      const response = await fetch('/api/admin/elite-config', { cache: 'no-store' })
+      if (!response.ok) return
+      const data = await response.json() as { success?: boolean; config?: EliteConfig }
+      if (data.success && data.config?.data_promocao_id) setElitePromoId(data.config.data_promocao_id)
+    } catch {
+      // A campanha ELITE continua acessível pela rota própria.
     }
   }, [])
 
@@ -118,227 +85,133 @@ export default function AdminPage() {
       void carregarEliteConfig()
     })
 
-    const refreshVisibleAnalytics = () => {
+    const refreshAnalytics = () => {
       if (document.visibilityState === 'visible') void carregarAnalytics()
     }
-    const interval = setInterval(refreshVisibleAnalytics, 60000)
-    document.addEventListener('visibilitychange', refreshVisibleAnalytics)
+    const interval = window.setInterval(refreshAnalytics, 60_000)
+    document.addEventListener('visibilitychange', refreshAnalytics)
     return () => {
       cancelled = true
-      clearInterval(interval)
-      document.removeEventListener('visibilitychange', refreshVisibleAnalytics)
+      window.clearInterval(interval)
+      document.removeEventListener('visibilitychange', refreshAnalytics)
     }
-  }, [session.status, carregarPromocoes, carregarAnalytics, carregarEliteConfig])
+  }, [session.status, carregarAnalytics, carregarEliteConfig, carregarPromocoes])
 
-  const handleLogout = async () => {
-    try {
-      const response = await fetch('/api/admin/logout', { method: 'POST' })
-      if (!response.ok) throw new Error('Logout failed.')
-      setUnauthenticated()
-    } catch {
-      toast.error('Não foi possível encerrar a sessão. Tente novamente.')
+  useEffect(() => {
+    const appWindow = window as Window & { __onlineCount?: number }
+    let cancelled = false
+    if (typeof appWindow.__onlineCount === 'number') {
+      queueMicrotask(() => {
+        if (!cancelled) setOnlineCount(appWindow.__onlineCount ?? null)
+      })
     }
-  }
+
+    const handleUpdate = (event: Event) => {
+      const count = (event as CustomEvent<number>).detail
+      if (typeof count === 'number') setOnlineCount(count)
+    }
+    window.addEventListener('online_presence_update', handleUpdate)
+    return () => {
+      cancelled = true
+      window.removeEventListener('online_presence_update', handleUpdate)
+    }
+  }, [])
 
   const handleReorder = async (newOrder: Promocao[]) => {
     const previousOrder = promocoes
     setPromocoes(newOrder)
-
     try {
-      const updates = newOrder.map((promo) => ({
-        id: promo.id,
-        config_regras: promo.config_regras
-      }))
-
-      const res = await fetch('/api/promocoes/reorder', {
+      const updates = newOrder.map((promo) => ({ id: promo.id, config_regras: promo.config_regras }))
+      const response = await fetch('/api/promocoes/reorder', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updates)
+        body: JSON.stringify(updates),
       })
-
-      if (!res.ok) {
-        throw new Error('Falha ao reordenar')
-      }
-      toast.success('Ordem atualizada com sucesso!')
-    } catch (e) {
-      console.error(e)
+      if (!response.ok) throw new Error('Falha ao atualizar a ordem pública.')
+      toast.success('Ordem das campanhas atualizada.')
+    } catch {
       setPromocoes(previousOrder)
-      toast.error('Erro ao salvar nova ordem. Atualize a página.')
+      toast.error('Não foi possível salvar a ordem das campanhas.')
     }
-  }
-
-  const handleCriarPromocao = async () => {
-    if (creating) return
-    setCreating(true)
-    try {
-      const prizeRows = (turno: string, values: number[]) => ({
-        turno,
-        minimo_corridas: 0,
-        premios: values.map((valor, index) => ({ posicao: index + 1, valor })),
-      })
-      const response = await fetch('/api/promocoes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          nome: `Nova promoção ${new Date().toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}`,
-          tipo: 'ranking_turno',
-          status: 'rascunho',
-          config_turnos: ['CAFE_DA_MANHA', 'ALMOCO', 'TARDE', 'JANTAR', 'MADRUGADA'],
-          config_premios: [
-            prizeRows('CAFE_DA_MANHA', [300, 200, 100]),
-            prizeRows('ALMOCO', [1500, 1000, 500]),
-            prizeRows('TARDE', [300, 200, 100]),
-            prizeRows('JANTAR', [1500, 1000, 500]),
-            prizeRows('MADRUGADA', [300, 200, 100]),
-          ],
-          config_regras: {
-            limite_ranking: 15,
-            mecanica: { metrica: 'corridas_completadas', tipo_calculo: 'ranking', agrupamento: 'turno' },
-          },
-        }),
-      })
-      const result = await response.json() as { id?: string; error?: string }
-      if (!response.ok || !result.id) throw new Error(result.error || 'Não foi possível criar a promoção.')
-      toast.success('Rascunho criado. Complete os dados na tela de gerenciamento.')
-      router.push(`/admin/promo/${result.id}`)
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Não foi possível criar a promoção.')
-    } finally {
-      setCreating(false)
-    }
-  }
-
-  if (session.status === 'checking') {
-    return (
-      <main className="flex min-h-[60vh] items-center justify-center bg-[#07132c] text-center">
-        <div>
-          <span className="mx-auto block h-5 w-5 animate-spin rounded-full border-2 border-blue-300/25 border-t-blue-300" aria-hidden="true" />
-          <p className="mt-3 text-sm text-slate-400">Verificando acesso administrativo…</p>
-        </div>
-      </main>
-    )
-  }
-
-  if (session.status === 'unavailable') {
-    return (
-      <main className="flex min-h-[60vh] items-center justify-center bg-[#07132c] px-5 text-center text-white">
-        <section className="max-w-md rounded-2xl border border-rose-300/20 bg-[#0d2350] p-6 shadow-xl">
-          <p className="text-lg font-black text-rose-200">Não foi possível verificar o acesso</p>
-          <p role="alert" className="mt-2 text-sm leading-6 text-slate-400">O serviço de sessão está temporariamente indisponível. Sua sessão não foi encerrada; tente verificar novamente.</p>
-          <button type="button" onClick={() => void retrySession()} disabled={retrying} className="mt-5 min-h-11 rounded-lg bg-blue-300 px-4 text-sm font-black text-slate-950 transition-colors hover:bg-blue-200 disabled:cursor-wait disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white">
-            {retrying ? 'Verificando…' : 'Tentar novamente'}
-          </button>
-        </section>
-      </main>
-    )
-  }
-
-  if (session.status === 'unauthenticated') {
-    return <AdminLoginScreen onSuccess={handleAdminLoginSuccess} />
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="min-h-screen pb-16 relative overflow-hidden"
-    >
-      <div className="tech-grid opacity-30 pointer-events-none"></div>
-      <div className="absolute top-0 inset-x-0 h-[300px] bg-gradient-to-b from-blue-500/5 to-transparent pointer-events-none"></div>
-
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 py-8 relative z-10"
-      >
-        <motion.div variants={itemVariants} className="flex flex-col md:flex-row justify-between items-center md:items-end mb-10 gap-6 border-b border-white/[0.04] pb-6">
-          <div className="text-center md:text-left flex-1">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-500/10 border border-blue-500/20 rounded-full text-[10px] font-bold text-blue-400 uppercase tracking-widest font-mono mb-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></span>
-              Acesso Mestre Ativo
-            </div>
-            <h1 className="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">Painel Administrativo</h1>
-            <p className="text-slate-400 text-sm md:text-base">Gerenciamento central de promoções e relatórios. Bem-vindo, <span className="text-white font-medium">{session.name}</span>.</p>
+    <main className="admin-theme min-h-screen px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl space-y-8">
+        <header className="flex flex-col justify-between gap-5 border-b border-slate-200 pb-6 sm:flex-row sm:items-end">
+          <div className="space-y-2">
+            <p className="text-sm font-semibold text-blue-800">Olá, {session.status === 'authenticated' ? session.name : 'administrador'}</p>
+            <h1 className="max-w-3xl text-balance text-3xl font-bold text-slate-950 sm:text-4xl">Campanhas</h1>
+            <p className="max-w-2xl text-pretty text-sm leading-6 text-slate-600">Crie, organize e acompanhe as promoções da Central em um só lugar.</p>
           </div>
+          <Link href="/admin/promo/nova" className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-lg bg-blue-700 px-5 text-sm font-semibold text-white hover:bg-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2">
+            <span aria-hidden="true" className="text-xl leading-none">+</span>
+            Nova promoção
+          </Link>
+        </header>
 
-          <div className="flex flex-wrap justify-center md:justify-end gap-3 w-full md:w-auto">
-            <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={handleLogout}
-              className="bg-slate-900 hover:bg-red-950/40 text-slate-400 hover:text-red-400 border border-white/[0.04] hover:border-red-500/30 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all"
-              aria-label="Encerrar sessão"
-            >
-              Encerrar Sessão
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={() => void handleCriarPromocao()}
-              disabled={creating}
-              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 text-white border border-blue-400/50 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider shadow-lg shadow-blue-500/20 transition-all flex items-center gap-2"
-              aria-label="Criar nova promoção"
-            >
-              {creating ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" aria-hidden="true" /> : <span className="text-lg leading-none">+</span>}
-              {creating ? 'Criando rascunho…' : 'Nova Promoção'}
-            </motion.button>
+        <section aria-label="Resumo das campanhas" className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <SummaryCard label="Total de campanhas" value={loading ? '—' : counts.total.toLocaleString('pt-BR')} />
+          <SummaryCard label={statusLabels.rascunho} value={loading ? '—' : counts.rascunho.toLocaleString('pt-BR')} tone="amber" />
+          <SummaryCard label={statusLabels.ativa} value={loading ? '—' : counts.ativa.toLocaleString('pt-BR')} tone="green" />
+          <SummaryCard label={statusLabels.encerrada} value={loading ? '—' : counts.encerrada.toLocaleString('pt-BR')} tone="slate" />
+        </section>
+
+        <section id="promocoes" aria-labelledby="campaigns-title" className="space-y-4">
+          <div>
+            <h2 id="campaigns-title" className="text-balance text-xl font-bold text-slate-950">Gestão de Promoções</h2>
+            <p className="mt-1 text-pretty text-sm text-slate-600">Busque, filtre, reordene e abra uma campanha para continuar a configuração.</p>
           </div>
-        </motion.div>
+          <AdminPromoList
+            promocoes={promocoes}
+            loading={loading}
+            error={loadError}
+            onRetry={() => void carregarPromocoes()}
+            onReorder={handleReorder}
+            elitePromoId={elitePromoId}
+          />
+        </section>
 
-        <motion.div variants={itemVariants} id="promocoes" className="mb-8">
-          <div className="mb-4">
-            <h2 className="text-xl font-bold text-white">Gestão de Promoções</h2>
-            <p className="mt-1 text-xs text-slate-400">Crie campanhas, ajuste regras e confira os prazos de publicação.</p>
+        <details className="group rounded-xl border border-slate-200 bg-white">
+          <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 px-5 py-3 text-sm font-semibold text-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 [&::-webkit-details-marker]:hidden">
+            <span>Configurações e métricas do site</span>
+            <span aria-hidden="true" className="text-slate-500 group-open:rotate-180">⌄</span>
+          </summary>
+          <div className="space-y-4 border-t border-slate-200 p-4 sm:p-5">
+            <SiteConfigPanel />
+            <section aria-labelledby="site-metrics-title" className="grid gap-3 sm:grid-cols-2">
+              <h2 id="site-metrics-title" className="sr-only">Métricas do site</h2>
+              <MetricCard label="Pessoas conectadas agora" value={onlineCount === null ? '—' : onlineCount.toLocaleString('pt-BR')} />
+              <MetricCard label="Tráfego total" value={totalVisits === null ? '—' : totalVisits.toLocaleString('pt-BR')} />
+            </section>
           </div>
-          <AdminPromoList promocoes={promocoes} loading={loading} onReorder={handleReorder} elitePromoId={elitePromoId} />
-        </motion.div>
+        </details>
+      </div>
+    </main>
+  )
+}
 
-        <motion.div variants={itemVariants} className="mb-8">
-          <SiteConfigPanel />
-        </motion.div>
+function SummaryCard({ label, value, tone = 'blue' }: { label: string; value: string; tone?: 'blue' | 'amber' | 'green' | 'slate' }) {
+  const tones = {
+    blue: 'border-blue-200 bg-blue-50 text-blue-800',
+    amber: 'border-amber-200 bg-amber-50 text-amber-800',
+    green: 'border-emerald-200 bg-emerald-50 text-emerald-800',
+    slate: 'border-slate-200 bg-white text-slate-700',
+  }
 
-        <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-          <motion.div
-            whileHover={{ scale: 1.02 }}
-            className="obsidian-card p-6 rounded-2xl border border-blue-500/20 bg-gradient-to-br from-[#0a1d3e] to-blue-950/20 relative overflow-hidden group flex items-center justify-between transition-all hover:border-blue-500/40"
-          >
-            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-blue-500/10 blur-[30px] rounded-full group-hover:bg-blue-500/20 transition-colors"></div>
-            <div className="relative z-10">
-              <div className="text-[10px] font-bold text-blue-300/80 uppercase tracking-wider font-mono mb-2 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-blue-500 animate-ping"></span>
-                Pessoas Conectadas Agora
-              </div>
-              <div className="text-4xl font-black text-white font-mono tracking-tighter">{onlineCount}</div>
-            </div>
-            <div className="text-blue-400 bg-blue-500/10 p-4 rounded-2xl border border-blue-500/20 relative z-10">
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-            </div>
-          </motion.div>
+  return (
+    <div className={`rounded-xl border p-4 sm:p-5 ${tones[tone]}`}>
+      <p className="text-pretty text-sm font-medium">{label}</p>
+      <p className="mt-2 font-mono text-2xl font-bold tabular-nums sm:text-3xl">{value}</p>
+    </div>
+  )
+}
 
-          <motion.div
-            whileHover={{ scale: 1.02 }}
-            className="obsidian-card p-6 rounded-2xl border border-blue-500/20 bg-gradient-to-br from-[#0a1d3e] to-blue-950/20 relative overflow-hidden group flex items-center justify-between transition-all hover:border-blue-500/40"
-          >
-            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-blue-500/10 blur-[30px] rounded-full group-hover:bg-blue-500/20 transition-colors"></div>
-            <div className="relative z-10">
-              <div className="text-[10px] font-bold text-blue-300/80 uppercase tracking-wider font-mono mb-2 flex items-center gap-2">
-                <svg className="w-3 h-3 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                Tráfego Total
-              </div>
-              <div className="text-4xl font-black text-white font-mono tracking-tighter">{totalVisits.toLocaleString('pt-BR')}</div>
-            </div>
-            <div className="text-blue-400 bg-blue-500/10 p-4 rounded-2xl border border-blue-500/20 relative z-10">
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-              </svg>
-            </div>
-          </motion.div>
-        </motion.div>
-
-      </motion.div>
-    </motion.div>
+function MetricCard({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+      <p className="text-sm text-slate-600">{label}</p>
+      <p className="mt-1 font-mono text-xl font-semibold tabular-nums text-slate-900">{value}</p>
+    </div>
   )
 }

@@ -383,7 +383,7 @@ export default function ExcelImportZone({
   return (
     <div className={`rounded-xl border border-white/[0.05] bg-[#0d2350] ${compact ? 'p-4' : 'p-5'} space-y-4`}>
       <div className="space-y-1">
-        <h3 className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 font-mono">
+        <h3 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-400 font-mono">
           <svg className="h-3 w-3 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
           </svg>
@@ -420,7 +420,7 @@ export default function ExcelImportZone({
       >
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div className="min-w-0">
-            <div className="text-[11px] font-bold text-white">{arquivo ? 'Arquivo selecionado' : 'Nenhum arquivo selecionado'}</div>
+            <div className="text-xs font-bold text-white">{arquivo ? 'Arquivo selecionado' : 'Nenhum arquivo selecionado'}</div>
             <div id="xlsx-import-help" className="mt-1 break-all text-xs text-slate-400">
               {arquivo ? `${arquivo.name} • ${(arquivo.size / 1024).toFixed(1)} KB` : 'Escolha um arquivo .xlsx ou arraste-o para esta área. Limite: 25 MB.'}
             </div>
@@ -430,7 +430,7 @@ export default function ExcelImportZone({
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={busy}
-            className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-slate-900 px-4 py-2 text-[11px] font-bold uppercase tracking-wider text-white transition-all hover:border-blue-500/40 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-slate-900 px-4 py-2 text-xs font-bold uppercase tracking-wider text-white transition-all hover:border-blue-500/40 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
           >
             Selecionar arquivo
           </button>
@@ -443,7 +443,7 @@ export default function ExcelImportZone({
         type="button"
         onClick={handlePreparePreview}
         disabled={!arquivo || busy || importId !== null}
-        className="admin-btn-secondary w-full !py-2.5 text-[11px] disabled:cursor-not-allowed disabled:opacity-50"
+        className="admin-btn-secondary w-full !py-2.5 text-xs disabled:cursor-not-allowed disabled:opacity-50"
       >
         {previewLoading ? 'Validando planilha...' : 'Validar e preparar prévia'}
       </button>
@@ -526,7 +526,7 @@ export default function ExcelImportZone({
 
       {uploadLoading && (
         <div className="space-y-2" aria-live="polite">
-          <div className="flex justify-between text-[10px] font-mono text-slate-400">
+          <div className="flex justify-between text-xs font-mono text-slate-400">
             <span>Enviando registros validados</span>
             <span className="text-blue-400">{progresso}%</span>
           </div>
@@ -539,7 +539,7 @@ export default function ExcelImportZone({
       {uploadResult && (
         <div
           role={uploadResult.success ? 'status' : 'alert'}
-          className={`rounded-lg border p-3 text-[11px] font-bold ${
+          className={`rounded-lg border p-3 text-xs font-bold ${
             uploadResult.success ? 'border-blue-500/20 bg-blue-500/5 text-blue-400' : 'border-red-500/20 bg-red-500/5 text-red-400'
           }`}
         >
@@ -551,7 +551,7 @@ export default function ExcelImportZone({
         type="button"
         onClick={handleUpload}
         disabled={!arquivo || !preview || !confirmed || validCount === 0 || busy}
-        className="admin-btn-primary w-full !py-2.5 text-[11px] disabled:cursor-not-allowed disabled:opacity-50"
+        className="admin-btn-primary w-full !py-2.5 text-xs disabled:cursor-not-allowed disabled:opacity-50"
       >
         {uploadLoading ? 'Importando...' : importId ? 'Tentar novamente a mesma importação' : 'Confirmar e importar planilha'}
       </button>

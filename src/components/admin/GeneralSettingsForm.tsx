@@ -2,7 +2,6 @@
 
 import React from 'react'
 import { Promocao } from '@/lib/supabase'
-import { useToast } from '@/components/ui/Toast'
 import { resolveRankingMetric } from '@/lib/rankingMetric'
 
 interface GeneralSettingsFormProps {
@@ -22,11 +21,9 @@ export default function GeneralSettingsForm({
   setTurnoEditorAtivo,
   hideStatus = false
 }: GeneralSettingsFormProps) {
-  const toast = useToast()
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    onSave({
+    void onSave({
       nome: promo.nome,
       cidade: promo.cidade,
       descricao: promo.descricao,
@@ -36,9 +33,7 @@ export default function GeneralSettingsForm({
       destaque_copa: promo.destaque_copa,
       config_regras: promo.config_regras,
       config_turnos: promo.config_turnos
-    }).then(() => toast.success('Alterações salvas!')).catch(() => {
-      // O editor já informa o erro; não mostre confirmação de salvamento.
-    })
+    }).catch(() => undefined)
   }
 
   const wrapFormat = (char: string) => {
@@ -65,7 +60,7 @@ export default function GeneralSettingsForm({
   return (
     <form onSubmit={handleSubmit} className="rounded-xl border border-white/[0.04] bg-[#0d2350] p-5 space-y-5">
       <div className="flex items-center justify-between">
-        <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider font-mono flex items-center gap-2">
+        <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider font-mono flex items-center gap-2">
           <svg className="w-3.5 h-3.5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
           Configurações Gerais
         </h2>
@@ -74,7 +69,7 @@ export default function GeneralSettingsForm({
       {/* Row 1: Name + City + Metric */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
         <div>
-          <label htmlFor="geral-nome" className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono mb-1.5">Nome</label>
+          <label htmlFor="geral-nome" className="block text-xs font-bold text-slate-400 uppercase tracking-wider font-mono mb-1.5">Nome</label>
           <input
             id="geral-nome"
             type="text"
@@ -85,7 +80,7 @@ export default function GeneralSettingsForm({
           />
         </div>
         <div>
-          <label htmlFor="geral-cidade" className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono mb-1.5">Cidade</label>
+          <label htmlFor="geral-cidade" className="block text-xs font-bold text-slate-400 uppercase tracking-wider font-mono mb-1.5">Cidade</label>
           <input
             id="geral-cidade"
             type="text"
@@ -96,7 +91,7 @@ export default function GeneralSettingsForm({
           />
         </div>
         <div>
-          <label htmlFor="geral-metrica" className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono mb-1.5">Métrica</label>
+          <label htmlFor="geral-metrica" className="block text-xs font-bold text-slate-400 uppercase tracking-wider font-mono mb-1.5">Métrica</label>
           <select
             id="geral-metrica"
             value={metricValue}
@@ -139,10 +134,10 @@ export default function GeneralSettingsForm({
 
       {/* Description */}
       <div>
-        <label htmlFor="geral-descricao" className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono mb-1.5">Descrição</label>
+        <label htmlFor="geral-descricao" className="block text-xs font-bold text-slate-400 uppercase tracking-wider font-mono mb-1.5">Descrição</label>
         <div className="flex gap-1 mb-1.5">
-          <button type="button" onClick={() => wrapFormat('**')} className="px-2 py-0.5 text-[10px] font-bold text-slate-400 hover:text-white bg-white/[0.03] hover:bg-white/[0.06] rounded transition-colors" title="Negrito">B</button>
-          <button type="button" onClick={() => wrapFormat('_')} className="px-2 py-0.5 text-[10px] italic text-slate-400 hover:text-white bg-white/[0.03] hover:bg-white/[0.06] rounded transition-colors" title="Itálico">I</button>
+          <button type="button" onClick={() => wrapFormat('**')} className="px-2 py-0.5 text-xs font-bold text-slate-400 hover:text-white bg-white/[0.03] hover:bg-white/[0.06] rounded transition-colors" title="Negrito">B</button>
+          <button type="button" onClick={() => wrapFormat('_')} className="px-2 py-0.5 text-xs italic text-slate-400 hover:text-white bg-white/[0.03] hover:bg-white/[0.06] rounded transition-colors" title="Itálico">I</button>
         </div>
         <textarea
           id="geral-descricao"
@@ -157,7 +152,7 @@ export default function GeneralSettingsForm({
       {/* Row 2: Dates + Limit + Status */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
         <div>
-          <label htmlFor="geral-inicio" className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono mb-1.5">Início</label>
+          <label htmlFor="geral-inicio" className="block text-xs font-bold text-slate-400 uppercase tracking-wider font-mono mb-1.5">Início</label>
           <input
             id="geral-inicio"
             type="date"
@@ -167,7 +162,7 @@ export default function GeneralSettingsForm({
           />
         </div>
         <div>
-          <label htmlFor="geral-fim" className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono mb-1.5">Término</label>
+          <label htmlFor="geral-fim" className="block text-xs font-bold text-slate-400 uppercase tracking-wider font-mono mb-1.5">Término</label>
           <input
             id="geral-fim"
             type="date"
@@ -177,7 +172,7 @@ export default function GeneralSettingsForm({
           />
         </div>
         <div>
-          <label htmlFor="geral-limite" className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono mb-1.5">Limite Ranking</label>
+          <label htmlFor="geral-limite" className="block text-xs font-bold text-slate-400 uppercase tracking-wider font-mono mb-1.5">Limite Ranking</label>
           <input
             id="geral-limite"
             type="number"
@@ -195,7 +190,7 @@ export default function GeneralSettingsForm({
           />
         </div>
         {!hideStatus && <div>
-          <label htmlFor="geral-status" className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono mb-1.5">Status</label>
+          <label htmlFor="geral-status" className="block text-xs font-bold text-slate-400 uppercase tracking-wider font-mono mb-1.5">Status</label>
           <select
             id="geral-status"
             value={promo.status}
@@ -231,7 +226,7 @@ export default function GeneralSettingsForm({
                 }
               })
             }}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[11px] font-bold transition-all ${
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all ${
               promo.config_regras?.tema_ninja
                 ? 'bg-slate-500/10 border-slate-500/30 text-slate-300'
                 : 'border-white/[0.04] text-slate-400 hover:text-slate-300 hover:border-white/10'
@@ -251,7 +246,7 @@ export default function GeneralSettingsForm({
         <button
           type="submit"
           disabled={saving}
-          className="admin-btn-primary !py-2 !px-5 text-[11px] flex items-center gap-2 w-full sm:w-auto justify-center"
+          className="admin-btn-primary !py-2 !px-5 text-xs flex items-center gap-2 w-full sm:w-auto justify-center"
         >
           {saving ? (
             <>

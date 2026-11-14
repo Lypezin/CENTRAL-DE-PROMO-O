@@ -81,7 +81,7 @@ export default function AdminLoginScreen({ onSuccess }: AdminLoginScreenProps) {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-[#07132c]">
+    <div className="admin-theme min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-slate-50">
       {/* Ambient tech grid */}
       <div className="tech-grid opacity-60"></div>
 

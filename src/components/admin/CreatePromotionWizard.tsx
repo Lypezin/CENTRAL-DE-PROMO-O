@@ -1,12 +1,11 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react'
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useToast } from '@/components/ui/Toast'
 import PromoPreviewCard from '@/components/admin/PromoPreviewCard'
-import PromotionCreationCompletion from '@/components/admin/PromotionCreationCompletion'
+import AdminConfirmDialog from '@/components/admin/AdminConfirmDialog'
 import TurnoPrizeRow, { type PrizeEditorField, type PrizeEntry, type TurnoPrizeConfig } from '@/components/admin/TurnoPrizeRow'
 import type { MecanicaPromocao, Promocao, RegrasPromocao } from '@/lib/supabase'
 
@@ -40,7 +39,6 @@ type WizardDraft = {
 }
 
 const WIZARD_DRAFT_KEY = 'central-promocoes:create-wizard:v1'
-const WIZARD_CREATED_PROMO_KEY = 'central-promocoes:create-wizard:created-promo:v1'
 
 const SHIFTS = [
   { key: 'CAFE_DA_MANHA', label: 'Café da manhã', short: 'Café' },
@@ -184,7 +182,6 @@ function Icon({ name, className = 'h-5 w-5' }: { name: 'flag' | 'calendar' | 'sp
 export default function CreatePromotionWizard() {
   const router = useRouter()
   const toast = useToast()
-  const reduceMotion = useReducedMotion()
   const [step, setStep] = useState<WizardStep>(0)
   const [nome, setNome] = useState('')
   const [descricao, setDescricao] = useState('')
@@ -203,7 +200,7 @@ export default function CreatePromotionWizard() {
   const [rulesText, setRulesText] = useState<string[]>([''])
   const [temaNinja, setTemaNinja] = useState(false)
   const [prizeGroups, setPrizeGroups] = useState(defaultPrizeGroups)
-  const [createdPromoId, setCreatedPromoId] = useState<string | null>(null)
+  const [discardConfirmOpen, setDiscardConfirmOpen] = useState(false)
   const [saving, setSaving] = useState(false)
   const [stepError, setStepError] = useState('')
   const [draftHydrated, setDraftHydrated] = useState(false)
@@ -225,12 +222,6 @@ export default function CreatePromotionWizard() {
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
       try {
-        const storedCreatedPromoId = window.sessionStorage.getItem(WIZARD_CREATED_PROMO_KEY)
-        if (storedCreatedPromoId) {
-          setCreatedPromoId(storedCreatedPromoId)
-          return
-        }
-
         const storedDraft = window.sessionStorage.getItem(WIZARD_DRAFT_KEY)
         if (storedDraft) {
           const draft = parseWizardDraft(JSON.parse(storedDraft) as unknown)
@@ -269,14 +260,6 @@ export default function CreatePromotionWizard() {
 
   useEffect(() => {
     if (!draftHydrated) return
-    if (createdPromoId) {
-      try {
-        window.sessionStorage.removeItem(WIZARD_DRAFT_KEY)
-      } catch {
-        // A campanha já criada continua acessível mesmo se o armazenamento da aba estiver indisponível.
-      }
-      return
-    }
     const draft: WizardDraft = {
       version: 1,
       step,
@@ -308,7 +291,7 @@ export default function CreatePromotionWizard() {
     } catch {
       // O wizard continua funcional mesmo se o navegador bloquear o armazenamento.
     }
-  }, [activeShift, activeShifts, cidade, createdPromoId, dataFim, dataInicio, descricao, draftHydrated, format, goalPrize, grouping, hasUserEnteredData, levels, limitRanking, metric, minimumGoal, nome, prizeGroups, rulesText, step, temaNinja])
+  }, [activeShift, activeShifts, cidade, dataFim, dataInicio, descricao, draftHydrated, format, goalPrize, grouping, hasUserEnteredData, levels, limitRanking, metric, minimumGoal, nome, prizeGroups, rulesText, step, temaNinja])
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
@@ -317,17 +300,17 @@ export default function CreatePromotionWizard() {
       const target = fieldId ? document.getElementById(fieldId) : null
       if (target instanceof HTMLElement) {
         target.focus()
-        target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' })
+        target.scrollIntoView({ behavior: 'auto', block: 'center' })
       } else if (stepError) {
         stepErrorRef.current?.focus()
-        stepErrorRef.current?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' })
+        stepErrorRef.current?.scrollIntoView({ behavior: 'auto', block: 'center' })
       } else {
         const heading = stepSectionRef.current?.querySelector<HTMLElement>('#wizard-step-title')
         heading?.focus()
       }
     })
     return () => window.cancelAnimationFrame(frame)
-  }, [focusRevision, reduceMotion, step, stepError])
+  }, [focusRevision, step, stepError])
 
   const configTurnos = useMemo(
     () => format !== 'ranking' || grouping === 'geral' ? ['GERAL'] : activeShifts,
@@ -537,7 +520,7 @@ export default function CreatePromotionWizard() {
     if (issue.shift) setActiveShift(issue.shift)
     if (issue.step !== step) {
       setStep(issue.step)
-      window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' })
+      window.scrollTo({ top: 0, behavior: 'auto' })
     }
     setStepError(issue.message)
   }
@@ -546,7 +529,7 @@ export default function CreatePromotionWizard() {
     pendingFocusFieldRef.current = null
     setStepError('')
     setStep(nextStep)
-    window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' })
+    window.scrollTo({ top: 0, behavior: 'auto' })
   }
 
   const handleNext = () => {
@@ -601,12 +584,11 @@ export default function CreatePromotionWizard() {
 
       try {
         window.sessionStorage.removeItem(WIZARD_DRAFT_KEY)
-        window.sessionStorage.setItem(WIZARD_CREATED_PROMO_KEY, result.id)
       } catch {
         // A campanha já foi criada; falha no armazenamento local não desfaz a gravação.
       }
-      setCreatedPromoId(result.id)
       toast.success('Rascunho criado. Você já pode importar os dados da campanha.')
+      router.push(`/admin/promo/${result.id}`)
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Falha de conexão ao criar a campanha.'
       pendingFocusFieldRef.current = null
@@ -625,8 +607,7 @@ export default function CreatePromotionWizard() {
     premios: [],
   }
 
-  const resetWizard = (confirmDiscard = true) => {
-    if (confirmDiscard && !window.confirm('Descartar o progresso desta campanha e começar novamente?')) return
+  const resetWizard = () => {
     pendingFocusFieldRef.current = null
     setFocusRevision((revision) => revision + 1)
     setStep(0)
@@ -651,37 +632,14 @@ export default function CreatePromotionWizard() {
     setHasRecoveredDraft(false)
     try {
       window.sessionStorage.removeItem(WIZARD_DRAFT_KEY)
-      window.sessionStorage.removeItem(WIZARD_CREATED_PROMO_KEY)
     } catch {
       // Limpar o armazenamento não é necessário para continuar após redefinir o formulário.
     }
   }
 
-  const returnToCampaigns = () => {
-    resetWizard(false)
-    setCreatedPromoId(null)
-    router.push('/admin')
-  }
-
-  const createAnotherCampaign = () => {
-    resetWizard(false)
-    setCreatedPromoId(null)
-  }
-
-  if (createdPromoId) {
-    return (
-      <PromotionCreationCompletion
-        promoId={createdPromoId}
-        onReturnToCampaigns={returnToCampaigns}
-        onCreateAnother={createAnotherCampaign}
-      />
-    )
-  }
-
   return (
-    <main className="relative min-h-[calc(100vh-3rem)] overflow-hidden bg-[#07132c] text-white">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_12%_0%,rgba(37,99,235,.12),transparent_34%),radial-gradient(ellipse_at_90%_12%,rgba(14,165,233,.08),transparent_28%)]" />
-      <div className="relative mx-auto max-w-[1280px] px-4 pb-32 pt-6 sm:px-6 lg:px-10 lg:pt-10">
+    <main className="admin-theme admin-wizard min-h-screen px-4 py-8 text-slate-950 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl pb-24">
         <header className="mb-7 flex flex-wrap items-end justify-between gap-5 border-b border-white/10 pb-6">
           <div>
             <Link href="/admin" className="mb-4 inline-flex min-h-10 items-center gap-2 rounded-lg pr-3 text-sm font-semibold text-slate-400 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">
@@ -694,7 +652,7 @@ export default function CreatePromotionWizard() {
           </div>
           <div className="flex flex-wrap items-center gap-2">
             {hasUserEnteredData && <span className="rounded-full border border-blue-300/20 bg-blue-300/[.06] px-3 py-1.5 text-xs font-semibold text-blue-100">{hasRecoveredDraft ? 'Progresso recuperado' : 'Progresso salvo'} nesta aba</span>}
-            {hasUserEnteredData && <button type="button" onClick={() => resetWizard()} className="min-h-9 rounded-lg px-2 text-xs font-semibold text-slate-400 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">Descartar progresso</button>}
+            {hasUserEnteredData && <button type="button" onClick={() => setDiscardConfirmOpen(true)} className="min-h-10 rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2">Descartar progresso</button>}
             <p className="rounded-full border border-white/10 bg-white/[.04] px-3 py-1.5 text-xs font-bold text-slate-200">Nada é publicado automaticamente</p>
           </div>
         </header>
@@ -737,16 +695,11 @@ export default function CreatePromotionWizard() {
           </details>}
           <div className={`grid items-start gap-7 ${step === 3 ? 'lg:grid-cols-[minmax(0,1fr)_minmax(340px,420px)] lg:gap-10' : 'lg:grid-cols-[minmax(0,1fr)_280px] lg:gap-10'}`}>
             <div className="min-w-0">
-              <AnimatePresence mode="wait" initial={false}>
-                <motion.section
+                <section
                   key={step}
-                  initial={reduceMotion ? false : { opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={reduceMotion ? undefined : { opacity: 0, y: -6 }}
-                  transition={{ duration: reduceMotion ? 0 : 0.2, ease: 'easeOut' }}
                   aria-labelledby="wizard-step-title"
                   ref={stepSectionRef}
-                  className="min-h-[440px] rounded-2xl border border-white/10 bg-[#0d2350]/90 p-5 shadow-[0_18px_60px_rgba(0,0,0,.25)] sm:p-7 lg:p-9"
+                  className="min-h-[440px] rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7 lg:p-9"
                 >
                   {stepError && (
                     <div ref={stepErrorRef} tabIndex={-1} role="alert" aria-live="assertive" className="mb-5 rounded-lg border border-rose-300/20 bg-rose-300/[.07] px-4 py-3 text-sm text-rose-100 focus:outline-none focus:ring-2 focus:ring-rose-300/60">
@@ -758,10 +711,10 @@ export default function CreatePromotionWizard() {
                       <StepHeading icon="flag" title="Dados da campanha" description="As informações que os entregadores vão reconhecer no cartão da promoção." />
                       <div className="mt-7 grid gap-5 sm:grid-cols-2">
                           <Field label="Nome da promoção" required hint="Até 120 caracteres" className="sm:col-span-2">
-                          <input id="campaign-name" autoFocus maxLength={120} value={nome} onChange={(event) => setNome(event.target.value)} placeholder="Ex.: Desafio de outubro" className="wizard-input text-lg font-semibold" />
+              <input id="campaign-name" autoFocus maxLength={120} value={nome} onChange={(event) => setNome(event.target.value)} placeholder="Ex.: Desafio de outubro" className="admin-input text-lg font-semibold" />
                         </Field>
                         <Field label="Cidade ou praça" hint="Opcional · aparece em destaque no card">
-                          <input id="campaign-city" maxLength={120} value={cidade} onChange={(event) => setCidade(event.target.value)} placeholder="Ex.: São Paulo" className="wizard-input" />
+                          <input id="campaign-city" maxLength={120} value={cidade} onChange={(event) => setCidade(event.target.value)} placeholder="Ex.: São Paulo" className="admin-input" />
                         </Field>
                         <fieldset className="sm:col-span-2">
                           <legend className="mb-2 text-xs font-bold text-slate-300">Tipo de campanha</legend>
@@ -776,16 +729,16 @@ export default function CreatePromotionWizard() {
                           <p className="mt-2 text-xs text-slate-400">O site publica esses três formatos usando a estrutura de competição de entregas.</p>
                         </fieldset>
                         <Field label="Descrição" hint={`${descricao.length}/280 caracteres no card`} className="sm:col-span-2">
-                          <textarea id="campaign-description" maxLength={280} rows={3} value={descricao} onChange={(event) => setDescricao(event.target.value)} placeholder="Explique rapidamente o que está em disputa." className="wizard-input min-h-24 resize-y leading-6" />
+                          <textarea id="campaign-description" maxLength={280} rows={3} value={descricao} onChange={(event) => setDescricao(event.target.value)} placeholder="Explique rapidamente o que está em disputa." className="admin-input min-h-24 resize-y leading-6" />
                         </Field>
                         <div className="sm:col-span-2">
                           <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-200"><Icon name="calendar" className="h-4 w-4 text-blue-200" /> Período da campanha</div>
                           <div className="grid gap-4 sm:grid-cols-2">
                             <Field label="Data de início">
-                              <input id="campaign-start" type="date" value={dataInicio} onChange={(event) => setDataInicio(event.target.value)} className="wizard-input [color-scheme:dark]" />
+                              <input id="campaign-start" type="date" value={dataInicio} onChange={(event) => setDataInicio(event.target.value)} className="admin-input [color-scheme:dark]" />
                             </Field>
                             <Field label="Data de término">
-                              <input id="campaign-end" type="date" value={dataFim} onChange={(event) => setDataFim(event.target.value)} className="wizard-input [color-scheme:dark]" />
+                              <input id="campaign-end" type="date" value={dataFim} onChange={(event) => setDataFim(event.target.value)} className="admin-input [color-scheme:dark]" />
                             </Field>
                           </div>
                           <p className="mt-2 text-xs text-slate-400">As datas podem ficar em aberto e ser adicionadas depois no painel.</p>
@@ -856,7 +809,7 @@ export default function CreatePromotionWizard() {
                           {rulesText.map((rule, index) => (
                             <div key={`rule-${index}`} className="flex items-start gap-2">
                               <label className="sr-only" htmlFor={`campaign-rule-${index}`}>Regra {index + 1}</label>
-                              <textarea id={`campaign-rule-${index}`} rows={2} maxLength={2000} value={rule} onChange={(event) => setRulesText((current) => current.map((item, itemIndex) => itemIndex === index ? event.target.value : item))} placeholder={`Regra ${index + 1}`} className="wizard-input min-h-14 resize-y leading-5" />
+                              <textarea id={`campaign-rule-${index}`} rows={2} maxLength={2000} value={rule} onChange={(event) => setRulesText((current) => current.map((item, itemIndex) => itemIndex === index ? event.target.value : item))} placeholder={`Regra ${index + 1}`} className="admin-input min-h-14 resize-y leading-5" />
                               {rulesText.length > 1 && <button type="button" onClick={() => setRulesText((current) => current.filter((_, itemIndex) => itemIndex !== index))} aria-label={`Remover regra ${index + 1}`} className="grid min-h-11 min-w-11 place-items-center rounded-lg text-slate-400 transition-colors hover:bg-white/[.06] hover:text-blue-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">×</button>}
                             </div>
                           ))}
@@ -898,7 +851,7 @@ export default function CreatePromotionWizard() {
 
                             <div className="mt-4 flex flex-col gap-4 rounded-xl border border-white/[.08] bg-black/20 p-4 sm:flex-row sm:items-end sm:justify-between">
                               <div><p className="text-sm font-bold text-slate-100">{shiftInfo(activeShift)?.label ?? 'Ranking geral'}</p><p className="mt-1 text-xs text-slate-400">Mínimo de corridas para ser elegível</p></div>
-                              <label className="flex items-center gap-2 text-xs text-slate-300"><span className="sr-only">Mínimo de corridas para {shiftInfo(activeShift)?.label ?? 'ranking geral'}</span><input id={`minimum-runs-${activeShift}`} type="number" min="0" max="1000000" step="1" value={visiblePrizeGroup.minimo_corridas ?? 0} onChange={(event) => updateMinimumRuns(event.target.value)} className="wizard-input w-28 !py-2 text-center tabular-nums" /> corridas</label>
+                              <label className="flex items-center gap-2 text-xs text-slate-300"><span className="sr-only">Mínimo de corridas para {shiftInfo(activeShift)?.label ?? 'ranking geral'}</span><input id={`minimum-runs-${activeShift}`} type="number" min="0" max="1000000" step="1" value={visiblePrizeGroup.minimo_corridas ?? 0} onChange={(event) => updateMinimumRuns(event.target.value)} className="admin-input w-28 !py-2 text-center tabular-nums" /> corridas</label>
                             </div>
 
                             <div className="mt-4 space-y-2">
@@ -909,15 +862,15 @@ export default function CreatePromotionWizard() {
                               {visiblePrizeGroup.premios.length === 0 && <div className="rounded-lg border border-dashed border-white/15 px-4 py-8 text-center text-sm text-slate-400">Nenhuma faixa neste turno. Adicione o primeiro prêmio acima.</div>}
                             </div>
                           </div>
-                          <label className="block max-w-xs"><span className="mb-1.5 block text-xs font-semibold text-slate-300">Limite de posições exibidas no ranking</span><input id="ranking-limit" type="number" min="1" max="500" value={limitRanking} onChange={(event) => setLimitRanking(Number(event.target.value) || 1)} className="wizard-input w-36 tabular-nums" /></label>
+                          <label className="block max-w-xs"><span className="mb-1.5 block text-xs font-semibold text-slate-300">Limite de posições exibidas no ranking</span><input id="ranking-limit" type="number" min="1" max="500" value={limitRanking} onChange={(event) => setLimitRanking(Number(event.target.value) || 1)} className="admin-input w-36 tabular-nums" /></label>
                         </div>
                       ) : format === 'metas' ? (
                         <div className="mt-7 grid gap-5 rounded-xl border border-white/[.08] bg-black/20 p-5 sm:grid-cols-2">
                           <Field label={metric === 'faturamento_taxas' ? 'Valor da meta (R$)' : 'Valor da meta'} required hint="Quanto cada entregador precisa alcançar">
-                            <input id="goal-value" type="number" min="0.01" max="100000000" step={metric === 'faturamento_taxas' ? '0.01' : '1'} value={minimumGoal} onChange={(event) => setMinimumGoal(Number(event.target.value))} className="wizard-input tabular-nums" />
+                            <input id="goal-value" type="number" min="0.01" max="100000000" step={metric === 'faturamento_taxas' ? '0.01' : '1'} value={minimumGoal} onChange={(event) => setMinimumGoal(Number(event.target.value))} className="admin-input tabular-nums" />
                           </Field>
                           <Field label="Prêmio por pessoa" required hint="Valor em reais">
-                            <div className="relative"><span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">R$</span><input id="goal-prize" type="number" min="0" max="100000000" step="0.01" value={goalPrize} onChange={(event) => setGoalPrize(Number(event.target.value))} className="wizard-input pl-10 tabular-nums" /></div>
+                            <div className="relative"><span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">R$</span><input id="goal-prize" type="number" min="0" max="100000000" step="0.01" value={goalPrize} onChange={(event) => setGoalPrize(Number(event.target.value))} className="admin-input pl-10 tabular-nums" /></div>
                           </Field>
                         </div>
                       ) : (
@@ -931,9 +884,9 @@ export default function CreatePromotionWizard() {
                           })} className="min-h-10 rounded-lg border border-blue-300/20 px-3 text-xs font-bold text-blue-100 transition-colors hover:bg-blue-300/[.08] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">+ Adicionar nível</button></div>
                           {levels.map((level, index) => (
                             <div key={level.id} className="grid gap-3 rounded-xl border border-white/[.08] bg-black/20 p-4 sm:grid-cols-[100px_minmax(0,1fr)_minmax(0,1fr)_44px] sm:items-end">
-                              <Field label="Nível"><input id={`level-${level.id}-number`} type="number" min="1" max="100" value={level.nivel} onChange={(event) => setLevels((current) => current.map((item) => item.id === level.id ? { ...item, nivel: Number(event.target.value) } : item))} className="wizard-input tabular-nums" /></Field>
-                              <Field label={metric === 'faturamento_taxas' ? 'Meta em taxas (R$)' : 'Meta'}><input id={`level-${level.id}-goal`} type="number" min="0.01" max="100000000" step={metric === 'faturamento_taxas' ? '0.01' : '1'} value={level.meta} onChange={(event) => setLevels((current) => current.map((item) => item.id === level.id ? { ...item, meta: Number(event.target.value) } : item))} className="wizard-input tabular-nums" /></Field>
-                              <Field label="Prêmio (R$)"><input id={`level-${level.id}-prize`} type="number" min="0" max="100000000" step="0.01" value={level.premio} onChange={(event) => setLevels((current) => current.map((item) => item.id === level.id ? { ...item, premio: Number(event.target.value) } : item))} className="wizard-input tabular-nums" /></Field>
+                              <Field label="Nível"><input id={`level-${level.id}-number`} type="number" min="1" max="100" value={level.nivel} onChange={(event) => setLevels((current) => current.map((item) => item.id === level.id ? { ...item, nivel: Number(event.target.value) } : item))} className="admin-input tabular-nums" /></Field>
+                              <Field label={metric === 'faturamento_taxas' ? 'Meta em taxas (R$)' : 'Meta'}><input id={`level-${level.id}-goal`} type="number" min="0.01" max="100000000" step={metric === 'faturamento_taxas' ? '0.01' : '1'} value={level.meta} onChange={(event) => setLevels((current) => current.map((item) => item.id === level.id ? { ...item, meta: Number(event.target.value) } : item))} className="admin-input tabular-nums" /></Field>
+                              <Field label="Prêmio (R$)"><input id={`level-${level.id}-prize`} type="number" min="0" max="100000000" step="0.01" value={level.premio} onChange={(event) => setLevels((current) => current.map((item) => item.id === level.id ? { ...item, premio: Number(event.target.value) } : item))} className="admin-input tabular-nums" /></Field>
                               <button type="button" disabled={levels.length <= 1} onClick={() => setLevels((current) => current.filter((item) => item.id !== level.id))} aria-label={`Remover nível ${index + 1}`} className="grid min-h-11 min-w-11 place-items-center rounded-lg text-slate-400 transition-colors hover:bg-blue-300/10 hover:text-blue-200 disabled:opacity-30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">×</button>
                             </div>
                           ))}
@@ -984,8 +937,7 @@ export default function CreatePromotionWizard() {
                       </div>
                     </>
                   )}
-                </motion.section>
-              </AnimatePresence>
+                </section>
             </div>
 
             <aside className="order-2 hidden lg:sticky lg:top-20 lg:block">
@@ -994,8 +946,8 @@ export default function CreatePromotionWizard() {
             </aside>
           </div>
 
-          <footer className="fixed inset-x-0 bottom-0 z-20 border-t border-white/10 bg-[#0a1d3e]/95 px-4 py-3 backdrop-blur-xl sm:px-6">
-            <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-3 lg:px-4">
+          <footer className="fixed inset-x-0 bottom-0 z-20 border-t border-slate-200 bg-white px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] sm:px-6">
+            <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
               <p className="hidden text-xs text-slate-400 sm:block">Etapa {step + 1} de {STEP_LABELS.length}</p>
               <div className="ml-auto flex items-center gap-2 sm:gap-3">
                 {step === 0 ? <Link href="/admin" className="inline-flex min-h-11 items-center rounded-lg px-4 text-sm font-semibold text-slate-400 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">Cancelar</Link> : <button type="button" disabled={saving} onClick={() => goToStep((step - 1) as WizardStep)} className="min-h-11 rounded-lg border border-white/10 px-4 text-sm font-semibold text-slate-200 transition-colors hover:bg-white/[.05] disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">Voltar</button>}
@@ -1005,13 +957,18 @@ export default function CreatePromotionWizard() {
           </footer>
         </form>
       </div>
-      <style jsx global>{`
-        .wizard-input { width: 100%; min-height: 46px; border: 1px solid rgba(255,255,255,.11); border-radius: 10px; background: rgba(0,0,0,.28); padding: 10px 13px; color: #f4f4f5; font-size: 14px; outline: none; transition: border-color .16s ease, background-color .16s ease, box-shadow .16s ease; }
-        .wizard-input::placeholder { color: #71717a; }
-        .wizard-input:focus { border-color: rgba(147,197,253,.75); background: rgba(0,0,0,.4); box-shadow: 0 0 0 3px rgba(147,197,253,.14); }
-        .wizard-input:disabled { cursor: not-allowed; opacity: .55; }
-        @media (prefers-reduced-motion: reduce) { .wizard-input { transition: none; } }
-      `}</style>
+      <AdminConfirmDialog
+        open={discardConfirmOpen}
+        title="Descartar o progresso da campanha?"
+        description="Os dados salvos nesta aba serão removidos e o assistente voltará ao primeiro passo."
+        confirmLabel="Descartar progresso"
+        tone="danger"
+        onCancel={() => setDiscardConfirmOpen(false)}
+        onConfirm={() => {
+          resetWizard()
+          setDiscardConfirmOpen(false)
+        }}
+      />
     </main>
   )
 }
@@ -1021,7 +978,7 @@ function StepHeading({ icon, title, description }: { icon: 'flag' | 'calendar' |
 }
 
 function Field({ label, required, hint, className = '', children }: { label: string; required?: boolean; hint?: string; className?: string; children: ReactNode }) {
-  return <label className={`block ${className}`}><span className="mb-1.5 flex items-center justify-between gap-2 text-xs font-bold text-slate-300"><span>{label}{required && <span className="ml-1 text-blue-200" aria-label="obrigatório">*</span>}</span>{hint && <span className="text-[10px] font-medium text-slate-400">{hint}</span>}</span>{children}</label>
+  return <label className={`block ${className}`}><span className="mb-1.5 flex items-center justify-between gap-2 text-xs font-bold text-slate-300"><span>{label}{required && <span className="ml-1 text-blue-200" aria-label="obrigatório">*</span>}</span>{hint && <span className="text-xs font-medium text-slate-400">{hint}</span>}</span>{children}</label>
 }
 
 function ChoiceButton({ selected, onClick, children }: { selected: boolean; onClick: () => void; children: React.ReactNode }) {
@@ -1034,5 +991,5 @@ function ThemeButton({ label, active, color, onClick }: { label: string; active:
 }
 
 function SummaryItem({ label, value }: { label: string; value: string }) {
-  return <div><dt className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{label}</dt><dd className="mt-1 text-sm font-semibold leading-5 text-slate-100">{value}</dd></div>
+  return <div><dt className="text-xs font-bold uppercase tracking-wider text-slate-400">{label}</dt><dd className="mt-1 text-sm font-semibold leading-5 text-slate-100">{value}</dd></div>
 }
