@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useToast } from '@/components/ui/Toast'
 import PromoPreviewCard from '@/components/admin/PromoPreviewCard'
 import AdminConfirmDialog from '@/components/admin/AdminConfirmDialog'
+import AdminDateInput from '@/components/admin/AdminDateInput'
 import TurnoPrizeRow, { type PrizeEditorField, type PrizeEntry, type TurnoPrizeConfig } from '@/components/admin/TurnoPrizeRow'
 import type { MecanicaPromocao, Promocao, RegrasPromocao } from '@/lib/supabase'
 
@@ -685,15 +686,15 @@ export default function CreatePromotionWizard() {
         </ol>
 
         <form onSubmit={createPromotion} noValidate>
-          {step === 3 && <details className="group mb-5 rounded-xl border border-white/10 bg-[#0d2350]/90 lg:hidden">
+          <details className="group mb-5 rounded-xl border border-white/10 bg-[#0d2350]/90 lg:hidden">
             <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 text-sm font-bold text-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 [&::-webkit-details-marker]:hidden">
               <span className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-blue-400" aria-hidden="true" />Prévia ao vivo do card público</span>
               <span className="text-xs font-semibold text-blue-200 group-open:hidden">Mostrar</span>
               <span className="hidden text-xs font-semibold text-slate-400 group-open:block">Ocultar</span>
             </summary>
             <div className="border-t border-white/[.08] p-3"><PromoPreviewCard promo={previewPromo} /></div>
-          </details>}
-          <div className={`grid items-start gap-7 ${step === 3 ? 'lg:grid-cols-[minmax(0,1fr)_minmax(340px,420px)] lg:gap-10' : 'lg:grid-cols-[minmax(0,1fr)_280px] lg:gap-10'}`}>
+          </details>
+          <div className="grid items-start gap-7 lg:grid-cols-[minmax(0,1fr)_minmax(320px,380px)] lg:gap-10">
             <div className="min-w-0">
                 <section
                   key={step}
@@ -735,10 +736,10 @@ export default function CreatePromotionWizard() {
                           <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-200"><Icon name="calendar" className="h-4 w-4 text-blue-200" /> Período da campanha</div>
                           <div className="grid gap-4 sm:grid-cols-2">
                             <Field label="Data de início">
-                              <input id="campaign-start" type="date" value={dataInicio} onChange={(event) => setDataInicio(event.target.value)} className="admin-input [color-scheme:dark]" />
+                              <AdminDateInput id="campaign-start" value={dataInicio} onChange={setDataInicio} />
                             </Field>
                             <Field label="Data de término">
-                              <input id="campaign-end" type="date" value={dataFim} onChange={(event) => setDataFim(event.target.value)} className="admin-input [color-scheme:dark]" />
+                              <AdminDateInput id="campaign-end" value={dataFim} onChange={setDataFim} />
                             </Field>
                           </div>
                           <p className="mt-2 text-xs text-slate-400">As datas podem ficar em aberto e ser adicionadas depois no painel.</p>
@@ -940,9 +941,13 @@ export default function CreatePromotionWizard() {
                 </section>
             </div>
 
-            <aside className="order-2 hidden lg:sticky lg:top-20 lg:block">
-              {step === 3 ? <PromoPreviewCard promo={previewPromo} /> : <div className="rounded-2xl border border-white/10 bg-[#0d2350]/80 p-5"><p className="text-xs font-black uppercase tracking-[.16em] text-blue-200">Seu caminho até publicar</p><ol className="mt-5 space-y-5 text-sm leading-6 text-slate-300"><li><strong className="text-white">1. Configure</strong><br />Nome, formato, regras e prêmios.</li><li><strong className="text-white">2. Revise</strong><br />Confira o resumo e crie o rascunho.</li><li><strong className="text-white">3. Importe</strong><br />Envie a planilha nesta página.</li><li><strong className="text-white">4. Publique</strong><br />Ative quando tudo estiver pronto.</li></ol></div>}
-              {step === 3 && <div className="mt-4 rounded-xl border border-white/[.08] bg-[#0d2350]/80 p-4"><p className="text-xs font-bold uppercase tracking-wider text-slate-400">Estado da campanha</p><div className="mt-2 flex items-center gap-2 text-sm font-semibold text-slate-100"><span className="h-2 w-2 rounded-full bg-blue-300" /> Rascunho · não publicado</div><p className="mt-2 text-xs leading-5 text-slate-400">Depois de criar, a planilha e a publicação aparecem nesta página.</p></div>}
+            <aside className="order-2 hidden space-y-4 lg:sticky lg:top-20 lg:block">
+              <PromoPreviewCard promo={previewPromo} />
+              <div className="rounded-xl border border-white/[.08] bg-[#0d2350]/80 p-4">
+                <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Estado da campanha</p>
+                <div className="mt-2 flex items-center gap-2 text-sm font-semibold text-slate-100"><span className="h-2 w-2 rounded-full bg-blue-300" /> Rascunho · não publicado</div>
+                <p className="mt-2 text-xs leading-5 text-slate-400">O card é atualizado enquanto você ajusta os dados e prêmios.</p>
+              </div>
             </aside>
           </div>
 

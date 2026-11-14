@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import AdminLoginScreen from '@/components/admin/AdminLoginScreen'
 import { AdminSessionProvider, useAdminSession } from '@/components/admin/AdminSessionProvider'
 
@@ -18,6 +18,35 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const { session, retrying, setAuthenticated, setUnauthenticated, retrySession } = useAdminSession()
   const [logoutError, setLogoutError] = useState('')
+  const [adminTheme, setAdminTheme] = useState<'light' | 'dark'>('light')
+
+  useEffect(() => {
+    let cancelled = false
+    try {
+      const savedTheme = window.localStorage.getItem('central-promocoes:admin-theme')
+      if (savedTheme === 'light' || savedTheme === 'dark') {
+        queueMicrotask(() => {
+          if (!cancelled) setAdminTheme(savedTheme)
+        })
+      }
+    } catch {
+      // A preferência de tema não bloqueia o acesso ao painel.
+    }
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const toggleAdminTheme = () => {
+    const nextTheme = adminTheme === 'dark' ? 'light' : 'dark'
+    setAdminTheme(nextTheme)
+    try {
+      window.localStorage.setItem('central-promocoes:admin-theme', nextTheme)
+    } catch {
+      // A mudança continua ativa nesta sessão mesmo sem armazenamento local.
+    }
+  }
 
   const handleLogout = async () => {
     setLogoutError('')
@@ -66,7 +95,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   ]
 
   return (
-    <div className="admin-shell -mt-16 min-h-screen bg-slate-50 text-slate-950">
+    <div className="admin-shell -mt-16 min-h-screen bg-slate-50 text-slate-950" data-admin-theme={adminTheme}>
       <header className="sticky top-0 z-40 border-b border-slate-200 bg-white">
         <div className="mx-auto flex min-h-16 max-w-7xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-4 py-2 sm:px-6 lg:px-8">
           <Link href="/admin" className="flex min-h-11 items-center gap-3 rounded-lg pr-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2">
@@ -91,6 +120,14 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
             <Link href="/" target="_blank" rel="noreferrer" className="inline-flex min-h-10 items-center rounded-lg px-3 text-sm font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2">
               Ver site
             </Link>
+            <button type="button" onClick={toggleAdminTheme} aria-pressed={adminTheme === 'dark'} aria-label={adminTheme === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro'} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2">
+              {adminTheme === 'dark' ? (
+                <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path strokeLinecap="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" /></svg>
+              ) : (
+                <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M20.5 15.3A8.5 8.5 0 0 1 8.7 3.5 8.5 8.5 0 1 0 20.5 15.3Z" /></svg>
+              )}
+              <span>{adminTheme === 'dark' ? 'Claro' : 'Escuro'}</span>
+            </button>
             <button type="button" onClick={() => void handleLogout()} className="inline-flex min-h-10 items-center rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2">
               Sair
             </button>

@@ -3,6 +3,7 @@
 import React from 'react'
 import { Promocao } from '@/lib/supabase'
 import { resolveRankingMetric } from '@/lib/rankingMetric'
+import AdminDateInput from '@/components/admin/AdminDateInput'
 
 interface GeneralSettingsFormProps {
   promo: Promocao
@@ -153,23 +154,11 @@ export default function GeneralSettingsForm({
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
         <div>
           <label htmlFor="geral-inicio" className="block text-xs font-bold text-slate-400 uppercase tracking-wider font-mono mb-1.5">Início</label>
-          <input
-            id="geral-inicio"
-            type="date"
-            value={promo.data_inicio || ''}
-            onChange={e => setPromo({ ...promo, data_inicio: e.target.value })}
-            className="admin-input !py-2.5 bg-[#0a1d3e]"
-          />
+          <AdminDateInput id="geral-inicio" value={promo.data_inicio || ''} onChange={value => setPromo({ ...promo, data_inicio: value })} />
         </div>
         <div>
           <label htmlFor="geral-fim" className="block text-xs font-bold text-slate-400 uppercase tracking-wider font-mono mb-1.5">Término</label>
-          <input
-            id="geral-fim"
-            type="date"
-            value={promo.data_fim || ''}
-            onChange={e => setPromo({ ...promo, data_fim: e.target.value })}
-            className="admin-input !py-2.5 bg-[#0a1d3e]"
-          />
+          <AdminDateInput id="geral-fim" value={promo.data_fim || ''} onChange={value => setPromo({ ...promo, data_fim: value })} />
         </div>
         <div>
           <label htmlFor="geral-limite" className="block text-xs font-bold text-slate-400 uppercase tracking-wider font-mono mb-1.5">Limite Ranking</label>
